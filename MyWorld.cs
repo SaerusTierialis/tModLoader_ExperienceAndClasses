@@ -8,7 +8,7 @@ namespace ExperienceAndClasses
     public class MyWorld : ModWorld
     {
         public static double TIME_BETWEEN_REQUEST_MSEC = 500;
-        public static double TIME_BETWEEN_AUTH_CODE_MSEC = 60*1000;
+        public static double TIME_BETWEEN_AUTH_CODE_MSEC = 120*1000;
 
         public static DateTime time_last_requests = DateTime.MinValue;
         public static DateTime time_last_auth_code = DateTime.MinValue;
@@ -16,15 +16,17 @@ namespace ExperienceAndClasses
         public override TagCompound Save()
         {
             return new TagCompound {
+                {"AUTH_CODE", ExperienceAndClasses.AUTH_CODE},
+                {"require_auth", ExperienceAndClasses.require_auth},
                 {"global_exp_modifier", ExperienceAndClasses.global_exp_modifier},
                 {"global_ignore_caps", ExperienceAndClasses.global_ignore_caps},
-                {"AUTH_CODE", ExperienceAndClasses.AUTH_CODE},
             };
         }
 
         public override void Load(TagCompound tag)
         {
             ExperienceAndClasses.AUTH_CODE = tag.TryGet<double>("AUTH_CODE", -1);
+            ExperienceAndClasses.require_auth = tag.TryGet<bool>("require_auth", true);
             ExperienceAndClasses.global_exp_modifier = tag.TryGet<double>("global_exp_modifier", 1);
             ExperienceAndClasses.global_ignore_caps = tag.TryGet<bool>("global_ignore_caps", false);
         }
@@ -44,7 +46,8 @@ namespace ExperienceAndClasses
 
                 if (ExperienceAndClasses.AUTH_CODE == -1) ExperienceAndClasses.AUTH_CODE = Main.rand.Next(1000) + ((Main.rand.Next(8) + 1) * 1000) + ((Main.rand.Next(8) + 1) * 10000) + ((Main.rand.Next(8) + 1) * 100000); //ExperienceAndClasses.AUTH_CODE = Math.Abs(Main.worldName.GetHashCode());
 
-                Console.WriteLine("Experience&Classes Auth Code: " + ExperienceAndClasses.AUTH_CODE);
+                if (ExperienceAndClasses.require_auth) Console.WriteLine("Experience&Classes Auth Code: " + ExperienceAndClasses.AUTH_CODE);
+                else Console.WriteLine("WARNING: Require Auth mode is disabled. To enable, enter singleplayer and type /expnoauth.");
             }
         }
 

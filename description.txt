@@ -1,8 +1,18 @@
 This mod introduces an RPG-style class and leveling system where all monsters provide experience based on their health, defense, and damage stats. Your current level and progression is presented in a movable UI box. As you level, you unlock various bonuses and progress through three tiers of classes with several choices along the way.
 
-v1.1.0 involved massive internal changes so it is possible that there will be a few bugs. If you spot any, please let me know on the forum. Thanks!
+You can now directly craft Experience Orbs at any Campfire!
 
 See forum for full patch notes.
+
+v1.1.4
+-add /expnoauth to toggle the need for auth on a map (must be used in single player mode and then load the map in multiplayer)
+-all command should now state "Invalid command or parameter." when bad parameters are given
+-disable /expcraft and /expuse (you can convert existing orbs into higher-value orbs for quick consumption) these are causing more trouble than they are worth
+-implement direct crafting of all Experience Orbs at workbench using earned experience as a replacement for /expcraft, this is done at any Campfire (to prevent confusion with other Experience Orb recipes)
+-have Ascension and Boss orbs craft into Exp Orb 100s instead of 1s (adjust exchange at each tier to 100/200, 300/600, 500/1000, 1000/2000)
+-fixed an exploitable crafting bug
+-current settings are now displayed upon entering a map
+-write auth to console every 2min (from 1min)
 
 v1.1.3
 -expauth codes are now shorter

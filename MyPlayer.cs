@@ -240,6 +240,18 @@ namespace ExperienceAndClasses
                 (mod as ExperienceAndClasses).myUI.setTrans(UI_trans);
                 (mod as ExperienceAndClasses).myUI.setPosition(UI_left, UI_top);
                 (mod as ExperienceAndClasses).myUI.updateValue(GetExp());
+
+                //settings
+                if (Main.netMode == 0)
+                {
+                    Main.NewText("Require Auth: " + ExperienceAndClasses.require_auth);
+                    Main.NewText("Experience Rate: " + (experience_modifier*100)+"%");
+                    Main.NewText("Ignore Class Caps: " + ignore_caps);
+                    if (explvlcap > 0) Main.NewText("Level Cap: " + explvlcap);
+                        else Main.NewText("Level Cap: disabled");
+                    if (expdmgred > 0) Main.NewText("Reduce Class Damamge: " + expdmgred + "%");
+                        else Main.NewText("Reduce Class Damamge: disabled");
+                }
             }
 
             base.OnEnterWorld(player);

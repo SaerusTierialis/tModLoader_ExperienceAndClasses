@@ -20,7 +20,7 @@ namespace ExperienceAndClasses.Items
 		public override void AddRecipes()
 		{
             Recipes.Methods.AddRecipes_ExpOrbConversion(mod, this, orb_value);
-            Commons.QuckRecipe(mod, new int[,] { { } }, this, 1, new Recipes.ExpRecipe(mod, exp_value));
+            Commons.QuckRecipe(mod, new int[,] { { } }, this, 1, new Recipes.ExpRecipe(mod, exp_value), TileID.Campfire);
         }
 
         public override bool UseItem(Player player)
@@ -45,7 +45,7 @@ namespace ExperienceAndClasses.Items
         public override void AddRecipes()
         {
             Recipes.Methods.AddRecipes_ExpOrbConversion(mod, this, orb_value);
-            Commons.QuckRecipe(mod, new int[,] { { } }, this, 1, new Recipes.ExpRecipe(mod, exp_value));
+            Commons.QuckRecipe(mod, new int[,] { { } }, this, 1, new Recipes.ExpRecipe(mod, exp_value), TileID.Campfire);
 
             /*~~~~~~~~~~~~~~~~~~~~~~~~Tier I Exchange Rates~~~~~~~~~~~~~~~~~~~~~~~~*/
             Commons.QuckRecipe(mod, new int[,] { { mod.ItemType("Boss_Orb"), 1 } }, this, 2, new Recipes.TierRecipe(mod, 1, true, false, -1, -1));
@@ -81,7 +81,7 @@ namespace ExperienceAndClasses.Items
         public override void AddRecipes()
         {
             Recipes.Methods.AddRecipes_ExpOrbConversion(mod, this, orb_value);
-            Commons.QuckRecipe(mod, new int[,] { { } }, this, 1, new Recipes.ExpRecipe(mod, exp_value));
+            Commons.QuckRecipe(mod, new int[,] { { } }, this, 1, new Recipes.ExpRecipe(mod, exp_value), TileID.Campfire);
 
             /*~~~~~~~~~~~~~~~~~~~~~~~~Tier 3 Exchange Rates~~~~~~~~~~~~~~~~~~~~~~~~*/
             Commons.QuckRecipe(mod, new int[,] { { mod.ItemType("Boss_Orb"), 1 } }, this, 1, new Recipes.TierRecipe(mod, 3, false, false, -1, 49));
@@ -113,7 +113,7 @@ namespace ExperienceAndClasses.Items
         public override void AddRecipes()
         {
             Recipes.Methods.AddRecipes_ExpOrbConversion(mod, this, orb_value);
-            Commons.QuckRecipe(mod, new int[,] { { } }, this, 1, new Recipes.ExpRecipe(mod, exp_value));
+            Commons.QuckRecipe(mod, new int[,] { { } }, this, 1, new Recipes.ExpRecipe(mod, exp_value), TileID.Campfire);
         }
 
         public override bool UseItem(Player player)
@@ -138,7 +138,7 @@ namespace ExperienceAndClasses.Items
         public override void AddRecipes()
         {
             Recipes.Methods.AddRecipes_ExpOrbConversion(mod, this, orb_value);
-            Commons.QuckRecipe(mod, new int[,] { { } }, this, 1, new Recipes.ExpRecipe(mod, exp_value));
+            Commons.QuckRecipe(mod, new int[,] { { } }, this, 1, new Recipes.ExpRecipe(mod, exp_value), TileID.Campfire);
         }
 
         public override bool UseItem(Player player)
@@ -163,7 +163,7 @@ namespace ExperienceAndClasses.Items
         public override void AddRecipes()
         {
             Recipes.Methods.AddRecipes_ExpOrbConversion(mod, this, orb_value);
-            Commons.QuckRecipe(mod, new int[,] { { } }, this, 1, new Recipes.ExpRecipe(mod, exp_value));
+            Commons.QuckRecipe(mod, new int[,] { { } }, this, 1, new Recipes.ExpRecipe(mod, exp_value), TileID.Campfire);
         }
 
         public override bool UseItem(Player player)

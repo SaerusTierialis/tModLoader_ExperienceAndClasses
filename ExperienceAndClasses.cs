@@ -47,6 +47,7 @@ namespace ExperienceAndClasses
 
         //for multiplayer only
         public static double AUTH_CODE = -1;
+        public static bool require_auth = true;
         public static double global_exp_modifier = 1;
         public static bool global_ignore_caps = false;
 
@@ -534,8 +535,17 @@ namespace ExperienceAndClasses
                         PacketSend_ServerFullExpList(ind_new_player, -1);
                     }
 
-                    player = Main.player[ind_new_player];
-                    if (TRACE) NetMessage.SendData(25, -1, -1, "TRACE:Recieved ClientTellExperience from player #" + player.whoAmI + ":" + player.name+" = "+ player.GetModPlayer<MyPlayer>(this).experience+" (has found first orb:"+ player.GetModPlayer<MyPlayer>(this).has_looted_monster_orb+")", 255, 255, 0, 255, 0);
+                    //tell the players the current settings
+                    string lvlcap, dmgred;
+                    if (myPlayer.explvlcap > 0) lvlcap = myPlayer.explvlcap.ToString();
+                        else lvlcap = "disabled";
+                    if (myPlayer.expdmgred > 0) dmgred = myPlayer.expdmgred.ToString() +"%";
+                        else dmgred = "disabled";
+                    NetMessage.SendData(25, player.whoAmI, -1, "Require Auth: "+require_auth+"\nExperience Rate: "+(global_exp_modifier *100)+ 
+                        "%\nIgnore Class Caps: "+global_ignore_caps+"\nLevel Cap: "+ lvlcap + "\nClass Damage Reduction: "+
+                        dmgred, 255, 255, 255, 0, 0);
+
+                    if (TRACE) NetMessage.SendData(25, -1, -1, "TRACE:Recieved ClientTellExperience from player #" + ind_new_player + ":" + player.name+" = "+ player.GetModPlayer<MyPlayer>(this).experience+" (has found first orb:"+ player.GetModPlayer<MyPlayer>(this).has_looted_monster_orb+")", 255, 255, 0, 255, 0);
                     break;
 
                 //Server telling player that they have now recieved their first Ascension Orb
@@ -587,7 +597,7 @@ namespace ExperienceAndClasses
                     text = reader.ReadString();
                     //act
                     myPlayer = player.GetModPlayer<MyPlayer>(this);
-                    if (myPlayer.auth)
+                    if (myPlayer.auth || !require_auth)
                     {
                         myPlayer.AddExp(exp_add);
                         Console.WriteLine("Accepted command request from player #" + player.whoAmI + ":" + player.name + " " + text);
@@ -609,7 +619,7 @@ namespace ExperienceAndClasses
                     text = reader.ReadString();
                     //act
                     myPlayer = player.GetModPlayer<MyPlayer>(this);
-                    if (myPlayer.auth)
+                    if (myPlayer.auth || !require_auth)
                     {
                         global_exp_modifier = exprate;
                         Console.WriteLine("Accepted command request from player #" + player.whoAmI + ":" + player.name + " " + text);
@@ -634,7 +644,7 @@ namespace ExperienceAndClasses
                     text = reader.ReadString();
                     //act
                     myPlayer = player.GetModPlayer<MyPlayer>(this);
-                    if (myPlayer.auth)
+                    if (myPlayer.auth || !require_auth)
                     {
                         global_ignore_caps = new_bool;
                         Console.WriteLine("Accepted command request from player #" + player.whoAmI + ":" + player.name + " " + text);
@@ -643,7 +653,7 @@ namespace ExperienceAndClasses
                         PacketSend_ServerToggleCap(global_ignore_caps);
 
                         //announce
-                        NetMessage.SendData(25, -1, -1, "IGNORE CLASS CAPS:"+ global_ignore_caps, 255, 255, 255, 0, 0);
+                        NetMessage.SendData(25, -1, -1, "Ignore Class Caps:"+ global_ignore_caps, 255, 255, 255, 0, 0);
                     }
                     else
                     {
@@ -723,14 +733,14 @@ namespace ExperienceAndClasses
                     myPlayer = player.GetModPlayer<MyPlayer>(this);
                     if (code == -1 || myPlayer.auth)
                     {
-                        NetMessage.SendData(25, player.whoAmI, -1, "AUTH:" + myPlayer.auth, 255, 255, 255, 0, 0);
+                        NetMessage.SendData(25, player.whoAmI, -1, "Auth:" + myPlayer.auth, 255, 255, 255, 0, 0);
                     }
                     else 
                     {
                         if (AUTH_CODE == code)
                         {
                             myPlayer.auth = true;
-                            NetMessage.SendData(25, player.whoAmI, -1, "AUTH:" + myPlayer.auth, 255, 255, 255, 0, 0);
+                            NetMessage.SendData(25, player.whoAmI, -1, "Auth:" + myPlayer.auth, 255, 255, 255, 0, 0);
                             Console.WriteLine("Accepted auth attempt from player #" + player.whoAmI + ":" + player.name + " " + code);
                         }
                         else
@@ -901,6 +911,20 @@ namespace ExperienceAndClasses
             {
                 PacketSend_ClientUpdateDmgRed(damage_reduction_percent);
                 Main.NewText("Request to change damage reduction to " + damage_reduction_percent + "% has been sent to the server.");
+            }
+        }
+
+        public void CommandRequireAuth()
+        {
+            if (Main.netMode != 0)
+            {
+                Main.NewText("This command functions only in singleplayer mode.");
+            }
+            else
+            {
+                require_auth = !require_auth;
+                if (require_auth) Main.NewText("Require Auth has been enabled. This map will now require auth in multiplayer mode.");
+                else Main.NewText("Require Auth has been disabled. This map will no longer require auth in multiplayer mode.");
             }
         }
 
@@ -1159,6 +1183,10 @@ namespace ExperienceAndClasses
                 {
                     if (localMyPlayer.expdmgred == -1) Main.NewText("Damage reduction is disabled.");
                     else Main.NewText("Damage reduction is " + localMyPlayer.expdmgred + "%.");
+                }
+                else if (command == "expnoauth")
+                {
+                    CommandRequireAuth();
                 }
                 else
                 {
