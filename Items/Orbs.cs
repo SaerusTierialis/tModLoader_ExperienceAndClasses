@@ -7,8 +7,8 @@ namespace ExperienceAndClasses.Items
     /* Experience Orb x1 */
 	public class Experience : ModItem
 	{
-        static int orb_value = 1;
-        static double exp_value = ExperienceAndClasses.EXP_ITEM_VALUE * orb_value;
+        const int orb_value = 1;
+        const double exp_value = ExperienceAndClasses.EXP_ITEM_VALUE * orb_value;
 
         public override void SetDefaults()
 		{
@@ -33,8 +33,8 @@ namespace ExperienceAndClasses.Items
     /* Experience Orb x100 */
     public class Experience100 : ModItem
     {
-        static int orb_value = 100;
-        static double exp_value = ExperienceAndClasses.EXP_ITEM_VALUE * orb_value;
+        const int orb_value = 100;
+        const double exp_value = ExperienceAndClasses.EXP_ITEM_VALUE * orb_value;
 
         public override void SetDefaults()
         {
@@ -69,8 +69,8 @@ namespace ExperienceAndClasses.Items
     /* Experience Orb x1000 */
     public class Experience1000 : ModItem
     {
-        static int orb_value = 1000;
-        static double exp_value = ExperienceAndClasses.EXP_ITEM_VALUE * orb_value;
+        const int orb_value = 1000;
+        const double exp_value = ExperienceAndClasses.EXP_ITEM_VALUE * orb_value;
 
         public override void SetDefaults()
         {
@@ -101,8 +101,8 @@ namespace ExperienceAndClasses.Items
     /* Experience Orb x10,000 */
     public class Experience10000 : ModItem
     {
-        static int orb_value = 10000;
-        static double exp_value = ExperienceAndClasses.EXP_ITEM_VALUE * orb_value;
+        const int orb_value = 10000;
+        const double exp_value = ExperienceAndClasses.EXP_ITEM_VALUE * orb_value;
 
         public override void SetDefaults()
         {
@@ -126,8 +126,8 @@ namespace ExperienceAndClasses.Items
     /* Experience Orb x100,000 */
     public class Experience100000 : ModItem
     {
-        static int orb_value = 100000;
-        static double exp_value = ExperienceAndClasses.EXP_ITEM_VALUE * orb_value;
+        const int orb_value = 100000;
+        const double exp_value = ExperienceAndClasses.EXP_ITEM_VALUE * orb_value;
 
         public override void SetDefaults()
         {
@@ -151,8 +151,8 @@ namespace ExperienceAndClasses.Items
     /* Experience Orb x1,000,000 */
     public class Experience1000000 : ModItem
     {
-        static int orb_value = 1000000;
-        static double exp_value = ExperienceAndClasses.EXP_ITEM_VALUE * orb_value;
+        const int orb_value = 1000000;
+        const double exp_value = ExperienceAndClasses.EXP_ITEM_VALUE * orb_value;
 
         public override void SetDefaults()
         {

@@ -7,8 +7,8 @@ namespace ExperienceAndClasses
 {
     public class MyWorld : ModWorld
     {
-        public static double TIME_BETWEEN_REQUEST_MSEC = 500;
-        public static double TIME_BETWEEN_AUTH_CODE_MSEC = 120*1000;
+        public const double TIME_BETWEEN_REQUEST_MSEC = 500;
+        public const double TIME_BETWEEN_AUTH_CODE_MSEC = 120*1000;
 
         public static DateTime time_last_requests = DateTime.MinValue;
         public static DateTime time_last_auth_code = DateTime.MinValue;
@@ -33,29 +33,33 @@ namespace ExperienceAndClasses
 
         public override void PostUpdate()
         {
-            //initial experience sync
+            //initial client experience and settings sync
             if (DateTime.Now.AddMilliseconds(-TIME_BETWEEN_REQUEST_MSEC).CompareTo(time_last_requests) > 0)
             {
                 time_last_requests = DateTime.Now;
-                doExpRequests();
+                doClientRequests();
             }
             //write auth code to console
             else if (DateTime.Now.AddMilliseconds(-TIME_BETWEEN_AUTH_CODE_MSEC).CompareTo(time_last_auth_code) > 0)
             {
+                //update time of write
                 time_last_auth_code = DateTime.Now;
 
-                if (ExperienceAndClasses.AUTH_CODE == -1) ExperienceAndClasses.AUTH_CODE = Main.rand.Next(1000) + ((Main.rand.Next(8) + 1) * 1000) + ((Main.rand.Next(8) + 1) * 10000) + ((Main.rand.Next(8) + 1) * 100000); //ExperienceAndClasses.AUTH_CODE = Math.Abs(Main.worldName.GetHashCode());
+                //create AUTH_CODE if it doesn't exist yet (first time map is run)
+                if (ExperienceAndClasses.AUTH_CODE == -1) ExperienceAndClasses.AUTH_CODE = Main.rand.Next(1000) + ((Main.rand.Next(8) + 1) * 1000) + ((Main.rand.Next(8) + 1) * 10000) + ((Main.rand.Next(8) + 1) * 100000);
 
+                //write
                 if (ExperienceAndClasses.require_auth) Console.WriteLine("Experience&Classes Auth Code: " + ExperienceAndClasses.AUTH_CODE);
                 else Console.WriteLine("WARNING: Require Auth mode is disabled. To enable, enter singleplayer and type /expnoauth.");
             }
         }
 
         /// <summary>
-        /// Looks for active players who have not done the initial experience sync and sends the request.
-        /// Requests are limited to once every TIME_BETWEEN_REQUEST_MSEC.
+        /// Looks for active players who have not done the initial sync and sends the request.
+        /// Requests are repeated once every TIME_BETWEEN_REQUEST_MSEC until the response is received
+        /// (indicated by experience values other than -1).
         /// </summary>
-        public void doExpRequests()
+        public void doClientRequests()
         {
             MyPlayer myPlayer;
             //DateTime target_time = DateTime.Now.AddMilliseconds(-TIME_BETWEEN_REQUEST_MSEC);
@@ -69,7 +73,7 @@ namespace ExperienceAndClasses
                         //request experience from player
                         (mod as ExperienceAndClasses).PacketSend_ServerRequestExperience(i);
 
-                        //also share class caps status
+                        //also share class caps status to ensure that token tooltips are correct
                         (mod as ExperienceAndClasses).PacketSend_ServerToggleCap(ExperienceAndClasses.global_ignore_caps);
                     }
                 }

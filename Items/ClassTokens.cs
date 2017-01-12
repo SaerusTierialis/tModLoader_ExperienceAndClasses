@@ -10,21 +10,21 @@ namespace ExperienceAndClasses.Items
     {
         //public static int TOKEN_LIMIT = 1;
 
-        public static int LAST_AT_LEVEL = 100; //highest "At Level X" bonus
-        public static float AURA_DISTANCE = 1000f;
+        public const int LAST_AT_LEVEL = 100; //highest "At Level X" bonus
+        public const float AURA_DISTANCE = 1000f;
 
-        public static int aura_update_MSEC = 500;
-        public static int aura_update_buff_TICKS = 50;
+        public const int AURA_UPDATE_MSEC = 500;
+        public const int AURA_UPDATE_BUFF_TICKS = 50;
 
         public static long TIME_START = new DateTime(2017, 1, 1).Ticks;
 
-        public static int time_ind_aura = 0;
-        public static int time_ind_aura_ichor = 1;
-        public static int time_ind_aura_life = 2;
-        public static int time_ind_aura_damage = 3;
-        public static int time_ind_self_life = 4;
-        public static int time_ind_self_mana = 5;
-        public static int NUMBER_TIME_IND = 6;
+        public const int TIME_IND_AURA = 0;
+        public const int TIME_IND_AURA_ICHOR = 1;
+        public const int TIME_IND_AURA_LIFE = 2;
+        public const int TIME_IND_AURA_DAMAGE = 3;
+        public const int TIME_IND_SELF_LIFE = 4;
+        public const int TIME_IND_SELF_MANA = 5;
+        public const int NUMBER_TIME_IND = 6;
 
         public static double[,] time_next = new double[256,NUMBER_TIME_IND]; //this is a poor use of memory, but moving it to MyPlayer causes several issues
 
@@ -485,7 +485,7 @@ namespace ExperienceAndClasses.Items
             
             //reapply aura buff indicators?
             bool aura_update = false;
-            if (apply && TimeReady(player.whoAmI, time_ind_aura, aura_update_MSEC, true)) aura_update = true;
+            if (apply && TimeReady(player.whoAmI, TIME_IND_AURA, AURA_UPDATE_MSEC, true)) aura_update = true;
 
             /* Reduction From expdmgred */
             string reduction = "";
@@ -1024,7 +1024,7 @@ namespace ExperienceAndClasses.Items
                     float heal;
                     bool do_aura = false;
 
-                    if (TimeReady(player.whoAmI, time_ind_aura_life, periodicPartyHeal_TIME_MSEC,true))
+                    if (TimeReady(player.whoAmI, TIME_IND_AURA_LIFE, periodicPartyHeal_TIME_MSEC,true))
                     {
                         do_aura = true;
                     }
@@ -1040,7 +1040,7 @@ namespace ExperienceAndClasses.Items
                             if (player.Distance(allie.position) < AURA_DISTANCE)
                             {
                                 //add icon
-                                if (aura_update) allie.AddBuff(mod.BuffType("Aura_Life"), aura_update_buff_TICKS);
+                                if (aura_update) allie.AddBuff(mod.BuffType("Aura_Life"), AURA_UPDATE_BUFF_TICKS);
 
                                 //heal
                                 if (do_aura)
@@ -1096,7 +1096,7 @@ namespace ExperienceAndClasses.Items
             {
                 if (apply)
                 {
-                    if (TimeReady(player.whoAmI, time_ind_aura_ichor, periodicIchorAura_TIME_MSEC,true))
+                    if (TimeReady(player.whoAmI, TIME_IND_AURA_ICHOR, periodicIchorAura_TIME_MSEC,true))
                     {
                         NPC[] npcs = Main.npc;
                         for (int npcIndex = 0; npcIndex < npcs.Length; npcIndex++)
@@ -1121,7 +1121,7 @@ namespace ExperienceAndClasses.Items
                 float dmgAmt = (periodicDmgAura * level); // - ((periodicDmgAura_LEVEL-1) * periodicDmgAura);
                 if (apply)
                 {
-                    if (TimeReady(player.whoAmI, time_ind_aura_damage, periodicDmgAura_TIME_MSEC,true))
+                    if (TimeReady(player.whoAmI, TIME_IND_AURA_DAMAGE, periodicDmgAura_TIME_MSEC,true))
                     {
                         NPC[] npcs = Main.npc;
                         for (int npcIndex = 0; npcIndex < npcs.Length; npcIndex++)
@@ -1179,7 +1179,7 @@ namespace ExperienceAndClasses.Items
                                      (buffInd == mod.BuffType("Aura_Defense2") && player.FindBuffIndex(mod.BuffType("Aura_Defense3")) == -1) || 
                                      (buffInd == mod.BuffType("Aura_Defense3")))
                                 {
-                                    if (aura_update) allie.AddBuff(buffInd, aura_update_buff_TICKS);
+                                    if (aura_update) allie.AddBuff(buffInd, AURA_UPDATE_BUFF_TICKS);
                                 }
                             }
                         }
@@ -1196,7 +1196,7 @@ namespace ExperienceAndClasses.Items
                 int amt = 0;
                 regenAmt = regenAmt * player.statLifeMax2;
 
-                if (apply && TimeReady(player.whoAmI, time_ind_self_life, periodicLifePercent_TIME_MSEC,true))
+                if (apply && TimeReady(player.whoAmI, TIME_IND_SELF_LIFE, periodicLifePercent_TIME_MSEC,true))
                 {
                     if (player.statLife<player.statLifeMax2)
                     {
@@ -1223,7 +1223,7 @@ namespace ExperienceAndClasses.Items
                 int amt = 0;
                 regenAmt = regenAmt * player.statManaMax2;
 
-                if (TimeReady(player.whoAmI, time_ind_self_mana, periodicManaPercent_TIME_MSEC,true))
+                if (TimeReady(player.whoAmI, TIME_IND_SELF_MANA, periodicManaPercent_TIME_MSEC,true))
                 {
                     if (player.statMana < player.statManaMax2)
                     {

@@ -43,6 +43,7 @@
     <Compile Include="MyPlayer.cs" />
     <Compile Include="MyWorld.cs" />
     <Compile Include="NPCs\MyGlobalNPC.cs" />
+    <Compile Include="MyProjectile.cs" />
     <Compile Include="Recipes\Recipes.cs" />
     <Compile Include="UI\MyUI.cs" />
   </ItemGroup>
@@ -67,6 +68,9 @@
     <Reference Include="Terraria">
       <HintPath>C:\Program Files (x86)\Steam\steamapps\common\terraria\Terraria.exe</HintPath>
     </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Projectiles\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

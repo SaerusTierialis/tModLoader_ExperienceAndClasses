@@ -39,9 +39,9 @@ namespace ExperienceAndClasses
         internal MyUI myUI;
 
         //EXP
+        public const int MAX_LEVEL = 3000;
+        public const double EXP_ITEM_VALUE = 1;
         public static double[] EARLY_EXP_REQ = new double[] { 0, 0, 10, 25, 50, 75, 100, 125, 150, 200, 350 };//{0, 0, 100, 250, 500, 750, 1000, 1500, 2000, 2500, 3000};
-        public static int MAX_LEVEL = 3000;
-        public static double EXP_ITEM_VALUE = 1;
         public static double[] EXP_REQ = new double[MAX_LEVEL + 1];
         public static double[] EXP_REQ_TOTAL = new double[MAX_LEVEL + 1];
 
@@ -72,19 +72,6 @@ namespace ExperienceAndClasses
             myUserInterface.SetState(myUI);
             MyUI.visible = true;
         }
-		
-        /*
-        public override void AddRecipeGroups()
-        {
-            RecipeGroup group = new RecipeGroup(() => "Either Boss or Monster Orb", new int[]
-            {
-                ItemType("Any_Orb"),
-                ItemType("Boss_Orb"),
-                ItemType("Monster_Orb")
-            });
-            RecipeGroup.RegisterGroup("ExperienceAndClasses:Orb", group);
-        }
-        */
 
         /* ~~~~~~~~~~~~~~~~~~~~~ Experience ~~~~~~~~~~~~~~~~~~~~~ */
 
@@ -111,7 +98,6 @@ namespace ExperienceAndClasses
                 EXP_REQ_TOTAL[lvl] = total;
             }
         }
-
 
         /// <summary>
         /// return the amount of exp required for given level (optionally returns the total exp required instead)

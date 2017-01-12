@@ -48,11 +48,11 @@ namespace ExperienceAndClasses.NPCs
                                 //announce
                                 if (Main.netMode == 0)
                                 {
-                                    Main.NewText("You have found a Boss Orb!");
+                                    Main.NewText("A Boss Orb has dropped!");
                                 }
                                 else if (Main.netMode == 2)
                                 {
-                                    NetMessage.SendData(25, -1, -1, Main.player[playerIndex].name + " has found a Boss Orb!", 255, 233, 36, 91, 0);
+                                    NetMessage.SendData(25, -1, -1,  "A Boss Orb has dropped for "+ Main.player[playerIndex].name+"!", 255, 233, 36, 91, 0);
                                 }
                                 //item
                                 Item.NewItem((int)npc.position.X, (int)npc.position.Y, npc.width, npc.height, mod.ItemType("Boss_Orb"));
@@ -87,11 +87,11 @@ namespace ExperienceAndClasses.NPCs
                                 //announce
                                 if (Main.netMode == 0)
                                 {
-                                    Main.NewText("You have found an Ascension Orb!");
+                                    Main.NewText("An Ascension Orb has dropped!");
                                 }
                                 else if (Main.netMode == 2)
                                 {
-                                    NetMessage.SendData(25, -1, -1, player.name + " has found an Ascension Orb!", 255, 4, 195, 249, 0);
+                                    NetMessage.SendData(25, -1, -1, "An Ascension Orb has dropped for "+ player.name+"!", 255, 4, 195, 249, 0);
                                 }
                                 //item
                                 Item.NewItem((int)npc.position.X, (int)npc.position.Y, npc.width, npc.height, mod.ItemType("Monster_Orb"));

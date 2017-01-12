@@ -5,7 +5,7 @@ namespace ExperienceAndClasses.Buffs
 {
     class Aura_Defense1 : ModBuff
     {
-        public static int bonus = 5;
+        public const int bonus = 5;
 
         public override void SetDefaults()
         {
@@ -24,7 +24,7 @@ namespace ExperienceAndClasses.Buffs
 
     class Aura_Defense2 : ModBuff
     {
-        public static int bonus = 10;
+        public const int bonus = 10;
 
         public override void SetDefaults()
         {
@@ -43,7 +43,7 @@ namespace ExperienceAndClasses.Buffs
 
     class Aura_Defense3 : ModBuff
     {
-        public static int bonus = 15;
+        public const int bonus = 15;
 
         public override void SetDefaults()
         {
@@ -63,8 +63,6 @@ namespace ExperienceAndClasses.Buffs
     //NOTE: does not do the actual healing
     class Aura_Life : ModBuff
     {
-        public static int bonus = 15;
-
         public override void SetDefaults()
         {
             Main.buffName[Type] = "Life Aura";
