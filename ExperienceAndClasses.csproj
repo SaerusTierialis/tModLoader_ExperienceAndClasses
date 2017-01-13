@@ -40,6 +40,9 @@
     <Compile Include="Items\ClassTokens.cs" />
     <Compile Include="Items\Orbs.cs" />
     <Compile Include="ExperienceAndClasses.cs" />
+    <Compile Include="Methods\ChatCommands.cs" />
+    <Compile Include="Methods\Experience.cs" />
+    <Compile Include="Methods\PacketSender.cs" />
     <Compile Include="MyPlayer.cs" />
     <Compile Include="MyWorld.cs" />
     <Compile Include="NPCs\Helpers.cs" />

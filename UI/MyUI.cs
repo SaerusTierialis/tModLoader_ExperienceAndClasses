@@ -143,9 +143,9 @@ namespace ExperienceAndClasses.UI
             float shopx = innerDimensions.X - 2f;
             float shopy = innerDimensions.Y - 5f;
 
-            int level = ExperienceAndClasses.GetLevel(exp);
-            double exp_have = ExperienceAndClasses.GetExpTowardsNextLevel(exp);
-            double exp_need = ExperienceAndClasses.GetExpReqForLevel(level+1,false);
+            int level = Methods.Experience.GetLevel(exp);
+            double exp_have = Methods.Experience.GetExpTowardsNextLevel(exp);
+            double exp_need = Methods.Experience.GetExpReqForLevel(level+1,false);
             float pct = (float)(exp_have / exp_need);
             float pctShow = (float)Math.Round((double)pct * 100, 2);
             if (pctShow == 100) pctShow = 99.99f;

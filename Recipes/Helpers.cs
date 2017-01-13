@@ -27,7 +27,7 @@ namespace ExperienceAndClasses.Recipes
                     else
                     {
                         //tell server to reduce experience
-                        (mod as ExperienceAndClasses).PacketSend_ClientTellAddExp(-experience_needed);
+                        Methods.PacketSender.ClientTellAddExp(-experience_needed);
                     }
                 }
 
@@ -85,7 +85,7 @@ namespace ExperienceAndClasses.Recipes
         {
             //experience required
             double experience_required = 0;
-            if (tier > 0 && tier < TIER_LEVEL_REQUIREMENTS.Length) experience_required = ExperienceAndClasses.GetExpReqForLevel(TIER_LEVEL_REQUIREMENTS[tier], true);
+            if (tier > 0 && tier < TIER_LEVEL_REQUIREMENTS.Length) experience_required = Methods.Experience.GetExpReqForLevel(TIER_LEVEL_REQUIREMENTS[tier], true);
 
             //use ClassRecipe as starting point
             ModRecipe recipe = new ClassRecipes2(mod, experience_required);

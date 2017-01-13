@@ -11,7 +11,7 @@ namespace ExperienceAndClasses
 {
     public class MyPlayer : ModPlayer
     {
-        public static double MAX_EXPERIENCE = ExperienceAndClasses.GetExpReqForLevel(ExperienceAndClasses.MAX_LEVEL, true);
+        public static double MAX_EXPERIENCE = Methods.Experience.GetExpReqForLevel(ExperienceAndClasses.MAX_LEVEL, true);
 
         public bool auth = false;
 
@@ -85,7 +85,7 @@ namespace ExperienceAndClasses
             }
 
             double priorExp = GetExp();
-            int priorLevel = ExperienceAndClasses.GetLevel(GetExp());
+            int priorLevel = Methods.Experience.GetLevel(GetExp());
             experience = xp;
             LimitExp();
             LevelUp(priorLevel);
@@ -93,7 +93,7 @@ namespace ExperienceAndClasses
             //if server, tell client
             if (Main.netMode == 2)
             {
-                (mod as ExperienceAndClasses).PacketSend_ServerForceExperience(player);
+                Methods.PacketSender.ServerForceExperience(player);
             }
             else if (Main.netMode==0)
             {
@@ -114,7 +114,7 @@ namespace ExperienceAndClasses
 
             if (explvlcap!=-1)
             {
-                double exp_cap = ExperienceAndClasses.GetExpReqForLevel(explvlcap, true);
+                double exp_cap = Methods.Experience.GetExpReqForLevel(explvlcap, true);
                 if (experience > exp_cap) experience = exp_cap;
             }
         }
@@ -128,7 +128,7 @@ namespace ExperienceAndClasses
             /*~~~~~~~~~~~~~~~~~~~~~~Single Player and Server Only~~~~~~~~~~~~~~~~~~~~~~*/
             if (Main.netMode == 1) return;
 
-            int level = ExperienceAndClasses.GetLevel(GetExp());
+            int level = Methods.Experience.GetLevel(GetExp());
             if (level>prior_level)
             {
                 if (Main.netMode == 0) Main.NewText("You have reached level " + level + "!");
@@ -270,7 +270,7 @@ namespace ExperienceAndClasses
         public override void PostUpdateEquips()
         {
             //class
-            string job = ExperienceAndClasses.GetClass(player);
+            string job = Methods.Experience.GetClass(player);
 
             /*
             if (job.Equals("No Class"))
@@ -317,10 +317,10 @@ namespace ExperienceAndClasses
             /*~~~~~~~~~~~~~~~~~~~~~~Single Player and Server Only~~~~~~~~~~~~~~~~~~~~~~*/
             if (!pvp && (Main.netMode==0 || Main.netMode==2))
             {
-                int level = ExperienceAndClasses.GetLevel(GetExp());
+                int level = Methods.Experience.GetLevel(GetExp());
 
-                double max_loss = ExperienceAndClasses.GetExpReqForLevel(level + 1, false) * 0.1;
-                double exp_so_far = ExperienceAndClasses.GetExpTowardsNextLevel(GetExp());
+                double max_loss = Methods.Experience.GetExpReqForLevel(level + 1, false) * 0.1;
+                double exp_so_far = Methods.Experience.GetExpTowardsNextLevel(GetExp());
 
                 double exp_loss = max_loss;
                 if (exp_so_far < max_loss)

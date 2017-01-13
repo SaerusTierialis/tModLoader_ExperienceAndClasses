@@ -471,7 +471,7 @@ namespace ExperienceAndClasses.Items
             if (Main.netMode == 1) ignore_caps = ExperienceAndClasses.global_ignore_caps;
 
             //get level
-            int level = ExperienceAndClasses.GetLevel(experience);
+            int level = Methods.Experience.GetLevel(experience);
 
             //reduce effective level if multiclassing
             int number_classes = CountClasses(player);

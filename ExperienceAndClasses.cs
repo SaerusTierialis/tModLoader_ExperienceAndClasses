@@ -54,7 +54,7 @@ namespace ExperienceAndClasses
         //const
         public ExperienceAndClasses()
         {
-            CalcExpReqs();
+            Methods.Experience.CalcExpReqs();
             Properties = new ModProperties()
             {
                 Autoload = true,
@@ -71,411 +71,6 @@ namespace ExperienceAndClasses
             myUserInterface = new UserInterface();
             myUserInterface.SetState(myUI);
             MyUI.visible = true;
-        }
-
-        /* ~~~~~~~~~~~~~~~~~~~~~ Experience ~~~~~~~~~~~~~~~~~~~~~ */
-
-        /// <summary>
-        /// calculate experience requirements, call only once
-        /// </summary>
-        public static void CalcExpReqs()
-        {
-            double adjust = 0;
-            double total = 0;
-            for (int lvl = 0; lvl <= MAX_LEVEL; lvl++)
-            {
-                if (lvl < EARLY_EXP_REQ.Length)
-                {
-                    EXP_REQ[lvl] = EARLY_EXP_REQ[lvl];
-                }
-                else
-                {
-                    adjust = ((double)lvl - (EARLY_EXP_REQ.Length)) / 100;
-                    if (adjust > 0.32) adjust = 0.32;
-                    EXP_REQ[lvl] = Math.Round(EXP_REQ[lvl - 1] * (1.35 - adjust), 0);
-                }
-                total += EXP_REQ[lvl];
-                EXP_REQ_TOTAL[lvl] = total;
-            }
-        }
-
-        /// <summary>
-        /// return the amount of exp required for given level (optionally returns the total exp required instead)
-        /// </summary>
-        /// <param name="level"></param>
-        /// <param name="total"></param>
-        /// <returns></returns>
-        public static double GetExpReqForLevel(int level, bool total)
-        {
-            if (level > MAX_LEVEL) level = MAX_LEVEL;
-            if (!total)
-                return EXP_REQ[level];
-            else
-                return EXP_REQ_TOTAL[level];
-        }
-
-        /// <summary>
-        /// get current level given experience
-        /// </summary>
-        /// <param name="experience"></param>
-        /// <returns></returns>
-        public static int GetLevel(double experience)
-        {
-            int level = 0;
-            while (experience >= GetExpReqForLevel(level + 1, true) && level < MAX_LEVEL) level++;
-            return level;
-        }
-
-        /// <summary>
-        /// get exp needed to reach next level
-        /// </summary>
-        /// <param name="experience"></param>
-        /// <returns></returns>
-        public static double GetExpUntilNextLevel(double experience)
-        {
-            int level = GetLevel(experience);
-            return GetExpReqForLevel(GetLevel(experience) + 1, true) - experience;
-        }
-
-
-        /// <summary>
-        /// get exp needed to reach next level
-        /// </summary>
-        /// <param name="experience"></param>
-        /// <returns></returns>
-        public static double GetExpTowardsNextLevel(double experience)
-        {
-            int level = GetLevel(experience);
-            return experience - GetExpReqForLevel(GetLevel(experience), true);
-        }
-
-        /// <summary>
-        /// Get player's class(es)
-        /// </summary>
-        /// <param name="player"></param>
-        /// <returns></returns>
-        public static string GetClass(Player player)
-        {
-            string job = "";
-            Item[] equip = player.armor;
-            for (int i = 0; i < equip.Length; i++)
-            {
-                if (equip[i].name.Contains("Class Token"))
-                {
-                    if (job.Length > 0) job += " & ";
-                    job += equip[i].name.Substring(equip[i].name.IndexOf(":") + 2);
-                }
-            }
-            if (job.Length == 0) job = "No Class";
-            return job;
-        }
-
-        /// <summary>
-        /// Get max tier of player's class(es)
-        /// </summary>
-        /// <param name="player"></param>
-        /// <returns></returns>
-        public static int GetTier(Player player)
-        {
-            string str;
-
-            Item[] equip = player.armor;
-            int tier = -1;
-            for (int i = 0; i < equip.Length; i++)
-            {
-                if (equip[i].name.Contains("Class Token"))
-                {
-                    str = equip[i].name.Substring(equip[i].name.IndexOf("Tier") + 5);
-                    str = str.Substring(0, str.Length - 1);
-                    switch (str)
-                    {
-                        case "I":
-                            if (tier < 1) tier = 1;
-                            break;
-                        case "II":
-                            if (tier < 2) tier = 2;
-                            break;
-                        case "III":
-                            if (tier < 3) tier = 3;
-                            break;
-                        default:
-                            break;
-                    }
-                }
-            }
-            return tier;
-        }
-
-        /* ~~~~~~~~~~~~~~~~~~~~~ Packet Senders - Player ~~~~~~~~~~~~~~~~~~~~~ */
-
-        /// <summary>
-        /// Player telling server to make an announcement
-        /// </summary>
-        /// <param name="message"></param>
-        /// <param name="red"></param>
-        /// <param name="green"></param>
-        /// <param name="blue"></param>
-        public void PacketSend_ClientTellAnnouncement(string message, int red, int green, int blue)
-        {
-            if (Main.netMode != 1) return;
-
-            if (red < 0) red = 0;
-            if (red > 255) red = 255;
-            if (green < 0) green = 0;
-            if (green > 255) green = 255;
-            if (blue < 0) blue = 0;
-            if (blue > 255) blue = 255;
-
-            ModPacket packet = GetPacket();
-            packet.Write((byte)ExpModMessageType.ClientTellAnnouncement);
-            packet.Write(Main.LocalPlayer.whoAmI);
-            packet.Write(message);
-            packet.Write(red); //red
-            packet.Write(green); //green
-            packet.Write(blue);   //blue
-            packet.Send();
-        }
-
-        /// <summary>
-        /// Player telling the server to adjust experience (e.g., craft token) NO AUTH REQUIRED
-        /// </summary>
-        /// <param name="exp"></param>
-        public void PacketSend_ClientTellAddExp(double exp)
-        {
-            if (Main.netMode != 1) return;
-
-            ModPacket packet = GetPacket();
-            packet.Write((byte)ExpModMessageType.ClientTellAddExp);
-            packet.Write(Main.LocalPlayer.whoAmI);
-            packet.Write(exp);
-            packet.Send();
-        }
-
-        /// <summary>
-        /// Player's response to server's request for experience (also send has_looted_monster_orb, explvlcap, and expdmgred)
-        /// </summary>
-        public void PacketSend_ClientTellExperience()
-        {
-            if (Main.netMode != 1) return;
-
-            MyPlayer local_MyPlayer = Main.LocalPlayer.GetModPlayer<MyPlayer>(this);
-
-            ModPacket packet = GetPacket();
-            packet.Write((byte)ExpModMessageType.ClientTellExperience);
-            packet.Write(Main.LocalPlayer.whoAmI);
-            packet.Write(local_MyPlayer.GetExp());
-            packet.Write(local_MyPlayer.has_looted_monster_orb);
-            packet.Write(local_MyPlayer.explvlcap);
-            packet.Write(local_MyPlayer.expdmgred);
-            packet.Send();
-        }
-
-        /// <summary>
-        /// Player requesting (needs auth) to add exp
-        /// </summary>
-        /// <param name="player_index"></param>
-        /// <param name="exp_add"></param>
-        /// <param name="text"></param>
-        public void PacketSend_ClientRequestAddExp(int player_index, double exp_add, string text)
-        {
-            if (Main.netMode != 1) return;
-
-            ModPacket packet = GetPacket();
-            packet.Write((byte)ExpModMessageType.ClientRequestAddExp);
-            packet.Write(player_index);
-            packet.Write(exp_add);
-            packet.Write(text);
-            packet.Send();
-        }
-
-        /// <summary>
-        /// Player asks server what the exprate is
-        /// </summary>
-        public void PacketSend_ClientAsksExpRate()
-        {
-            if (Main.netMode != 1) return;
-
-            ModPacket packet = GetPacket();
-            packet.Write((byte)ExpModMessageType.ClientAsksExpRate);
-            packet.Write(Main.LocalPlayer.whoAmI);
-            packet.Send();
-        }
-
-        /// <summary>
-        /// Player requests (needs auth) to set exprate
-        /// </summary>
-        /// <param name="player_index"></param>
-        /// <param name="rate"></param>
-        /// <param name="text"></param>
-        public void PacketSend_ClientRequestExpRate(double rate, string text)
-        {
-            if (Main.netMode != 1) return;
-
-            ModPacket packet = GetPacket();
-            packet.Write((byte)ExpModMessageType.ClientRequestExpRate);
-            packet.Write(Main.LocalPlayer.whoAmI);
-            packet.Write(rate);
-            packet.Write(text);
-            packet.Send();
-        }
-
-        /// <summary>
-        /// Player requesting (needs auth) to toggle class caps
-        /// </summary>
-        /// <param name="new_cap_bool"></param>
-        /// <param name="text"></param>
-        public void PacketSend_ClientRequestToggleCap(bool new_cap_bool, string text)
-        {
-            if (Main.netMode != 1) return;
-
-            ModPacket packet = GetPacket();
-            packet.Write((byte)ExpModMessageType.ClientRequestToggleCap);
-            packet.Write(Main.LocalPlayer.whoAmI);
-            packet.Write(new_cap_bool);
-            packet.Write(text);
-            packet.Send();
-        }
-
-        /// <summary>
-        /// Player attempt auth
-        /// </summary>
-        /// <param name="code"></param>
-        public void PacketSend_ClientTryAuth(double code)
-        {
-            if (Main.netMode != 1) return;
-
-            ModPacket packet = GetPacket();
-            packet.Write((byte)ExpModMessageType.ClientTryAuth);
-            packet.Write(Main.LocalPlayer.whoAmI);
-            packet.Write(code);
-            packet.Send();
-        }
-
-        /// <summary>
-        /// Player tells server that they would like to change their level cap
-        /// </summary>
-        /// <param name="new_level_cap"></param>
-        public void PacketSend_ClientUpdateLvlCap(int new_level_cap)
-        {
-            if (Main.netMode != 1) return;
-
-            ModPacket packet = GetPacket();
-            packet.Write((byte)ExpModMessageType.ClientUpdateLvlCap);
-            packet.Write(Main.LocalPlayer.whoAmI);
-            packet.Write(new_level_cap);
-            packet.Send();
-        }
-
-        /// <summary>
-        /// Player tells server that they would like to change their damage reduction
-        /// </summary>
-        /// <param name="new_damage_reduction_percent"></param>
-        public void PacketSend_ClientUpdateDmgRed(int new_damage_reduction_percent)
-        {
-            if (Main.netMode != 1) return;
-
-            ModPacket packet = GetPacket();
-            packet.Write((byte)ExpModMessageType.ClientUpdateDmgRed);
-            packet.Write(Main.LocalPlayer.whoAmI);
-            packet.Write(new_damage_reduction_percent);
-            packet.Send();
-        }
-
-        /* ~~~~~~~~~~~~~~~~~~~~~ Packet Senders - Server ~~~~~~~~~~~~~~~~~~~~~ */
-
-        /// <summary>
-        /// Server telling specific clients a player's new exp value
-        /// </summary>
-        /// <param name="player"></param>
-        /// <param name="exp"></param>
-        /// <param name="to_who"></param>
-        /// <param name="to_ignore"></param>
-        public void PacketSend_ServerForceExperience(Player player, int to_who=-1, int to_ignore=-1)
-        {
-            if (Main.netMode != 2) return;
-
-            MyPlayer myPlayer = player.GetModPlayer<MyPlayer>(this);
-
-            ModPacket packet = GetPacket();
-            packet.Write((byte)ExpModMessageType.ServerForceExperience);
-            packet.Write(player.whoAmI);
-            packet.Write(myPlayer.GetExp());
-            packet.Write(myPlayer.explvlcap);
-            packet.Write(myPlayer.expdmgred);
-            packet.Send(to_who,to_ignore);
-        }
-
-        /// <summary>
-        /// Server's initial request for player experience (also send has_looted_monster_orb, explvlcap, and expdmgred)
-        /// </summary>
-        /// <param name="player_index"></param>
-        public void PacketSend_ServerRequestExperience(int player_index)
-        {
-            if (Main.netMode != 2) return;
-
-            ModPacket packet = GetPacket();
-            packet.Write((byte)ExpModMessageType.ServerRequestExperience);
-            packet.Send(player_index);
-        }
-
-        /// <summary>
-        /// Server setting class caps on/off
-        /// </summary>
-        /// <param name="new_cap_bool"></param>
-        public void PacketSend_ServerToggleCap(bool new_cap_bool)
-        {
-            if (Main.netMode != 2) return;
-
-            ModPacket packet = GetPacket();
-            packet.Write((byte)ExpModMessageType.ServerToggleCap);
-            packet.Write(new_cap_bool);
-            packet.Send();
-        }
-
-        /// <summary>
-        /// Server telling player that they have now recieved their first Ascension Orb
-        /// </summary>
-        /// <param name="player_index"></param>
-        public void PacketSend_ServerFirstAscensionOrb(int player_index)
-        {
-            if (Main.netMode != 2) return;
-
-            ModPacket packet = GetPacket();
-            packet.Write((byte)ExpModMessageType.ServerFirstAscensionOrb);
-            packet.Send(player_index);
-        }
-
-        /// <summary>
-        /// Server sends full exp list to new player (also explvlcap and expdmgred)
-        /// </summary>
-        /// <param name="to_who"></param>
-        /// <param name="to_ignore"></param>
-        public void PacketSend_ServerFullExpList(int to_who, int to_ignore)
-        {
-            if (Main.netMode != 2) return;
-
-            Player player;
-            MyPlayer myPlayer;
-            ModPacket packet = GetPacket();
-            packet.Write((byte)ExpModMessageType.ServerFullExpList);
-            for (int i = 0; i <= 255; i++)
-            {
-                player = Main.player[i];
-                if (Main.player[i].active)
-                {
-                    myPlayer = player.GetModPlayer<MyPlayer>(this);
-                    packet.Write(myPlayer.GetExp());
-                    packet.Write(myPlayer.explvlcap);
-                    packet.Write(myPlayer.expdmgred);
-                }
-                else
-                {
-                    packet.Write(-1);
-                    packet.Write(-1);
-                    packet.Write(-1);
-                }
-            }
-            packet.Send(to_who,to_ignore);
         }
 
         /* ~~~~~~~~~~~~~~~~~~~~~ HANDLE PACKETS ~~~~~~~~~~~~~~~~~~~~~ */
@@ -495,7 +90,7 @@ namespace ExperienceAndClasses
             {
                 //Server's initial request for player experience (also send has_looted_monster_orb, explvlcap, and expdmgred)
                 case ExpModMessageType.ServerRequestExperience:
-                    PacketSend_ClientTellExperience();
+                    Methods.PacketSender.ClientTellExperience();
 
                     if (TRACE) NetMessage.SendData(25, -1, -1, "TRACE:Recieved ServerRequestExperience", 255, 255, 0, 255, 0);
                     break;
@@ -513,12 +108,12 @@ namespace ExperienceAndClasses
 
                     //tell everyone else how much exp the new player has
                     int ind_new_player = player.whoAmI;
-                    PacketSend_ServerForceExperience(player, -1, ind_new_player);
+                    Methods.PacketSender.ServerForceExperience(player, -1, ind_new_player);
 
                     //give new player full exp list
                     if (Main.netMode == 2)
                     {
-                        PacketSend_ServerFullExpList(ind_new_player, -1);
+                        Methods.PacketSender.ServerFullExpList(ind_new_player, -1);
                     }
 
                     //tell the players the current settings
@@ -636,7 +231,7 @@ namespace ExperienceAndClasses
                         Console.WriteLine("Accepted command request from player #" + player.whoAmI + ":" + player.name + " " + text);
 
                         //share new status
-                        PacketSend_ServerToggleCap(global_ignore_caps);
+                        Methods.PacketSender.ServerToggleCap(global_ignore_caps);
 
                         //announce
                         NetMessage.SendData(25, -1, -1, "Ignore Class Caps:"+ global_ignore_caps, 255, 255, 255, 0, 0);
@@ -774,169 +369,8 @@ namespace ExperienceAndClasses
             }
         }
 
-        /* ~~~~~~~~~~~~~~~~~~~~~ COMMAND FUNCTIONS ~~~~~~~~~~~~~~~~~~~~~ */
+        /* ~~~~~~~~~~~~~~~~~~~~~ CHAT COMMANDS ~~~~~~~~~~~~~~~~~~~~~ */
 
-        public void CommandSetExp(double exp, string text)
-        {
-            Player player = Main.LocalPlayer;
-            MyPlayer myPlayer = player.GetModPlayer<MyPlayer>(this);
-            if (Main.netMode==0)
-            {
-                myPlayer.SetExp(exp);
-                Main.NewText("Set experience to " + exp+".");
-            }
-            else if (Main.netMode==1)
-            {
-                double exp_add = exp - myPlayer.GetExp();
-                PacketSend_ClientRequestAddExp(player.whoAmI, exp_add, text);
-                Main.NewTextMultiline("Request that experience be set to " + exp + " has been sent to the server."+
-                                    "\nIf you are authorized, the change should occur shortly. Use /auth [code]"+
-                                    "\nto become authorized. The code is displayed in the server console.");
-            }
-        }
-
-        public void CommandExpRate()
-        {
-            if (Main.netMode == 0)
-            {
-                Main.NewText("Your current exprate is " + (Main.LocalPlayer.GetModPlayer<MyPlayer>(this).experience_modifier * 100) + "%.");
-            }
-            else if (Main.netMode == 1)
-            {
-                PacketSend_ClientAsksExpRate();
-                Main.NewText("Request for exprate has been sent to the server.");
-            }
-        }
-
-        public void CommandSetExpRate(double rate, string text)
-        {
-            MyPlayer myPlayer = Main.LocalPlayer.GetModPlayer<MyPlayer>(this);
-            if (Main.netMode == 0)
-            {
-                myPlayer.experience_modifier = rate;
-                Main.NewText("The new exprate is " + (myPlayer.experience_modifier * 100) + "%.");
-            }
-            else if (Main.netMode == 1)
-            {
-                PacketSend_ClientRequestExpRate(rate, text);
-                Main.NewTextMultiline("Request that exprate be set to " + (rate * 100) + "% has been sent to the server." +
-                                    "\nIf you are authorized, the change should occur shortly. Use /auth [code]" +
-                                    "\nto become authorized. The code is displayed in the server console.");
-            }
-        }
-
-        public void CommandToggleCaps(string text)
-        {
-            Player player = Main.LocalPlayer;
-            MyPlayer myPlayer = player.GetModPlayer<MyPlayer>(this);
-            if (Main.netMode == 0)
-            {
-                myPlayer.ignore_caps = !myPlayer.ignore_caps;
-                if (myPlayer.ignore_caps)
-                {
-                    Main.NewText("Class bonus caps disabled.");
-                }
-                else
-                {
-                    Main.NewText("Class bonus caps enabled.");
-                }
-            }
-            else if (Main.netMode==1)
-            {
-                PacketSend_ClientRequestToggleCap(!global_ignore_caps, text);
-                Main.NewTextMultiline("Request to toggle the class caps feature has been sent to the server." +
-                                    "\nIf you are authorized, the change should occur shortly. Use /auth [code]" +
-                                    "\nto become authorized. The code is displayed in the server console.");
-            }
-        }
-
-        public void CommandAuth(double code)//code -1 to check auth
-        {
-            if (Main.netMode != 1) return;
-            PacketSend_ClientTryAuth(code);
-            Main.NewTextMultiline("Request to authenticate has been sent to the server." +
-                                "\nIf successful, you will receive a response shortly.");
-        }
-
-        public void CommandLvlCap(int level)
-        {
-            if (level < -1 || level==0 || level > MAX_LEVEL) return;
-
-            Player player = Main.LocalPlayer;
-            MyPlayer myPlayer = player.GetModPlayer<MyPlayer>(this);
-            if (Main.netMode == 0)
-            {
-                int prior_level = GetLevel(myPlayer.GetExp());
-                myPlayer.explvlcap = level;
-                myPlayer.LimitExp();
-                myPlayer.LevelUp(prior_level);
-                myUI.updateValue(myPlayer.GetExp());
-                if (level == -1) Main.NewText("Level cap disabled.");
-                    else Main.NewText("Level cap set to " + myPlayer.explvlcap + ".");
-            }
-            else if (Main.netMode == 1)
-            {
-                PacketSend_ClientUpdateLvlCap(level);
-                Main.NewText("Request to change level cap to "+level+" has been sent to the server.");
-            }
-        }
-
-        public void CommandDmgRed(int damage_reduction_percent)
-        {
-            if (damage_reduction_percent < -1 || damage_reduction_percent > 100) return;
-
-            Player player = Main.LocalPlayer;
-            MyPlayer myPlayer = player.GetModPlayer<MyPlayer>(this);
-            if (Main.netMode == 0)
-            {
-                myPlayer.expdmgred = damage_reduction_percent;
-                if (damage_reduction_percent == -1) Main.NewText("Damage reduction disabled.");
-                    else Main.NewText("Damage reduction set to " + myPlayer.expdmgred + ".");
-            }
-            else if (Main.netMode == 1)
-            {
-                PacketSend_ClientUpdateDmgRed(damage_reduction_percent);
-                Main.NewText("Request to change damage reduction to " + damage_reduction_percent + "% has been sent to the server.");
-            }
-        }
-
-        public void CommandRequireAuth()
-        {
-            if (Main.netMode != 0)
-            {
-                Main.NewText("This command functions only in singleplayer mode.");
-            }
-            else
-            {
-                require_auth = !require_auth;
-                if (require_auth) Main.NewText("Require Auth has been enabled. This map will now require auth in multiplayer mode.");
-                else Main.NewText("Require Auth has been disabled. This map will no longer require auth in multiplayer mode.");
-            }
-        }
-
-        /* ~~~~~~~~~~~~~~~~~~~~~ OVERRIDES ~~~~~~~~~~~~~~~~~~~~~ */
-
-        public override void ModifyInterfaceLayers(List<MethodSequenceListItem> layers)
-        {
-            int MouseTextIndex = layers.FindIndex(layer => layer.Name.Equals("Vanilla: Mouse Text"));
-            if (MouseTextIndex != -1)
-            {
-                layers.Insert(MouseTextIndex, new MethodSequenceListItem(
-                    "Experience UI",
-                    delegate
-                    {
-                        if (MyUI.visible)
-                        {
-                            myUserInterface.Update(Main._drawInterfaceGameTime);
-                            myUI.Draw(Main.spriteBatch);
-                        }
-                        return true;
-                    },
-                    null)
-                );
-            }
-        }
-        
         public override void ChatInput(string text, ref bool broadcast)
         {
             if (text[0] != '/')
@@ -1002,11 +436,11 @@ namespace ExperienceAndClasses
                             exp = player.GetModPlayer<MyPlayer>(this).GetExp();
                             //Main.NewText(player.name + "=" + exp);
 
-                            job = GetClass(player);
-                            level = GetLevel(exp);
+                            job = Methods.Experience.GetClass(player);
+                            level = Methods.Experience.GetLevel(exp);
 
-                            exp_have = ExperienceAndClasses.GetExpTowardsNextLevel(exp);
-                            exp_need = ExperienceAndClasses.GetExpReqForLevel(level + 1, false);
+                            exp_have = Methods.Experience.GetExpTowardsNextLevel(exp);
+                            exp_need = Methods.Experience.GetExpReqForLevel(level + 1, false);
 
                             message += "\n" + player.name + ", Level " + level + "(" + Math.Round((double)exp_have / (double)exp_need * 100, 2) + "%), " + job;
                         }
@@ -1016,26 +450,26 @@ namespace ExperienceAndClasses
                 else if (command == "expadd" && args.Length > 0)
                 {
                     double exp = Double.Parse(args[0]);
-                    CommandSetExp(localMyPlayer.GetExp() + exp, text);
+                    Methods.ChatCommands.CommandSetExp(localMyPlayer.GetExp() + exp, text);
                 }
                 else if (command == "expsub" && args.Length > 0)
                 {
                     double exp = Double.Parse(args[0]);
-                    CommandSetExp(localMyPlayer.GetExp() - exp, text);
+                    Methods.ChatCommands.CommandSetExp(localMyPlayer.GetExp() - exp, text);
                 }
                 else if (command == "expset" && args.Length > 0)
                 {
                     double exp = Double.Parse(args[0]);
-                    CommandSetExp(exp, text);
+                    Methods.ChatCommands.CommandSetExp(exp, text);
                 }
                 else if (command == "exprate" && args.Length == 0)
                 {
-                    CommandExpRate();
+                    Methods.ChatCommands.CommandExpRate();
                 }
                 else if (command == "exprate" && args.Length > 0)
                 {
                     double rate = Double.Parse(args[0]);
-                    CommandSetExpRate(rate / 100, text);
+                    Methods.ChatCommands.CommandSetExpRate(rate / 100, text);
                 }
                 /* Disabled /expuse and /expcraft in v1.1.4 (switched to direct crafting)
                 else if (command == "expuse")
@@ -1058,7 +492,7 @@ namespace ExperienceAndClasses
                     }
                     else
                     {
-                        PacketSend_ClientTellAddExp(numUsed * EXP_ITEM_VALUE);
+                        Methods.PacketSender.PacketSend_ClientTellAddExp(numUsed * EXP_ITEM_VALUE);
                     }
                     Main.NewText("Used " + numUsed + " experience items.");
                 }
@@ -1073,7 +507,7 @@ namespace ExperienceAndClasses
                     }
                     else
                     {
-                        PacketSend_ClientTellAddExp(-1 * numCraft * EXP_ITEM_VALUE);
+                        Methods.PacketSender.PacketSend_ClientTellAddExp(-1 * numCraft * EXP_ITEM_VALUE);
                     }
 
                     Main.NewText("Crafted " + numCraft + " experience items.");
@@ -1096,10 +530,10 @@ namespace ExperienceAndClasses
                     else amt = Int32.Parse(args[0]);
 
                     double exp = localMyPlayer.GetExp();
-                    int level = GetLevel(exp) + amt;
-                    exp = GetExpReqForLevel(level, true);
+                    int level = Methods.Experience.GetLevel(exp) + amt;
+                    exp = Methods.Experience.GetExpReqForLevel(level, true);
 
-                    CommandSetExp(exp, text);
+                    Methods.ChatCommands.CommandSetExp(exp, text);
                 }
                 else if (command == "explvlsub")
                 {
@@ -1108,16 +542,16 @@ namespace ExperienceAndClasses
                     else amt = Int32.Parse(args[0]);
 
                     double exp = localMyPlayer.GetExp();
-                    int level = GetLevel(exp) - amt;
-                    exp = GetExpReqForLevel(level, true);
+                    int level = Methods.Experience.GetLevel(exp) - amt;
+                    exp = Methods.Experience.GetExpReqForLevel(level, true);
                     if (exp < 0) exp = 0;
 
-                    CommandSetExp(exp, text);
+                    Methods.ChatCommands.CommandSetExp(exp, text);
                 }
                 else if (command == "explvlset" && args.Length > 0)
                 {
                     int level = Int32.Parse(args[0]);
-                    CommandSetExp(GetExpReqForLevel(level, true), text);
+                    Methods.ChatCommands.CommandSetExp(Methods.Experience.GetExpReqForLevel(level, true), text);
                 }
                 else if (command == "expmsg")
                 {
@@ -1133,12 +567,12 @@ namespace ExperienceAndClasses
                 }
                 else if (command == "expclasscaps")
                 {
-                    CommandToggleCaps(text);
+                    Methods.ChatCommands.CommandToggleCaps(text);
                 }
                 else if (command == "expauth" && args.Length==0)
                 {
                     if (Main.netMode == 0) Main.NewText("Auth is only for multiplayer use.");
-                        else CommandAuth(-1);
+                        else Methods.ChatCommands.CommandAuth(-1);
                 }
                 else if (command == "expauth" && args.Length>0)
                 {
@@ -1146,13 +580,13 @@ namespace ExperienceAndClasses
                     else
                     {
                         double code = Double.Parse(args[0]);
-                        CommandAuth(code);
+                        Methods.ChatCommands.CommandAuth(code);
                     }
                 }
                 else if (command == "explvlcap" && args.Length > 0)
                 {
                     int lvl = Int32.Parse(args[0]);
-                    CommandLvlCap(lvl);
+                    Methods.ChatCommands.CommandLvlCap(lvl);
                 }
                 else if (command == "explvlcap" && args.Length == 0)
                 {
@@ -1163,7 +597,7 @@ namespace ExperienceAndClasses
                 {
                     int dmgred = Int32.Parse(args[0]);
                     if (dmgred == 0) dmgred = -1;
-                    CommandDmgRed(dmgred);
+                    Methods.ChatCommands.CommandDmgRed(dmgred);
                 }
                 else if (command == "expdmgred" && args.Length == 0)
                 {
@@ -1172,7 +606,7 @@ namespace ExperienceAndClasses
                 }
                 else if (command == "expnoauth")
                 {
-                    CommandRequireAuth();
+                    Methods.ChatCommands.CommandRequireAuth();
                 }
                 else
                 {
@@ -1187,6 +621,29 @@ namespace ExperienceAndClasses
 
             //do base
             base.ChatInput(text, ref broadcast);
+        }
+
+        /* ~~~~~~~~~~~~~~~~~~~~~ MISC OVERRIDES ~~~~~~~~~~~~~~~~~~~~~ */
+
+        public override void ModifyInterfaceLayers(List<MethodSequenceListItem> layers)
+        {
+            int MouseTextIndex = layers.FindIndex(layer => layer.Name.Equals("Vanilla: Mouse Text"));
+            if (MouseTextIndex != -1)
+            {
+                layers.Insert(MouseTextIndex, new MethodSequenceListItem(
+                    "Experience UI",
+                    delegate
+                    {
+                        if (MyUI.visible)
+                        {
+                            myUserInterface.Update(Main._drawInterfaceGameTime);
+                            myUI.Draw(Main.spriteBatch);
+                        }
+                        return true;
+                    },
+                    null)
+                );
+            }
         }
     }
 }

@@ -62,7 +62,7 @@ namespace ExperienceAndClasses.Recipes
                 item.rare = createItem.rare;
 
                 //tell server to announce (no effect in single player)
-                (mod as ExperienceAndClasses).PacketSend_ClientTellAnnouncement(Main.LocalPlayer.name + " has completed " + createItem.name + "!", 255, 255, 0);
+                Methods.PacketSender.ClientTellAnnouncement(Main.LocalPlayer.name + " has completed " + createItem.name + "!", 255, 255, 0);
             }
         }
     }
@@ -159,8 +159,8 @@ namespace ExperienceAndClasses.Recipes
         {
             Player player = Main.LocalPlayer;
             MyPlayer myPlayer = player.GetModPlayer<MyPlayer>(mod);
-            int tier_current = ExperienceAndClasses.GetTier(player);
-            int level_current = ExperienceAndClasses.GetLevel(myPlayer.GetExp());
+            int tier_current = Methods.Experience.GetTier(player);
+            int level_current = Methods.Experience.GetLevel(myPlayer.GetExp());
 
             if (level_min >= 0 && level_current < level_min) return false;
             if (level_max >= 0 && level_current > level_max) return false;
