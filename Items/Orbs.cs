@@ -30,7 +30,7 @@ namespace ExperienceAndClasses.Items
 
 		public override void AddRecipes()
 		{
-            Recipes.Helpers.AddRecipes_ExpOrbConversion(mod, this, orb_value);
+            Recipes.Helpers.AddRecipes_ExpOrbConversion(this, orb_value);
             Commons.QuckRecipe(mod, new int[,] { { } }, this, 1, new Recipes.ExpRecipe(mod, ExperienceAndClasses.EXP_ITEM_VALUE * orb_value), TileID.Campfire);
         }
         public override bool UseItem(Player player)

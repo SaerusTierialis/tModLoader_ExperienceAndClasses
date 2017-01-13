@@ -7,6 +7,12 @@ using System.Collections.Generic;
 using System;
 using System.IO;
 
+public class Application
+{
+    [STAThread]
+    static void Main(string[] args) { }
+}
+
 namespace ExperienceAndClasses
 {
     /* For Packets */
@@ -425,7 +431,6 @@ namespace ExperienceAndClasses
                     Player player;
                     double exp = 0, exp_have, exp_need;
                     int level;
-                    Item[] equip; //inv
                     string job, message = "Current Players:";
                     for (int playerIndex = 0; playerIndex < 255; playerIndex++)
                     {

@@ -1,11 +1,12 @@
 ﻿using Terraria;
-using Terraria.ID;
 using Terraria.ModLoader;
 
 namespace ExperienceAndClasses.Recipes
 {
-    static class Helpers
+    public static class Helpers
     {
+        static Mod mod = ModLoader.GetMod("ExperienceAndClasses");
+
         /// <summary>
         /// Returns true if the player had enough experience, else false.
         /// If this returns false in a OnCraft, you must "Main.mouseItem.stack--;" to prevent exploit.
@@ -13,7 +14,7 @@ namespace ExperienceAndClasses.Recipes
         /// <param name="mod"></param>
         /// <param name="experience_needed"></param>
         /// <returns></returns>
-        public static bool CraftWithExp(Mod mod, double experience_needed)
+        public static bool CraftWithExp(double experience_needed)
         {
             MyPlayer myPlayer = Main.LocalPlayer.GetModPlayer<MyPlayer>(mod);
 
@@ -48,7 +49,7 @@ namespace ExperienceAndClasses.Recipes
         /// <param name="mod"></param>
         /// <param name="target"></param>
         /// <param name="target_orb_value"></param>
-        public static void AddRecipes_ExpOrbConversion(Mod mod, ModItem target, int target_orb_value)
+        public static void AddRecipes_ExpOrbConversion(ModItem target, int target_orb_value)
         {
             int value;
             string value_str;
@@ -81,7 +82,7 @@ namespace ExperienceAndClasses.Recipes
         /// <param name="mod"></param>
         /// <param name="tier"></param>
         /// <returns></returns>
-        public static ModRecipe GetTokenRecipeBase(Mod mod, int tier)
+        public static ModRecipe GetTokenRecipeBase(int tier)
         {
             //experience required
             double experience_required = 0;

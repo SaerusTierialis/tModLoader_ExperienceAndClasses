@@ -24,7 +24,7 @@ namespace ExperienceAndClasses.Recipes
 
         public override void OnCraft(Item item)
         {
-            if (Helpers.CraftWithExp(mod, experience_needed))
+            if (Helpers.CraftWithExp(experience_needed))
             {
                 //success - do craft
                 base.OnCraft(item);

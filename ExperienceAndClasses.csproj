@@ -33,9 +33,11 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="..\Commons.cs">
+      <Link>Commons.cs</Link>
+    </Compile>
     <Compile Include="Buffs\Auras.cs" />
     <Compile Include="Buffs\Buffs.cs" />
-    <Compile Include="Commons.cs" />
     <Compile Include="Dusts\Dusts.cs" />
     <Compile Include="Items\ClassTokens.cs" />
     <Compile Include="Items\Orbs.cs" />
@@ -76,4 +78,7 @@
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>"C:\Program Files (x86)\Steam\steamapps\common\Terraria\tModLoaderServer.exe" -build "$(ProjectDir)\"</PostBuildEvent>
+  </PropertyGroup>
 </Project>
