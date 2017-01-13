@@ -42,9 +42,11 @@
     <Compile Include="ExperienceAndClasses.cs" />
     <Compile Include="MyPlayer.cs" />
     <Compile Include="MyWorld.cs" />
+    <Compile Include="NPCs\Helpers.cs" />
     <Compile Include="NPCs\MyGlobalNPC.cs" />
     <Compile Include="Projectiles\MyGlobalProjectile.cs" />
-    <Compile Include="Recipes\Recipes.cs" />
+    <Compile Include="Recipes\Helpers.cs" />
+    <Compile Include="Recipes\RecipeTypes.cs" />
     <Compile Include="UI\MyUI.cs" />
   </ItemGroup>
   <ItemGroup>

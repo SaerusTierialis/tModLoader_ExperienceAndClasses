@@ -352,7 +352,7 @@ namespace ExperienceAndClasses.Items
                     maxMinions = 0.1f;
                     maxMinions_CAP = 2;
                     break;
-                case "MinionMaster":
+                case "Minion Master":
                     statLifeMax2 = 0.5f;
                     statManaMax2 = 1f;
                     maxMinions = 0.15f;
@@ -362,7 +362,7 @@ namespace ExperienceAndClasses.Items
                     minionKB_CAP = 0.4f;
                     maxMinions_flat = 2f;
                     break;
-                case "SoulBinder":
+                case "Soul Binder":
                     statLifeMax2 = 0.75f;
                     lifeRegen = 0.075f;
                     statManaMax2 = 1f;
@@ -425,7 +425,7 @@ namespace ExperienceAndClasses.Items
                     magicDamage = 0.0025f;
                     minionDamage = 0.0025f;
                     break;
-                case "HybridII":
+                case "Hybrid II":
                     statLifeMax2 = 1f;
                     lifeRegen = 0.075f;
                     statManaMax2 = 1f;
@@ -1314,605 +1314,303 @@ namespace ExperienceAndClasses.Items
     }
 
     /* Novice */
-    public class ClassToken_Novice : ModItem
+    public class ClassToken_Novice : ClassToken
     {
-        public override void SetDefaults()
+        public ClassToken_Novice()
         {
-            item.name = "Class Token: Novice (Tier I)";
-            item.width = 36;// = 17;
-            item.height = 36;// = 28;
-            item.toolTip = "Starter class."+
-                       "\n\nClass advancement is available at level " + Recipes.ClassRecipes.TIER_2_LEVEL + ".";
-            ClassTokens.AddDescAndEffects(Main.LocalPlayer, item, "Novice", false, new MyPlayer(),mod);
-            item.value = 0;
-            item.rare = 2;
-            item.accessory = true;
+            name = "Novice";
+            tier = 1;
+            desc = "Starter class."+
+                       "\n\nClass advancement is available at level " + Recipes.Helpers.TIER_LEVEL_REQUIREMENTS[tier+1] + ".";
         }
-
-        public override void UpdateAccessory(Player player, bool hideVisual)
-        {
-            ClassTokens.AddDescAndEffects(player, item, "Novice", true, player.GetModPlayer<MyPlayer>(mod),mod);
-        }
-
         public override void AddRecipes()
         {
-            Commons.QuckRecipe(mod, new int[,] { }, this, 1, new Recipes.ClassRecipes(mod, -1));
+            Commons.QuckRecipe(mod, new int[,] { }, this, 1, Recipes.Helpers.GetTokenRecipeBase(mod, tier));
         }
-
-        /*
-        public override bool CanEquipAccessory(Player player, int slot)
-        {
-            if (ClassTokens.CanWearMoreTokens(player,slot))
-                return false;
-            else 
-                return base.CanEquipAccessory(player, slot);
-        }
-        */
-
     }
 
     /* Squire */
-    public class ClassToken_Squire : ModItem
+    public class ClassToken_Squire : ClassToken
     {
-        public override void SetDefaults()
+        public ClassToken_Squire()
         {
-            item.name = "Class Token: Squire (Tier II)";
-            item.width = 36;// = 23;
-            item.height = 36;// = 28;
-            item.toolTip = "Basic melee damage and life class."+
-                       "\n\nClass advancement is available at level " + Recipes.ClassRecipes.TIER_3_LEVEL + ".";
-            ClassTokens.AddDescAndEffects(Main.LocalPlayer, item, "Squire", false, new MyPlayer(),mod);
-            item.value = 0;
-            item.rare = 3;
-            item.accessory = true;
+            name = "Squire";
+            tier = 2;
+            desc = "Basic melee damage and life class."+
+                       "\n\nClass advancement is available at level " + Recipes.Helpers.TIER_LEVEL_REQUIREMENTS[tier+1] + ".";
         }
-
-        public override void UpdateAccessory(Player player, bool hideVisual)
-        {
-            ClassTokens.AddDescAndEffects(player, item, "Squire", true, player.GetModPlayer<MyPlayer>(mod),mod);
-        }
-
         public override void AddRecipes()
         {
-            ModRecipe recipe = new Recipes.ClassRecipes(mod, 2);
+            ModRecipe recipe = Recipes.Helpers.GetTokenRecipeBase(mod, tier);
             recipe.AddRecipeGroup("IronBar", 10);
             Commons.QuckRecipe(mod, new int[,] { { mod.ItemType("ClassToken_Novice"), 1 } }, this, 1, recipe);
         }
-
-        /*
-        public override bool CanEquipAccessory(Player player, int slot)
-        {
-            if (ClassTokens.CanWearMoreTokens(player,slot))
-                return false;
-            else 
-                return base.CanEquipAccessory(player, slot);
-        }
-        */
     }
 
     /* Squire - Tank */
-    public class ClassToken_Tank : ModItem
+    public class ClassToken_Tank : ClassToken
     {
-        public override void SetDefaults()
+        public ClassToken_Tank()
         {
-            item.name = "Class Token: Tank (Tier III)";
-            item.width = 36;// = 23;
-            item.height = 36;// = 28;
-            item.toolTip = "Tank class."+
+            name = "Tank";
+            tier = 3;
+            desc = "Tank class."+
                        "\n\nHas the highest life, defense, and aggro. Occasionally recovers"+
                        "\na percentage of maximum life.";
-            ClassTokens.AddDescAndEffects(Main.LocalPlayer, item, "Tank", false, new MyPlayer(),mod);
-            item.value = 0;
-            item.rare = 10;
-            item.accessory = true;
         }
-
-        public override void UpdateAccessory(Player player, bool hideVisual)
-        {
-            ClassTokens.AddDescAndEffects(player, item, "Tank", true, player.GetModPlayer<MyPlayer>(mod),mod);
-        }
-
         public override void AddRecipes()
         {
-            Commons.QuckRecipe(mod, new int[,] { { mod.ItemType("ClassToken_Squire"), 1 }, { ItemID.StoneBlock, 999 } }, this, 1, new Recipes.ClassRecipes(mod, 3));
-            Commons.QuckRecipe(mod, new int[,] { { mod.ItemType("ClassToken_Hybrid"), 1 }, { ItemID.StoneBlock, 999 } }, this, 1, new Recipes.ClassRecipes(mod, 3));
+            Commons.QuckRecipe(mod, new int[,] { { mod.ItemType("ClassToken_Squire"), 1 }, { ItemID.StoneBlock, 999 } }, this, 1, Recipes.Helpers.GetTokenRecipeBase(mod, tier));
+            Commons.QuckRecipe(mod, new int[,] { { mod.ItemType("ClassToken_Hybrid"), 1 }, { ItemID.StoneBlock, 999 } }, this, 1, Recipes.Helpers.GetTokenRecipeBase(mod, tier));
         }
-
-        /*
-        public override bool CanEquipAccessory(Player player, int slot)
-        {
-            if (ClassTokens.CanWearMoreTokens(player,slot))
-                return false;
-            else 
-                return base.CanEquipAccessory(player, slot);
-        }
-        */
     }
 
     /* Squire - Warrior */
-    public class ClassToken_Warrior : ModItem
+    public class ClassToken_Warrior : ClassToken
     {
-        public override void SetDefaults()
+        public ClassToken_Warrior()
         {
-            item.name = "Class Token: Warrior (Tier III)";
-            item.width = 36;// = 23;
-            item.height = 36;// = 28;
-            item.toolTip = "Melee damage and life class."+
+            name = "Warrior";
+            tier = 3;
+            desc = "Melee damage and life class."+
                        "\n\nHas the highest melee damage, and the second highest melee speed"+
                          "\nand life.";
-            ClassTokens.AddDescAndEffects(Main.LocalPlayer, item, "Warrior", false, new MyPlayer(),mod);
-            item.value = 0;
-            item.rare = 10;
-            item.accessory = true;
         }
-
-        public override void UpdateAccessory(Player player, bool hideVisual)
-        {
-            ClassTokens.AddDescAndEffects(player, item, "Warrior", true, player.GetModPlayer<MyPlayer>(mod),mod);
-        }
-
         public override void AddRecipes()
         {
             ModRecipe recipe;
 
-            recipe = new Recipes.ClassRecipes(mod, 3);
+            recipe = Recipes.Helpers.GetTokenRecipeBase(mod, tier);
             recipe.AddRecipeGroup("IronBar", 100);
             Commons.QuckRecipe(mod, new int[,] { { mod.ItemType("ClassToken_Squire"), 1 } }, this, 1, recipe);
 
-            recipe = new Recipes.ClassRecipes(mod, 3);
+            recipe = Recipes.Helpers.GetTokenRecipeBase(mod, tier);
             recipe.AddRecipeGroup("IronBar", 100);
             Commons.QuckRecipe(mod, new int[,] { { mod.ItemType("ClassToken_Hybrid"), 1 } }, this, 1, recipe);
         }
-
-        /*
-        public override bool CanEquipAccessory(Player player, int slot)
-        {
-            if (ClassTokens.CanWearMoreTokens(player,slot))
-                return false;
-            else 
-                return base.CanEquipAccessory(player, slot);
-        }
-        */
     }
 
     /* Squire - Berserker */
-    public class ClassToken_Berserker : ModItem
+    public class ClassToken_Berserker : ClassToken
     {
-        public override void SetDefaults()
+        public ClassToken_Berserker()
         {
-            item.name = "Class Token: Berserker (Tier III)";
-            item.width = 36;// = 23;
-            item.height = 36;// = 28;
-            item.toolTip = "Melee speed and agility class."+
+            name = "Berserker";
+            tier = 3;
+            desc = "Melee speed and agility class."+
                        "\n\nHas the highest melee speed as well as moderate life, agility,"+
                          "\nand melee damage.";
-            ClassTokens.AddDescAndEffects(Main.LocalPlayer, item, "Berserker", false, new MyPlayer(),mod);
-            item.value = 0;
-            item.rare = 10;
-            item.accessory = true;
         }
-
-        public override void UpdateAccessory(Player player, bool hideVisual)
-        {
-            ClassTokens.AddDescAndEffects(player, item, "Berserker", true, player.GetModPlayer<MyPlayer>(mod),mod);
-        }
-
         public override void AddRecipes()
         {
             ModRecipe recipe;
 
-            recipe = new Recipes.ClassRecipes(mod, 3);
+            recipe = Recipes.Helpers.GetTokenRecipeBase(mod, tier);
             recipe.AddRecipeGroup("IronBar", 100);
             Commons.QuckRecipe(mod, new int[,] { { mod.ItemType("ClassToken_Squire"), 1 } }, this, 1, recipe);
 
-            recipe = new Recipes.ClassRecipes(mod, 3);
+            recipe = Recipes.Helpers.GetTokenRecipeBase(mod, tier);
             recipe.AddRecipeGroup("IronBar", 100);
             Commons.QuckRecipe(mod, new int[,] { { mod.ItemType("ClassToken_Hybrid"), 1 } }, this, 1, recipe);
         }
-
-        /*
-        public override bool CanEquipAccessory(Player player, int slot)
-        {
-            if (ClassTokens.CanWearMoreTokens(player,slot))
-                return false;
-            else 
-                return base.CanEquipAccessory(player, slot);
-        }
-        */
     }
 
     /* Hunter */
-    public class ClassToken_Hunter : ModItem
+    public class ClassToken_Hunter : ClassToken
     {
-        public override void SetDefaults()
+        public ClassToken_Hunter()
         {
-            item.name = "Class Token: Hunter (Tier II)";
-            item.width = 36;// = 25;
-            item.height = 36;// = 28;
-            item.toolTip = "Basic ranged class."+
-                       "\n\nClass advancement is available at level " + Recipes.ClassRecipes.TIER_3_LEVEL + ".";
-            ClassTokens.AddDescAndEffects(Main.LocalPlayer, item, "Hunter", false, new MyPlayer(),mod);
-            item.value = 0;
-            item.rare = 3;
-            item.accessory = true;
+            name = "Hunter";
+            tier = 2;
+            desc = "Basic ranged class."+
+                       "\n\nClass advancement is available at level " + Recipes.Helpers.TIER_LEVEL_REQUIREMENTS[tier+1] + ".";
         }
-
-        public override void UpdateAccessory(Player player, bool hideVisual)
-        {
-            ClassTokens.AddDescAndEffects(player, item, "Hunter", true, player.GetModPlayer<MyPlayer>(mod),mod);
-        }
-
         public override void AddRecipes()
         {
-            ModRecipe recipe = new Recipes.ClassRecipes(mod, 2);
+            ModRecipe recipe = Recipes.Helpers.GetTokenRecipeBase(mod, tier);
             recipe.AddRecipeGroup("Wood", 100);
             Commons.QuckRecipe(mod, new int[,] { { mod.ItemType("ClassToken_Novice"), 1 } }, this, 1, recipe);
         }
-
-        /*
-        public override bool CanEquipAccessory(Player player, int slot)
-        {
-            if (ClassTokens.CanWearMoreTokens(player,slot))
-                return false;
-            else 
-                return base.CanEquipAccessory(player, slot);
-        }
-        */
-
     }
 
     /* Hunter - Archer */
-    public class ClassToken_Archer : ModItem
+    public class ClassToken_Archer : ClassToken
     {
-        public override void SetDefaults()
+        public ClassToken_Archer()
         {
-            item.name = "Class Token: Archer (Tier III)";
-            item.width = 36;// = 25;
-            item.height = 36;// = 28;
-            item.toolTip = "Archery class."+
+            name = "Archer";
+            tier = 3;
+            desc = "Archery class."+
                        "\n\nFocuses on archery weapons (bow/crossbow). Gun weapons do not"+
                          "\nrecieve any bonuses.";
-            ClassTokens.AddDescAndEffects(Main.LocalPlayer, item, "Archer", false, new MyPlayer(),mod);
-            item.value = 0;
-            item.rare = 10;
-            item.accessory = true;
         }
-
-        public override void UpdateAccessory(Player player, bool hideVisual)
-        {
-            ClassTokens.AddDescAndEffects(player, item, "Archer", true, player.GetModPlayer<MyPlayer>(mod),mod);
-        }
-
         public override void AddRecipes()
         {
             ModRecipe recipe;
 
-            recipe = new Recipes.ClassRecipes(mod, 3);
+            recipe = Recipes.Helpers.GetTokenRecipeBase(mod, tier);
             recipe.AddRecipeGroup("Wood", 500);
             Commons.QuckRecipe(mod, new int[,] { { mod.ItemType("ClassToken_Hunter"), 1 } }, this, 1, recipe);
 
-            recipe = new Recipes.ClassRecipes(mod, 3);
+            recipe = Recipes.Helpers.GetTokenRecipeBase(mod, tier);
             recipe.AddRecipeGroup("Wood", 500);
             Commons.QuckRecipe(mod, new int[,] { { mod.ItemType("ClassToken_Hybrid"), 1 } }, this, 1, recipe);
         }
-
-        /*
-        public override bool CanEquipAccessory(Player player, int slot)
-        {
-            if (ClassTokens.CanWearMoreTokens(player,slot))
-                return false;
-            else 
-                return base.CanEquipAccessory(player, slot);
-        }
-        */
     }
 
     /* Hunter - Ranger */
-    public class ClassToken_Ranger : ModItem
+    public class ClassToken_Ranger : ClassToken
     {
-        public override void SetDefaults()
+        public ClassToken_Ranger()
         {
-            item.name = "Class Token: Ranger (Tier III)";
-            item.width = 36;// = 28;
-            item.height = 36;// = 28;
-            item.toolTip = "Generic ranged class."+
+            name = "Ranger";
+            tier = 3;
+            desc = "Generic ranged class."+
                        "\n\nAn unspecialized ranged class. Equally well-suited to archery and"+
                          "\ngun weapons. Has slightly better survivability than Archer and"+
                          "\nGunner, but less damage.";
-            ClassTokens.AddDescAndEffects(Main.LocalPlayer, item, "Ranger", false, new MyPlayer(),mod);
-            item.value = 0;
-            item.rare = 10;
-            item.accessory = true;
         }
-
-        public override void UpdateAccessory(Player player, bool hideVisual)
-        {
-            ClassTokens.AddDescAndEffects(player, item, "Ranger", true, player.GetModPlayer<MyPlayer>(mod),mod);
-        }
-
         public override void AddRecipes()
         {
             ModRecipe recipe;
 
-            recipe = new Recipes.ClassRecipes(mod, 3);
+            recipe = Recipes.Helpers.GetTokenRecipeBase(mod, tier);
             recipe.AddRecipeGroup("IronBar", 50);
             recipe.AddRecipeGroup("Wood", 250);
             Commons.QuckRecipe(mod, new int[,] { { mod.ItemType("ClassToken_Hunter"), 1 } }, this, 1, recipe);
 
-            recipe = new Recipes.ClassRecipes(mod, 3);
+            recipe = Recipes.Helpers.GetTokenRecipeBase(mod, tier);
             recipe.AddRecipeGroup("IronBar", 50);
             recipe.AddRecipeGroup("Wood", 250);
             Commons.QuckRecipe(mod, new int[,] { { mod.ItemType("ClassToken_Hybrid"), 1 } }, this, 1, recipe);
         }
-
-        /*
-        public override bool CanEquipAccessory(Player player, int slot)
-        {
-            if (ClassTokens.CanWearMoreTokens(player,slot))
-                return false;
-            else 
-                return base.CanEquipAccessory(player, slot);
-        }
-        */
     }
 
     /* Hunter - Gunner */
-    public class ClassToken_Gunner : ModItem
+    public class ClassToken_Gunner : ClassToken
     {
-        public override void SetDefaults()
+        public ClassToken_Gunner()
         {
-            item.name = "Class Token: Gunner (Tier III)";
-            item.width = 36;// = 28;
-            item.height = 36;// = 28;
-            item.toolTip = "Gunnery class." +
+            name = "Gunner";
+            tier = 3;
+            desc = "Gunnery class." +
                        "\n\nFocuses on gun weapons. Archery weapons (bow/crossbow) do not" +
                          "\nrecieve any bonuses.";
-            ClassTokens.AddDescAndEffects(Main.LocalPlayer, item, "Gunner", false, new MyPlayer(),mod);
-            item.value = 0;
-            item.rare = 10;
-            item.accessory = true;
         }
-
-        public override void UpdateAccessory(Player player, bool hideVisual)
-        {
-            ClassTokens.AddDescAndEffects(player, item, "Gunner", true, player.GetModPlayer<MyPlayer>(mod),mod);
-        }
-
         public override void AddRecipes()
         {
             ModRecipe recipe;
 
-            recipe = new Recipes.ClassRecipes(mod, 3);
+            recipe = Recipes.Helpers.GetTokenRecipeBase(mod, tier);
             recipe.AddRecipeGroup("IronBar", 100);
             Commons.QuckRecipe(mod, new int[,] { { mod.ItemType("ClassToken_Hunter"), 1 } }, this, 1, recipe);
 
-            recipe = new Recipes.ClassRecipes(mod, 3);
+            recipe = Recipes.Helpers.GetTokenRecipeBase(mod, tier);
             recipe.AddRecipeGroup("IronBar", 100);
             Commons.QuckRecipe(mod, new int[,] { { mod.ItemType("ClassToken_Hybrid"), 1 } }, this, 1, recipe);
         }
-
-        /*
-        public override bool CanEquipAccessory(Player player, int slot)
-        {
-            if (ClassTokens.CanWearMoreTokens(player,slot))
-                return false;
-            else 
-                return base.CanEquipAccessory(player, slot);
-        }
-        */
     }
 
     /* Mage */
-    public class ClassToken_Mage : ModItem
+    public class ClassToken_Mage : ClassToken
     {
-        public override void SetDefaults()
+        public ClassToken_Mage()
         {
-            item.name = "Class Token: Mage (Tier II)";
-            item.width = 36;// = 21;
-            item.height = 36;// = 28;
-            item.toolTip = "Basic magic class."+
-                       "\n\nClass advancement is available at level " + Recipes.ClassRecipes.TIER_3_LEVEL + ".";
-            ClassTokens.AddDescAndEffects(Main.LocalPlayer, item, "Mage", false, new MyPlayer(),mod);
-            item.value = 0;
-            item.rare = 3;
-            item.accessory = true;
+            name = "Mage";
+            tier = 2;
+            desc = "Basic magic class."+
+                       "\n\nClass advancement is available at level " + Recipes.Helpers.TIER_LEVEL_REQUIREMENTS[tier+1] + ".";
         }
-
-        public override void UpdateAccessory(Player player, bool hideVisual)
-        {
-            ClassTokens.AddDescAndEffects(player, item, "Mage", true, player.GetModPlayer<MyPlayer>(mod),mod);
-        }
-
         public override void AddRecipes()
         {
-            Commons.QuckRecipe(mod, new int[,] { { mod.ItemType("ClassToken_Novice"), 1 }, { ItemID.FallenStar, 3 } }, this, 1, new Recipes.ClassRecipes(mod, 2));
+            Commons.QuckRecipe(mod, new int[,] { { mod.ItemType("ClassToken_Novice"), 1 }, { ItemID.FallenStar, 3 } }, this, 1, Recipes.Helpers.GetTokenRecipeBase(mod, tier));
         }
-
-        /*
-        public override bool CanEquipAccessory(Player player, int slot)
-        {
-            if (ClassTokens.CanWearMoreTokens(player,slot))
-                return false;
-            else 
-                return base.CanEquipAccessory(player, slot);
-        }
-        */
-
     }
 
     /* Mage - Mystic */
-    public class ClassToken_Mystic : ModItem
+    public class ClassToken_Mystic : ClassToken
     {
-        public override void SetDefaults()
+        public ClassToken_Mystic()
         {
-            item.name = "Class Token: Mystic (Tier III)";
-            item.width = 36;// = 27;
-            item.height = 36;// = 28;
-            item.toolTip = "Magic damage class."+
-                       "\n\nHas the highest magic damage, mana, mana regen, and mana cost"+
+            name = "Mystic";
+            tier = 3;
+            desc = "Magic damage class." +
+                       "\n\nHas the highest magic damage, mana, mana regen, and mana cost" +
                          "\nreduction. This is the only class with magic crit. Occasionally" +
                          "\nrecovers a percentage of maximum mana.";
-            ClassTokens.AddDescAndEffects(Main.LocalPlayer, item, "Mystic", false, new MyPlayer(),mod);
-            item.value = 0;
-            item.rare = 10;
-            item.accessory = true;
         }
-
-        public override void UpdateAccessory(Player player, bool hideVisual)
-        {
-            ClassTokens.AddDescAndEffects(player, item, "Mystic", true, player.GetModPlayer<MyPlayer>(mod),mod);
-        }
-
         public override void AddRecipes()
         {
-            Commons.QuckRecipe(mod, new int[,] { { mod.ItemType("ClassToken_Mage"), 1 }, {ItemID.FallenStar, 20} }, this, 1, new Recipes.ClassRecipes(mod, 3));
-            Commons.QuckRecipe(mod, new int[,] { { mod.ItemType("ClassToken_Hybrid"), 1 }, {ItemID.FallenStar, 20} }, this, 1, new Recipes.ClassRecipes(mod, 3));
+            Commons.QuckRecipe(mod, new int[,] { { mod.ItemType("ClassToken_Mage"), 1 }, {ItemID.FallenStar, 20} }, this, 1, Recipes.Helpers.GetTokenRecipeBase(mod, tier));
+            Commons.QuckRecipe(mod, new int[,] { { mod.ItemType("ClassToken_Hybrid"), 1 }, {ItemID.FallenStar, 20} }, this, 1, Recipes.Helpers.GetTokenRecipeBase(mod, tier));
         }
-
-        /*
-        public override bool CanEquipAccessory(Player player, int slot)
-        {
-            if (ClassTokens.CanWearMoreTokens(player,slot))
-                return false;
-            else 
-                return base.CanEquipAccessory(player, slot);
-        }
-        */
-
     }
 
     /* Mage - Sage */
-    public class ClassToken_Sage : ModItem
+    public class ClassToken_Sage : ClassToken
     {
-        public override void SetDefaults()
+        public ClassToken_Sage()
         {
-            item.name = "Class Token: Sage (Tier III)";
-            item.width = 36;// = 23;
-            item.height = 36;// = 28;
-            item.toolTip = "Defensive magic class."+
+            name = "Sage";
+            tier = 3;
+            desc = "Defensive magic class."+
                        "\n\nMagic damage and mana stats are second to the Mystic, but"+
                          "\nthe Sage has excellent life and defense. Occasionally" +
                          "\nrecovers a percentage of maximum mana. The Sage also produces"+
                          "\nan aura that boosts defense of nearby allies and further"+
                          "\nbolsters the Sage's defenses.";
-            ClassTokens.AddDescAndEffects(Main.LocalPlayer, item, "Sage", false, new MyPlayer(),mod);
-            item.value = 0;
-            item.rare = 10;
-            item.accessory = true;
         }
-
-        public override void UpdateAccessory(Player player, bool hideVisual)
-        {
-            ClassTokens.AddDescAndEffects(player, item, "Sage", true, player.GetModPlayer<MyPlayer>(mod),mod);
-        }
-
         public override void AddRecipes()
         {
             Commons.QuckRecipe(mod, new int[,] { { mod.ItemType("ClassToken_Mage"), 1 }, {ItemID.FallenStar, 10},
-                {ItemID.StoneBlock, 500} }, this, 1, new Recipes.ClassRecipes(mod, 3));
+                {ItemID.StoneBlock, 500} }, this, 1, Recipes.Helpers.GetTokenRecipeBase(mod, tier));
             Commons.QuckRecipe(mod, new int[,] { { mod.ItemType("ClassToken_Hybrid"), 1 }, {ItemID.FallenStar, 10},
-                {ItemID.StoneBlock, 500} }, this, 1, new Recipes.ClassRecipes(mod, 3));
+                {ItemID.StoneBlock, 500} }, this, 1, Recipes.Helpers.GetTokenRecipeBase(mod, tier));
         }
-
-        /*
-        public override bool CanEquipAccessory(Player player, int slot)
-        {
-            if (ClassTokens.CanWearMoreTokens(player,slot))
-                return false;
-            else 
-                return base.CanEquipAccessory(player, slot);
-        }
-        */
-
     }
 
     /* Summoner */
-    public class ClassToken_Summoner : ModItem
+    public class ClassToken_Summoner : ClassToken
     {
-        public override void SetDefaults()
+        public ClassToken_Summoner()
         {
-            item.name = "Class Token: Summoner (Tier II)";
-            item.width = 36;// = 25;
-            item.height = 36;// = 28;
-            item.toolTip = "Basic minion class."+
-                       "\n\nClass advancement is available at level " + Recipes.ClassRecipes.TIER_3_LEVEL + ".";
-            ClassTokens.AddDescAndEffects(Main.LocalPlayer, item, "Summoner", false, new MyPlayer(),mod);
-            item.value = 0;
-            item.rare = 3;
-            item.accessory = true;
+            name = "Summoner";
+            tier = 2;
+            desc = "Basic minion class."+
+                       "\n\nClass advancement is available at level " + Recipes.Helpers.TIER_LEVEL_REQUIREMENTS[tier+1] + ".";
         }
-
-        public override void UpdateAccessory(Player player, bool hideVisual)
-        {
-            ClassTokens.AddDescAndEffects(player, item, "Summoner", true, player.GetModPlayer<MyPlayer>(mod),mod);
-        }
-
         public override void AddRecipes()
         {
-            Commons.QuckRecipe(mod, new int[,] { { mod.ItemType("ClassToken_Novice"), 1 }, { mod.ItemType("Monster_Orb"), 1} }, this, 1, new Recipes.ClassRecipes(mod, 2));
+            Commons.QuckRecipe(mod, new int[,] { { mod.ItemType("ClassToken_Novice"), 1 }, { mod.ItemType("Monster_Orb"), 1} }, this, 1, Recipes.Helpers.GetTokenRecipeBase(mod, tier));
         }
-
-        /*
-        public override bool CanEquipAccessory(Player player, int slot)
-        {
-            if (ClassTokens.CanWearMoreTokens(player,slot))
-                return false;
-            else 
-                return base.CanEquipAccessory(player, slot);
-        }
-        */
-
     }
 
     /* Summoner - SoulBinder */
-    public class ClassToken_SoulBinder : ModItem
+    public class ClassToken_SoulBinder : ClassToken
     {
-        public override void SetDefaults()
+        public ClassToken_SoulBinder()
         {
-            item.name = "Class Token: Soul Binder (Tier III)";
-            item.width = 36;// = 28;
-            item.height = 36;// = 28;
-            item.toolTip = "Minion quality class."+
+            name = "Soul Binder";
+            tier = 3;
+            desc = "Minion quality class."+
                        "\n\nFocuses on quality of minions rather than quantity. Has"+
                          "\nslightly better life and defense than the Minion Master.";
-            ClassTokens.AddDescAndEffects(Main.LocalPlayer, item, "SoulBinder", false, new MyPlayer(),mod);
-            item.value = 0;
-            item.rare = 10;
-            item.accessory = true;
         }
-
-        public override void UpdateAccessory(Player player, bool hideVisual)
-        {
-            ClassTokens.AddDescAndEffects(player, item, "SoulBinder", true, player.GetModPlayer<MyPlayer>(mod),mod);
-        }
-
         public override void AddRecipes()
         {
-            Commons.QuckRecipe(mod, new int[,] { { mod.ItemType("ClassToken_Summoner"), 1 }, { mod.ItemType("Monster_Orb"), 10 } }, this, 1, new Recipes.ClassRecipes(mod, 3));
-            Commons.QuckRecipe(mod, new int[,] { { mod.ItemType("ClassToken_Hybrid"), 1 }, { mod.ItemType("Monster_Orb"), 10 } }, this, 1, new Recipes.ClassRecipes(mod, 3));
+            Commons.QuckRecipe(mod, new int[,] { { mod.ItemType("ClassToken_Summoner"), 1 }, { mod.ItemType("Monster_Orb"), 10 } }, this, 1, Recipes.Helpers.GetTokenRecipeBase(mod, tier));
+            Commons.QuckRecipe(mod, new int[,] { { mod.ItemType("ClassToken_Hybrid"), 1 }, { mod.ItemType("Monster_Orb"), 10 } }, this, 1, Recipes.Helpers.GetTokenRecipeBase(mod, tier));
         }
-
-        /*
-        public override bool CanEquipAccessory(Player player, int slot)
-        {
-            if (ClassTokens.CanWearMoreTokens(player,slot))
-                return false;
-            else 
-                return base.CanEquipAccessory(player, slot);
-        }
-        */
-
     }
 
     /* Summoner - MinionMaster */
-    public class ClassToken_MinionMaster : ModItem
+    public class ClassToken_MinionMaster : ClassToken
     {
-        public override void SetDefaults()
+        public ClassToken_MinionMaster()
         {
-            item.name = "Class Token: Minion Master (Tier III)";
-            item.width = 36;// = 19;
-            item.height = 36;// = 28;
-            item.toolTip = "Minion quantity class." +
+            name = "Minion Master";
+            tier = 3;
+            desc = "Minion quantity class." +
                        "\n\nFocuses on quantity of minions rather than quality. Has" +
                          "\nslightly worse life and defense than the Soul Binder, but"+
                          "\nthis is offset by sheer numbers."+
@@ -1921,82 +1619,38 @@ namespace ExperienceAndClasses.Items
                          "\nattacks. It is possible to exceed this limit with these types"+
                          "\nof minions on a high level Minion Master, which reduces"+
                          "\neffective single target damage.";
-            ClassTokens.AddDescAndEffects(Main.LocalPlayer, item, "MinionMaster", false, new MyPlayer(),mod);
-            item.value = 0;
-            item.rare = 10;
-            item.accessory = true;
         }
-
-        public override void UpdateAccessory(Player player, bool hideVisual)
-        {
-            ClassTokens.AddDescAndEffects(player, item, "MinionMaster", true, player.GetModPlayer<MyPlayer>(mod),mod);
-        }
-
         public override void AddRecipes()
         {
-            Commons.QuckRecipe(mod, new int[,] { { mod.ItemType("ClassToken_Summoner"), 1 }, {mod.ItemType("Monster_Orb"), 10} }, this, 1, new Recipes.ClassRecipes(mod, 3));
-            Commons.QuckRecipe(mod, new int[,] { { mod.ItemType("ClassToken_Hybrid"), 1 }, { mod.ItemType("Monster_Orb"), 10 } }, this, 1, new Recipes.ClassRecipes(mod, 3));
+            Commons.QuckRecipe(mod, new int[,] { { mod.ItemType("ClassToken_Summoner"), 1 }, {mod.ItemType("Monster_Orb"), 10} }, this, 1, Recipes.Helpers.GetTokenRecipeBase(mod, tier));
+            Commons.QuckRecipe(mod, new int[,] { { mod.ItemType("ClassToken_Hybrid"), 1 }, { mod.ItemType("Monster_Orb"), 10 } }, this, 1, Recipes.Helpers.GetTokenRecipeBase(mod, tier));
         }
-
-        /*
-        public override bool CanEquipAccessory(Player player, int slot)
-        {
-            if (ClassTokens.CanWearMoreTokens(player,slot))
-                return false;
-            else 
-                return base.CanEquipAccessory(player, slot);
-        }
-        */
-
     }
 
     /* Rogue */
-    public class ClassToken_Rogue : ModItem
+    public class ClassToken_Rogue : ClassToken
     {
-        public override void SetDefaults()
+        public ClassToken_Rogue()
         {
-            item.name = "Class Token: Rogue (Tier II)";
-            item.width = 36;// = 19;
-            item.height = 36;// = 28;
-            item.toolTip = "Basic throwing, melee, and agility class."+
-                       "\n\nClass advancement is available at level " + Recipes.ClassRecipes.TIER_3_LEVEL + ".";
-            ClassTokens.AddDescAndEffects(Main.LocalPlayer, item, "Rogue", false, new MyPlayer(),mod);
-            item.value = 0;
-            item.rare = 3;
-            item.accessory = true;
+            name = "Rogue";
+            tier = 2;
+            desc = "Basic throwing, melee, and agility class."+
+                       "\n\nClass advancement is available at level " + Recipes.Helpers.TIER_LEVEL_REQUIREMENTS[tier+1] + ".";
         }
-
-        public override void UpdateAccessory(Player player, bool hideVisual)
-        {
-            ClassTokens.AddDescAndEffects(player, item, "Rogue", true, player.GetModPlayer<MyPlayer>(mod),mod);
-        }
-
         public override void AddRecipes()
         {
-            Commons.QuckRecipe(mod, new int[,] { { mod.ItemType("ClassToken_Novice"), 1 }, { ItemID.GoldCoin, 1 } }, this, 1, new Recipes.ClassRecipes(mod, 2));
+            Commons.QuckRecipe(mod, new int[,] { { mod.ItemType("ClassToken_Novice"), 1 }, { ItemID.GoldCoin, 1 } }, this, 1, Recipes.Helpers.GetTokenRecipeBase(mod, tier));
         }
-
-        /*
-        public override bool CanEquipAccessory(Player player, int slot)
-        {
-            if (ClassTokens.CanWearMoreTokens(player,slot))
-                return false;
-            else 
-                return base.CanEquipAccessory(player, slot);
-        }
-        */
-
     }
 
     /* Rogue - Assassin */
-    public class ClassToken_Assassin : ModItem
+    public class ClassToken_Assassin : ClassToken
     {
-        public override void SetDefaults()
+        public ClassToken_Assassin()
         {
-            item.name = "Class Token: Assassin (Tier III)";
-            item.width = 36;// = 20;
-            item.height = 36;// = 28;
-            item.toolTip = "Melee critical and agility class."+
+            name = "Assassin";
+            tier = 3;
+            desc = "Melee critical and agility class."+
                        "\n\nHas the unique ability to make Opener Attacks, which rewards a"+
                          "\n\"poking\" playstyle."+
                        "\n\nOpener Attack: Occurs when making a melee attack against a target"+
@@ -2005,230 +1659,138 @@ namespace ExperienceAndClasses.Items
                          "\nonly half of the damage multiplier. Does not trigger on projectile"+
                          "\nmelee attacks such as boomerang or magic sword projectiles. Bonus"+
                          "\ncritical damage is tripled on Opener Attacks.";
-            ClassTokens.AddDescAndEffects(Main.LocalPlayer, item, "Assassin", false, new MyPlayer(),mod);
-            item.value = 0;
-            item.rare = 10;
-            item.accessory = true;
         }
-
-        public override void UpdateAccessory(Player player, bool hideVisual)
-        {
-            ClassTokens.AddDescAndEffects(player, item, "Assassin", true, player.GetModPlayer<MyPlayer>(mod),mod);
-        }
-
         public override void AddRecipes()
         {
-            Commons.QuckRecipe(mod, new int[,] { { mod.ItemType("ClassToken_Rogue"), 1 }, { ItemID.PlatinumCoin, 1 } }, this, 1, new Recipes.ClassRecipes(mod, 3));
-            Commons.QuckRecipe(mod, new int[,] { { mod.ItemType("ClassToken_Hybrid"), 1 }, { ItemID.PlatinumCoin, 1 } }, this, 1, new Recipes.ClassRecipes(mod, 3));
+            Commons.QuckRecipe(mod, new int[,] { { mod.ItemType("ClassToken_Rogue"), 1 }, { ItemID.PlatinumCoin, 1 } }, this, 1, Recipes.Helpers.GetTokenRecipeBase(mod, tier));
+            Commons.QuckRecipe(mod, new int[,] { { mod.ItemType("ClassToken_Hybrid"), 1 }, { ItemID.PlatinumCoin, 1 } }, this, 1, Recipes.Helpers.GetTokenRecipeBase(mod, tier));
         }
-
-        /*
-        public override bool CanEquipAccessory(Player player, int slot)
-        {
-            if (ClassTokens.CanWearMoreTokens(player,slot))
-                return false;
-            else 
-                return base.CanEquipAccessory(player, slot);
-        }
-        */
     }
 
     /* Rogue - Ninja */
-    public class ClassToken_Ninja : ModItem
+    public class ClassToken_Ninja : ClassToken
     {
-        public override void SetDefaults()
+        public ClassToken_Ninja()
         {
-            item.name = "Class Token: Ninja (Tier III)";
-            item.width = 36;// = 28;
-            item.height = 36;// = 26;
-            item.toolTip = "Throwing and agility class."+
+            name = "Ninja";
+            tier = 3;
+            desc = "Throwing and agility class."+
                        "\n\nTo make throwing builds viable, Ninja has the highest"+
                          "\ndamage modifier of any class. Ninja also has excellent"+
                          "\nagility including the highest jump bonus.";
-            ClassTokens.AddDescAndEffects(Main.LocalPlayer, item, "Ninja", false, new MyPlayer(),mod);
-            item.value = 0;
-            item.rare = 10;
-            item.accessory = true;
         }
-
-        public override void UpdateAccessory(Player player, bool hideVisual)
-        {
-            ClassTokens.AddDescAndEffects(player, item, "Ninja", true, player.GetModPlayer<MyPlayer>(mod),mod);
-        }
-
         public override void AddRecipes()
         {
-            Commons.QuckRecipe(mod, new int[,] { { mod.ItemType("ClassToken_Rogue"), 1}, { ItemID.PlatinumCoin, 1} }, this, 1, new Recipes.ClassRecipes(mod, 3));
-            Commons.QuckRecipe(mod, new int[,] { { mod.ItemType("ClassToken_Hybrid"), 1 }, { ItemID.PlatinumCoin, 1 } }, this, 1, new Recipes.ClassRecipes(mod, 3));
+            Commons.QuckRecipe(mod, new int[,] { { mod.ItemType("ClassToken_Rogue"), 1}, { ItemID.PlatinumCoin, 1} }, this, 1, Recipes.Helpers.GetTokenRecipeBase(mod, tier));
+            Commons.QuckRecipe(mod, new int[,] { { mod.ItemType("ClassToken_Hybrid"), 1 }, { ItemID.PlatinumCoin, 1 } }, this, 1, Recipes.Helpers.GetTokenRecipeBase(mod, tier));
         }
-
-        /*
-        public override bool CanEquipAccessory(Player player, int slot)
-        {
-            if (ClassTokens.CanWearMoreTokens(player,slot))
-                return false;
-            else 
-                return base.CanEquipAccessory(player, slot);
-        }
-        */
     }
 
     /* Cleric */
-    public class ClassToken_Cleric : ModItem
+    public class ClassToken_Cleric : ClassToken
     {
-        public override void SetDefaults()
+        public ClassToken_Cleric()
         {
-            item.name = "Class Token: Cleric (Tier II)";
-            item.width = 36;// = 27;
-            item.height = 36;// = 28;
-            item.toolTip = "Basic support class."+
+            name = "Cleric";
+            tier = 2;
+            desc = "Basic support class."+
                        "\n\nCan produce an Ichor Aura that occasionally inflicts"+
                          "\nIchor on all nearby enemies for a moment."+
-                       "\n\nClass advancement is available at level " + Recipes.ClassRecipes.TIER_3_LEVEL + ".";
-            ClassTokens.AddDescAndEffects(Main.LocalPlayer, item, "Cleric", false, new MyPlayer(),mod);
-            item.value = 0;
-            item.rare = 3;
-            item.accessory = true;
+                       "\n\nClass advancement is available at level " + Recipes.Helpers.TIER_LEVEL_REQUIREMENTS[tier+1] + ".";
         }
-
-        public override void UpdateAccessory(Player player, bool hideVisual)
-        {
-            ClassTokens.AddDescAndEffects(player, item, "Cleric", true, player.GetModPlayer<MyPlayer>(mod),mod);
-        }
-
         public override void AddRecipes()
         {
-            Commons.QuckRecipe(mod, new int[,] { { mod.ItemType("ClassToken_Novice"), 1 }, { ItemID.LesserHealingPotion, 3} }, this, 1, new Recipes.ClassRecipes(mod, 2));
+            Commons.QuckRecipe(mod, new int[,] { { mod.ItemType("ClassToken_Novice"), 1 }, { ItemID.LesserHealingPotion, 3} }, this, 1, Recipes.Helpers.GetTokenRecipeBase(mod, tier));
         }
-
-        /*
-        public override bool CanEquipAccessory(Player player, int slot)
-        {
-            if (ClassTokens.CanWearMoreTokens(player,slot))
-                return false;
-            else 
-                return base.CanEquipAccessory(player, slot);
-        }
-        */
     }
 
     /* Cleric - Saint */
-    public class ClassToken_Saint : ModItem
+    public class ClassToken_Saint : ClassToken
     {
-        public override void SetDefaults()
+        public ClassToken_Saint()
         {
-            item.name = "Class Token: Saint (Tier III)";
-            item.width = 36;// = 27;
-            item.height = 36;// = 28;
-            item.toolTip = "Advanced support class." +
+            name = "Saint";
+            tier = 3;
+            desc = "Advanced support class." +
                        "\n\nCan produce a longer-lasting Ichor Aura as well as a" +
                          "\nLife Aura (healing) and Damage Aura (harm). The Saint" +
                          "\nalso has several immunities, mana cost reduction, and" +
                          "\ndecent life and defense.";
-            ClassTokens.AddDescAndEffects(Main.LocalPlayer, item, "Saint", false, new MyPlayer(),mod);
-            item.value = 0;
-            item.rare = 10;
-            item.accessory = true;
         }
-
-        public override void UpdateAccessory(Player player, bool hideVisual)
-        {
-            ClassTokens.AddDescAndEffects(player, item, "Saint", true, player.GetModPlayer<MyPlayer>(mod),mod);
-        }
-
         public override void AddRecipes()
         {
             Commons.QuckRecipe(mod, new int[,] { { mod.ItemType("ClassToken_Cleric"), 1 }, { ItemID.HeartLantern, 1},
-                { ItemID.StarinaBottle, 1},{ ItemID.Campfire, 10} }, this, 1, new Recipes.ClassRecipes(mod, 3));
+                { ItemID.StarinaBottle, 1},{ ItemID.Campfire, 10} }, this, 1, Recipes.Helpers.GetTokenRecipeBase(mod, tier));
 
             Commons.QuckRecipe(mod, new int[,] { { mod.ItemType("ClassToken_Hybrid"), 1 }, { ItemID.HeartLantern, 1},
-                { ItemID.StarinaBottle, 1},{ ItemID.Campfire, 10} }, this, 1, new Recipes.ClassRecipes(mod, 3));
+                { ItemID.StarinaBottle, 1},{ ItemID.Campfire, 10} }, this, 1, Recipes.Helpers.GetTokenRecipeBase(mod, tier));
         }
-
-        /*
-        public override bool CanEquipAccessory(Player player, int slot)
-        {
-            if (ClassTokens.CanWearMoreTokens(player,slot))
-                return false;
-            else 
-                return base.CanEquipAccessory(player, slot);
-        }
-        */
     }
 
     /* Hybrid */
-    public class ClassToken_Hybrid : ModItem
+    public class ClassToken_Hybrid : ClassToken
     {
-        public override void SetDefaults()
+        public ClassToken_Hybrid()
         {
-            item.name = "Class Token: Hybrid (Tier II)";
-            item.width = 36;// = 27;
-            item.height = 36;// = 28;
-            item.toolTip = "Basic hybrid class."+
+            name = "Hybrid";
+            tier = 2;
+            desc = "Basic hybrid class."+
                        "\n\nCan advance to any Tier III class or to the well-rounded Hybrid II class."+
-                       "\n\nClass advancement is available at level " + Recipes.ClassRecipes.TIER_3_LEVEL + ".";
-            ClassTokens.AddDescAndEffects(Main.LocalPlayer, item, "Hybrid", false, new MyPlayer(),mod);
-            item.value = 0;
-            item.rare = 3;
-            item.accessory = true;
+                       "\n\nClass advancement is available at level " + Recipes.Helpers.TIER_LEVEL_REQUIREMENTS[tier+1] + ".";
         }
-
-        public override void UpdateAccessory(Player player, bool hideVisual)
-        {
-            ClassTokens.AddDescAndEffects(player, item, "Hybrid", true, player.GetModPlayer<MyPlayer>(mod),mod);
-        }
-
         public override void AddRecipes()
         {
-            Commons.QuckRecipe(mod, new int[,] { { mod.ItemType("ClassToken_Novice"), 1 }, { ItemID.DirtBlock, 200 } }, this, 1, new Recipes.ClassRecipes(mod, 2));
+            Commons.QuckRecipe(mod, new int[,] { { mod.ItemType("ClassToken_Novice"), 1 }, { ItemID.DirtBlock, 200 } }, this, 1, Recipes.Helpers.GetTokenRecipeBase(mod, tier));
         }
-
-        /*
-        public override bool CanEquipAccessory(Player player, int slot)
-        {
-            if (ClassTokens.CanWearMoreTokens(player,slot))
-                return false;
-            else 
-                return base.CanEquipAccessory(player, slot);
-        }
-        */
     }
 
     /* Hybrid - Hybrid II */
-    public class ClassToken_HybridII : ModItem
+    public class ClassToken_HybridII : ClassToken
     {
-        public override void SetDefaults()
+        public ClassToken_HybridII()
         {
-            item.name = "Class Token: Hybrid II (Tier III)";
-            item.width = 36;// = 27;
-            item.height = 36;// = 28;
-            item.toolTip = "Advanced hybrid class."+
+            name = "Hybrid II";
+            tier = 3;
+            desc = "Advanced hybrid class."+
                          "\nA jack-of-all-trades with numerous bonuses and decent"+
                          "\nsurvivability.";
-            ClassTokens.AddDescAndEffects(Main.LocalPlayer, item, "HybridII", false, new MyPlayer(),mod);
+        }
+        public override void AddRecipes()
+        {
+            Commons.QuckRecipe(mod, new int[,] { {mod.ItemType("ClassToken_Hybrid"), 1}, { ItemID.DirtBlock, 999} }, this, 1, Recipes.Helpers.GetTokenRecipeBase(mod, tier));
+        }
+    }
+
+    /* All Class Tokens are derived from this */
+    public class ClassToken : ModItem
+    {
+        public string[] TIER_NAMES = new string[] { "?", "I", "II", "III" };
+        public string name = "default";
+        public int tier = 1;
+        public string desc = "Class Token template. Not meant to be used as an in-game item.";
+        public override void SetDefaults()
+        {
+            //tier string
+            string tier_string = "?";
+            if (tier > 0 && tier < TIER_NAMES.Length) tier_string = TIER_NAMES[tier];
+
+            //basic properties
+            item.name = "Class Token: " + name + " (Tier " + tier_string + ")";
+            item.width = 36;
+            item.height = 36;
             item.value = 0;
             item.rare = 10;
             item.accessory = true;
-        }
 
+            //add class description
+            item.toolTip = desc;
+
+            //add class bonuses description
+            if (name != "default") ClassTokens.AddDescAndEffects(Main.LocalPlayer, item, name, false, new MyPlayer(), mod);
+        }
         public override void UpdateAccessory(Player player, bool hideVisual)
         {
-            ClassTokens.AddDescAndEffects(player, item, "HybridII", true, player.GetModPlayer<MyPlayer>(mod),mod);
+            ClassTokens.AddDescAndEffects(player, item, name, true, player.GetModPlayer<MyPlayer>(mod), mod);
         }
-
-        public override void AddRecipes()
-        {
-            Commons.QuckRecipe(mod, new int[,] { {mod.ItemType("ClassToken_Hybrid"), 1}, { ItemID.DirtBlock, 999} }, this, 1, new Recipes.ClassRecipes(mod, 3));
-        }
-
-        /*
-        public override bool CanEquipAccessory(Player player, int slot)
-        {
-            if (ClassTokens.CanWearMoreTokens(player,slot))
-                return false;
-            else 
-                return base.CanEquipAccessory(player, slot);
-        }
-        */
     }
 }

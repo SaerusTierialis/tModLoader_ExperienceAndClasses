@@ -478,7 +478,7 @@ namespace ExperienceAndClasses
             packet.Send(to_who,to_ignore);
         }
 
-        /* ~~~~~~~~~~~~~~~~~~~~~ PACKETS ~~~~~~~~~~~~~~~~~~~~~ */
+        /* ~~~~~~~~~~~~~~~~~~~~~ HANDLE PACKETS ~~~~~~~~~~~~~~~~~~~~~ */
 
         public override void HandlePacket(BinaryReader reader, int whoAmI)
         {

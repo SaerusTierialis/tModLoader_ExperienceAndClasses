@@ -4,48 +4,53 @@ using Terraria.ModLoader;
 
 namespace ExperienceAndClasses.Items
 {
-    /* Experience Orb x1 */
-	public class Experience : ModItem
+    /* Experience Orb x1 + all other Experience Orbs are derived from this*/
+    public class Experience : ModItem
 	{
-        const int orb_value = 1;
-        const double exp_value = ExperienceAndClasses.EXP_ITEM_VALUE * orb_value;
+        public int orb_value = 1;
 
         public override void SetDefaults()
 		{
+            //name
 			item.name = "Experience Orb";
-            Methods.SetDefaults_ExpOrbs(item, exp_value);
-            item.toolTip += "\nEnter \"/expuse #\" to consume several at once.";
+            if (orb_value > 1) item.name += " " + orb_value;
+
+            //info
+            item.toolTip = "Worth " + (ExperienceAndClasses.EXP_ITEM_VALUE * orb_value) + " experience.";
+            item.width = 29;
+            item.height = 30;
+            item.maxStack = 9999999;
+            item.value = 0;
+            item.rare = 7;
+            item.consumable = true;
+            item.useAnimation = 10;
+            item.useTime = 10;
+            item.useStyle = 4;
         }
 
 		public override void AddRecipes()
 		{
-            Recipes.Methods.AddRecipes_ExpOrbConversion(mod, this, orb_value);
-            Commons.QuckRecipe(mod, new int[,] { { } }, this, 1, new Recipes.ExpRecipe(mod, exp_value), TileID.Campfire);
+            Recipes.Helpers.AddRecipes_ExpOrbConversion(mod, this, orb_value);
+            Commons.QuckRecipe(mod, new int[,] { { } }, this, 1, new Recipes.ExpRecipe(mod, ExperienceAndClasses.EXP_ITEM_VALUE * orb_value), TileID.Campfire);
         }
-
         public override bool UseItem(Player player)
         {
-            player.GetModPlayer<MyPlayer>(mod).AddExp(ExperienceAndClasses.EXP_ITEM_VALUE);
+            player.GetModPlayer<MyPlayer>(mod).AddExp(ExperienceAndClasses.EXP_ITEM_VALUE * orb_value);
             return true;
         }
     }
 
     /* Experience Orb x100 */
-    public class Experience100 : ModItem
+    public class Experience100 : Experience
     {
-        const int orb_value = 100;
-        const double exp_value = ExperienceAndClasses.EXP_ITEM_VALUE * orb_value;
-
-        public override void SetDefaults()
+        public Experience100() : base()
         {
-            item.name = "Experience Orb 100";
-            Methods.SetDefaults_ExpOrbs(item, exp_value);
+            orb_value = 100;
         }
-
         public override void AddRecipes()
         {
-            Recipes.Methods.AddRecipes_ExpOrbConversion(mod, this, orb_value);
-            Commons.QuckRecipe(mod, new int[,] { { } }, this, 1, new Recipes.ExpRecipe(mod, exp_value), TileID.Campfire);
+            //include basic recipes
+            base.AddRecipes();
 
             /*~~~~~~~~~~~~~~~~~~~~~~~~Tier I Exchange Rates~~~~~~~~~~~~~~~~~~~~~~~~*/
             Commons.QuckRecipe(mod, new int[,] { { mod.ItemType("Boss_Orb"), 1 } }, this, 2, new Recipes.TierRecipe(mod, 1, true, false, -1, -1));
@@ -58,30 +63,19 @@ namespace ExperienceAndClasses.Items
             /*~~~~~~~~~~~~~~~~~~~~~~~~Tier 3 Exchange Rates~~~~~~~~~~~~~~~~~~~~~~~~*/
             Commons.QuckRecipe(mod, new int[,] { { mod.ItemType("Monster_Orb"), 1 } }, this, 5, new Recipes.TierRecipe(mod, 3, false, false, -1, 49));
         }
-
-        public override bool UseItem(Player player)
-        {
-            player.GetModPlayer<MyPlayer>(mod).AddExp(exp_value);
-            return true;
-        }
     }
 
     /* Experience Orb x1000 */
-    public class Experience1000 : ModItem
+    public class Experience1000 : Experience
     {
-        const int orb_value = 1000;
-        const double exp_value = ExperienceAndClasses.EXP_ITEM_VALUE * orb_value;
-
-        public override void SetDefaults()
+        public Experience1000() : base()
         {
-            item.name = "Experience Orb 1000";
-            Methods.SetDefaults_ExpOrbs(item, exp_value);
+            orb_value = 1000;
         }
-
         public override void AddRecipes()
         {
-            Recipes.Methods.AddRecipes_ExpOrbConversion(mod, this, orb_value);
-            Commons.QuckRecipe(mod, new int[,] { { } }, this, 1, new Recipes.ExpRecipe(mod, exp_value), TileID.Campfire);
+            //include basic recipes
+            base.AddRecipes();
 
             /*~~~~~~~~~~~~~~~~~~~~~~~~Tier 3 Exchange Rates~~~~~~~~~~~~~~~~~~~~~~~~*/
             Commons.QuckRecipe(mod, new int[,] { { mod.ItemType("Boss_Orb"), 1 } }, this, 1, new Recipes.TierRecipe(mod, 3, false, false, -1, 49));
@@ -90,86 +84,32 @@ namespace ExperienceAndClasses.Items
             Commons.QuckRecipe(mod, new int[,] { { mod.ItemType("Boss_Orb"), 1 } }, this, 2, new Recipes.TierRecipe(mod, 3, false, false, 50, -1));
             Commons.QuckRecipe(mod, new int[,] { { mod.ItemType("Monster_Orb"), 1 } }, this, 1, new Recipes.TierRecipe(mod, 3, false, false, 50, -1));
         }
-
-        public override bool UseItem(Player player)
-        {
-            player.GetModPlayer<MyPlayer>(mod).AddExp(exp_value);
-            return true;
-        }
     }
 
     /* Experience Orb x10,000 */
-    public class Experience10000 : ModItem
+    public class Experience10000 : Experience
     {
-        const int orb_value = 10000;
-        const double exp_value = ExperienceAndClasses.EXP_ITEM_VALUE * orb_value;
-
-        public override void SetDefaults()
+        public Experience10000() : base()
         {
-            item.name = "Experience Orb 10,000";
-            Methods.SetDefaults_ExpOrbs(item, exp_value);
-        }
-
-        public override void AddRecipes()
-        {
-            Recipes.Methods.AddRecipes_ExpOrbConversion(mod, this, orb_value);
-            Commons.QuckRecipe(mod, new int[,] { { } }, this, 1, new Recipes.ExpRecipe(mod, exp_value), TileID.Campfire);
-        }
-
-        public override bool UseItem(Player player)
-        {
-            player.GetModPlayer<MyPlayer>(mod).AddExp(exp_value);
-            return true;
+            orb_value = 10000;
         }
     }
 
     /* Experience Orb x100,000 */
-    public class Experience100000 : ModItem
+    public class Experience100000 : Experience
     {
-        const int orb_value = 100000;
-        const double exp_value = ExperienceAndClasses.EXP_ITEM_VALUE * orb_value;
-
-        public override void SetDefaults()
+        public Experience100000() : base()
         {
-            item.name = "Experience Orb 100,000";
-            Methods.SetDefaults_ExpOrbs(item, exp_value);
-        }
-
-        public override void AddRecipes()
-        {
-            Recipes.Methods.AddRecipes_ExpOrbConversion(mod, this, orb_value);
-            Commons.QuckRecipe(mod, new int[,] { { } }, this, 1, new Recipes.ExpRecipe(mod, exp_value), TileID.Campfire);
-        }
-
-        public override bool UseItem(Player player)
-        {
-            player.GetModPlayer<MyPlayer>(mod).AddExp(exp_value);
-            return true;
+            orb_value = 100000;
         }
     }
 
     /* Experience Orb x1,000,000 */
-    public class Experience1000000 : ModItem
+    public class Experience1000000 : Experience
     {
-        const int orb_value = 1000000;
-        const double exp_value = ExperienceAndClasses.EXP_ITEM_VALUE * orb_value;
-
-        public override void SetDefaults()
+        public Experience1000000() : base()
         {
-            item.name = "Experience Orb 1,000,000";
-            Methods.SetDefaults_ExpOrbs(item, exp_value);
-        }
-
-        public override void AddRecipes()
-        {
-            Recipes.Methods.AddRecipes_ExpOrbConversion(mod, this, orb_value);
-            Commons.QuckRecipe(mod, new int[,] { { } }, this, 1, new Recipes.ExpRecipe(mod, exp_value), TileID.Campfire);
-        }
-
-        public override bool UseItem(Player player)
-        {
-            player.GetModPlayer<MyPlayer>(mod).AddExp(exp_value);
-            return true;
+            orb_value = 1000000;
         }
     }
 
@@ -216,29 +156,6 @@ namespace ExperienceAndClasses.Items
 
             //alt recipe: plat
             Commons.QuckRecipe(mod, new int[,] { { ItemID.LifeCrystal, 1 }, { ItemID.ManaCrystal, 1 }, { ItemID.PlatinumBar, 20 } }, this, 1);
-        }
-    }
-
-    /* General Methods */
-    class Methods
-    {
-        /// <summary>
-        /// Fill item info for Exp Orbs
-        /// </summary>
-        /// <param name="item"></param>
-        /// <param name="exp_value"></param>
-        public static void SetDefaults_ExpOrbs(Item item, double exp_value)
-        {
-            item.toolTip = "Worth " + exp_value + " experience.";
-            item.width = 29;
-            item.height = 30;
-            item.maxStack = 9999999;
-            item.value = 0;
-            item.rare = 7;
-            item.consumable = true;
-            item.useAnimation = 10;
-            item.useTime = 10;
-            item.useStyle = 4;
         }
     }
 }
