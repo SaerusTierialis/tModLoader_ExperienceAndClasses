@@ -3,7 +3,7 @@ using Terraria.ModLoader;
 
 namespace ExperienceAndClasses  
 {
-    class MyProjectile : GlobalProjectile
+    class MyGlobalProjectile : GlobalProjectile
     {
 
     }
