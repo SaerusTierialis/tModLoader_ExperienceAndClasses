@@ -6,8 +6,10 @@ using Terraria.ModLoader;
 namespace ExperienceAndClasses.Items
 {
     /* General Functins */
-    public class ClassTokens
+    public static class ClassTokenMethods
     {
+        static Mod mod = ModLoader.GetMod("ExperienceAndClasses");
+
         //public static int TOKEN_LIMIT = 1;
 
         public const int LAST_AT_LEVEL = 100; //highest "At Level X" bonus
@@ -76,7 +78,7 @@ namespace ExperienceAndClasses.Items
             return countTokens;
         }
 
-        public static void AddDescAndEffects(Player player, Item item, string job, bool apply, MyPlayer myPlayer, Mod mod)
+        public static void AddDescAndEffects(Player player, Item item, string job, bool apply, MyPlayer myPlayer=null)
         {
             //auto-generate declarations/initializations
             float statLifeMax2 = 0f;
@@ -458,6 +460,9 @@ namespace ExperienceAndClasses.Items
                 default:
                     break;
             }
+
+            //get the MyPlayer
+            if(myPlayer==null) myPlayer = player.GetModPlayer<MyPlayer>(mod);
 
             //experience and ignore class caps
             double experience = 0;
@@ -1786,11 +1791,11 @@ namespace ExperienceAndClasses.Items
             item.toolTip = desc;
 
             //add class bonuses description
-            if (name != "default") ClassTokens.AddDescAndEffects(Main.LocalPlayer, item, name, false, new MyPlayer(), mod);
+            if (name != "default") ClassTokenMethods.AddDescAndEffects(Main.LocalPlayer, item, name, false, new MyPlayer());
         }
         public override void UpdateAccessory(Player player, bool hideVisual)
         {
-            ClassTokens.AddDescAndEffects(player, item, name, true, player.GetModPlayer<MyPlayer>(mod), mod);
+            ClassTokenMethods.AddDescAndEffects(player, item, name, true);
         }
     }
 }
