@@ -63,7 +63,6 @@ namespace ExperienceAndClasses.Methods
         /// <returns></returns>
         public static double GetExpUntilNextLevel(double experience)
         {
-            int level = GetLevel(experience);
             return GetExpReqForLevel(GetLevel(experience) + 1, true) - experience;
         }
 
@@ -75,7 +74,6 @@ namespace ExperienceAndClasses.Methods
         /// <returns></returns>
         public static double GetExpTowardsNextLevel(double experience)
         {
-            int level = GetLevel(experience);
             return experience - GetExpReqForLevel(GetLevel(experience), true);
         }
 

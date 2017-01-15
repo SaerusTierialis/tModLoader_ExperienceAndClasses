@@ -3,9 +3,9 @@ using Terraria.ModLoader;
 
 namespace ExperienceAndClasses.Buffs
 {
+    /* Assassin opener attack indicator */
     class Buff_OpenerAttack : ModBuff
     {
-
         public override void SetDefaults()
         {
             Main.buffName[Type] = "Opener Attack";
@@ -13,6 +13,5 @@ namespace ExperienceAndClasses.Buffs
             Main.buffNoTimeDisplay[Type] = true;
             Main.buffNoSave[Type] = true;
         }
-
     }
 }

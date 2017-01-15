@@ -4,7 +4,7 @@ using Terraria.ModLoader;
 
 namespace ExperienceAndClasses.Dusts
 {
-    class Dust_OpenerAttack : ModDust
+    public class Dust_OpenerAttack : Dusts
     {
         public override void OnSpawn(Dust dust)
         {
@@ -12,7 +12,12 @@ namespace ExperienceAndClasses.Dusts
             dust.velocity.X *= 0.3f;
             dust.scale *= 0.7f;
         }
+    }
 
+
+
+    public abstract class Dusts : ModDust
+    {
         public override bool MidUpdate(Dust dust)
         {
             if (!dust.noGravity)

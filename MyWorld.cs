@@ -25,10 +25,10 @@ namespace ExperienceAndClasses
 
         public override void Load(TagCompound tag)
         {
-            ExperienceAndClasses.AUTH_CODE = tag.TryGet<double>("AUTH_CODE", -1);
-            ExperienceAndClasses.require_auth = tag.TryGet<bool>("require_auth", true);
-            ExperienceAndClasses.global_exp_modifier = tag.TryGet<double>("global_exp_modifier", 1);
-            ExperienceAndClasses.global_ignore_caps = tag.TryGet<bool>("global_ignore_caps", false);
+            ExperienceAndClasses.AUTH_CODE = Commons.TryGet<double>(tag, "AUTH_CODE", -1);
+            ExperienceAndClasses.require_auth = Commons.TryGet<bool>(tag, "require_auth", true);
+            ExperienceAndClasses.global_exp_modifier = Commons.TryGet<double>(tag, "global_exp_modifier", 1);
+            ExperienceAndClasses.global_ignore_caps = Commons.TryGet<bool>(tag, "global_ignore_caps", false);
         }
 
         public override void PostUpdate()

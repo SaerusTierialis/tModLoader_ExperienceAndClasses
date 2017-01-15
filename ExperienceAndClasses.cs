@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System;
 using System.IO;
 
+//needed for compiling outside of Terraria
 public class Application
 {
     [STAThread]

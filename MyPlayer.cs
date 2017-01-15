@@ -183,35 +183,34 @@ namespace ExperienceAndClasses
         public override void Load(TagCompound tag)
         {
             //load exp
-            experience = tag.TryGet<double>("experience", 0);
+            experience = Commons.TryGet<double>(tag, "experience", 0);
             if (experience < 0) experience = 0;
             if (experience > MAX_EXPERIENCE) experience = MAX_EXPERIENCE;
 
             //load exp rate
-            experience_modifier = tag.TryGet<double>("experience_modifier", 1);
+            experience_modifier = Commons.TryGet<double>(tag, "experience_modifier", 1);
 
             //load exp message
-            display_exp = tag.TryGet<bool>("display_exp", false);
+            display_exp = Commons.TryGet<bool>(tag, "display_exp", false);
 
             //load ignore caps
-            ignore_caps = tag.TryGet<bool>("ignore_caps", false);
+            ignore_caps = Commons.TryGet<bool>(tag, "ignore_caps", false);
 
             //UI
-            UI_left = tag.TryGet<float>("UI_left", 400f);
-            UI_top = tag.TryGet<float>("UI_top", 100f);
-            UI_show = tag.TryGet<bool>("UI_show", true);
-            UI_trans = tag.TryGet<bool>("UI_trans", false);
+            UI_left = Commons.TryGet<float>(tag, "UI_left", 400f);
+            UI_top = Commons.TryGet<float>(tag, "UI_top", 100f);
+            UI_show = Commons.TryGet<bool>(tag, "UI_show", true);
+            UI_trans = Commons.TryGet<bool>(tag, "UI_trans", false);
 
             //has_looted_monster_orb
-            has_looted_monster_orb = tag.TryGet<bool>("has_looted_monster_orb", false);
+            has_looted_monster_orb = Commons.TryGet<bool>(tag, "has_looted_monster_orb", false);
 
             //explvlcap
-            explvlcap = tag.TryGet<int>("explvlcap", -1);
+            explvlcap = Commons.TryGet<int>(tag, "explvlcap", -1);
 
             //expdmgred
-            expdmgred = tag.TryGet<int>("expdmgred", -1);
+            expdmgred = Commons.TryGet<int>(tag, "expdmgred", -1);
         }
-
 
         public override void SetupStartInventory(IList<Item> items)
         {
@@ -265,13 +264,13 @@ namespace ExperienceAndClasses
 
             base.PreUpdate();
         }
-
+        
         public override void PostUpdateEquips()
         {
+            /*
             //class
             string job = Methods.Experience.GetClass(player);
 
-            /*
             if (job.Equals("No Class"))
             {
                 has_class = false;
