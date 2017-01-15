@@ -144,9 +144,9 @@ namespace ExperienceAndClasses.UI
             float shopy = innerDimensions.Y - 5f;
 
             int level = Methods.Experience.GetLevel(exp);
-            double exp_have = Methods.Experience.GetExpTowardsNextLevel(exp);
-            double exp_need = Methods.Experience.GetExpReqForLevel(level+1,false);
-            float pct = (float)(exp_have / exp_need);
+            double expHave = Methods.Experience.GetExpTowardsNextLevel(exp);
+            double expNeed = Methods.Experience.GetExpReqForLevel(level+1,false);
+            float pct = (float)(expHave / expNeed);
             float pctShow = (float)Math.Round((double)pct * 100, 2);
             if (pctShow == 100) pctShow = 99.99f;
 
@@ -154,23 +154,23 @@ namespace ExperienceAndClasses.UI
             {
                 pct = 1f;
                 pctShow = 100;
-                exp_have = 0;
-                exp_need = 0;
+                expHave = 0;
+                expNeed = 0;
             }
 
-            string str_exp_num = exp_have + "/" + exp_need;
-            Vector2 v2_exp_num = Main.fontMouseText.MeasureString(str_exp_num);
+            string strExpNum = expHave + "/" + expNeed;
+            Vector2 v2ExpNum = Main.fontMouseText.MeasureString(strExpNum);
 
-            string str_pct_show = pctShow + "%";
-            Vector2 v2_pct_show = Main.fontMouseText.MeasureString(str_pct_show);
+            string strPctShow = pctShow + "%";
+            Vector2 v2PctShow = Main.fontMouseText.MeasureString(strPctShow);
 
             Utils.DrawBorderStringFourWay(spriteBatch, Main.fontMouseText, "LEVEL: " + level, shopx, shopy, Color.White, Color.Black, new Vector2(0.3f), 0.75f);
 
-            Utils.DrawBorderStringFourWay(spriteBatch, Main.fontMouseText, str_pct_show, shopx + 120f - (v2_pct_show.X/3), shopy, Color.White, Color.Black, new Vector2(0.3f), 0.75f);
+            Utils.DrawBorderStringFourWay(spriteBatch, Main.fontMouseText, strPctShow, shopx + 120f - (v2PctShow.X/3), shopy, Color.White, Color.Black, new Vector2(0.3f), 0.75f);
             //shopx + (float)(24 * 4)
 
-            if (exp_need<=999999999 && exp_need>0)
-                Utils.DrawBorderStringFourWay(spriteBatch, Main.fontMouseText, str_exp_num, (shopx+65f) - (v2_exp_num.X/3), shopy + 25f, Color.White, Color.Black, new Vector2(0.3f), 0.75f);
+            if (expNeed<=999999999 && expNeed>0)
+                Utils.DrawBorderStringFourWay(spriteBatch, Main.fontMouseText, strExpNum, (shopx+65f) - (v2ExpNum.X/3), shopy + 25f, Color.White, Color.Black, new Vector2(0.3f), 0.75f);
 
             //shopx + (float)(24 * 1.6f)
 

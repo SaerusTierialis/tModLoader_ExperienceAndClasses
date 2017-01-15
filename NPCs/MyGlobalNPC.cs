@@ -49,14 +49,14 @@ namespace ExperienceAndClasses.NPCs
                         if (player.active && player.Distance(npc.position) <= 5000f)
                         {
                             myPlayer = player.GetModPlayer<MyPlayer>(mod);
-                            if (myPlayer.has_looted_monster_orb) chance = 150;
+                            if (myPlayer.hasLootedMonsterOrb) chance = 150;
                                 else chance = 75;
                             if (Main.rand.Next(chance) == 0) // 1/200 (1/75 for first orb)
                             {
-                                if (!myPlayer.has_looted_monster_orb)
+                                if (!myPlayer.hasLootedMonsterOrb)
                                 {
                                     //records orb loot
-                                    myPlayer.has_looted_monster_orb = true;
+                                    myPlayer.hasLootedMonsterOrb = true;
 
                                     if (Main.netMode == 2)
                                     {
@@ -96,7 +96,7 @@ namespace ExperienceAndClasses.NPCs
                         myPlayer = player.GetModPlayer<MyPlayer>(mod);
 
                         //generous distance cutoff (a few screens)
-                        if ((myPlayer.experience_modifier>0) && (npc.boss || (player.Distance(npc.position) <= 5000f))) //&& myPlayer.has_class)
+                        if ((myPlayer.experienceModifier>0) && (npc.boss || (player.Distance(npc.position) <= 5000f)))
                         {
                             //10% bonus for well fed
                             expGive = experience;
@@ -104,9 +104,9 @@ namespace ExperienceAndClasses.NPCs
 
                             //apply rate bonus
                             if (Main.netMode == 0)
-                                expGive *= myPlayer.experience_modifier; //single-player
+                                expGive *= myPlayer.experienceModifier; //single-player
                             else
-                                expGive *= ExperienceAndClasses.global_exp_modifier; //server
+                                expGive *= ExperienceAndClasses.globalExpModifier; //server
 
                             //min 1 exp
                             if (expGive < 1f) expGive = 1f;

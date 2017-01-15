@@ -12,23 +12,23 @@ namespace ExperienceAndClasses.Recipes
         /// If this returns false in a OnCraft, you must "Main.mouseItem.stack--;" to prevent exploit.
         /// </summary>
         /// <param name="mod"></param>
-        /// <param name="experience_needed"></param>
+        /// <param name="experienceNeeded"></param>
         /// <returns></returns>
-        public static bool CraftWithExp(double experience_needed)
+        public static bool CraftWithExp(double experienceNeeded)
         {
             MyPlayer myPlayer = Main.LocalPlayer.GetModPlayer<MyPlayer>(mod);
 
-            if (myPlayer.GetExp() >= experience_needed) //have enough exp
+            if (myPlayer.GetExp() >= experienceNeeded) //have enough exp
             {
                 //take exp
-                if (experience_needed > 0)
+                if (experienceNeeded > 0)
                 {
                     if (Main.netMode == 0)
-                        myPlayer.SubtractExp(experience_needed);
+                        myPlayer.SubtractExp(experienceNeeded);
                     else
                     {
                         //tell server to reduce experience
-                        Methods.PacketSender.ClientTellAddExp(-experience_needed);
+                        Methods.PacketSender.ClientTellAddExp(-experienceNeeded);
                     }
                 }
 
@@ -48,29 +48,29 @@ namespace ExperienceAndClasses.Recipes
         /// </summary>
         /// <param name="mod"></param>
         /// <param name="target"></param>
-        /// <param name="target_orb_value"></param>
-        public static void AddRecipes_ExpOrbConversion(ModItem target, int target_orb_value)
+        /// <param name="targetOrbValue"></param>
+        public static void AddRecipes_ExpOrbConversion(ModItem target, int targetOrbValue)
         {
             int value;
-            string value_str;
+            string valueStr;
             for (int i = 0; i < values.Length; i++)
             {
                 value = values[i];
 
-                if (value != 1 && target_orb_value != 1) continue; //only convert to and from 1s for now
+                if (value != 1 && targetOrbValue != 1) continue; //only convert to and from 1s for now
 
-                if (value != 1) value_str = "" + value;
-                else value_str = "";
+                if (value != 1) valueStr = "" + value;
+                else valueStr = "";
 
-                if (value > target_orb_value)
+                if (value > targetOrbValue)
                 {
                     //convert DOWN
-                    Commons.QuckRecipe(mod, new int[,] { { mod.ItemType("Experience" + value_str), 1 } }, target, value / target_orb_value);
+                    Commons.QuckRecipe(mod, new int[,] { { mod.ItemType("Experience" + valueStr), 1 } }, target, value / targetOrbValue);
                 }
-                else if (value < target_orb_value)
+                else if (value < targetOrbValue)
                 {
                     //convert UP
-                    Commons.QuckRecipe(mod, new int[,] { { mod.ItemType("Experience" + value_str), target_orb_value / value } }, target);
+                    Commons.QuckRecipe(mod, new int[,] { { mod.ItemType("Experience" + valueStr), targetOrbValue / value } }, target);
                 }
             }
         }
@@ -85,11 +85,11 @@ namespace ExperienceAndClasses.Recipes
         public static ModRecipe GetTokenRecipeBase(int tier)
         {
             //experience required
-            double experience_required = 0;
-            if (tier > 0 && tier < TIER_LEVEL_REQUIREMENTS.Length) experience_required = Methods.Experience.GetExpReqForLevel(TIER_LEVEL_REQUIREMENTS[tier], true);
+            double experienceRequired = 0;
+            if (tier > 0 && tier < TIER_LEVEL_REQUIREMENTS.Length) experienceRequired = Methods.Experience.GetExpReqForLevel(TIER_LEVEL_REQUIREMENTS[tier], true);
 
             //use ClassRecipe as starting point
-            ModRecipe recipe = new ClassRecipes2(mod, experience_required);
+            ModRecipe recipe = new ClassRecipes2(mod, experienceRequired);
 
             //add standard item requirements (not class specific)
             switch (tier)

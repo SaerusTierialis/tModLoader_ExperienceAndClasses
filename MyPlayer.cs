@@ -15,29 +15,27 @@ namespace ExperienceAndClasses
         public bool auth = false;
 
         public double experience = -1;
-        public double experience_modifier = 1;
+        public double experienceModifier = 1;
 
         public int explvlcap = -1;
         public int expdmgred = -1;
 
-        public bool display_exp = false;
-        public bool ignore_caps = false;
+        public bool displayExp = false;
+        public bool ignoreCaps = false;
 
-        public float UI_left = 400f;
-        public float UI_top = 100f;
-        public bool UI_show = true;
-        public bool UI_trans = false;
+        public float UILeft = 400f;
+        public float UITop = 100f;
+        public bool UIShow = true;
+        public bool UITrans = false;
 
-        //public bool has_class = true;
+        public double bonusCritPct = 0;
+        public double openerBonusPct = 0;
+        public int openerTime_msec = 0;
+        public DateTime timeLastAttack = DateTime.MinValue;
 
-        public double bonus_crit_pct = 0;
-        public double opener_bonus_pct = 0;
-        public int opener_time_msec = 0;
-        public DateTime time_last_attack = DateTime.MinValue;
+        public float percentMidas = 0;
 
-        public float percent_midas = 0;
-
-        public bool has_looted_monster_orb = false;
+        public bool hasLootedMonsterOrb = false;
 
         
         /// <summary>
@@ -113,27 +111,27 @@ namespace ExperienceAndClasses
 
             if (explvlcap!=-1)
             {
-                double exp_cap = Methods.Experience.GetExpReqForLevel(explvlcap, true);
-                if (experience > exp_cap) experience = exp_cap;
+                double expCap = Methods.Experience.GetExpReqForLevel(explvlcap, true);
+                if (experience > expCap) experience = expCap;
             }
         }
 
         /// <summary>
         /// Displays level-up/down messages. For use in single-player or by server.
         /// </summary>
-        /// <param name="prior_level"></param>
-        public void LevelUp(int prior_level)
+        /// <param name="priorLevel"></param>
+        public void LevelUp(int priorLevel)
         {
             /*~~~~~~~~~~~~~~~~~~~~~~Single Player and Server Only~~~~~~~~~~~~~~~~~~~~~~*/
             if (Main.netMode == 1) return;
 
             int level = Methods.Experience.GetLevel(GetExp());
-            if (level>prior_level)
+            if (level>priorLevel)
             {
                 if (Main.netMode == 0) Main.NewText("You have reached level " + level + "!");
                     else NetMessage.SendData(25, -1, -1, player.name+" has reached level "+level+"!", 255, 0, 255, 0, 0);
             }
-            else if (level<prior_level)
+            else if (level<priorLevel)
             {
                 if (Main.netMode == 0) Main.NewText("You has fallen to level " + level + "!");
                     else NetMessage.SendData(25, -1, -1, player.name + " has dropped to level " + level + "!", 255, 255, 0, 0, 0);
@@ -143,37 +141,37 @@ namespace ExperienceAndClasses
         /// <summary>
         /// Displays the local "You have gained/lost x experience." message. Loss is always displayed.
         /// </summary>
-        /// <param name="experience_change"></param>
-        public void ExpMsg(double experience_change)
+        /// <param name="experienceChange"></param>
+        public void ExpMsg(double experienceChange)
         {
             if (!Main.LocalPlayer.Equals(player)) return;
 
-            if (experience_change>0 && display_exp)
+            if (experienceChange>0 && displayExp)
             {
-                Main.NewText("You have earned " + (int)experience_change + " experience.");
+                Main.NewText("You have earned " + (int)experienceChange + " experience.");
             }
-            else if (experience_change<0)
+            else if (experienceChange<0)
             {
-                Main.NewText("You have lost " + (int)(experience_change * -1) + " experience.");
+                Main.NewText("You have lost " + (int)(experienceChange * -1) + " experience.");
             }
         }
 
         //save xp
         public override TagCompound Save()
         {
-            UI_left = (mod as ExperienceAndClasses).myUI.getLeft();
-            UI_top = (mod as ExperienceAndClasses).myUI.getTop();
+            UILeft = (mod as ExperienceAndClasses).myUI.getLeft();
+            UITop = (mod as ExperienceAndClasses).myUI.getTop();
 
             return new TagCompound {
                 { "experience", experience},
-                {"experience_modifier", experience_modifier},
-                {"display_exp", display_exp},
-                {"ignore_caps", ignore_caps},
-                {"UI_left", UI_left},
-                {"UI_top", UI_top},
-                {"UI_show", UI_show},
-                {"has_looted_monster_orb", has_looted_monster_orb},
-                {"UI_trans", UI_trans},
+                {"experience_modifier", experienceModifier},
+                {"display_exp", displayExp},
+                {"ignore_caps", ignoreCaps},
+                {"UI_left", UILeft},
+                {"UI_top", UITop},
+                {"UI_show", UIShow},
+                {"has_looted_monster_orb", hasLootedMonsterOrb},
+                {"UI_trans", UITrans},
                 {"explvlcap", explvlcap},
                 {"expdmgred", expdmgred}
             };
@@ -188,22 +186,22 @@ namespace ExperienceAndClasses
             if (experience > MAX_EXPERIENCE) experience = MAX_EXPERIENCE;
 
             //load exp rate
-            experience_modifier = Commons.TryGet<double>(tag, "experience_modifier", 1);
+            experienceModifier = Commons.TryGet<double>(tag, "experience_modifier", 1);
 
             //load exp message
-            display_exp = Commons.TryGet<bool>(tag, "display_exp", false);
+            displayExp = Commons.TryGet<bool>(tag, "display_exp", false);
 
             //load ignore caps
-            ignore_caps = Commons.TryGet<bool>(tag, "ignore_caps", false);
+            ignoreCaps = Commons.TryGet<bool>(tag, "ignore_caps", false);
 
             //UI
-            UI_left = Commons.TryGet<float>(tag, "UI_left", 400f);
-            UI_top = Commons.TryGet<float>(tag, "UI_top", 100f);
-            UI_show = Commons.TryGet<bool>(tag, "UI_show", true);
-            UI_trans = Commons.TryGet<bool>(tag, "UI_trans", false);
+            UILeft = Commons.TryGet<float>(tag, "UI_left", 400f);
+            UITop = Commons.TryGet<float>(tag, "UI_top", 100f);
+            UIShow = Commons.TryGet<bool>(tag, "UI_show", true);
+            UITrans = Commons.TryGet<bool>(tag, "UI_trans", false);
 
-            //has_looted_monster_orb
-            has_looted_monster_orb = Commons.TryGet<bool>(tag, "has_looted_monster_orb", false);
+            //hasLootedMonsterOrb
+            hasLootedMonsterOrb = Commons.TryGet<bool>(tag, "has_looted_monster_orb", false);
 
             //explvlcap
             explvlcap = Commons.TryGet<int>(tag, "explvlcap", -1);
@@ -235,16 +233,16 @@ namespace ExperienceAndClasses
                 }
 
                 UI.MyUI.visible = true;
-                (mod as ExperienceAndClasses).myUI.setTrans(UI_trans);
-                (mod as ExperienceAndClasses).myUI.setPosition(UI_left, UI_top);
+                (mod as ExperienceAndClasses).myUI.setTrans(UITrans);
+                (mod as ExperienceAndClasses).myUI.setPosition(UILeft, UITop);
                 (mod as ExperienceAndClasses).myUI.updateValue(GetExp());
 
                 //settings
                 if (Main.netMode == 0)
                 {
-                    Main.NewText("Require Auth: " + ExperienceAndClasses.require_auth);
-                    Main.NewText("Experience Rate: " + (experience_modifier*100)+"%");
-                    Main.NewText("Ignore Class Caps: " + ignore_caps);
+                    Main.NewText("Require Auth: " + ExperienceAndClasses.requireAuth);
+                    Main.NewText("Experience Rate: " + (experienceModifier*100)+"%");
+                    Main.NewText("Ignore Class Caps: " + ignoreCaps);
                     if (explvlcap > 0) Main.NewText("Level Cap: " + explvlcap);
                         else Main.NewText("Level Cap: disabled");
                     if (expdmgred > 0) Main.NewText("Reduce Class Damamge: " + expdmgred + "%");
@@ -257,34 +255,20 @@ namespace ExperienceAndClasses
 
         public override void PreUpdate()
         {
-            bonus_crit_pct = 0;
-            opener_bonus_pct = 0;
-            opener_time_msec = 0;
-            percent_midas = 0;
+            bonusCritPct = 0;
+            openerBonusPct = 0;
+            openerTime_msec = 0;
+            percentMidas = 0;
 
             base.PreUpdate();
         }
         
         public override void PostUpdateEquips()
         {
-            /*
-            //class
-            string job = Methods.Experience.GetClass(player);
-
-            if (job.Equals("No Class"))
-            {
-                has_class = false;
-            }
-            else
-            {
-                has_class = true;
-            }
-            */
-
             //UI
             if (player.Equals(Main.LocalPlayer))
             {
-                if (UI_show)// && has_class)
+                if (UIShow)
                 {
                     UI.MyUI.visible = true;
                 }
@@ -317,17 +301,17 @@ namespace ExperienceAndClasses
             {
                 int level = Methods.Experience.GetLevel(GetExp());
 
-                double max_loss = Methods.Experience.GetExpReqForLevel(level + 1, false) * 0.1;
-                double exp_so_far = Methods.Experience.GetExpTowardsNextLevel(GetExp());
+                double maxLoss = Methods.Experience.GetExpReqForLevel(level + 1, false) * 0.1;
+                double expSoFar = Methods.Experience.GetExpTowardsNextLevel(GetExp());
 
-                double exp_loss = max_loss;
-                if (exp_so_far < max_loss)
+                double expLoss = maxLoss;
+                if (expSoFar < maxLoss)
                 {
-                    exp_loss = exp_so_far;
+                    expLoss = expSoFar;
                 }
-                exp_loss = Math.Floor(exp_loss);
+                expLoss = Math.Floor(expLoss);
 
-                SubtractExp(exp_loss); //notifies client if server
+                SubtractExp(expLoss); //notifies client if server
 
                 if (Main.netMode==0)
                 {
@@ -341,26 +325,26 @@ namespace ExperienceAndClasses
         public override void ModifyHitNPC(Item item, NPC target, ref int damage, ref float knockback, ref bool crit)
         {
             //on-hit midas
-            if (Main.rand.Next(100) < (percent_midas * 100)) target.AddBuff(Terraria.ID.BuffID.Midas, 300);
+            if (Main.rand.Next(100) < (percentMidas * 100)) target.AddBuff(Terraria.ID.BuffID.Midas, 300);
 
             //Assassin special attack
             DateTime now = DateTime.Now;
-            if (opener_bonus_pct>0 && item.melee && (time_last_attack.AddMilliseconds(opener_time_msec).CompareTo(now)<=0 || target.life==target.lifeMax))
+            if (openerBonusPct>0 && item.melee && (timeLastAttack.AddMilliseconds(openerTime_msec).CompareTo(now)<=0 || target.life==target.lifeMax))
             {
                 //bonus opener damage
-                damage = (int)Math.Round((double)damage * (1 + opener_bonus_pct), 0);
+                damage = (int)Math.Round((double)damage * (1 + openerBonusPct), 0);
 
                 //crit opener?
-                if (bonus_crit_pct > 0) damage = (int)Math.Round((double)damage * (1 + (bonus_crit_pct*3)), 0);
+                if (bonusCritPct > 0) damage = (int)Math.Round((double)damage * (1 + (bonusCritPct*3)), 0);
             }
             else
             {
                 //bonus crit damage (Assassin)
-                if (item.melee && bonus_crit_pct > 0) damage = (int)Math.Round((double)damage * (1 + bonus_crit_pct), 0);
+                if (item.melee && bonusCritPct > 0) damage = (int)Math.Round((double)damage * (1 + bonusCritPct), 0);
             }
 
             //record time
-            time_last_attack = now;
+            timeLastAttack = now;
 
             //remove buff
             int buffInd = player.FindBuffIndex(mod.BuffType("Buff_OpenerAttack"));
@@ -373,22 +357,22 @@ namespace ExperienceAndClasses
         public override void ModifyHitNPCWithProj(Projectile proj, NPC target, ref int damage, ref float knockback, ref bool crit, ref int hitDirection)
         {
             //on-hit midas
-            if (Main.rand.Next(100) < (percent_midas * 100)) target.AddBuff(Terraria.ID.BuffID.Midas, 300);
+            if (Main.rand.Next(100) < (percentMidas * 100)) target.AddBuff(Terraria.ID.BuffID.Midas, 300);
 
             //Assassin special attack for yoyo
             DateTime now = DateTime.Now;
             Item item = Main.player[proj.owner].HeldItem;
-            if (opener_bonus_pct > 0 && proj.melee && item.channel && (time_last_attack.AddMilliseconds(opener_time_msec).CompareTo(now) <= 0 || target.life == target.lifeMax))
+            if (openerBonusPct > 0 && proj.melee && item.channel && (timeLastAttack.AddMilliseconds(openerTime_msec).CompareTo(now) <= 0 || target.life == target.lifeMax))
             {
                 //bonus opener damage (50% YOYO PENALTY)
-                damage = (int)Math.Round((double)damage * (1 + (opener_bonus_pct/2)), 0);
+                damage = (int)Math.Round((double)damage * (1 + (openerBonusPct/2)), 0);
 
                 //crit opener?
-                if (bonus_crit_pct > 0) damage = (int)Math.Round((double)damage * (1 + (bonus_crit_pct * 3)), 0);
+                if (bonusCritPct > 0) damage = (int)Math.Round((double)damage * (1 + (bonusCritPct * 3)), 0);
             }
 
             //record time
-            time_last_attack = now;
+            timeLastAttack = now;
 
             //remove buff
             int buffInd = player.FindBuffIndex(mod.BuffType("Buff_OpenerAttack"));

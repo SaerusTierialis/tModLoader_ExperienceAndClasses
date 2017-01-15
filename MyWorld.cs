@@ -10,46 +10,46 @@ namespace ExperienceAndClasses
         public const double TIME_BETWEEN_REQUEST_MSEC = 500;
         public const double TIME_BETWEEN_AUTH_CODE_MSEC = 120*1000;
 
-        public static DateTime time_last_requests = DateTime.MinValue;
-        public static DateTime time_last_auth_code = DateTime.MinValue;
+        public static DateTime timeLastRequests = DateTime.MinValue;
+        public static DateTime timeLastAuthCode = DateTime.MinValue;
 
         public override TagCompound Save()
         {
             return new TagCompound {
-                {"AUTH_CODE", ExperienceAndClasses.AUTH_CODE},
-                {"require_auth", ExperienceAndClasses.require_auth},
-                {"global_exp_modifier", ExperienceAndClasses.global_exp_modifier},
-                {"global_ignore_caps", ExperienceAndClasses.global_ignore_caps},
+                {"AUTH_CODE", ExperienceAndClasses.authCode},
+                {"require_auth", ExperienceAndClasses.requireAuth},
+                {"global_exp_modifier", ExperienceAndClasses.globalExpModifier},
+                {"global_ignore_caps", ExperienceAndClasses.globalIgnoreCaps},
             };
         }
 
         public override void Load(TagCompound tag)
         {
-            ExperienceAndClasses.AUTH_CODE = Commons.TryGet<double>(tag, "AUTH_CODE", -1);
-            ExperienceAndClasses.require_auth = Commons.TryGet<bool>(tag, "require_auth", true);
-            ExperienceAndClasses.global_exp_modifier = Commons.TryGet<double>(tag, "global_exp_modifier", 1);
-            ExperienceAndClasses.global_ignore_caps = Commons.TryGet<bool>(tag, "global_ignore_caps", false);
+            ExperienceAndClasses.authCode = Commons.TryGet<double>(tag, "AUTH_CODE", -1);
+            ExperienceAndClasses.requireAuth = Commons.TryGet<bool>(tag, "require_auth", true);
+            ExperienceAndClasses.globalExpModifier = Commons.TryGet<double>(tag, "global_exp_modifier", 1);
+            ExperienceAndClasses.globalIgnoreCaps = Commons.TryGet<bool>(tag, "global_ignore_caps", false);
         }
 
         public override void PostUpdate()
         {
             //initial client experience and settings sync
-            if (DateTime.Now.AddMilliseconds(-TIME_BETWEEN_REQUEST_MSEC).CompareTo(time_last_requests) > 0)
+            if (DateTime.Now.AddMilliseconds(-TIME_BETWEEN_REQUEST_MSEC).CompareTo(timeLastRequests) > 0)
             {
-                time_last_requests = DateTime.Now;
+                timeLastRequests = DateTime.Now;
                 doClientRequests();
             }
             //write auth code to console
-            else if (DateTime.Now.AddMilliseconds(-TIME_BETWEEN_AUTH_CODE_MSEC).CompareTo(time_last_auth_code) > 0)
+            else if (DateTime.Now.AddMilliseconds(-TIME_BETWEEN_AUTH_CODE_MSEC).CompareTo(timeLastAuthCode) > 0)
             {
                 //update time of write
-                time_last_auth_code = DateTime.Now;
+                timeLastAuthCode = DateTime.Now;
 
                 //create AUTH_CODE if it doesn't exist yet (first time map is run)
-                if (ExperienceAndClasses.AUTH_CODE == -1) ExperienceAndClasses.AUTH_CODE = Main.rand.Next(1000) + ((Main.rand.Next(8) + 1) * 1000) + ((Main.rand.Next(8) + 1) * 10000) + ((Main.rand.Next(8) + 1) * 100000);
+                if (ExperienceAndClasses.authCode == -1) ExperienceAndClasses.authCode = Main.rand.Next(1000) + ((Main.rand.Next(8) + 1) * 1000) + ((Main.rand.Next(8) + 1) * 10000) + ((Main.rand.Next(8) + 1) * 100000);
 
                 //write
-                if (ExperienceAndClasses.require_auth) Console.WriteLine("Experience&Classes Auth Code: " + ExperienceAndClasses.AUTH_CODE);
+                if (ExperienceAndClasses.requireAuth) Console.WriteLine("Experience&Classes Auth Code: " + ExperienceAndClasses.authCode);
                 else Console.WriteLine("WARNING: Require Auth mode is disabled. To enable, enter singleplayer and type /expnoauth.");
             }
         }
@@ -74,7 +74,7 @@ namespace ExperienceAndClasses
                         Methods.PacketSender.ServerRequestExperience(i);
 
                         //also share class caps status to ensure that token tooltips are correct
-                        Methods.PacketSender.ServerToggleCap(ExperienceAndClasses.global_ignore_caps);
+                        Methods.PacketSender.ServerToggleClassCap(ExperienceAndClasses.globalIgnoreCaps);
                     }
                 }
             }

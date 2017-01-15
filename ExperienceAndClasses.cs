@@ -26,7 +26,7 @@ namespace ExperienceAndClasses
         ClientTellExperience,
         ClientAsksExpRate,
         ClientRequestExpRate,
-        ClientRequestToggleCap,
+        ClientRequestToggleClassCap,
         ClientTryAuth,
         ClientUpdateLvlCap,
         ClientUpdateDmgRed,
@@ -34,7 +34,7 @@ namespace ExperienceAndClasses
         ServerRequestExperience,
         ServerForceExperience,
         ServerFullExpList,
-        ServerToggleCap
+        ServerToggleClassCap
     }
 
     class ExperienceAndClasses : Mod
@@ -48,15 +48,15 @@ namespace ExperienceAndClasses
         //EXP
         public const int MAX_LEVEL = 3000;
         public const double EXP_ITEM_VALUE = 1;
-        public static double[] EARLY_EXP_REQ = new double[] { 0, 0, 10, 25, 50, 75, 100, 125, 150, 200, 350 };//{0, 0, 100, 250, 500, 750, 1000, 1500, 2000, 2500, 3000};
+        public readonly static double[] EARLY_EXP_REQ = new double[] { 0, 0, 10, 25, 50, 75, 100, 125, 150, 200, 350 };//{0, 0, 100, 250, 500, 750, 1000, 1500, 2000, 2500, 3000};
         public static double[] EXP_REQ = new double[MAX_LEVEL + 1];
         public static double[] EXP_REQ_TOTAL = new double[MAX_LEVEL + 1];
 
         //for multiplayer only
-        public static double AUTH_CODE = -1;
-        public static bool require_auth = true;
-        public static double global_exp_modifier = 1;
-        public static bool global_ignore_caps = false;
+        public static double authCode = -1;
+        public static bool requireAuth = true;
+        public static double globalExpModifier = 1;
+        public static bool globalIgnoreCaps = false;
 
         //const
         public ExperienceAndClasses()
@@ -85,42 +85,42 @@ namespace ExperienceAndClasses
         public override void HandlePacket(BinaryReader reader, int whoAmI)
         {
             ExpModMessageType msgType = (ExpModMessageType)reader.ReadByte();
-            double experience, exp_add, exprate;
+            double experience, expAdd, exprate;
             String text;
             Player player;
             MyPlayer myPlayer;
-            bool new_bool;
-            MyPlayer local_MyPlayer = null;
+            bool newBool;
+            MyPlayer localMyPlayer = null;
             int explvlcap, expdmgred;
-            if (Main.netMode!=2) local_MyPlayer = Main.LocalPlayer.GetModPlayer<MyPlayer>(this);
+            if (Main.netMode!=2) localMyPlayer = Main.LocalPlayer.GetModPlayer<MyPlayer>(this);
             switch (msgType)
             {
-                //Server's initial request for player experience (also send has_looted_monster_orb, explvlcap, and expdmgred)
+                //Server's initial request for player experience (also send hasLootedMonsterOrb, explvlcap, and expdmgred)
                 case ExpModMessageType.ServerRequestExperience:
                     Methods.PacketSender.ClientTellExperience();
 
                     if (TRACE) NetMessage.SendData(25, -1, -1, "TRACE:Recieved ServerRequestExperience", 255, 255, 0, 255, 0);
                     break;
 
-                //Player's response to server's request for experience (also send has_looted_monster_orb, explvlcap, and expdmgred)
+                //Player's response to server's request for experience (also send hasLootedMonsterOrb, explvlcap, and expdmgred)
                 case ExpModMessageType.ClientTellExperience:
                     player = Main.player[reader.ReadInt32()];
                     myPlayer = player.GetModPlayer<MyPlayer>(this);
                     myPlayer.experience = reader.ReadDouble();
-                    myPlayer.has_looted_monster_orb = reader.ReadBoolean();
+                    myPlayer.hasLootedMonsterOrb = reader.ReadBoolean();
                     myPlayer.explvlcap = reader.ReadInt32();
                     myPlayer.expdmgred = reader.ReadInt32();
                     NetMessage.SendData(25, -1, -1, "Experience synced for player #"+player.whoAmI+":"+player.name, 255, 255, 255, 0, 0);
                     Console.WriteLine("Experience synced for player #" + player.whoAmI + ":" + player.name);
 
                     //tell everyone else how much exp the new player has
-                    int ind_new_player = player.whoAmI;
-                    Methods.PacketSender.ServerForceExperience(player, -1, ind_new_player);
+                    int indNewPlayer = player.whoAmI;
+                    Methods.PacketSender.ServerForceExperience(player, -1, indNewPlayer);
 
                     //give new player full exp list
                     if (Main.netMode == 2)
                     {
-                        Methods.PacketSender.ServerFullExpList(ind_new_player, -1);
+                        Methods.PacketSender.ServerFullExpList(indNewPlayer, -1);
                     }
 
                     //tell the players the current settings
@@ -129,16 +129,16 @@ namespace ExperienceAndClasses
                         else lvlcap = "disabled";
                     if (myPlayer.expdmgred > 0) dmgred = myPlayer.expdmgred.ToString() +"%";
                         else dmgred = "disabled";
-                    NetMessage.SendData(25, player.whoAmI, -1, "Require Auth: "+require_auth+"\nExperience Rate: "+(global_exp_modifier *100)+ 
-                        "%\nIgnore Class Caps: "+global_ignore_caps+"\nLevel Cap: "+ lvlcap + "\nClass Damage Reduction: "+
+                    NetMessage.SendData(25, player.whoAmI, -1, "Require Auth: "+requireAuth+"\nExperience Rate: "+(globalExpModifier *100)+ 
+                        "%\nIgnore Class Caps: "+globalIgnoreCaps+"\nLevel Cap: "+ lvlcap + "\nClass Damage Reduction: "+
                         dmgred, 255, 255, 255, 0, 0);
 
-                    if (TRACE) NetMessage.SendData(25, -1, -1, "TRACE:Recieved ClientTellExperience from player #" + ind_new_player + ":" + player.name+" = "+ player.GetModPlayer<MyPlayer>(this).experience+" (has found first orb:"+ player.GetModPlayer<MyPlayer>(this).has_looted_monster_orb+")", 255, 255, 0, 255, 0);
+                    if (TRACE) NetMessage.SendData(25, -1, -1, "TRACE:Recieved ClientTellExperience from player #" + indNewPlayer + ":" + player.name+" = "+ player.GetModPlayer<MyPlayer>(this).experience+" (has found first orb:"+ player.GetModPlayer<MyPlayer>(this).hasLootedMonsterOrb+")", 255, 255, 0, 255, 0);
                     break;
 
                 //Server telling player that they have now recieved their first Ascension Orb
                 case ExpModMessageType.ServerFirstAscensionOrb:
-                    local_MyPlayer.has_looted_monster_orb = true;
+                    localMyPlayer.hasLootedMonsterOrb = true;
                     if (TRACE) NetMessage.SendData(25, -1, -1, "TRACE:Recieved ServerFirstAscensionOrb", 255, 255, 0, 255, 0);
                     break;
 
@@ -146,21 +146,21 @@ namespace ExperienceAndClasses
                 case ExpModMessageType.ServerForceExperience:
                     //read
                     player = Main.player[reader.ReadInt32()];
-                    double new_exp = reader.ReadDouble();
+                    double newExp = reader.ReadDouble();
                     explvlcap = reader.ReadInt32();
                     expdmgred = reader.ReadInt32();
                     //ignore invalid requests
-                    if (new_exp < 0) break;
+                    if (newExp < 0) break;
                     //act
                     myPlayer = player.GetModPlayer<MyPlayer>(this);
-                    double exp_change = new_exp - myPlayer.experience;
-                    myPlayer.experience = new_exp;
-                    myPlayer.ExpMsg(exp_change);
+                    double expChange = newExp - myPlayer.experience;
+                    myPlayer.experience = newExp;
+                    myPlayer.ExpMsg(expChange);
                     myPlayer.explvlcap = explvlcap;
                     myPlayer.expdmgred = expdmgred;
 
-                    if (Main.LocalPlayer.Equals(player)) myUI.updateValue(new_exp);
-                    if (TRACE) NetMessage.SendData(25, -1, -1, "TRACE:Recieved ServerForceExperience for player #" + player.whoAmI + ":" + player.name + " = " + new_exp, 255, 255, 0, 255, 0);
+                    if (Main.LocalPlayer.Equals(player)) myUI.updateValue(newExp);
+                    if (TRACE) NetMessage.SendData(25, -1, -1, "TRACE:Recieved ServerForceExperience for player #" + player.whoAmI + ":" + player.name + " = " + newExp, 255, 255, 0, 255, 0);
                     break;
 
                 //Player telling the server to adjust experience (e.g., craft token)
@@ -168,12 +168,12 @@ namespace ExperienceAndClasses
                     if (Main.netMode != 2) break;
                     //read
                     player = Main.player[reader.ReadInt32()];
-                    exp_add = reader.ReadDouble();
+                    expAdd = reader.ReadDouble();
                     //act
                     myPlayer = player.GetModPlayer<MyPlayer>(this);
-                    myPlayer.AddExp(exp_add);
+                    myPlayer.AddExp(expAdd);
 
-                    if (TRACE) NetMessage.SendData(25, -1, -1, "TRACE:Recieved ClientTellAddExp from player #" + player.whoAmI +":"+player.name+" = " + exp_add, 255, 255, 0, 255, 0);
+                    if (TRACE) NetMessage.SendData(25, -1, -1, "TRACE:Recieved ClientTellAddExp from player #" + player.whoAmI +":"+player.name+" = " + expAdd, 255, 255, 0, 255, 0);
                     break;
 
                 //Similar to ClientTellAddExp, but requires auth
@@ -181,13 +181,13 @@ namespace ExperienceAndClasses
                     if (Main.netMode != 2) break;
                     //read
                     player = Main.player[reader.ReadInt32()];
-                    exp_add = reader.ReadDouble();
+                    expAdd = reader.ReadDouble();
                     text = reader.ReadString();
                     //act
                     myPlayer = player.GetModPlayer<MyPlayer>(this);
-                    if (myPlayer.auth || !require_auth)
+                    if (myPlayer.auth || !requireAuth)
                     {
-                        myPlayer.AddExp(exp_add);
+                        myPlayer.AddExp(expAdd);
                         Console.WriteLine("Accepted command request from player #" + player.whoAmI + ":" + player.name + " " + text);
                     }
                     else
@@ -195,7 +195,7 @@ namespace ExperienceAndClasses
                         Console.WriteLine("Rejected command request from player #" + player.whoAmI + ":" + player.name + " " + text);
                     }
 
-                    if (TRACE) NetMessage.SendData(25, -1, -1, "TRACE:Recieved ClientRequestAddExp from player #" + player.whoAmI + ":" + player.name + " = " + exp_add, 255, 255, 0, 255, 0);
+                    if (TRACE) NetMessage.SendData(25, -1, -1, "TRACE:Recieved ClientRequestAddExp from player #" + player.whoAmI + ":" + player.name + " = " + expAdd, 255, 255, 0, 255, 0);
                     break;
 
                 //Player asking to set exprate, requires auth
@@ -207,13 +207,13 @@ namespace ExperienceAndClasses
                     text = reader.ReadString();
                     //act
                     myPlayer = player.GetModPlayer<MyPlayer>(this);
-                    if (myPlayer.auth || !require_auth)
+                    if (myPlayer.auth || !requireAuth)
                     {
-                        global_exp_modifier = exprate;
+                        globalExpModifier = exprate;
                         Console.WriteLine("Accepted command request from player #" + player.whoAmI + ":" + player.name + " " + text);
 
                         //announce
-                        NetMessage.SendData(25, -1, -1, "Experience Rate:" + (global_exp_modifier*100)+"%", 255, 255, 255, 0, 0);
+                        NetMessage.SendData(25, -1, -1, "Experience Rate:" + (globalExpModifier*100)+"%", 255, 255, 255, 0, 0);
                     }
                     else
                     {
@@ -224,24 +224,24 @@ namespace ExperienceAndClasses
                     break;
 
                 //Player asking to toggle class caps, requires auth
-                case ExpModMessageType.ClientRequestToggleCap:
+                case ExpModMessageType.ClientRequestToggleClassCap:
                     if (Main.netMode != 2) break;
                     //read
                     player = Main.player[reader.ReadInt32()];
-                    new_bool = reader.ReadBoolean();
+                    newBool = reader.ReadBoolean();
                     text = reader.ReadString();
                     //act
                     myPlayer = player.GetModPlayer<MyPlayer>(this);
-                    if (myPlayer.auth || !require_auth)
+                    if (myPlayer.auth || !requireAuth)
                     {
-                        global_ignore_caps = new_bool;
+                        globalIgnoreCaps = newBool;
                         Console.WriteLine("Accepted command request from player #" + player.whoAmI + ":" + player.name + " " + text);
 
                         //share new status
-                        Methods.PacketSender.ServerToggleCap(global_ignore_caps);
+                        Methods.PacketSender.ServerToggleClassCap(globalIgnoreCaps);
 
                         //announce
-                        NetMessage.SendData(25, -1, -1, "Ignore Class Caps:"+ global_ignore_caps, 255, 255, 255, 0, 0);
+                        NetMessage.SendData(25, -1, -1, "Ignore Class Caps:"+ globalIgnoreCaps, 255, 255, 255, 0, 0);
                     }
                     else
                     {
@@ -252,14 +252,14 @@ namespace ExperienceAndClasses
                     break;
 
                 //Server setting class caps on/off
-                case ExpModMessageType.ServerToggleCap:
+                case ExpModMessageType.ServerToggleClassCap:
                     if (Main.netMode != 1) break;
                     //read
-                    new_bool = reader.ReadBoolean();
+                    newBool = reader.ReadBoolean();
                     //act
-                    global_ignore_caps = new_bool;
+                    globalIgnoreCaps = newBool;
 
-                    if (TRACE) NetMessage.SendData(25, -1, -1, "TRACE:Recieved ServerToggleCap = "+ global_ignore_caps, 255, 255, 0, 255, 0);
+                    if (TRACE) NetMessage.SendData(25, -1, -1, "TRACE:Recieved ServerToggleCap = "+ globalIgnoreCaps, 255, 255, 0, 255, 0);
                     break;
 
                 //Player telling server to make an announcement
@@ -306,7 +306,7 @@ namespace ExperienceAndClasses
                     //read
                     player = Main.player[reader.ReadInt32()];
                     //act
-                    NetMessage.SendData(25, player.whoAmI, -1, "The current exprate is " + (global_exp_modifier * 100) + "%.", 255, 255, 255, 0, 0);
+                    NetMessage.SendData(25, player.whoAmI, -1, "The current exprate is " + (globalExpModifier * 100) + "%.", 255, 255, 255, 0, 0);
 
                     if (TRACE) NetMessage.SendData(25, -1, -1, "TRACE:Recieved ClientAsksExpRate from player #" + player.whoAmI + ":" + player.name, 255, 255, 0, 255, 0);
                     break;
@@ -325,7 +325,7 @@ namespace ExperienceAndClasses
                     }
                     else 
                     {
-                        if (AUTH_CODE == code)
+                        if (authCode == code)
                         {
                             myPlayer.auth = true;
                             NetMessage.SendData(25, player.whoAmI, -1, "Auth:" + myPlayer.auth, 255, 255, 255, 0, 0);
@@ -408,29 +408,29 @@ namespace ExperienceAndClasses
 
                 if (command == "expbar")
                 {
-                    localMyPlayer.UI_show = !localMyPlayer.UI_show;
-                    if (localMyPlayer.UI_show) Main.NewText("Experience bar enabled. Display will be visible while wearing a Class Token.");
+                    localMyPlayer.UIShow = !localMyPlayer.UIShow;
+                    if (localMyPlayer.UIShow) Main.NewText("Experience bar enabled. Display will be visible while wearing a Class Token.");
                     else Main.NewText("Experience bar hidden.");
                 }
                 else if (command == "expbartrans")
                 {
-                    localMyPlayer.UI_trans = !localMyPlayer.UI_trans;
-                    myUI.setTrans(localMyPlayer.UI_trans);
-                    if (localMyPlayer.UI_trans) Main.NewText("Experience bar is now transparent.");
+                    localMyPlayer.UITrans = !localMyPlayer.UITrans;
+                    myUI.setTrans(localMyPlayer.UITrans);
+                    if (localMyPlayer.UITrans) Main.NewText("Experience bar is now transparent.");
                     else Main.NewText("Experience bar is now opaque.");
                 }
                 else if (command == "expbarreset")
                 {
                     myUI.setPosition(400f, 100f);
-                    localMyPlayer.UI_show = true;
-                    localMyPlayer.UI_trans = false;
-                    myUI.setTrans(localMyPlayer.UI_trans);
+                    localMyPlayer.UIShow = true;
+                    localMyPlayer.UITrans = false;
+                    myUI.setTrans(localMyPlayer.UITrans);
                     Main.NewText("Experience bar reset.");
                 }
                 else if (command == "explist")
                 {
                     Player player;
-                    double exp = 0, exp_have, exp_need;
+                    double exp = 0, expHave, expNeed;
                     int level;
                     string job, message = "Current Players:";
                     for (int playerIndex = 0; playerIndex < 255; playerIndex++)
@@ -445,10 +445,10 @@ namespace ExperienceAndClasses
                             job = Methods.Experience.GetClass(player);
                             level = Methods.Experience.GetLevel(exp);
 
-                            exp_have = Methods.Experience.GetExpTowardsNextLevel(exp);
-                            exp_need = Methods.Experience.GetExpReqForLevel(level + 1, false);
+                            expHave = Methods.Experience.GetExpTowardsNextLevel(exp);
+                            expNeed = Methods.Experience.GetExpReqForLevel(level + 1, false);
 
-                            message += "\n" + player.name + ", Level " + level + "(" + Math.Round((double)exp_have / (double)exp_need * 100, 2) + "%), " + job;
+                            message += "\n" + player.name + ", Level " + level + "(" + Math.Round((double)expHave / (double)expNeed * 100, 2) + "%), " + job;
                         }
                     }
                     Main.NewTextMultiline(message);
@@ -561,8 +561,8 @@ namespace ExperienceAndClasses
                 }
                 else if (command == "expmsg")
                 {
-                    localMyPlayer.display_exp = !localMyPlayer.display_exp;
-                    if (localMyPlayer.display_exp)
+                    localMyPlayer.displayExp = !localMyPlayer.displayExp;
+                    if (localMyPlayer.displayExp)
                     {
                         Main.NewText("Experience messages enabled.");
                     }

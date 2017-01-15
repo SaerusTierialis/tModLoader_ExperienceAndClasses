@@ -23,6 +23,7 @@ namespace ExperienceAndClasses.Buffs
         public Aura_Defense1()
         {
             base.bonus = bonus;
+            tierNumber = 1;
             tier = "I";
         }
     }
@@ -32,6 +33,7 @@ namespace ExperienceAndClasses.Buffs
         public Aura_Defense2()
         {
             base.bonus = bonus;
+            tierNumber = 2;
             tier = "II";
         }
     }
@@ -41,6 +43,7 @@ namespace ExperienceAndClasses.Buffs
         public Aura_Defense3()
         {
             base.bonus = bonus;
+            tierNumber = 3;
             tier = "III";
         }
     }
@@ -50,6 +53,7 @@ namespace ExperienceAndClasses.Buffs
     {
         public int bonus = 0;
         public string tier = "?";
+        public int tierNumber = 0;
 
         public override void SetDefaults()
         {
@@ -61,8 +65,45 @@ namespace ExperienceAndClasses.Buffs
 
         public override void Update(Player player, ref int buffIndex)
         {
-            player.statDefense += bonus;
+            if (AllowEffect<Player>(player)) player.statDefense += bonus;
+        }
+        public override void Update(NPC npc, ref int buffIndex)
+        {
+            if (AllowEffect<NPC>(npc)) npc.defense += bonus;
         }
 
+        /// <summary>
+        /// Returns false if a higher tier def aura is active on target.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="target"></param>
+        /// <returns></returns>
+        public bool AllowEffect<T>(T target)
+        {
+            if (tierNumber == 3) return true;
+
+            bool buff2=false, buff3=false;
+            if (typeof(T) == typeof(Player))
+            {
+                Player player = (target as Player);
+                buff2 = player.FindBuffIndex(mod.BuffType("Aura_Defense2")) != -1;
+                buff3 = player.FindBuffIndex(mod.BuffType("Aura_Defense3")) != -1;
+            }
+            else if (typeof(T) == typeof(NPC))
+            {
+                NPC npc = (target as NPC);
+                buff2 = npc.FindBuffIndex(mod.BuffType("Aura_Defense2")) != -1;
+                buff3 = npc.FindBuffIndex(mod.BuffType("Aura_Defense3")) != -1;
+            }
+
+            if ((tierNumber == 1 && (buff2 || buff3)) || (tierNumber == 2 && buff3))
+            {
+                return false;
+            }
+            else
+            {
+                return true;
+            }
+        }
     }
 }

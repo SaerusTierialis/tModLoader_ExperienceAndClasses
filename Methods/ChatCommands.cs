@@ -18,8 +18,8 @@ namespace ExperienceAndClasses.Methods
             }
             else if (Main.netMode == 1)
             {
-                double exp_add = exp - myPlayer.GetExp();
-                Methods.PacketSender.ClientRequestAddExp(player.whoAmI, exp_add, text);
+                double expAdd = exp - myPlayer.GetExp();
+                Methods.PacketSender.ClientRequestAddExp(player.whoAmI, expAdd, text);
                 Main.NewTextMultiline("Request that experience be set to " + exp + " has been sent to the server." +
                                     "\nIf you are authorized, the change should occur shortly. Use /auth [code]" +
                                     "\nto become authorized. The code is displayed in the server console.");
@@ -30,7 +30,7 @@ namespace ExperienceAndClasses.Methods
         {
             if (Main.netMode == 0)
             {
-                Main.NewText("Your current exprate is " + (Main.LocalPlayer.GetModPlayer<MyPlayer>(mod).experience_modifier * 100) + "%.");
+                Main.NewText("Your current exprate is " + (Main.LocalPlayer.GetModPlayer<MyPlayer>(mod).experienceModifier * 100) + "%.");
             }
             else if (Main.netMode == 1)
             {
@@ -44,8 +44,8 @@ namespace ExperienceAndClasses.Methods
             MyPlayer myPlayer = Main.LocalPlayer.GetModPlayer<MyPlayer>(mod);
             if (Main.netMode == 0)
             {
-                myPlayer.experience_modifier = rate;
-                Main.NewText("The new exprate is " + (myPlayer.experience_modifier * 100) + "%.");
+                myPlayer.experienceModifier = rate;
+                Main.NewText("The new exprate is " + (myPlayer.experienceModifier * 100) + "%.");
             }
             else if (Main.netMode == 1)
             {
@@ -62,8 +62,8 @@ namespace ExperienceAndClasses.Methods
             MyPlayer myPlayer = player.GetModPlayer<MyPlayer>(mod);
             if (Main.netMode == 0)
             {
-                myPlayer.ignore_caps = !myPlayer.ignore_caps;
-                if (myPlayer.ignore_caps)
+                myPlayer.ignoreCaps = !myPlayer.ignoreCaps;
+                if (myPlayer.ignoreCaps)
                 {
                     Main.NewText("Class bonus caps disabled.");
                 }
@@ -74,7 +74,7 @@ namespace ExperienceAndClasses.Methods
             }
             else if (Main.netMode == 1)
             {
-                Methods.PacketSender.ClientRequestToggleCap(!ExperienceAndClasses.global_ignore_caps, text);
+                Methods.PacketSender.ClientRequestToggleClassCap(!ExperienceAndClasses.globalIgnoreCaps, text);
                 Main.NewTextMultiline("Request to toggle the class caps feature has been sent to the server." +
                                     "\nIf you are authorized, the change should occur shortly. Use /auth [code]" +
                                     "\nto become authorized. The code is displayed in the server console.");
@@ -97,10 +97,10 @@ namespace ExperienceAndClasses.Methods
             MyPlayer myPlayer = player.GetModPlayer<MyPlayer>(mod);
             if (Main.netMode == 0)
             {
-                int prior_level = Methods.Experience.GetLevel(myPlayer.GetExp());
+                int priorLevel = Methods.Experience.GetLevel(myPlayer.GetExp());
                 myPlayer.explvlcap = level;
                 myPlayer.LimitExp();
-                myPlayer.LevelUp(prior_level);
+                myPlayer.LevelUp(priorLevel);
                 (mod as ExperienceAndClasses).myUI.updateValue(myPlayer.GetExp());
                 if (level == -1) Main.NewText("Level cap disabled.");
                 else Main.NewText("Level cap set to " + myPlayer.explvlcap + ".");
@@ -112,22 +112,22 @@ namespace ExperienceAndClasses.Methods
             }
         }
 
-        public static void CommandDmgRed(int damage_reduction_percent)
+        public static void CommandDmgRed(int damageReductionPercent)
         {
-            if (damage_reduction_percent < -1 || damage_reduction_percent > 100) return;
+            if (damageReductionPercent < -1 || damageReductionPercent > 100) return;
 
             Player player = Main.LocalPlayer;
             MyPlayer myPlayer = player.GetModPlayer<MyPlayer>(mod);
             if (Main.netMode == 0)
             {
-                myPlayer.expdmgred = damage_reduction_percent;
-                if (damage_reduction_percent == -1) Main.NewText("Damage reduction disabled.");
+                myPlayer.expdmgred = damageReductionPercent;
+                if (damageReductionPercent == -1) Main.NewText("Damage reduction disabled.");
                 else Main.NewText("Damage reduction set to " + myPlayer.expdmgred + ".");
             }
             else if (Main.netMode == 1)
             {
-                Methods.PacketSender.ClientUpdateDmgRed(damage_reduction_percent);
-                Main.NewText("Request to change damage reduction to " + damage_reduction_percent + "% has been sent to the server.");
+                Methods.PacketSender.ClientUpdateDmgRed(damageReductionPercent);
+                Main.NewText("Request to change damage reduction to " + damageReductionPercent + "% has been sent to the server.");
             }
         }
 
@@ -139,8 +139,8 @@ namespace ExperienceAndClasses.Methods
             }
             else
             {
-                ExperienceAndClasses.require_auth = !ExperienceAndClasses.require_auth;
-                if (ExperienceAndClasses.require_auth) Main.NewText("Require Auth has been enabled. mod map will now require auth in multiplayer mode.");
+                ExperienceAndClasses.requireAuth = !ExperienceAndClasses.requireAuth;
+                if (ExperienceAndClasses.requireAuth) Main.NewText("Require Auth has been enabled. mod map will now require auth in multiplayer mode.");
                 else Main.NewText("Require Auth has been disabled. mod map will no longer require auth in multiplayer mode.");
             }
         }

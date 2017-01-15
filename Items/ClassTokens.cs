@@ -453,10 +453,10 @@ namespace ExperienceAndClasses.Items
         }
     }
 
-    /* All Class Tokens are derived from this */
+    /* TEMPLATES */
     public abstract class ClassToken : ModItem
     {
-        public static string[] TIER_NAMES = new string[] { "?", "I", "II", "III" };
+        public static readonly string[] TIER_NAMES = new string[] { "?", "I", "II", "III" };
         public string name = "default";
         public int tier = 1;
         public string desc = "Class Token template. Not meant to be used as an in-game item.";
@@ -483,7 +483,7 @@ namespace ExperienceAndClasses.Items
         }
         public override bool CanEquipAccessory(Player player, int slot)
         {
-            if (!Helpers.VALID_SLOTS.Contains(slot)) return false;
+            if (!Helpers.VALID_SLOTS_EQUIP.Contains(slot)) return false;
                 else return base.CanEquipAccessory(player, slot);
         }
         public override void UpdateAccessory(Player player, bool hideVisual)
