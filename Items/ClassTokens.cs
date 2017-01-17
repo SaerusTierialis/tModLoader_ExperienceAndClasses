@@ -14,6 +14,13 @@ namespace ExperienceAndClasses.Items
         public string desc = "Starter class." +
                          "\n\nClass advancement is available at level " + Recipes.ClassRecipes.TIER_LEVEL_REQUIREMENTS[1 + 1] + ".";
 
+        public override void UpdateInventory(Player player)
+        {
+            //update description in inventory (remove "current bonuses")
+            if (Main.LocalPlayer.Equals(player)) Helpers.ClassTokenEffects(Main.LocalPlayer, item, name, false, new MyPlayer());
+            base.UpdateInventory(player);
+        }
+
         public override void SetDefaults()
         {
             //tier string

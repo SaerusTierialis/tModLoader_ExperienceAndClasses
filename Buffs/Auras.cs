@@ -13,7 +13,6 @@ namespace ExperienceAndClasses.Buffs
             Main.buffNoTimeDisplay[Type] = true;
             Main.buffNoSave[Type] = true;
         }
-
     }
 
     /* Sage's defense aura tiers */
