@@ -1005,7 +1005,7 @@ namespace ExperienceAndClasses.Items
             floatBonus = pctChanceMidas * level;
             if (floatBonus > 0)
             {
-                if (applyEffects) myPlayer.percentMidas = floatBonus;
+                if (applyEffects) myPlayer.percentMidas += floatBonus;
                 bonuses += "\n+" + (floatBonus * 100) + "% chance to inflict Midas Debuff";
             }
             if (pctChanceMidas > 0) desc += "\n+" + (pctChanceMidas * 100) + "% chance to inflict Midas Debuff";
@@ -1157,22 +1157,18 @@ namespace ExperienceAndClasses.Items
             //10% melee crit damage
             if (meleeCritDmg30Pct_LEVEL != -1 && level >= meleeCritDmg30Pct_LEVEL)
             {
-                if (applyEffects) myPlayer.bonusCritPct = 0.3;
+                if (applyEffects && myPlayer.bonusCritPct < 0.3) myPlayer.bonusCritPct = 0.3;
                 bonuses += "\n30% bonus melee critical damage (90% on Opener Attacks)";
             }
             else if (meleeCritDmg20Pct_LEVEL != -1 && level >= meleeCritDmg20Pct_LEVEL)
             {
-                if (applyEffects) myPlayer.bonusCritPct = 0.2;
+                if (applyEffects && myPlayer.bonusCritPct < 0.2) myPlayer.bonusCritPct = 0.2;
                 bonuses += "\n20% bonus melee critical damage (60% on Opener Attacks)";
             }
             else if (meleeCritDmg10Pct_LEVEL != -1 && level >= meleeCritDmg10Pct_LEVEL)
             {
-                if (applyEffects) myPlayer.bonusCritPct = 0.1;
+                if (applyEffects && myPlayer.bonusCritPct < 0.1) myPlayer.bonusCritPct = 0.1;
                 bonuses += "\n10% bonus melee critical damage (30% on Opener Attacks)";
-            }
-            else
-            {
-                myPlayer.bonusCritPct = 0;
             }
 
             //Assassin attack (bonus damage if target has full health or no attack has been made recently)
