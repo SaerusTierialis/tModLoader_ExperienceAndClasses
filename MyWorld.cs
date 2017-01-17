@@ -20,6 +20,7 @@ namespace ExperienceAndClasses
                 {"require_auth", ExperienceAndClasses.requireAuth},
                 {"global_exp_modifier", ExperienceAndClasses.globalExpModifier},
                 {"global_ignore_caps", ExperienceAndClasses.globalIgnoreCaps},
+                {"traceMap", ExperienceAndClasses.traceMap},
             };
         }
 
@@ -29,6 +30,7 @@ namespace ExperienceAndClasses
             ExperienceAndClasses.requireAuth = Commons.TryGet<bool>(tag, "require_auth", true);
             ExperienceAndClasses.globalExpModifier = Commons.TryGet<double>(tag, "global_exp_modifier", 1);
             ExperienceAndClasses.globalIgnoreCaps = Commons.TryGet<bool>(tag, "global_ignore_caps", false);
+            ExperienceAndClasses.traceMap = Commons.TryGet<bool>(tag, "traceMap", false);
         }
 
         public override void PostUpdate()

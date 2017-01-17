@@ -288,6 +288,7 @@ namespace ExperienceAndClasses.Items
             float minionDamage_PENALTYPER = 0f;
             float minionKB = 0f;
             float minionKB_CAP = 0.75f;
+            float light = 0f;
             float pctChanceMidas = 0f;
             float maxMinions_flat = 0f;
             int noKnockback_LEVEL = -1;
@@ -405,7 +406,6 @@ namespace ExperienceAndClasses.Items
                     archery_LEVEL = 50;
                     ammoCost80_LEVEL = 20;
                     ammoCost75_LEVEL = 40;
-                    scope_LEVEL = 70;
                     break;
                 case "Gunner":
                     statLifeMax2 = 0.5f;
@@ -415,7 +415,6 @@ namespace ExperienceAndClasses.Items
                     rangedCrit_CAP = 20;
                     ammoCost80_LEVEL = 20;
                     ammoCost75_LEVEL = 40;
-                    scope_LEVEL = 50;
                     break;
                 case "Ranger":
                     statLifeMax2 = 0.75f;
@@ -426,7 +425,6 @@ namespace ExperienceAndClasses.Items
                     rangedCrit_CAP = 20;
                     ammoCost80_LEVEL = 15;
                     ammoCost75_LEVEL = 35;
-                    scope_LEVEL = 60;
                     break;
                 case "Rogue":
                     statLifeMax2 = 0.5f;
@@ -565,6 +563,7 @@ namespace ExperienceAndClasses.Items
                     manaRegenDelayBonus = 0.2f;
                     manaCost = 0.005f;
                     manaCost_CAP = 0.4f;
+                    light = 0.01f;
                     immune_Silence_LEVEL = 1;
                     immune_Cursed_LEVEL = 50;
                     immune_Confused_LEVEL = 30;
@@ -993,6 +992,15 @@ namespace ExperienceAndClasses.Items
                 if (!ignoreCaps) desc += " (max " + (minionKB_CAP * 100) + "%)";
             }
 
+            //light
+            floatBonus = light * level;
+            if (floatBonus > 0)
+            {
+                if (applyEffects) Lighting.AddLight(player.position, 0.2f + floatBonus, 0.2f + floatBonus, 0.2f + floatBonus);
+                bonuses += "\n+" + (floatBonus*100) + "% light";
+            }
+            if (light > 0) desc += "\n+" + (light*100) + "% light";
+
             //chance to inflict Midas on hit
             floatBonus = pctChanceMidas * level;
             if (floatBonus > 0)
@@ -1250,7 +1258,6 @@ namespace ExperienceAndClasses.Items
                 
                 if (applyEffects && auraUpdate)
                 {
-                    Main.NewText("Adding " + buff);
                     AuraEffect(player, true, true, true, false, false, 0, 0, 0, 0, 0, buff, AURA_UPDATE_BUFF_TICKS);
                 }
                 bonuses += "\nincrease the defense of nearby allies by " + intBonus;

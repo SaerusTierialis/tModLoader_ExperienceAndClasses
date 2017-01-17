@@ -15,7 +15,7 @@ namespace ExperienceAndClasses.Buffs
         }
     }
 
-    /* Sage's defense aura tiers */
+    /* Template & Sage's defense aura tiers */
     public class Aura_Defense1 : ModBuff
     {
         public static int bonus_defense = 5;
@@ -41,7 +41,6 @@ namespace ExperienceAndClasses.Buffs
             if (Helpers.AllowEffect<NPC>(mod, npc, tierNumber)) npc.defense += bonus;
         }
     }
-
 
     public class Aura_Defense2 : Aura_Defense1
     {

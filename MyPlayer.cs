@@ -13,6 +13,7 @@ namespace ExperienceAndClasses
         public static double MAX_EXPERIENCE = Methods.Experience.GetExpReqForLevel(ExperienceAndClasses.MAX_LEVEL, true);
 
         public bool auth = false;
+        public bool traceChar = false;
 
         public double experience = -1;
         public double experienceModifier = 1;
@@ -173,7 +174,8 @@ namespace ExperienceAndClasses
                 {"has_looted_monster_orb", hasLootedMonsterOrb},
                 {"UI_trans", UITrans},
                 {"explvlcap", explvlcap},
-                {"expdmgred", expdmgred}
+                {"expdmgred", expdmgred},
+                {"traceChar", traceChar},
             };
         }
 
@@ -208,6 +210,9 @@ namespace ExperienceAndClasses
 
             //expdmgred
             expdmgred = Commons.TryGet<int>(tag, "expdmgred", -1);
+
+            //trace
+            traceChar = Commons.TryGet<bool>(tag, "traceChar", false);
         }
 
         public override void SetupStartInventory(IList<Item> items)
