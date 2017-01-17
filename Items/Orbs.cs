@@ -4,17 +4,76 @@ using Terraria.ModLoader;
 
 namespace ExperienceAndClasses.Items
 {
-    /* Experience Orb x1 */
-    public class Experience : ExperienceOrb
+    /* Template & Experience Orb x1 */
+    public class Experience : ModItem
     {
-        public Experience() : base()
+        static int[] values = { 1, 100, 1000, 10000, 100000, 1000000 };
+
+        public int orbValue = 1;
+
+        public override void SetDefaults()
         {
-            orbValue = 1;
+            //name
+            item.name = "Experience Orb";
+            if (orbValue > 1) item.name += " " + orbValue;
+
+            //info
+            item.toolTip = "Worth " + (ExperienceAndClasses.EXP_ITEM_VALUE * orbValue) + " experience.";
+            item.width = 29;
+            item.height = 30;
+            item.maxStack = 9999999;
+            item.value = 0;
+            item.rare = 7;
+            item.consumable = true;
+            item.useAnimation = 10;
+            item.useTime = 10;
+            item.useStyle = 4;
+        }
+
+        public override void AddRecipes()
+        {
+            //orb-to-orb converstion
+            if (orbValue == 1)
+            {
+                //convert down to 1's
+                foreach (int i in values)
+                {
+                    if (i>1)
+                    {
+                        Commons.QuckRecipe(mod, new int[,] { { mod.ItemType("Experience"+i), 1 } }, this, i);
+                    }
+                }
+            }
+            else
+            {
+                //convert up from 1's
+                Commons.QuckRecipe(mod, new int[,] { {mod.ItemType<Experience>(), orbValue } }, this, 1);
+            }
+            
+            //exp-to-orb conversion
+            Commons.QuckRecipe(mod, new int[,] { { } }, this, 1, new Recipes.ExpRecipe(mod, ExperienceAndClasses.EXP_ITEM_VALUE * orbValue), TileID.Campfire);
+        }
+        public override bool UseItem(Player player)
+        {
+            player.GetModPlayer<MyPlayer>(mod).AddExp(ExperienceAndClasses.EXP_ITEM_VALUE * orbValue);
+            return true;
+        }
+
+        /* Bypass MaxStacks */
+        public override void OnCraft(Recipe recipe)
+        {
+            item.maxStack = 9999999;
+            base.OnCraft(recipe);
+        }
+        public override void UpdateInventory(Player player)
+        {
+            item.maxStack = 9999999;
+            base.UpdateInventory(player);
         }
     }
 
     /* Experience Orb x100 */
-    public class Experience100 : ExperienceOrb
+    public class Experience100 : Experience
     {
         public Experience100() : base()
         {
@@ -39,7 +98,7 @@ namespace ExperienceAndClasses.Items
     }
 
     /* Experience Orb x1000 */
-    public class Experience1000 : ExperienceOrb
+    public class Experience1000 : Experience
     {
         public Experience1000() : base()
         {
@@ -60,7 +119,7 @@ namespace ExperienceAndClasses.Items
     }
 
     /* Experience Orb x10,000 */
-    public class Experience10000 : ExperienceOrb
+    public class Experience10000 : Experience
     {
         public Experience10000() : base()
         {
@@ -69,7 +128,7 @@ namespace ExperienceAndClasses.Items
     }
 
     /* Experience Orb x100,000 */
-    public class Experience100000 : ExperienceOrb
+    public class Experience100000 : Experience
     {
         public Experience100000() : base()
         {
@@ -78,7 +137,7 @@ namespace ExperienceAndClasses.Items
     }
 
     /* Experience Orb x1,000,000 */
-    public class Experience1000000 : ExperienceOrb
+    public class Experience1000000 : Experience
     {
         public Experience1000000() : base()
         {
@@ -129,54 +188,6 @@ namespace ExperienceAndClasses.Items
 
             //alt recipe: plat
             Commons.QuckRecipe(mod, new int[,] { { ItemID.LifeCrystal, 1 }, { ItemID.ManaCrystal, 1 }, { ItemID.PlatinumBar, 20 } }, this, 1);
-        }
-    }
-
-    /* TEMPLATES */
-    public abstract class ExperienceOrb : ModItem
-    {
-        public int orbValue = 1;
-
-        public override void SetDefaults()
-        {
-            //name
-            item.name = "Experience Orb";
-            if (orbValue > 1) item.name += " " + orbValue;
-
-            //info
-            item.toolTip = "Worth " + (ExperienceAndClasses.EXP_ITEM_VALUE * orbValue) + " experience.";
-            item.width = 29;
-            item.height = 30;
-            item.maxStack = 9999999;
-            item.value = 0;
-            item.rare = 7;
-            item.consumable = true;
-            item.useAnimation = 10;
-            item.useTime = 10;
-            item.useStyle = 4;
-        }
-
-        public override void AddRecipes()
-        {
-            Recipes.Helpers.AddRecipes_ExpOrbConversion(this, orbValue);
-            Commons.QuckRecipe(mod, new int[,] { { } }, this, 1, new Recipes.ExpRecipe(mod, ExperienceAndClasses.EXP_ITEM_VALUE * orbValue), TileID.Campfire);
-        }
-        public override bool UseItem(Player player)
-        {
-            player.GetModPlayer<MyPlayer>(mod).AddExp(ExperienceAndClasses.EXP_ITEM_VALUE * orbValue);
-            return true;
-        }
-
-        /* Bypass MaxStacks */
-        public override void OnCraft(Recipe recipe)
-        {
-            item.maxStack = 9999999;
-            base.OnCraft(recipe);
-        }
-        public override void UpdateInventory(Player player)
-        {
-            item.maxStack = 9999999;
-            base.UpdateInventory(player);
         }
     }
 }

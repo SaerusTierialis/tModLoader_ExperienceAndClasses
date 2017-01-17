@@ -6,7 +6,7 @@ using Terraria.ModLoader;
 
 namespace ExperienceAndClasses.Items
 {
-    public class Helpers
+    public static class Helpers
     {
         static Mod mod = ModLoader.GetMod("ExperienceAndClasses");
 
@@ -1242,17 +1242,17 @@ namespace ExperienceAndClasses.Items
                     if (defenseAura3_LEVEL != -1 && level >= defenseAura3_LEVEL)
                     {
                         AuraEffect(player, true, true, true, false, false, 0, 0, 0, 0, 0, mod.BuffType("Aura_Defense3"), AURA_UPDATE_BUFF_TICKS);
-                        intBonus = Buffs.Aura_Defense3.bonus;
+                        intBonus = Buffs.Aura_Defense3.bonus_defense;
                     }
                     else if (defenseAura2_LEVEL != -1 && level >= defenseAura2_LEVEL)
                     {
                         AuraEffect(player, true, true, true, false, false, 0, 0, 0, 0, 0, mod.BuffType("Aura_Defense2"), AURA_UPDATE_BUFF_TICKS);
-                        intBonus = Buffs.Aura_Defense2.bonus;
+                        intBonus = Buffs.Aura_Defense2.bonus_defense;
                     }
                     else
                     {
                         AuraEffect(player, true, true, true, false, false, 0, 0, 0, 0, 0, mod.BuffType("Aura_Defense1"), AURA_UPDATE_BUFF_TICKS);
-                        intBonus = Buffs.Aura_Defense1.bonus;
+                        intBonus = Buffs.Aura_Defense1.bonus_defense;
                     }
                 }
                 bonuses += "\nincrease the defense of nearby allies by " + intBonus;
@@ -1294,7 +1294,7 @@ namespace ExperienceAndClasses.Items
             //flat bonnus minon(s)
             if (maxMinions_flat > 0)
             {
-                desc += "\nLv1: +" + maxMinions_flat + " additional minion";
+                desc += "\nLevel 1: +" + maxMinions_flat + " additional minion";
                 if (intBonus > 1)
                 {
                     desc += "s";
@@ -1340,9 +1340,9 @@ namespace ExperienceAndClasses.Items
                 if (periodicPartyHeal_LEVEL == lvl) desc += "\nLevel " + lvl + ": occasionally heals allies (half for self)";
                 if (periodicIchorAura_LEVEL == lvl) desc += "\nLevel " + lvl + ": occasionally inflicts ichor on nearby enemies";
                 if (periodicDmgAura_LEVEL == lvl) desc += "\nLevel " + lvl + ": occasionally harms enemies";
-                if (defenseAura1_LEVEL == lvl) desc += "\nLevel " + lvl + ": increase the defense of nearby allies by " + Buffs.Aura_Defense1.bonus + " (non-stacking)";
-                if (defenseAura2_LEVEL == lvl) desc += "\nLevel " + lvl + ": increase the defense of nearby allies by " + Buffs.Aura_Defense2.bonus + " (non-stacking)";
-                if (defenseAura3_LEVEL == lvl) desc += "\nLevel " + lvl + ": increase the defense of nearby allies by " + Buffs.Aura_Defense3.bonus + " (non-stacking)";
+                if (defenseAura1_LEVEL == lvl) desc += "\nLevel " + lvl + ": increase the defense of nearby allies by " + Buffs.Aura_Defense1.bonus_defense + " (non-stacking)";
+                if (defenseAura2_LEVEL == lvl) desc += "\nLevel " + lvl + ": increase the defense of nearby allies by " + Buffs.Aura_Defense2.bonus_defense + " (non-stacking)";
+                if (defenseAura3_LEVEL == lvl) desc += "\nLevel " + lvl + ": increase the defense of nearby allies by " + Buffs.Aura_Defense3.bonus_defense + " (non-stacking)";
                 if (periodicLifePercent_LEVEL == lvl) desc += "\nLevel " + lvl + ": occasionally regenerates health (scales with max hp and level)";
                 if (periodicManaPercent_LEVEL == lvl) desc += "\nLevel " + lvl + ": occasionally regenerates mana (scales with max mp and level)";
             }

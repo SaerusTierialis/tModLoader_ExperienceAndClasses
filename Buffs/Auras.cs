@@ -17,43 +17,13 @@ namespace ExperienceAndClasses.Buffs
     }
 
     /* Sage's defense aura tiers */
-    public class Aura_Defense1 : Aura_Defense
+    public class Aura_Defense1 : ModBuff
     {
-        public static int bonus = 5;
-        public Aura_Defense1()
-        {
-            base.bonus = bonus;
-            tierNumber = 1;
-            tier = "I";
-        }
-    }
-    public class Aura_Defense2 : Aura_Defense
-    {
-        public static int bonus = 10;
-        public Aura_Defense2()
-        {
-            base.bonus = bonus;
-            tierNumber = 2;
-            tier = "II";
-        }
-    }
-    public class Aura_Defense3 : Aura_Defense
-    {
-        public static int bonus = 15;
-        public Aura_Defense3()
-        {
-            base.bonus = bonus;
-            tierNumber = 3;
-            tier = "III";
-        }
-    }
+        public static int bonus_defense = 5;
 
-    /* TEMPLATES */
-    public abstract class Aura_Defense : ModBuff
-    {
-        public int bonus = 0;
-        public string tier = "?";
-        public int tierNumber = 0;
+        public int bonus = bonus_defense;
+        public string tier = "I";
+        public int tierNumber = 1;
 
         public override void SetDefaults()
         {
@@ -82,7 +52,7 @@ namespace ExperienceAndClasses.Buffs
         {
             if (tierNumber == 3) return true;
 
-            bool buff2=false, buff3=false;
+            bool buff2 = false, buff3 = false;
             if (typeof(T) == typeof(Player))
             {
                 Player player = (target as Player);
@@ -104,6 +74,30 @@ namespace ExperienceAndClasses.Buffs
             {
                 return true;
             }
+        }
+    }
+
+
+    public class Aura_Defense2 : Aura_Defense1
+    {
+        public static int bonus_defense = 10;
+
+        public Aura_Defense2()
+        {
+            base.bonus = bonus_defense;
+            tierNumber = 2;
+            tier = "II";
+        }
+    }
+    public class Aura_Defense3 : Aura_Defense1
+    {
+        public static int bonus_defense = 15;
+
+        public Aura_Defense3()
+        {
+            base.bonus = bonus_defense;
+            tierNumber = 3;
+            tier = "III";
         }
     }
 }

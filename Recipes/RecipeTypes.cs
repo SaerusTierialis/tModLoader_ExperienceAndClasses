@@ -39,11 +39,24 @@ namespace ExperienceAndClasses.Recipes
     }
 
     /* Class Token recipe bases (take exp and standard item requirements, remove prefix, announce) */
-    class ClassRecipes2 : ExpRecipe
+    class ClassRecipes : ExpRecipe
     {
-        public ClassRecipes2(Mod mod, double experienceNeeded) : base(mod, experienceNeeded)
+        public static int[] TIER_LEVEL_REQUIREMENTS = new int[] { 0, 0, 10, 25 };
+        public ClassRecipes(Mod mod, int tier) : base(mod, 0)
         {
-            //no changes here
+            //exp needed
+            base.experienceNeeded = Methods.Experience.GetExpReqForLevel(TIER_LEVEL_REQUIREMENTS[tier], true);
+
+            //items needed
+            if (tier == 2)
+            {
+                AddIngredient(mod.ItemType<Items.Monster_Orb>(), 1);
+            }
+            else if (tier == 3)
+            {
+                AddIngredient(mod.ItemType<Items.Boss_Orb>(), 5);
+                AddIngredient(mod.ItemType<Items.Monster_Orb>(), 50);
+            }
         }
         public override void OnCraft(Item item)
         {

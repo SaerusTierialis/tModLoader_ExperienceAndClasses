@@ -3,7 +3,7 @@ using Terraria.ModLoader;
 
 namespace ExperienceAndClasses.NPCs
 {
-    static class Helpers
+    public static class Helpers
     {
         /// <summary>
         /// Returns the unrounded base experience for NPC. Returns 0 for invalid NPC.

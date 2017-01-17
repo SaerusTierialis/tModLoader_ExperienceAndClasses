@@ -65,8 +65,6 @@ namespace ExperienceAndClasses
             Properties = new ModProperties()
             {
                 Autoload = true,
-                AutoloadGores = true,
-                AutoloadSounds = true
             };
         }
 
@@ -494,7 +492,9 @@ namespace ExperienceAndClasses
                     }
                     if (Main.netMode == 0)
                     {
-                        localMyPlayer.AddExp(numUsed * EXP_ITEM_VALUE);
+                        localMyPlayer.AddExp(numUsed * EXP
+                        
+                ITEM_VALUE);
                     }
                     else
                     {
