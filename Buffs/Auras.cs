@@ -34,45 +34,11 @@ namespace ExperienceAndClasses.Buffs
 
         public override void Update(Player player, ref int buffIndex)
         {
-            if (AllowEffect<Player>(player)) player.statDefense += bonus;
+            if (Helpers.AllowEffect<Player>(mod, player, tierNumber)) player.statDefense += bonus;
         }
         public override void Update(NPC npc, ref int buffIndex)
         {
-            if (AllowEffect<NPC>(npc)) npc.defense += bonus;
-        }
-
-        /// <summary>
-        /// Returns false if a higher tier def aura is active on target.
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="target"></param>
-        /// <returns></returns>
-        public bool AllowEffect<T>(T target)
-        {
-            if (tierNumber == 3) return true;
-
-            bool buff2 = false, buff3 = false;
-            if (typeof(T) == typeof(Player))
-            {
-                Player player = (target as Player);
-                buff2 = player.FindBuffIndex(mod.BuffType("Aura_Defense2")) != -1;
-                buff3 = player.FindBuffIndex(mod.BuffType("Aura_Defense3")) != -1;
-            }
-            else if (typeof(T) == typeof(NPC))
-            {
-                NPC npc = (target as NPC);
-                buff2 = npc.FindBuffIndex(mod.BuffType("Aura_Defense2")) != -1;
-                buff3 = npc.FindBuffIndex(mod.BuffType("Aura_Defense3")) != -1;
-            }
-
-            if ((tierNumber == 1 && (buff2 || buff3)) || (tierNumber == 2 && buff3))
-            {
-                return false;
-            }
-            else
-            {
-                return true;
-            }
+            if (Helpers.AllowEffect<NPC>(mod, npc, tierNumber)) npc.defense += bonus;
         }
     }
 

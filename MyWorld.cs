@@ -71,10 +71,10 @@ namespace ExperienceAndClasses
                     if (myPlayer.GetExp() == -1)// && target_time.CompareTo(time_last_player_request[i])>0)
                     {
                         //request experience from player
-                        Methods.PacketSender.ServerRequestExperience(i);
+                        Methods.PacketSender.ServerRequestExperience(mod, i);
 
                         //also share class caps status to ensure that token tooltips are correct
-                        Methods.PacketSender.ServerToggleClassCap(ExperienceAndClasses.globalIgnoreCaps);
+                        Methods.PacketSender.ServerToggleClassCap(mod, ExperienceAndClasses.globalIgnoreCaps);
                     }
                 }
             }

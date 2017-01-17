@@ -90,7 +90,7 @@ namespace ExperienceAndClasses
             //if server, tell client
             if (Main.netMode == 2)
             {
-                Methods.PacketSender.ServerForceExperience(player);
+                Methods.PacketSender.ServerForceExperience(mod, player);
             }
             else if (Main.netMode==0)
             {

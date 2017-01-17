@@ -5,18 +5,17 @@ namespace ExperienceAndClasses.Methods
 {
     public static class PacketSender
     {
-        static Mod mod = ModLoader.GetMod("ExperienceAndClasses");
-
         /* ~~~~~~~~~~~~~~~~~~~~~ Packet Senders - Client ~~~~~~~~~~~~~~~~~~~~~ */
 
         /// <summary>
-        /// Player telling server to make an announcement
+        /// Player telling server to make an announcement.
         /// </summary>
+        /// <param name="mod"></param>
         /// <param name="message"></param>
         /// <param name="red"></param>
         /// <param name="green"></param>
         /// <param name="blue"></param>
-        public static void ClientTellAnnouncement(string message, int red, int green, int blue)
+        public static void ClientTellAnnouncement(Mod mod, string message, int red, int green, int blue)
         {
             if (Main.netMode != 1) return;
 
@@ -38,10 +37,11 @@ namespace ExperienceAndClasses.Methods
         }
 
         /// <summary>
-        /// Player telling the server to adjust experience (e.g., craft token) NO AUTH REQUIRED
+        /// Player telling the server to adjust experience (e.g., craft token) NO AUTH REQUIRED.
         /// </summary>
+        /// <param name="mod"></param>
         /// <param name="exp"></param>
-        public static void ClientTellAddExp(double exp)
+        public static void ClientTellAddExp(Mod mod, double exp)
         {
             if (Main.netMode != 1) return;
 
@@ -53,9 +53,10 @@ namespace ExperienceAndClasses.Methods
         }
 
         /// <summary>
-        /// Player's response to server's request for experience (also send hasLootedMonsterOrb, explvlcap, and expdmgred)
+        /// Player's response to server's request for experience (also send hasLootedMonsterOrb, explvlcap, and expdmgred).
         /// </summary>
-        public static void ClientTellExperience()
+        /// <param name="mod"></param>
+        public static void ClientTellExperience(Mod mod)
         {
             if (Main.netMode != 1) return;
 
@@ -72,12 +73,13 @@ namespace ExperienceAndClasses.Methods
         }
 
         /// <summary>
-        /// Player requesting (needs auth) to add exp
+        /// Player requesting (needs auth) to add exp.
         /// </summary>
+        /// <param name="mod"></param>
         /// <param name="playerIndex"></param>
         /// <param name="expAdd"></param>
         /// <param name="text"></param>
-        public static void ClientRequestAddExp(int playerIndex, double expAdd, string text)
+        public static void ClientRequestAddExp(Mod mod, int playerIndex, double expAdd, string text)
         {
             if (Main.netMode != 1) return;
 
@@ -90,9 +92,10 @@ namespace ExperienceAndClasses.Methods
         }
 
         /// <summary>
-        /// Player asks server what the exprate is
+        /// Player asks server what the exprate is.
         /// </summary>
-        public static void ClientAsksExpRate()
+        /// <param name="mod"></param>
+        public static void ClientAsksExpRate(Mod mod)
         {
             if (Main.netMode != 1) return;
 
@@ -103,12 +106,13 @@ namespace ExperienceAndClasses.Methods
         }
 
         /// <summary>
-        /// Player requests (needs auth) to set exprate
+        /// Player requests (needs auth) to set exprate.
         /// </summary>
+        /// <param name="mod"></param>
         /// <param name="playerIndex"></param>
         /// <param name="rate"></param>
         /// <param name="text"></param>
-        public static void ClientRequestExpRate(double rate, string text)
+        public static void ClientRequestExpRate(Mod mod, double rate, string text)
         {
             if (Main.netMode != 1) return;
 
@@ -121,11 +125,12 @@ namespace ExperienceAndClasses.Methods
         }
 
         /// <summary>
-        /// Player requesting (needs auth) to toggle class caps
+        /// Player requesting (needs auth) to toggle class caps.
         /// </summary>
+        /// <param name="mod"></param>
         /// <param name="newCapBool"></param>
         /// <param name="text"></param>
-        public static void ClientRequestToggleClassCap(bool newCapBool, string text)
+        public static void ClientRequestToggleClassCap(Mod mod, bool newCapBool, string text)
         {
             if (Main.netMode != 1) return;
 
@@ -138,10 +143,10 @@ namespace ExperienceAndClasses.Methods
         }
 
         /// <summary>
-        /// Player attempt auth
+        /// Player attempt auth.
         /// </summary>
         /// <param name="code"></param>
-        public static void ClientTryAuth(double code)
+        public static void ClientTryAuth(Mod mod, double code)
         {
             if (Main.netMode != 1) return;
 
@@ -153,10 +158,11 @@ namespace ExperienceAndClasses.Methods
         }
 
         /// <summary>
-        /// Player tells server that they would like to change their level cap
+        /// Player tells server that they would like to change their level cap.
         /// </summary>
+        /// <param name="mod"></param>
         /// <param name="newLevelCap"></param>
-        public static void ClientUpdateLvlCap(int newLevelCap)
+        public static void ClientUpdateLvlCap(Mod mod, int newLevelCap)
         {
             if (Main.netMode != 1) return;
 
@@ -168,10 +174,11 @@ namespace ExperienceAndClasses.Methods
         }
 
         /// <summary>
-        /// Player tells server that they would like to change their damage reduction
+        /// Player tells server that they would like to change their damage reduction.
         /// </summary>
+        /// <param name="mod"></param>
         /// <param name="newDamageReductionPercent"></param>
-        public static void ClientUpdateDmgRed(int newDamageReductionPercent)
+        public static void ClientUpdateDmgRed(Mod mod, int newDamageReductionPercent)
         {
             if (Main.netMode != 1) return;
 
@@ -185,13 +192,14 @@ namespace ExperienceAndClasses.Methods
         /* ~~~~~~~~~~~~~~~~~~~~~ Packet Senders - Server ~~~~~~~~~~~~~~~~~~~~~ */
 
         /// <summary>
-        /// Server telling specific clients a player's new exp value
+        /// Server telling specific clients a player's new exp value.
         /// </summary>
+        /// <param name="mod"></param>
         /// <param name="player"></param>
         /// <param name="exp"></param>
         /// <param name="toWho"></param>
         /// <param name="toIgnore"></param>
-        public static void ServerForceExperience(Player player, int toWho = -1, int toIgnore = -1)
+        public static void ServerForceExperience(Mod mod, Player player, int toWho = -1, int toIgnore = -1)
         {
             if (Main.netMode != 2) return;
 
@@ -207,10 +215,11 @@ namespace ExperienceAndClasses.Methods
         }
 
         /// <summary>
-        /// Server's initial request for player experience (also send hasLootedMonsterOrb, explvlcap, and expdmgred)
+        /// Server's initial request for player experience (also send hasLootedMonsterOrb, explvlcap, and expdmgred).
         /// </summary>
+        /// <param name="mod"></param>
         /// <param name="playerIndex"></param>
-        public static void ServerRequestExperience(int playerIndex)
+        public static void ServerRequestExperience(Mod mod, int playerIndex)
         {
             if (Main.netMode != 2) return;
 
@@ -220,10 +229,11 @@ namespace ExperienceAndClasses.Methods
         }
 
         /// <summary>
-        /// Server setting class caps on/off
+        /// Server setting class caps on/off.
         /// </summary>
+        /// <param name="mod"></param>
         /// <param name="newCapBool"></param>
-        public static void ServerToggleClassCap(bool newCapBool)
+        public static void ServerToggleClassCap(Mod mod, bool newCapBool)
         {
             if (Main.netMode != 2) return;
 
@@ -234,10 +244,11 @@ namespace ExperienceAndClasses.Methods
         }
 
         /// <summary>
-        /// Server telling player that they have now recieved their first Ascension Orb
+        /// Server telling player that they have now recieved their first Ascension Orb.
         /// </summary>
+        /// <param name="mod"></param>
         /// <param name="playerIndex"></param>
-        public static void ServerFirstAscensionOrb(int playerIndex)
+        public static void ServerFirstAscensionOrb(Mod mod, int playerIndex)
         {
             if (Main.netMode != 2) return;
 
@@ -247,11 +258,12 @@ namespace ExperienceAndClasses.Methods
         }
 
         /// <summary>
-        /// Server sends full exp list to new player (also explvlcap and expdmgred)
+        /// Server sends full exp list to new player (also explvlcap and expdmgred).
         /// </summary>
+        /// <param name="mod"></param>
         /// <param name="toWho"></param>
         /// <param name="toIgnore"></param>
-        public static void ServerFullExpList(int toWho, int toIgnore)
+        public static void ServerFullExpList(Mod mod, int toWho, int toIgnore)
         {
             if (Main.netMode != 2) return;
 

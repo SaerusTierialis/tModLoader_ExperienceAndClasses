@@ -39,6 +39,7 @@
     </Compile>
     <Compile Include="Buffs\Auras.cs" />
     <Compile Include="Buffs\Buffs.cs" />
+    <Compile Include="Buffs\Helpers.cs" />
     <Compile Include="Dusts\Dusts.cs" />
     <Compile Include="Items\Helpers.cs" />
     <Compile Include="Items\ClassTokens.cs" />

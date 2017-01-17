@@ -16,8 +16,8 @@ namespace ExperienceAndClasses.Items
 
         public override void UpdateInventory(Player player)
         {
-            //update description in inventory (remove "current bonuses")
-            if (Main.LocalPlayer.Equals(player)) Helpers.ClassTokenEffects(Main.LocalPlayer, item, name, false, new MyPlayer());
+            //update description in inventory (remove current bonuses)
+            if (Main.LocalPlayer.Equals(player)) Helpers.ClassTokenEffects(mod, Main.LocalPlayer, item, name, false, new MyPlayer());
             base.UpdateInventory(player);
         }
 
@@ -39,7 +39,7 @@ namespace ExperienceAndClasses.Items
             item.toolTip = desc;
 
             //add class bonuses description
-            Helpers.ClassTokenEffects(Main.LocalPlayer, item, name, false, new MyPlayer());
+            Helpers.ClassTokenEffects(mod, Main.LocalPlayer, item, name, false, new MyPlayer());
         }
         public override void AddRecipes()
         {
@@ -52,7 +52,7 @@ namespace ExperienceAndClasses.Items
         }
         public override void UpdateAccessory(Player player, bool hideVisual)
         {
-            Helpers.ClassTokenEffects(player, item, name, true);
+            Helpers.ClassTokenEffects(mod, player, item, name, true);
         }
     }
 

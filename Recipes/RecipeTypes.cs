@@ -24,7 +24,7 @@ namespace ExperienceAndClasses.Recipes
 
         public override void OnCraft(Item item)
         {
-            if (Helpers.CraftWithExp(experienceNeeded))
+            if (Helpers.CraftWithExp(mod, experienceNeeded))
             {
                 //success - do craft
                 base.OnCraft(item);
@@ -75,7 +75,7 @@ namespace ExperienceAndClasses.Recipes
                 item.rare = createItem.rare;
 
                 //tell server to announce (no effect in single player)
-                Methods.PacketSender.ClientTellAnnouncement(Main.LocalPlayer.name + " has completed " + createItem.name + "!", 255, 255, 0);
+                Methods.PacketSender.ClientTellAnnouncement(mod, Main.LocalPlayer.name + " has completed " + createItem.name + "!", 255, 255, 0);
             }
         }
     }

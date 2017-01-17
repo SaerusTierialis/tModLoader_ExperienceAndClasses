@@ -5,9 +5,13 @@ namespace ExperienceAndClasses.Methods
 {
     public static class ChatCommands
     {
-        static Mod mod = ModLoader.GetMod("ExperienceAndClasses");
-
-        public static void CommandSetExp(double exp, string text)
+        /// <summary>
+        /// Command to set current character's experience total (auth if multiplayer).
+        /// </summary>
+        /// <param name="mod"></param>
+        /// <param name="exp"></param>
+        /// <param name="text"></param>
+        public static void CommandSetExp(Mod mod, double exp, string text)
         {
             Player player = Main.LocalPlayer;
             MyPlayer myPlayer = player.GetModPlayer<MyPlayer>(mod);
@@ -19,14 +23,19 @@ namespace ExperienceAndClasses.Methods
             else if (Main.netMode == 1)
             {
                 double expAdd = exp - myPlayer.GetExp();
-                Methods.PacketSender.ClientRequestAddExp(player.whoAmI, expAdd, text);
+                Methods.PacketSender.ClientRequestAddExp(mod, player.whoAmI, expAdd, text);
                 Main.NewTextMultiline("Request that experience be set to " + exp + " has been sent to the server." +
                                     "\nIf you are authorized, the change should occur shortly. Use /auth [code]" +
                                     "\nto become authorized. The code is displayed in the server console.");
             }
         }
 
-        public static void CommandExpRate()
+
+        /// <summary>
+        /// Command to check experience rate (global if multiplayer).
+        /// </summary>
+        /// <param name="mod"></param>
+        public static void CommandExpRate(Mod mod)
         {
             if (Main.netMode == 0)
             {
@@ -34,12 +43,19 @@ namespace ExperienceAndClasses.Methods
             }
             else if (Main.netMode == 1)
             {
-                Methods.PacketSender.ClientAsksExpRate();
+                Methods.PacketSender.ClientAsksExpRate(mod);
                 Main.NewText("Request for exprate has been sent to the server.");
             }
         }
 
-        public static void CommandSetExpRate(double rate, string text)
+
+        /// <summary>
+        /// Command to set experience rate (auth and global if multiplayer).
+        /// </summary>
+        /// <param name="mod"></param>
+        /// <param name="rate"></param>
+        /// <param name="text"></param>
+        public static void CommandSetExpRate(Mod mod, double rate, string text)
         {
             MyPlayer myPlayer = Main.LocalPlayer.GetModPlayer<MyPlayer>(mod);
             if (Main.netMode == 0)
@@ -49,14 +65,20 @@ namespace ExperienceAndClasses.Methods
             }
             else if (Main.netMode == 1)
             {
-                Methods.PacketSender.ClientRequestExpRate(rate, text);
+                Methods.PacketSender.ClientRequestExpRate(mod, rate, text);
                 Main.NewTextMultiline("Request that exprate be set to " + (rate * 100) + "% has been sent to the server." +
                                     "\nIf you are authorized, the change should occur shortly. Use /auth [code]" +
                                     "\nto become authorized. The code is displayed in the server console.");
             }
         }
 
-        public static void CommandToggleCaps(string text)
+
+        /// <summary>
+        /// Command to toggle class caps (auth and global if multiplayer).
+        /// </summary>
+        /// <param name="mod"></param>
+        /// <param name="text"></param>
+        public static void CommandToggleCaps(Mod mod, string text)
         {
             Player player = Main.LocalPlayer;
             MyPlayer myPlayer = player.GetModPlayer<MyPlayer>(mod);
@@ -74,22 +96,34 @@ namespace ExperienceAndClasses.Methods
             }
             else if (Main.netMode == 1)
             {
-                Methods.PacketSender.ClientRequestToggleClassCap(!ExperienceAndClasses.globalIgnoreCaps, text);
+                Methods.PacketSender.ClientRequestToggleClassCap(mod, !ExperienceAndClasses.globalIgnoreCaps, text);
                 Main.NewTextMultiline("Request to toggle the class caps feature has been sent to the server." +
                                     "\nIf you are authorized, the change should occur shortly. Use /auth [code]" +
                                     "\nto become authorized. The code is displayed in the server console.");
             }
         }
 
-        public static void CommandAuth(double code)//code -1 to check auth
+
+        /// <summary>
+        /// Command to attempt auth in multiplayer.
+        /// </summary>
+        /// <param name="mod"></param>
+        /// <param name="code"></param>
+        public static void CommandAuth(Mod mod, double code)//code -1 to check auth
         {
             if (Main.netMode != 1) return;
-            Methods.PacketSender.ClientTryAuth(code);
+            Methods.PacketSender.ClientTryAuth(mod, code);
             Main.NewTextMultiline("Request to authenticate has been sent to the server." +
                                 "\nIf successful, you will receive a response shortly.");
         }
 
-        public static void CommandLvlCap(int level)
+
+        /// <summary>
+        /// Command to set current character's level cap (request if multiplayer).
+        /// </summary>
+        /// <param name="mod"></param>
+        /// <param name="level"></param>
+        public static void CommandLvlCap(Mod mod, int level)
         {
             if (level < -1 || level == 0 || level > ExperienceAndClasses.MAX_LEVEL) return;
 
@@ -107,12 +141,18 @@ namespace ExperienceAndClasses.Methods
             }
             else if (Main.netMode == 1)
             {
-                Methods.PacketSender.ClientUpdateLvlCap(level);
+                Methods.PacketSender.ClientUpdateLvlCap(mod, level);
                 Main.NewText("Request to change level cap to " + level + " has been sent to the server.");
             }
         }
 
-        public static void CommandDmgRed(int damageReductionPercent)
+
+        /// <summary>
+        /// Command to set current character's class damage reduction (request if multiplayer).
+        /// </summary>
+        /// <param name="mod"></param>
+        /// <param name="damageReductionPercent"></param>
+        public static void CommandDmgRed(Mod mod, int damageReductionPercent)
         {
             if (damageReductionPercent < -1 || damageReductionPercent > 100) return;
 
@@ -126,11 +166,14 @@ namespace ExperienceAndClasses.Methods
             }
             else if (Main.netMode == 1)
             {
-                Methods.PacketSender.ClientUpdateDmgRed(damageReductionPercent);
+                Methods.PacketSender.ClientUpdateDmgRed(mod, damageReductionPercent);
                 Main.NewText("Request to change damage reduction to " + damageReductionPercent + "% has been sent to the server.");
             }
         }
 
+        /// <summary>
+        /// Command for toggling auth requirement of a map while in singleplayer.
+        /// </summary>
         public static void CommandRequireAuth()
         {
             if (Main.netMode != 0)

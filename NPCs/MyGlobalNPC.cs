@@ -61,7 +61,7 @@ namespace ExperienceAndClasses.NPCs
                                     if (Main.netMode == 2)
                                     {
                                         //server tells client to record this
-                                        Methods.PacketSender.ServerFirstAscensionOrb(Main.player[playerIndex].whoAmI);
+                                        Methods.PacketSender.ServerFirstAscensionOrb(mod, Main.player[playerIndex].whoAmI);
                                     }
                                 }
                                 //announce

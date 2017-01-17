@@ -91,11 +91,12 @@ namespace ExperienceAndClasses
             MyPlayer localMyPlayer = null;
             int explvlcap, expdmgred;
             if (Main.netMode!=2) localMyPlayer = Main.LocalPlayer.GetModPlayer<MyPlayer>(this);
+            Mod mod = (this as Mod);
             switch (msgType)
             {
                 //Server's initial request for player experience (also send hasLootedMonsterOrb, explvlcap, and expdmgred)
                 case ExpModMessageType.ServerRequestExperience:
-                    Methods.PacketSender.ClientTellExperience();
+                    Methods.PacketSender.ClientTellExperience(mod);
 
                     if (TRACE) NetMessage.SendData(25, -1, -1, "TRACE:Recieved ServerRequestExperience", 255, 255, 0, 255, 0);
                     break;
@@ -113,12 +114,12 @@ namespace ExperienceAndClasses
 
                     //tell everyone else how much exp the new player has
                     int indNewPlayer = player.whoAmI;
-                    Methods.PacketSender.ServerForceExperience(player, -1, indNewPlayer);
+                    Methods.PacketSender.ServerForceExperience(mod, player, -1, indNewPlayer);
 
                     //give new player full exp list
                     if (Main.netMode == 2)
                     {
-                        Methods.PacketSender.ServerFullExpList(indNewPlayer, -1);
+                        Methods.PacketSender.ServerFullExpList(mod, indNewPlayer, -1);
                     }
 
                     //tell the players the current settings
@@ -236,7 +237,7 @@ namespace ExperienceAndClasses
                         Console.WriteLine("Accepted command request from player #" + player.whoAmI + ":" + player.name + " " + text);
 
                         //share new status
-                        Methods.PacketSender.ServerToggleClassCap(globalIgnoreCaps);
+                        Methods.PacketSender.ServerToggleClassCap(mod, globalIgnoreCaps);
 
                         //announce
                         NetMessage.SendData(25, -1, -1, "Ignore Class Caps:"+ globalIgnoreCaps, 255, 255, 255, 0, 0);
@@ -398,6 +399,7 @@ namespace ExperienceAndClasses
             }
 
             MyPlayer localMyPlayer = Main.LocalPlayer.GetModPlayer<MyPlayer>(this);
+            Mod mod = (this as Mod);
 
             broadcast = false;
 
@@ -454,26 +456,26 @@ namespace ExperienceAndClasses
                 else if (command == "expadd" && args.Length > 0)
                 {
                     double exp = Double.Parse(args[0]);
-                    Methods.ChatCommands.CommandSetExp(localMyPlayer.GetExp() + exp, text);
+                    Methods.ChatCommands.CommandSetExp(mod, localMyPlayer.GetExp() + exp, text);
                 }
                 else if (command == "expsub" && args.Length > 0)
                 {
                     double exp = Double.Parse(args[0]);
-                    Methods.ChatCommands.CommandSetExp(localMyPlayer.GetExp() - exp, text);
+                    Methods.ChatCommands.CommandSetExp(mod, localMyPlayer.GetExp() - exp, text);
                 }
                 else if (command == "expset" && args.Length > 0)
                 {
                     double exp = Double.Parse(args[0]);
-                    Methods.ChatCommands.CommandSetExp(exp, text);
+                    Methods.ChatCommands.CommandSetExp(mod, exp, text);
                 }
                 else if (command == "exprate" && args.Length == 0)
                 {
-                    Methods.ChatCommands.CommandExpRate();
+                    Methods.ChatCommands.CommandExpRate(mod);
                 }
                 else if (command == "exprate" && args.Length > 0)
                 {
                     double rate = Double.Parse(args[0]);
-                    Methods.ChatCommands.CommandSetExpRate(rate / 100, text);
+                    Methods.ChatCommands.CommandSetExpRate(mod, rate / 100, text);
                 }
                 /* Disabled /expuse and /expcraft in v1.1.4 (switched to direct crafting)
                 else if (command == "expuse")
@@ -539,7 +541,7 @@ namespace ExperienceAndClasses
                     int level = Methods.Experience.GetLevel(exp) + amt;
                     exp = Methods.Experience.GetExpReqForLevel(level, true);
 
-                    Methods.ChatCommands.CommandSetExp(exp, text);
+                    Methods.ChatCommands.CommandSetExp(mod, exp, text);
                 }
                 else if (command == "explvlsub")
                 {
@@ -552,12 +554,12 @@ namespace ExperienceAndClasses
                     exp = Methods.Experience.GetExpReqForLevel(level, true);
                     if (exp < 0) exp = 0;
 
-                    Methods.ChatCommands.CommandSetExp(exp, text);
+                    Methods.ChatCommands.CommandSetExp(mod, exp, text);
                 }
                 else if (command == "explvlset" && args.Length > 0)
                 {
                     int level = Int32.Parse(args[0]);
-                    Methods.ChatCommands.CommandSetExp(Methods.Experience.GetExpReqForLevel(level, true), text);
+                    Methods.ChatCommands.CommandSetExp(mod, Methods.Experience.GetExpReqForLevel(level, true), text);
                 }
                 else if (command == "expmsg")
                 {
@@ -573,12 +575,12 @@ namespace ExperienceAndClasses
                 }
                 else if (command == "expclasscaps")
                 {
-                    Methods.ChatCommands.CommandToggleCaps(text);
+                    Methods.ChatCommands.CommandToggleCaps(mod, text);
                 }
                 else if (command == "expauth" && args.Length==0)
                 {
                     if (Main.netMode == 0) Main.NewText("Auth is only for multiplayer use.");
-                        else Methods.ChatCommands.CommandAuth(-1);
+                        else Methods.ChatCommands.CommandAuth(mod, -1);
                 }
                 else if (command == "expauth" && args.Length>0)
                 {
@@ -586,13 +588,13 @@ namespace ExperienceAndClasses
                     else
                     {
                         double code = Double.Parse(args[0]);
-                        Methods.ChatCommands.CommandAuth(code);
+                        Methods.ChatCommands.CommandAuth(mod, code);
                     }
                 }
                 else if (command == "explvlcap" && args.Length > 0)
                 {
                     int lvl = Int32.Parse(args[0]);
-                    Methods.ChatCommands.CommandLvlCap(lvl);
+                    Methods.ChatCommands.CommandLvlCap(mod, lvl);
                 }
                 else if (command == "explvlcap" && args.Length == 0)
                 {
@@ -603,7 +605,7 @@ namespace ExperienceAndClasses
                 {
                     int dmgred = Int32.Parse(args[0]);
                     if (dmgred == 0) dmgred = -1;
-                    Methods.ChatCommands.CommandDmgRed(dmgred);
+                    Methods.ChatCommands.CommandDmgRed(mod, dmgred);
                 }
                 else if (command == "expdmgred" && args.Length == 0)
                 {

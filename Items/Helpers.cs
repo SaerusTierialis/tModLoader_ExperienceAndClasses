@@ -8,8 +8,6 @@ namespace ExperienceAndClasses.Items
 {
     public static class Helpers
     {
-        static Mod mod = ModLoader.GetMod("ExperienceAndClasses");
-
         /* General */
         public static readonly int LAST_AT_LEVEL = 100; //highest "At Level X" bonus
         public static readonly List<int> VALID_SLOTS = Enumerable.Range(3, 8).ToList();
@@ -253,7 +251,7 @@ namespace ExperienceAndClasses.Items
         /// <param name="job"></param>
         /// <param name="applyEffects"></param>
         /// <param name="myPlayer"></param>
-        public static void ClassTokenEffects(Player player, Item item, string job, bool applyEffects, MyPlayer myPlayer = null)
+        public static void ClassTokenEffects(Mod mod, Player player, Item item, string job, bool applyEffects, MyPlayer myPlayer = null)
         {
             //auto-generate class bonuses (var names match player attributes)
             float statLifeMax2 = 0f;
@@ -1186,11 +1184,6 @@ namespace ExperienceAndClasses.Items
                 }
                 bonuses += "\nOpener Attacks deal " + (floatBonus * 100) + "% damage";
             }
-            else
-            {
-                myPlayer.openerBonusPct = 0f;
-                myPlayer.openerTime_msec = 0;
-            }
 
             //periodic party healing
             if (periodicPartyHeal_LEVEL != -1 && level >= periodicPartyHeal_LEVEL)
@@ -1237,23 +1230,28 @@ namespace ExperienceAndClasses.Items
             //defense aura
             if ((defenseAura1_LEVEL != -1 && level >= defenseAura1_LEVEL) || (defenseAura2_LEVEL != -1 && level >= defenseAura2_LEVEL) || (defenseAura3_LEVEL != -1 && level >= defenseAura3_LEVEL))
             {
+                int buff = 0;
+                intBonus = 0;
+                if (defenseAura3_LEVEL != -1 && level >= defenseAura3_LEVEL)
+                {
+                    buff = mod.BuffType<Buffs.Aura_Defense3>();
+                    intBonus = Buffs.Aura_Defense3.bonus_defense;
+                }
+                else if (defenseAura2_LEVEL != -1 && level >= defenseAura2_LEVEL)
+                {
+                    buff = mod.BuffType<Buffs.Aura_Defense2>();
+                    intBonus = Buffs.Aura_Defense2.bonus_defense;
+                }
+                else
+                {
+                    buff = mod.BuffType<Buffs.Aura_Defense1>();
+                    intBonus = Buffs.Aura_Defense1.bonus_defense;
+                }
+                
                 if (applyEffects && auraUpdate)
                 {
-                    if (defenseAura3_LEVEL != -1 && level >= defenseAura3_LEVEL)
-                    {
-                        AuraEffect(player, true, true, true, false, false, 0, 0, 0, 0, 0, mod.BuffType("Aura_Defense3"), AURA_UPDATE_BUFF_TICKS);
-                        intBonus = Buffs.Aura_Defense3.bonus_defense;
-                    }
-                    else if (defenseAura2_LEVEL != -1 && level >= defenseAura2_LEVEL)
-                    {
-                        AuraEffect(player, true, true, true, false, false, 0, 0, 0, 0, 0, mod.BuffType("Aura_Defense2"), AURA_UPDATE_BUFF_TICKS);
-                        intBonus = Buffs.Aura_Defense2.bonus_defense;
-                    }
-                    else
-                    {
-                        AuraEffect(player, true, true, true, false, false, 0, 0, 0, 0, 0, mod.BuffType("Aura_Defense1"), AURA_UPDATE_BUFF_TICKS);
-                        intBonus = Buffs.Aura_Defense1.bonus_defense;
-                    }
+                    Main.NewText("Adding " + buff);
+                    AuraEffect(player, true, true, true, false, false, 0, 0, 0, 0, 0, buff, AURA_UPDATE_BUFF_TICKS);
                 }
                 bonuses += "\nincrease the defense of nearby allies by " + intBonus;
             }
