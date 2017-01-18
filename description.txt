@@ -2,6 +2,33 @@ This mod introduces an RPG-style class and leveling system where all monsters pr
 
 See forum for full patch notes.
 
+v1.1.6
+-class tokens can now only be equipped in the vanilla accessory slots (prevents many bugs and exploits when using other mods) 
+-update token description when unequipped 
+-hide the ClassToken template 
+-auras now work as you'd expect in pvp (don't buff or heal enemies, do harm them) 
+-defense aura now applies to friendly NPC 
+-life aura now shows healing on friendly NPC 
+-if there are multiple defense auras in a region, you can now see a buff indicator for each tier (but still only get the highest-tier buff) 
+-code cleanup and optimizations (done enough, more in next version)
+-auras now all use a general method (future auras will be easier/faster to implement and less likely to contain bugs) 
+-Experience Orbs can now stack to 9,999,999 even if you have MaxStacks installed 
+-Berserker damage reduced to 0.25%/level (from 0.75%/level) 
+-Warrior damage reduced to 1%/level (from 1.25%/level) 
+-fix reload bug
+-fix aura buffs break when reloading mods 
+-add option for you all to toggle the trace for debugging (/exptrace and /expmaptrace) 
+-remove scope from tier III range classes 
+-multiclass assassin bug (sometimes opener doesn't work depending on token order and positions) 
+-add dodge chance to Rogue, Assassin, and Ninja 
+-add brief invulnerability after opener attack (excluding "free" opener attacks against full-life targets) 
+-make opener easier to use with projectile melee weapons (i.e., opener can trigger from melee hit shortly after the projectile hits)
+-opener attack dust effect now becomes noticeable more quickly 
+-add light to saint 
+-changes to prevent other potential reload issues
+-fixed a potential multiclass bug with bonus melee crit damage
+-percent midas now stacks when multiclassing
+
 v1.1.5
 -Mac/Linux could not run version v1.1.4, this issue has been resolved
 -reworded Ascension/Boss Orb message to state that the orb has dropped
