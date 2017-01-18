@@ -30,13 +30,13 @@ namespace ExperienceAndClasses.Buffs
         {
             if (player.GetModPlayer<MyPlayer>(mod).openerImmuneEnd.CompareTo(DateTime.Now) <= 0)
             {
-                player.DelBuff(mod.BuffType<Buffs.Buff_OpenerPhase>());
+                //player.DelBuff(mod.BuffType<Buffs.Buff_OpenerPhase>());
             }
             else
             {
                 player.immune = true;
-                player.immuneTime = 2;
-                player.AddBuff(mod.BuffType<Buffs.Buff_OpenerPhase>(), 2);
+                player.immuneTime = 1;
+                player.AddBuff(mod.BuffType<Buffs.Buff_OpenerPhase>(), 1);
             }
 
             base.Update(player, ref buffIndex);

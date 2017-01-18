@@ -346,7 +346,7 @@ namespace ExperienceAndClasses
                 //if ready, add phase
                 if (ready)
                 {
-                    player.AddBuff(mod.BuffType<Buffs.Buff_OpenerPhase>(), 2);
+                    player.AddBuff(mod.BuffType<Buffs.Buff_OpenerPhase>(), 1);
                     openerImmuneEnd = now.AddMilliseconds(openerImmuneTime_msec);
                 }
 
