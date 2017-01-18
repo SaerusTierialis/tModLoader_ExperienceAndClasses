@@ -254,8 +254,8 @@ namespace ExperienceAndClasses
                     Main.NewText("Ignore Class Caps: " + ignoreCaps);
                     if (explvlcap > 0) Main.NewText("Level Cap: " + explvlcap);
                         else Main.NewText("Level Cap: disabled");
-                    if (expdmgred > 0) Main.NewText("Reduce Class Damamge: " + expdmgred + "%");
-                        else Main.NewText("Reduce Class Damamge: disabled");
+                    if (expdmgred > 0) Main.NewText("Reduce Class Damage: " + expdmgred + "%");
+                        else Main.NewText("Reduce Class Damage: disabled");
                 }
             }
 
