@@ -6,6 +6,7 @@ using Terraria.ModLoader;
 namespace ExperienceAndClasses.Items
 {
     /* Template & Novice */
+    //note that abstract ModItem cause issues
     public class ClassToken_Novice : ModItem
     {
         public static readonly string[] TIER_NAMES = new string[] { "?", "I", "II", "III" };

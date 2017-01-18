@@ -5,6 +5,7 @@ using Terraria.ModLoader;
 namespace ExperienceAndClasses.Items
 {
     /* Template & Experience Orb x1 */
+    //note that abstract ModItem cause issues
     public class Experience : ModItem
     {
         static int[] values = { 1, 100, 1000, 10000, 100000, 1000000 };

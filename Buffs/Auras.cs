@@ -16,6 +16,7 @@ namespace ExperienceAndClasses.Buffs
     }
 
     /* Template & Sage's defense aura tiers */
+    //note that abstract ModBuff cause issues
     public class Aura_Defense1 : ModBuff
     {
         public static int bonus_defense = 5;
