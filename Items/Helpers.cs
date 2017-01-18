@@ -31,6 +31,9 @@ namespace ExperienceAndClasses.Items
 
         public static double[,] timeNext = new double[256, NUMBER_TIME_IND]; //this is a poor use of memory, but moving it to MyPlayer caused several issues
 
+        //pre-defined bonus values
+        public static readonly int[] OPENER_ATTACK_IMMUNE_MSEC = new int[] { 500, 750, 1000, 1250 };
+
         /// <summary>
         /// Returns true if the specified effect is ready. Timing is handled in intervals to ensure that effects occur in sync across clients.
         /// </summary>
@@ -289,6 +292,8 @@ namespace ExperienceAndClasses.Items
             float minionKB = 0f;
             float minionKB_CAP = 0.75f;
             float light = 0f;
+            float dodgeChancePct = 0f;
+            int dodgeChancePct_CAP = 30;
             float pctChanceMidas = 0f;
             float maxMinions_flat = 0f;
             int noKnockback_LEVEL = -1;
@@ -318,6 +323,10 @@ namespace ExperienceAndClasses.Items
             float assassinAttack_FLAT = 0f;
             int assassinAttack_TIME_MSEC = 2000;
             int assassinAttack_LEVEL = -1;
+            int assassinAttackPhase0_LEVEL = -1;
+            int assassinAttackPhase1_LEVEL = -1;
+            int assassinAttackPhase2_LEVEL = -1;
+            int assassinAttackPhase3_LEVEL = -1;
             float periodicPartyHeal = 0f;
             int periodicPartyHeal_TIME_MSEC = 5000;
             int periodicPartyHeal_LEVEL = -1;
@@ -439,6 +448,8 @@ namespace ExperienceAndClasses.Items
                     thrownVelocity = 0.005f;
                     thrownCrit = 0.5f;
                     thrownCrit_CAP = 15;
+                    dodgeChancePct = 0.34f;
+                    dodgeChancePct_CAP = 10;
                     pctChanceMidas = 0.0075f;
                     break;
                 case "Assassin":
@@ -450,6 +461,8 @@ namespace ExperienceAndClasses.Items
                     meleeDamage = 0.003f;
                     meleeCrit = 1f;
                     meleeCrit_CAP = 100;
+                    dodgeChancePct = 0.34f;
+                    dodgeChancePct_CAP = 20;
                     pctChanceMidas = 0.01f;
                     noFallDmg_LEVEL = 15;
                     immune_Poisoned_LEVEL = 30;
@@ -460,6 +473,10 @@ namespace ExperienceAndClasses.Items
                     assassinAttack_FLAT = 5f;
                     assassinAttack_TIME_MSEC = 2000;
                     assassinAttack_LEVEL = 1;
+                    assassinAttackPhase0_LEVEL = 1;
+                    assassinAttackPhase1_LEVEL = 40;
+                    assassinAttackPhase2_LEVEL = 80;
+                    assassinAttackPhase3_LEVEL = 100;
                     break;
                 case "Ninja":
                     statLifeMax2 = 0.5f;
@@ -471,6 +488,8 @@ namespace ExperienceAndClasses.Items
                     thrownVelocity = 0.015f;
                     thrownCrit = 0.75f;
                     thrownCrit_CAP = 75;
+                    dodgeChancePct = 0.34f;
+                    dodgeChancePct_CAP = 30;
                     pctChanceMidas = 0.01f;
                     noFallDmg_LEVEL = 15;
                     immune_Confused_LEVEL = 20;
@@ -1001,6 +1020,20 @@ namespace ExperienceAndClasses.Items
             }
             if (light > 0) desc += "\n+" + (light*100) + "% light";
 
+            //dodgeChancePct
+            intBonus = (int)Math.Floor(dodgeChancePct * level);
+            if (intBonus > 0)
+            {
+                if (!ignoreCaps && (myPlayer.dodgeChancePct + intBonus) > dodgeChancePct_CAP) intBonus = dodgeChancePct_CAP - myPlayer.dodgeChancePct;
+                if (applyEffects) myPlayer.dodgeChancePct += intBonus;
+                bonuses += "\n+" + intBonus + "% dodge";
+            }
+            if (dodgeChancePct>0f)
+            {
+                desc += "\n+" + dodgeChancePct + "% dodge";
+                if (!ignoreCaps) desc += " (max " + dodgeChancePct_CAP + "%)";
+            }
+
             //chance to inflict Midas on hit
             floatBonus = pctChanceMidas * level;
             if (floatBonus > 0)
@@ -1186,7 +1219,30 @@ namespace ExperienceAndClasses.Items
                         player.AddBuff(mod.BuffType("Buff_OpenerAttack"), 50);
                     }
                 }
-                bonuses += "\nOpener Attacks deal " + (floatBonus * 100) + "% damage";
+                bonuses += "\nopener attacks deal " + (floatBonus * 100) + "% damage";
+            }
+
+            intBonus = -1;
+            if (assassinAttackPhase3_LEVEL != -1 && level >= assassinAttackPhase3_LEVEL)
+            {
+                intBonus = 3;
+            }
+            else if (assassinAttackPhase2_LEVEL != -1 && level >= assassinAttackPhase2_LEVEL)
+            {
+                intBonus = 2;
+            }
+            else if (assassinAttackPhase1_LEVEL != -1 && level >= assassinAttackPhase1_LEVEL)
+            {
+                intBonus = 1;
+            }
+            else if (assassinAttackPhase0_LEVEL != -1 && level >= assassinAttackPhase0_LEVEL)
+            {
+                intBonus = 0;
+            }
+            if (intBonus > -1)
+            {
+                if (applyEffects && myPlayer.openerImmuneTime_msec < OPENER_ATTACK_IMMUNE_MSEC[intBonus]) myPlayer.openerImmuneTime_msec = OPENER_ATTACK_IMMUNE_MSEC[intBonus];
+                bonuses += "\nopener attacks grant "+(OPENER_ATTACK_IMMUNE_MSEC[intBonus] / 1000f) +" second immunity (phase)";
             }
 
             //periodic party healing
@@ -1336,7 +1392,12 @@ namespace ExperienceAndClasses.Items
                 if (meleeCritDmg20Pct_LEVEL == lvl) desc += "\nLevel " + lvl + ": 20% bonus melee critical damage (non-stacking)";
                 if (meleeCritDmg30Pct_LEVEL == lvl) desc += "\nLevel " + lvl + ": 30% bonus melee critical damage (non-stacking)";
 
-                if (assassinAttack_LEVEL == lvl) desc += "\nLevel " + lvl + ": Opener Attacks deal " + (assassinAttack_FLAT * 100) + "+(" + (assassinAttack * 100) + "/level)% damage";
+                if (assassinAttack_LEVEL == lvl) desc += "\nLevel " + lvl + ": opener attacks deal " + (assassinAttack_FLAT * 100) + "+(" + (assassinAttack * 100) + "/level)% damage";
+
+                if (assassinAttackPhase0_LEVEL==lvl) desc += "\nLevel " + lvl + ": opener attacks grant " + (OPENER_ATTACK_IMMUNE_MSEC[0] / 1000f) + " second immunity (phase)";
+                if (assassinAttackPhase1_LEVEL == lvl) desc += "\nLevel " + lvl + ": opener attacks grant " + (OPENER_ATTACK_IMMUNE_MSEC[1] / 1000f) + " second immunity (phase)";
+                if (assassinAttackPhase2_LEVEL == lvl) desc += "\nLevel " + lvl + ": opener attacks grant " + (OPENER_ATTACK_IMMUNE_MSEC[2] / 1000f) + " second immunity (phase)";
+                if (assassinAttackPhase3_LEVEL == lvl) desc += "\nLevel " + lvl + ": opener attacks grant " + (OPENER_ATTACK_IMMUNE_MSEC[3] / 1000f) + " second immunity (phase)";
 
                 if (periodicPartyHeal_LEVEL == lvl) desc += "\nLevel " + lvl + ": occasionally heals allies (half for self)";
                 if (periodicIchorAura_LEVEL == lvl) desc += "\nLevel " + lvl + ": occasionally inflicts ichor on nearby enemies";

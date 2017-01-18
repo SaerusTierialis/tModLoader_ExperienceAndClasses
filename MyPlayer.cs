@@ -33,6 +33,10 @@ namespace ExperienceAndClasses
         public double openerBonusPct = 0;
         public int openerTime_msec = 0;
         public DateTime timeLastAttack = DateTime.MinValue;
+        public int openerImmuneTime_msec = 0;
+        public DateTime openerImmuneEnd = DateTime.MinValue;
+
+        public int dodgeChancePct = 0;
 
         public float percentMidas = 0;
 
@@ -263,7 +267,9 @@ namespace ExperienceAndClasses
             bonusCritPct = 0;
             openerBonusPct = 0;
             openerTime_msec = 0;
+            openerImmuneTime_msec = 0;
             percentMidas = 0;
+            dodgeChancePct = 0;
 
             base.PreUpdate();
         }
@@ -334,8 +340,16 @@ namespace ExperienceAndClasses
 
             //Assassin special attack
             DateTime now = DateTime.Now;
-            if (openerBonusPct>0 && item.melee && (timeLastAttack.AddMilliseconds(openerTime_msec).CompareTo(now)<=0 || target.life==target.lifeMax))
+            bool ready = timeLastAttack.AddMilliseconds(openerTime_msec).CompareTo(now) <= 0;
+            if (openerBonusPct>0 && item.melee && (ready || target.life==target.lifeMax))
             {
+                //if ready, add phase
+                if (ready)
+                {
+                    player.AddBuff(mod.BuffType<Buffs.Buff_OpenerPhase>(), 2);
+                    openerImmuneEnd = now.AddMilliseconds(openerImmuneTime_msec);
+                }
+
                 //bonus opener damage
                 damage = (int)Math.Round((double)damage * (1 + openerBonusPct), 0);
 
@@ -352,7 +366,7 @@ namespace ExperienceAndClasses
             timeLastAttack = now;
 
             //remove buff
-            int buffInd = player.FindBuffIndex(mod.BuffType("Buff_OpenerAttack"));
+            int buffInd = player.FindBuffIndex(mod.BuffType<Buffs.Buff_OpenerAttack>());
             if (buffInd != -1) player.DelBuff(buffInd);
 
             //base
@@ -367,8 +381,16 @@ namespace ExperienceAndClasses
             //Assassin special attack for yoyo
             DateTime now = DateTime.Now;
             Item item = Main.player[proj.owner].HeldItem;
-            if (openerBonusPct > 0 && proj.melee && item.channel && (timeLastAttack.AddMilliseconds(openerTime_msec).CompareTo(now) <= 0 || target.life == target.lifeMax))
+            bool ready = timeLastAttack.AddMilliseconds(openerTime_msec).CompareTo(now) <= 0;
+            if (openerBonusPct > 0 && proj.melee && item.channel && (ready || target.life == target.lifeMax))
             {
+                //if ready, add phase
+                if (ready)
+                {
+                    player.AddBuff(mod.BuffType<Buffs.Buff_OpenerPhase>(), 2);
+                    openerImmuneEnd = now.AddMilliseconds(openerImmuneTime_msec);
+                }
+
                 //bonus opener damage (50% YOYO PENALTY)
                 damage = (int)Math.Round((double)damage * (1 + (openerBonusPct/2)), 0);
 
@@ -379,8 +401,11 @@ namespace ExperienceAndClasses
             //record time
             timeLastAttack = now;
 
+            //flex time for point-blank melee weapons that have a projectile
+            if (openerBonusPct > 0 && !proj.melee && !item.channel) timeLastAttack.AddMilliseconds(-50);
+
             //remove buff
-            int buffInd = player.FindBuffIndex(mod.BuffType("Buff_OpenerAttack"));
+            int buffInd = player.FindBuffIndex(mod.BuffType<Buffs.Buff_OpenerAttack>());
             if (buffInd != -1) player.DelBuff(buffInd);
 
             //base
@@ -389,10 +414,10 @@ namespace ExperienceAndClasses
 
         public override void DrawEffects(PlayerDrawInfo drawInfo, ref float r, ref float g, ref float b, ref float a, ref bool fullBright)
         {
-            int buffInd = player.FindBuffIndex(mod.BuffType("Buff_OpenerAttack"));
+            int buffInd = player.FindBuffIndex(mod.BuffType<Buffs.Buff_OpenerAttack>());
             if (buffInd != -1)
             {
-                if (Main.rand.Next(10) == 0 && drawInfo.shadow == 0f)
+                if (Main.rand.Next(5) == 0 && drawInfo.shadow == 0f)
                 {
                     int dust = Dust.NewDust(drawInfo.position - new Vector2(2f, 2f), player.width + 4, player.height + 4, mod.DustType("Dust_OpenerAttack"), player.velocity.X * 0.4f, player.velocity.Y * 0.4f, 100, default(Color), 3f);
                     Main.dust[dust].noGravity = true;
@@ -402,6 +427,23 @@ namespace ExperienceAndClasses
                 }
             }
             base.DrawEffects(drawInfo, ref r, ref g, ref b, ref a, ref fullBright);
+        }
+
+        public override bool PreHurt(bool pvp, bool quiet, ref int damage, ref int hitDirection, ref bool crit, ref bool customDamage, ref bool playSound, ref bool genGore, ref PlayerDeathReason damageSource)
+        {
+            //% dodge chance (shadow dodge and ninja dodge both use 80 ticks so I used that here)
+            if (Main.LocalPlayer.Equals(player))
+            {
+                if (dodgeChancePct > 0 && Main.rand.Next(100) < dodgeChancePct)
+                {
+                    player.immune = true;
+                    player.immuneTime = 80;
+                    NetMessage.SendData(62, -1, -1, "", player.whoAmI, 2f, 0f, 0f, 0, 0, 0);
+                    return false;
+                }
+            }
+
+            return base.PreHurt(pvp, quiet, ref damage, ref hitDirection, ref crit, ref customDamage, ref playSound, ref genGore, ref damageSource);
         }
 
     }
