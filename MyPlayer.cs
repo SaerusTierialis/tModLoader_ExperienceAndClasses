@@ -12,6 +12,9 @@ namespace ExperienceAndClasses
     {
         public static double MAX_EXPERIENCE = Methods.Experience.GetExpReqForLevel(ExperienceAndClasses.MAX_LEVEL, true);
 
+        //general
+        public bool hasLootedMonsterOrb = false;
+
         public bool auth = false;
         public bool traceChar = false;
 
@@ -29,19 +32,19 @@ namespace ExperienceAndClasses
         public bool UIShow = true;
         public bool UITrans = false;
 
+        public List<Tuple<Item, string>> classTokensEquipped;
+
+        //rogue
+        public float percentMidas = 0;
+        public int dodgeChancePct = 0;
+
+        //assassin
         public double bonusCritPct = 0;
         public double openerBonusPct = 0;
         public int openerTime_msec = 0;
         public DateTime timeLastAttack = DateTime.MinValue;
         public int openerImmuneTime_msec = 0;
         public DateTime openerImmuneEnd = DateTime.MinValue;
-
-        public int dodgeChancePct = 0;
-
-        public float percentMidas = 0;
-
-        public bool hasLootedMonsterOrb = false;
-
         
         /// <summary>
         /// Returns experience total.
@@ -264,6 +267,10 @@ namespace ExperienceAndClasses
 
         public override void PreUpdate()
         {
+            //empty current class list
+            classTokensEquipped = new List<Tuple<Item, string>>();
+
+            //default var bonuses
             bonusCritPct = 0;
             openerBonusPct = 0;
             openerTime_msec = 0;
@@ -273,20 +280,14 @@ namespace ExperienceAndClasses
 
             base.PreUpdate();
         }
-        
+
         public override void PostUpdateEquips()
         {
-            //UI
-            if (player.Equals(Main.LocalPlayer))
+            //apply class effects
+            int numberClasses = classTokensEquipped.Count;
+            foreach (var i in classTokensEquipped)
             {
-                if (UIShow)
-                {
-                    UI.MyUI.visible = true;
-                }
-                else
-                {
-                    UI.MyUI.visible = false;
-                }
+                Items.Helpers.ClassTokenEffects(mod, player, i.Item1, i.Item2, true, this, numberClasses);
             }
 
             base.PostUpdateEquips();
@@ -299,9 +300,20 @@ namespace ExperienceAndClasses
             {
                 //update UI if local single-player
                 if(Main.netMode==0) (mod as ExperienceAndClasses).myUI.updateValue(GetExp());
+
+                //UI visibility
+                if (UIShow)
+                {
+                    UI.MyUI.visible = true;
+                }
+                else
+                {
+                    UI.MyUI.visible = false;
+                }
             }
 
-            //
+            
+
             base.PostUpdate();
         }
 
@@ -382,7 +394,7 @@ namespace ExperienceAndClasses
             DateTime now = DateTime.Now;
             Item item = Main.player[proj.owner].HeldItem;
             bool ready = timeLastAttack.AddMilliseconds(openerTime_msec).CompareTo(now) <= 0;
-            if (openerBonusPct > 0 && proj.melee && item.channel && (ready || target.life == target.lifeMax))
+            if (openerBonusPct > 0 && Items.Helpers.HeldYoyo(player) && (ready || target.life == target.lifeMax))
             {
                 //if ready, add phase
                 if (ready)
@@ -402,7 +414,7 @@ namespace ExperienceAndClasses
             timeLastAttack = now;
 
             //flex time for point-blank melee weapons that have a projectile
-            if (openerBonusPct > 0 && !proj.melee && !item.channel) timeLastAttack.AddMilliseconds(-50);
+            if (openerBonusPct > 0 && !Items.Helpers.HeldYoyo(player)) timeLastAttack.AddMilliseconds(-50);
 
             //remove buff
             int buffInd = player.FindBuffIndex(mod.BuffType<Buffs.Buff_OpenerAttack>());

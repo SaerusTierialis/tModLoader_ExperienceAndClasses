@@ -10,8 +10,7 @@ namespace ExperienceAndClasses.Items
     {
         /* General */
         public static readonly int LAST_AT_LEVEL = 100; //highest "At Level X" bonus
-        public static readonly List<int> VALID_SLOTS = Enumerable.Range(3, 8).ToList();
-        public static readonly List<int> VALID_SLOTS_EQUIP = Enumerable.Range(3, 18).ToList();
+        public static readonly List<int> VANITY_SLOTS = Enumerable.Range(13, 18).ToList();
 
         /* Aura */
         public static readonly float AURA_DISTANCE = 1000f;
@@ -65,23 +64,11 @@ namespace ExperienceAndClasses.Items
                 return false;
         }
 
-        /// <summary>
-        /// Returns the number of classes equipped.
-        /// </summary>
-        /// <param name="player"></param>
-        /// <returns></returns>
-        public static int CountClasses(Player player)
+        public static bool HeldYoyo(Player player)
         {
-            int countTokens = 0;
-
-            //count regular slots
-            Item[] equips = player.armor;
-            foreach (int i in VALID_SLOTS)
-            {
-                if (equips[i].name.Contains("Class Token")) countTokens++;
-            }
-
-            return countTokens;
+            Item item = player.HeldItem;
+            if ((item.melee || item.thrown) && item.channel) return true;
+                else return false;
         }
 
         /// <summary>
@@ -254,7 +241,7 @@ namespace ExperienceAndClasses.Items
         /// <param name="job"></param>
         /// <param name="applyEffects"></param>
         /// <param name="myPlayer"></param>
-        public static void ClassTokenEffects(Mod mod, Player player, Item item, string job, bool applyEffects, MyPlayer myPlayer = null)
+        public static void ClassTokenEffects(Mod mod, Player player, Item item, string job, bool applyEffects, MyPlayer myPlayer = null, int numberClasses=1)
         {
             //auto-generate class bonuses (var names match player attributes)
             float statLifeMax2 = 0f;
@@ -582,7 +569,7 @@ namespace ExperienceAndClasses.Items
                     manaRegenDelayBonus = 0.2f;
                     manaCost = 0.005f;
                     manaCost_CAP = 0.4f;
-                    light = 0.01f;
+                    light = 0.0075f;
                     immune_Silence_LEVEL = 1;
                     immune_Cursed_LEVEL = 50;
                     immune_Confused_LEVEL = 30;
@@ -670,7 +657,6 @@ namespace ExperienceAndClasses.Items
             int level = Methods.Experience.GetLevel(experience);
 
             //reduce effective level if multiclassing
-            int numberClasses = CountClasses(player);
             string multiclass = "";
             if (numberClasses > 1)
             {
@@ -837,15 +823,19 @@ namespace ExperienceAndClasses.Items
             floatBonus = (meleeSpeed * level);
             if (floatBonus > 0)
             {
-                if (player.HeldItem.channel && floatBonus > 0.7f) floatBonus = 0.7f;
-                //if (floatBonus > meleeSpeed_CAP && !ignore_caps) floatBonus = meleeSpeed_CAP;
+                //limit yo-yo to 200% speed
+                if (HeldYoyo(player))
+                {
+                    float meleeSpeedCurrent = player.meleeSpeed;
+                    if ((meleeSpeedCurrent + floatBonus) > 2f) floatBonus = 2f - meleeSpeedCurrent;
+                }
+
                 if (applyEffects) player.meleeSpeed += floatBonus;
                 bonuses += "\n+" + (floatBonus * 100) + "% melee speed";
             }
             if (meleeSpeed > 0)
             {
                 desc += "\n+" + (meleeSpeed * 100) + "% melee speed";
-                //if (!ignore_caps) desc += " (max " + (meleeSpeed_CAP * 100) + "%)";
             }
 
             //throwing damage
@@ -1222,6 +1212,7 @@ namespace ExperienceAndClasses.Items
                 bonuses += "\nopener attacks deal " + (floatBonus * 100) + "% damage";
             }
 
+            //opener attack iframe
             intBonus = -1;
             if (assassinAttackPhase3_LEVEL != -1 && level >= assassinAttackPhase3_LEVEL)
             {
@@ -1242,7 +1233,7 @@ namespace ExperienceAndClasses.Items
             if (intBonus > -1)
             {
                 if (applyEffects && myPlayer.openerImmuneTime_msec < OPENER_ATTACK_IMMUNE_MSEC[intBonus]) myPlayer.openerImmuneTime_msec = OPENER_ATTACK_IMMUNE_MSEC[intBonus];
-                bonuses += "\nopener attacks grant "+(OPENER_ATTACK_IMMUNE_MSEC[intBonus] / 1000f) +" second immunity (phase)";
+                bonuses += "\nopener attacks grant "+(OPENER_ATTACK_IMMUNE_MSEC[intBonus] / 1000f) + " second immunity (must be off cooldown)";
             }
 
             //periodic party healing
@@ -1394,10 +1385,10 @@ namespace ExperienceAndClasses.Items
 
                 if (assassinAttack_LEVEL == lvl) desc += "\nLevel " + lvl + ": opener attacks deal " + (assassinAttack_FLAT * 100) + "+(" + (assassinAttack * 100) + "/level)% damage";
 
-                if (assassinAttackPhase0_LEVEL==lvl) desc += "\nLevel " + lvl + ": opener attacks grant " + (OPENER_ATTACK_IMMUNE_MSEC[0] / 1000f) + " second immunity (phase)";
-                if (assassinAttackPhase1_LEVEL == lvl) desc += "\nLevel " + lvl + ": opener attacks grant " + (OPENER_ATTACK_IMMUNE_MSEC[1] / 1000f) + " second immunity (phase)";
-                if (assassinAttackPhase2_LEVEL == lvl) desc += "\nLevel " + lvl + ": opener attacks grant " + (OPENER_ATTACK_IMMUNE_MSEC[2] / 1000f) + " second immunity (phase)";
-                if (assassinAttackPhase3_LEVEL == lvl) desc += "\nLevel " + lvl + ": opener attacks grant " + (OPENER_ATTACK_IMMUNE_MSEC[3] / 1000f) + " second immunity (phase)";
+                if (assassinAttackPhase0_LEVEL==lvl) desc += "\nLevel " + lvl + ": opener attacks grant " + (OPENER_ATTACK_IMMUNE_MSEC[0] / 1000f) + " second immunity (must be off cooldown)";
+                if (assassinAttackPhase1_LEVEL == lvl) desc += "\nLevel " + lvl + ": opener attacks grant " + (OPENER_ATTACK_IMMUNE_MSEC[1] / 1000f) + " second immunity (must be off cooldown)";
+                if (assassinAttackPhase2_LEVEL == lvl) desc += "\nLevel " + lvl + ": opener attacks grant " + (OPENER_ATTACK_IMMUNE_MSEC[2] / 1000f) + " second immunity (must be off cooldown)";
+                if (assassinAttackPhase3_LEVEL == lvl) desc += "\nLevel " + lvl + ": opener attacks grant " + (OPENER_ATTACK_IMMUNE_MSEC[3] / 1000f) + " second immunity (must be off cooldown)";
 
                 if (periodicPartyHeal_LEVEL == lvl) desc += "\nLevel " + lvl + ": occasionally heals allies (half for self)";
                 if (periodicIchorAura_LEVEL == lvl) desc += "\nLevel " + lvl + ": occasionally inflicts ichor on nearby enemies";

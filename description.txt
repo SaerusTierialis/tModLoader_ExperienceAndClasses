@@ -2,6 +2,13 @@ This mod introduces an RPG-style class and leveling system where all monsters pr
 
 See forum for full patch notes.
 
+v1.1.7
+-update tooltip to state that the invincibility after opener attack is only triggered when the opener was ready (i.e., not from "free" openers on full-life targets while cooldown is not done)
+-fix health reset bug with "Stats Config" when opener attack phase stops an attack
+-improve yo-yo attack speed check
+-reallow tokens to be equipped in slots added by mods (e.g., cheat sheet), the related issues have been resolved
+-reduce saint light
+
 v1.1.6
 -class tokens can now only be equipped in the vanilla accessory slots (prevents many bugs and exploits when using other mods) 
 -update token description when unequipped 

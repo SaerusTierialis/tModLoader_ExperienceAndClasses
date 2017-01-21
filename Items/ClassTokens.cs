@@ -46,14 +46,10 @@ namespace ExperienceAndClasses.Items
         {
             if (tier==1) Commons.QuckRecipe(mod, new int[,] { }, this, 1, new Recipes.ClassRecipes(mod, tier));
         }
-        public override bool CanEquipAccessory(Player player, int slot)
-        {
-            if (!Helpers.VALID_SLOTS_EQUIP.Contains(slot)) return false;
-            else return base.CanEquipAccessory(player, slot);
-        }
         public override void UpdateAccessory(Player player, bool hideVisual)
         {
-            Helpers.ClassTokenEffects(mod, player, item, name, true);
+            //Helpers.ClassTokenEffects(mod, player, item, name, true);
+            player.GetModPlayer<MyPlayer>(mod).classTokensEquipped.Add(new Tuple<Item, string>(item, name));
         }
     }
 
