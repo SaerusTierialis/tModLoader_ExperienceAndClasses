@@ -444,10 +444,10 @@ namespace ExperienceAndClasses.Items
         public override void AddRecipes()
         {
             Commons.QuckRecipe(mod, new int[,] { { mod.ItemType("ClassToken_Cleric"), 1 }, { ItemID.HeartLantern, 1},
-                { ItemID.StarinaBottle, 1},{ ItemID.WorkBench, 10} }, this, 1, new Recipes.ClassRecipes(mod, tier));
+                { ItemID.StarinaBottle, 1},{ ItemID.Campfire, 10} }, this, 1, new Recipes.ClassRecipes(mod, tier));
 
             Commons.QuckRecipe(mod, new int[,] { { mod.ItemType("ClassToken_Hybrid"), 1 }, { ItemID.HeartLantern, 1},
-                { ItemID.StarinaBottle, 1},{ ItemID.WorkBench, 10} }, this, 1, new Recipes.ClassRecipes(mod, tier));
+                { ItemID.StarinaBottle, 1},{ ItemID.Campfire, 10} }, this, 1, new Recipes.ClassRecipes(mod, tier));
         }
     }
 

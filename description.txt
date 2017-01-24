@@ -2,6 +2,9 @@ This mod introduces an RPG-style class and leveling system where all monsters pr
 
 See forum for full patch notes.
 
+v1.1.8
+-fixed saint recipe
+
 v1.1.7
 -update tooltip to state that the invincibility after opener attack is only triggered when the opener was ready (i.e., not from "free" openers on full-life targets while cooldown is not done)
 -fix health reset bug with "Stats Config" when opener attack phase stops an attack
