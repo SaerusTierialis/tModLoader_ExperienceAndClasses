@@ -178,13 +178,45 @@ namespace ExperienceAndClasses.Methods
         {
             if (Main.netMode != 0)
             {
-                Main.NewText("mod command functions only in singleplayer mode.");
+                Main.NewText("This command functions only in singleplayer mode.");
             }
             else
             {
                 ExperienceAndClasses.requireAuth = !ExperienceAndClasses.requireAuth;
                 if (ExperienceAndClasses.requireAuth) Main.NewText("Require Auth has been enabled. mod map will now require auth in multiplayer mode.");
                 else Main.NewText("Require Auth has been disabled. mod map will no longer require auth in multiplayer mode.");
+            }
+        }
+
+        /// <summary>
+        /// Command for showing the map's auth code in singleplayer.
+        /// </summary>
+        public static void CommandShowAuthCode()
+        {
+            if (Main.netMode != 0)
+            {
+                Main.NewText("This command functions only in singleplayer mode.");
+            }
+            else
+            {
+                Main.NewText("This map's auth code is " + ExperienceAndClasses.authCode);
+            }
+        }
+
+        /// <summary>
+        /// Command for setting teh map's auth code in singleplayer.
+        /// </summary>
+        /// <param name="newCode"></param>
+        public static void CommandSetAuthCode(double newCode)
+        {
+            if (Main.netMode != 0)
+            {
+                Main.NewText("This command functions only in singleplayer mode.");
+            }
+            else
+            {
+                ExperienceAndClasses.authCode = newCode;
+                Main.NewText("This map's auth code is now " + ExperienceAndClasses.authCode);
             }
         }
     }

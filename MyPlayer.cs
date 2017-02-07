@@ -156,11 +156,11 @@ namespace ExperienceAndClasses
 
             if (experienceChange>0 && displayExp)
             {
-                Main.NewText("You have earned " + (int)experienceChange + " experience.");
+                Main.NewText("You have earned " + Math.Round(experienceChange) + " experience.");
             }
             else if (experienceChange<0)
             {
-                Main.NewText("You have lost " + (int)(experienceChange * -1) + " experience.");
+                Main.NewText("You have lost " + Math.Round(experienceChange * -1) + " experience.");
             }
         }
 

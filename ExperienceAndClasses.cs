@@ -632,6 +632,17 @@ namespace ExperienceAndClasses
                     if (traceMap) Main.NewText("Map trace is enabled.");
                     else Main.NewText("Map trace is disabled");
                 }
+                else if (command == "expauthcode" && args.Length == 0)
+                {
+                    Methods.ChatCommands.CommandShowAuthCode();
+                }
+                else if (command == "expauthcode" && args.Length > 0)
+                {
+                    double newCode = Double.Parse(args[0]);
+                    if (newCode < 0) newCode = 0;
+                    newCode = Math.Round(newCode);
+                    Methods.ChatCommands.CommandSetAuthCode(newCode);
+                }
                 else
                 {
                     broadcast = true;
