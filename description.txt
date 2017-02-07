@@ -2,6 +2,13 @@ This mod introduces an RPG-style class and leveling system where all monsters pr
 
 See forum for full patch notes.
 
+v1.1.9
+-more code cleanup and optimizations
+-Ninja on-hit petal bonus changed to level 30 (from 40)
+-added command /expauthcode to display the map's auth code (must be used in single player mode)
+-added command /expauthcode # to change the map's auth code (must be used in single player mode)
+-fixed a display issue in the "you have earned/lost x experience" messages
+
 v1.1.8
 -fixed saint recipe
 
