@@ -33,13 +33,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="..\Commons.cs">
-      <Link>Commons.cs</Link>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Compile>
     <Compile Include="Buffs\Auras.cs" />
     <Compile Include="Buffs\Buffs.cs" />
     <Compile Include="Buffs\Helpers.cs" />
+    <Compile Include="Commons.cs" />
     <Compile Include="Dusts\Dusts.cs" />
     <Compile Include="Items\Helpers.cs" />
     <Compile Include="Items\ClassTokens.cs" />
@@ -48,6 +45,7 @@
     <Compile Include="Methods\ChatCommands.cs" />
     <Compile Include="Methods\Experience.cs" />
     <Compile Include="Methods\PacketSender.cs" />
+    <Compile Include="MyCommands.cs" />
     <Compile Include="MyPlayer.cs" />
     <Compile Include="MyWorld.cs" />
     <Compile Include="NPCs\Helpers.cs" />
