@@ -2,6 +2,9 @@ This mod introduces an RPG-style class and leveling system where all monsters pr
 
 See forum for full patch notes.
 
+v1.2.1
+-updated for tModLoader v0.9.2.3 (for v1.3.5, v2)
+
 v1.2.0
 -updated for tModLoader v0.9.2.1
 
