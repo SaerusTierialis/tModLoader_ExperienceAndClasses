@@ -25,7 +25,7 @@ namespace ExperienceAndClasses.Methods
                 double expAdd = exp - myPlayer.GetExp();
                 Methods.PacketSender.ClientRequestAddExp(mod, player.whoAmI, expAdd, text);
                 Main.NewTextMultiline("Request that experience be set to " + exp + " has been sent to the server." +
-                                    "\nIf you are authorized, the change should occur shortly. Use /auth [code]" +
+                                    "\nIf you are authorized, the change should occur shortly. Use /expauth [code]" +
                                     "\nto become authorized. The code is displayed in the server console.");
             }
         }
@@ -67,7 +67,7 @@ namespace ExperienceAndClasses.Methods
             {
                 Methods.PacketSender.ClientRequestExpRate(mod, rate, text);
                 Main.NewTextMultiline("Request that exprate be set to " + (rate * 100) + "% has been sent to the server." +
-                                    "\nIf you are authorized, the change should occur shortly. Use /auth [code]" +
+                                    "\nIf you are authorized, the change should occur shortly. Use /expauth [code]" +
                                     "\nto become authorized. The code is displayed in the server console.");
             }
         }
@@ -98,7 +98,7 @@ namespace ExperienceAndClasses.Methods
             {
                 Methods.PacketSender.ClientRequestToggleClassCap(mod, !ExperienceAndClasses.globalIgnoreCaps, text);
                 Main.NewTextMultiline("Request to toggle the class caps feature has been sent to the server." +
-                                    "\nIf you are authorized, the change should occur shortly. Use /auth [code]" +
+                                    "\nIf you are authorized, the change should occur shortly. Use /expauth [code]" +
                                     "\nto become authorized. The code is displayed in the server console.");
             }
         }
