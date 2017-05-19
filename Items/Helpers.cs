@@ -1383,7 +1383,7 @@ namespace ExperienceAndClasses.Items
                 if (meleeCritDmg20Pct_LEVEL == lvl) desc += "\nLevel " + lvl + ": 20% bonus melee critical damage (non-stacking)";
                 if (meleeCritDmg30Pct_LEVEL == lvl) desc += "\nLevel " + lvl + ": 30% bonus melee critical damage (non-stacking)";
 
-                if (assassinAttack_LEVEL == lvl) desc += "\nLevel " + lvl + ": opener attacks deal " + (assassinAttack_FLAT * 100) + "+(" + (assassinAttack * 100) + "/level)% damage";
+                if (assassinAttack_LEVEL == lvl) desc += "\nLevel " + lvl + ": opener attacks deal " + (assassinAttack_FLAT * 100) + "%+(" + (assassinAttack * 100) + "*level)% damage";
 
                 if (assassinAttackPhase0_LEVEL==lvl) desc += "\nLevel " + lvl + ": opener attacks grant " + (OPENER_ATTACK_IMMUNE_MSEC[0] / 1000f) + " second immunity (must be off cooldown)";
                 if (assassinAttackPhase1_LEVEL == lvl) desc += "\nLevel " + lvl + ": opener attacks grant " + (OPENER_ATTACK_IMMUNE_MSEC[1] / 1000f) + " second immunity (must be off cooldown)";
