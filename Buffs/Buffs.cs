@@ -9,8 +9,10 @@ namespace ExperienceAndClasses.Buffs
     {
         public override void SetDefaults()
         {
-            Main.buffName[Type] = "Opener Attack";
-            Main.buffTip[Type] = "Bonus damage on the next melee attack\nBonus is half for yo-yo";
+            //Main.buffName[Type] = "Opener Attack";
+            //Main.buffTip[Type] = "Bonus damage on the next melee attack\nBonus is half for yo-yo";
+            DisplayName.SetDefault("Opener Attack");
+            Description.SetDefault("Bonus damage on the next melee attack\nBonus is half for yo-yo");
             Main.buffNoTimeDisplay[Type] = true;
             Main.buffNoSave[Type] = true;
         }
@@ -21,8 +23,10 @@ namespace ExperienceAndClasses.Buffs
     {
         public override void SetDefaults()
         {
-            Main.buffName[Type] = "Phase";
-            Main.buffTip[Type] = "Cannot be hit";
+            //Main.buffName[Type] = "Phase";
+            //Main.buffTip[Type] = "Cannot be hit";
+            DisplayName.SetDefault("Phase");
+            Description.SetDefault("Cannot be hit");
             Main.buffNoTimeDisplay[Type] = true;
             Main.buffNoSave[Type] = true;
         }

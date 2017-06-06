@@ -29,7 +29,8 @@ namespace ExperienceAndClasses.Items
             if (tier > 0 && tier < TIER_NAMES.Length) tierString = TIER_NAMES[tier];
 
             //basic properties
-            item.name = "Class Token: " + name + " (Tier " + tierString + ")";
+            //item.name = "Class Token: " + name + " (Tier " + tierString + ")";
+            DisplayName.SetDefault("Class Token: " + name + " (Tier " + tierString + ")");
             item.width = 36;
             item.height = 36;
             item.value = 0;
@@ -37,7 +38,8 @@ namespace ExperienceAndClasses.Items
             item.accessory = true;
 
             //add class description
-            item.toolTip = desc;
+            //item.toolTip = desc;
+            Tooltip.SetDefault(desc);
 
             //add class bonuses description
             Helpers.ClassTokenEffects(mod, Main.LocalPlayer, item, name, false, new MyPlayer());

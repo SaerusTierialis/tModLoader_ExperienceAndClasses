@@ -381,11 +381,11 @@ namespace ExperienceAndClasses
 
         /* ~~~~~~~~~~~~~~~~~~~~~ CHAT COMMANDS ~~~~~~~~~~~~~~~~~~~~~ */
 
-        
+
 
         /* ~~~~~~~~~~~~~~~~~~~~~ MISC OVERRIDES ~~~~~~~~~~~~~~~~~~~~~ */
 
-        public override void ModifyInterfaceLayers(List<MethodSequenceListItem> layers)
+        public override void ModifyInterfaceLayers(List<GameInterfaceLayer> layers)
         {
             int MouseTextIndex = layers.FindIndex(layer => layer.Name.Equals("Vanilla: Mouse Text"));
             if (MouseTextIndex != -1)
