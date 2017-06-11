@@ -1,7 +1,9 @@
-﻿using System;
+﻿using Microsoft.Xna.Framework;
+using System;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
+using System.Collections.Generic;
 
 namespace ExperienceAndClasses.Items
 {
@@ -14,11 +16,22 @@ namespace ExperienceAndClasses.Items
         public int tier = 1;
         public string desc = "Starter class." +
                          "\n\nClass advancement is available at level " + Recipes.ClassRecipes.TIER_LEVEL_REQUIREMENTS[1 + 1] + ".";
+        public string desc2 = "";
+
+        public override void ModifyTooltips(List<TooltipLine> tooltips)
+        {
+            if (desc2.Length > 0)
+            {
+                TooltipLine line = new TooltipLine(mod, "desc2", desc2);
+                line.overrideColor = Color.LimeGreen;
+                tooltips.Add(line);
+            }
+        }
 
         public override void UpdateInventory(Player player)
         {
             //update description in inventory (remove current bonuses)
-            if (Main.LocalPlayer.Equals(player)) Helpers.ClassTokenEffects(mod, Main.LocalPlayer, item, name, false, new MyPlayer());
+            if (Main.LocalPlayer.Equals(player)) Helpers.ClassTokenEffects(mod, Main.LocalPlayer, this, name, false, new MyPlayer());
             base.UpdateInventory(player);
         }
 
@@ -42,7 +55,7 @@ namespace ExperienceAndClasses.Items
             Tooltip.SetDefault(desc);
 
             //add class bonuses description
-            Helpers.ClassTokenEffects(mod, Main.LocalPlayer, item, name, false, new MyPlayer());
+            Helpers.ClassTokenEffects(mod, Main.LocalPlayer, this, name, false, new MyPlayer());
         }
         public override void AddRecipes()
         {

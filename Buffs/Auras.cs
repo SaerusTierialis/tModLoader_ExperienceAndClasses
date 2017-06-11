@@ -8,8 +8,8 @@ namespace ExperienceAndClasses.Buffs
     {
         public override void SetDefaults()
         {
-            Main.buffName[Type] = "Life Aura";
-            Main.buffTip[Type] = "Periodically restores life";
+            DisplayName.SetDefault("Life Aura");
+            Description.SetDefault("Periodically restores life");
             Main.buffNoTimeDisplay[Type] = true;
             Main.buffNoSave[Type] = true;
         }
@@ -27,8 +27,8 @@ namespace ExperienceAndClasses.Buffs
 
         public override void SetDefaults()
         {
-            Main.buffName[Type] = "Defense Aura " + bonus;
-            Main.buffTip[Type] = "Adds " + bonus + " defense";
+            DisplayName.SetDefault("Defense Aura " + bonus);
+            Description.SetDefault("Adds " + bonus + " defense");
             Main.buffNoTimeDisplay[Type] = true;
             Main.buffNoSave[Type] = true;
         }
@@ -45,7 +45,7 @@ namespace ExperienceAndClasses.Buffs
 
     public class Aura_Defense2 : Aura_Defense1
     {
-        public static int bonus_defense = 10;
+        new public static int bonus_defense = 10;
 
         public Aura_Defense2()
         {
@@ -56,7 +56,7 @@ namespace ExperienceAndClasses.Buffs
     }
     public class Aura_Defense3 : Aura_Defense1
     {
-        public static int bonus_defense = 15;
+        new public static int bonus_defense = 15;
 
         public Aura_Defense3()
         {

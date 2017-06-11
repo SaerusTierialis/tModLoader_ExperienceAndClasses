@@ -88,10 +88,10 @@ namespace ExperienceAndClasses.Methods
             Item[] equip = player.armor;
             for (int i = 0; i < equip.Length; i++)
             {
-                if (equip[i].name.Contains("Class Token"))
+                if (equip[i].Name.Contains("Class Token"))
                 {
                     if (job.Length > 0) job += " & ";
-                    job += equip[i].name.Substring(equip[i].name.IndexOf(":") + 2);
+                    job += equip[i].Name.Substring(equip[i].Name.IndexOf(":") + 2);
                 }
             }
             if (job.Length == 0) job = "No Class";
@@ -111,9 +111,9 @@ namespace ExperienceAndClasses.Methods
             int tier = -1;
             for (int i = 0; i < equip.Length; i++)
             {
-                if (equip[i].name.Contains("Class Token"))
+                if (equip[i].Name.Contains("Class Token"))
                 {
-                    str = equip[i].name.Substring(equip[i].name.IndexOf("Tier") + 5);
+                    str = equip[i].Name.Substring(equip[i].Name.IndexOf("Tier") + 5);
                     str = str.Substring(0, str.Length - 1);
                     switch (str)
                     {

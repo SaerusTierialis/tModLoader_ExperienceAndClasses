@@ -12,14 +12,27 @@ namespace ExperienceAndClasses.Items
 
         public int orbValue = 1;
 
+        public override void SetStaticDefaults()
+        {
+            Tooltip.SetDefault("Worth " + (ExperienceAndClasses.EXP_ITEM_VALUE * orbValue) + " experience.");
+            if (orbValue > 1)
+            {
+                DisplayName.SetDefault("Experience Orb " + orbValue);
+            }
+            else
+            {
+                DisplayName.SetDefault("Experience Orb");
+            }
+        }
+
         public override void SetDefaults()
         {
             //name
-            item.name = "Experience Orb";
-            if (orbValue > 1) item.name += " " + orbValue;
+            //item.name = "Experience Orb";
+            //if (orbValue > 1) item.name += " " + orbValue;
 
             //info
-            item.toolTip = "Worth " + (ExperienceAndClasses.EXP_ITEM_VALUE * orbValue) + " experience.";
+            //item.toolTip = "Worth " + (ExperienceAndClasses.EXP_ITEM_VALUE * orbValue) + " experience.";
             item.width = 29;
             item.height = 30;
             item.maxStack = 9999999;
@@ -149,34 +162,49 @@ namespace ExperienceAndClasses.Items
     /* Boss Orb */
     public class Boss_Orb : ModItem
     {
+        public override void SetStaticDefaults()
+        {
+            DisplayName.SetDefault("Boss Orb");
+            Tooltip.SetDefault("Can be converted to Ascension Orbs, broken down into" +
+                         "\nExperience Orbs, or sold." +
+                       "\n\nNote: rate of experience exchange improves with class tier");
+        }
+
         public override void SetDefaults()
         {
-            item.name = "Boss Orb";
+            //item.name = "Boss Orb";
             item.width = 29;
             item.height = 30;
             item.maxStack = 9999999;
             item.value = 50000;
             item.rare = 10;
-            item.toolTip = "Can be converted to Ascension Orbs, broken down into"+
-                         "\nExperience Orbs, or sold."+
-                       "\n\nNote: rate of experience exchange improves with class tier";
+            //item.toolTip = "Can be converted to Ascension Orbs, broken down into"+
+            //             "\nExperience Orbs, or sold."+
+            //           "\n\nNote: rate of experience exchange improves with class tier";
         }
     }
 
     /* Ascension Orb */
     public class Monster_Orb : ModItem
     {
+        public override void SetStaticDefaults()
+        {
+            DisplayName.SetDefault("Ascension Orb");
+            Tooltip.SetDefault("Used in Tier II and III class advancements. Can also" +
+                         "\nbe broken down into Experience Orbs or sold." +
+                       "\n\nNote: rate of experience exchange improves with class tier");
+        }
         public override void SetDefaults()
         {
-            item.name = "Ascension Orb";
+            //item.name = "Ascension Orb";
             item.width = 29;
             item.height = 30;
             item.maxStack = 9999999;
             item.value = 25000;
             item.rare = 9;
-            item.toolTip = "Used in Tier II and III class advancements. Can also" +
-                         "\nbe broken down into Experience Orbs or sold."+
-                       "\n\nNote: rate of experience exchange improves with class tier";
+            //item.toolTip = "Used in Tier II and III class advancements. Can also" +
+            //             "\nbe broken down into Experience Orbs or sold."+
+            //           "\n\nNote: rate of experience exchange improves with class tier";
         }
 
         public override void AddRecipes()

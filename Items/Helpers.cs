@@ -241,7 +241,7 @@ namespace ExperienceAndClasses.Items
         /// <param name="job"></param>
         /// <param name="applyEffects"></param>
         /// <param name="myPlayer"></param>
-        public static void ClassTokenEffects(Mod mod, Player player, Item item, string job, bool applyEffects, MyPlayer myPlayer = null, int numberClasses=1)
+        public static void ClassTokenEffects(Mod mod, Player player, ModItem item, string job, bool applyEffects, MyPlayer myPlayer = null, int numberClasses=1)
         {
             //auto-generate class bonuses (var names match player attributes)
             float statLifeMax2 = 0f;
@@ -1406,8 +1406,8 @@ namespace ExperienceAndClasses.Items
 
             //create tooltip
             if (applyEffects) desc += "\n\n" + bonuses;
-            item.toolTip2 = desc;
-
+            //item.toolTip2 = desc;
+            (item as ClassToken_Novice).desc2 = desc;
         }
     }
 }
