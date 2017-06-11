@@ -5,6 +5,7 @@ using Terraria.DataStructures;
 using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
 using System.Collections.Generic;
+using Terraria.Localization;
 
 namespace ExperienceAndClasses
 {
@@ -32,7 +33,7 @@ namespace ExperienceAndClasses
         public bool UIShow = true;
         public bool UITrans = false;
 
-        public List<Tuple<Item, string>> classTokensEquipped;
+        public List<Tuple<ModItem, string>> classTokensEquipped;
 
         //rogue
         public float percentMidas = 0;
@@ -85,7 +86,7 @@ namespace ExperienceAndClasses
             //in the rare case that the player is not synced with the server, don't do anything
             if (Main.netMode == 2 && experience == -1)
             {
-                NetMessage.SendData(25, -1, -1, "Failed to change the experience value for player #"+player.whoAmI+":"+player.name +" (player not yet synced)", 255, 255, 0, 0, 0);
+                NetMessage.SendData(25, -1, -1, NetworkText.FromLiteral("Failed to change the experience value for player #" +player.whoAmI+":"+player.name +" (player not yet synced)"), 255, 255, 0, 0, 0);
                 return;
             }
 
@@ -137,12 +138,12 @@ namespace ExperienceAndClasses
             if (level>priorLevel)
             {
                 if (Main.netMode == 0) Main.NewText("You have reached level " + level + "!");
-                    else NetMessage.SendData(25, -1, -1, player.name+" has reached level "+level+"!", 255, 0, 255, 0, 0);
+                    else NetMessage.SendData(25, -1, -1, NetworkText.FromLiteral(player.name+" has reached level "+level+"!"), 255, 0, 255, 0, 0);
             }
             else if (level<priorLevel)
             {
                 if (Main.netMode == 0) Main.NewText("You has fallen to level " + level + "!");
-                    else NetMessage.SendData(25, -1, -1, player.name + " has dropped to level " + level + "!", 255, 255, 0, 0, 0);
+                    else NetMessage.SendData(25, -1, -1, NetworkText.FromLiteral(player.name + " has dropped to level " + level + "!"), 255, 255, 0, 0, 0);
             }
         }
 
@@ -268,7 +269,7 @@ namespace ExperienceAndClasses
         public override void PreUpdate()
         {
             //empty current class list
-            classTokensEquipped = new List<Tuple<Item, string>>();
+            classTokensEquipped = new List<Tuple<ModItem, string>>();
 
             //default var bonuses
             bonusCritPct = 0;
@@ -450,7 +451,7 @@ namespace ExperienceAndClasses
                 {
                     player.immune = true;
                     player.immuneTime = 80;
-                    NetMessage.SendData(62, -1, -1, "", player.whoAmI, 2f, 0f, 0f, 0, 0, 0);
+                    NetMessage.SendData(62, -1, -1, null, player.whoAmI, 2f, 0f, 0f, 0, 0, 0);
                     return false;
                 }
             }

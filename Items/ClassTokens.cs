@@ -64,7 +64,7 @@ namespace ExperienceAndClasses.Items
         public override void UpdateAccessory(Player player, bool hideVisual)
         {
             //Helpers.ClassTokenEffects(mod, player, item, name, true);
-            player.GetModPlayer<MyPlayer>(mod).classTokensEquipped.Add(new Tuple<Item, string>(item, name));
+            player.GetModPlayer<MyPlayer>(mod).classTokensEquipped.Add(new Tuple<ModItem, string>(this, name));
         }
     }
 

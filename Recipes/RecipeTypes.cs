@@ -75,7 +75,7 @@ namespace ExperienceAndClasses.Recipes
                 item.rare = createItem.rare;
 
                 //tell server to announce (no effect in single player)
-                Methods.PacketSender.ClientTellAnnouncement(mod, Main.LocalPlayer.name + " has completed " + createItem.name + "!", 255, 255, 0);
+                Methods.PacketSender.ClientTellAnnouncement(mod, Main.LocalPlayer.name + " has completed " + createItem.Name + "!", 255, 255, 0);
             }
         }
     }
