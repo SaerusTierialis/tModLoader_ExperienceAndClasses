@@ -1325,7 +1325,6 @@ namespace ExperienceAndClasses.Items
             {
                 float regenAmount = (periodicManaPercent * level); //- ((periodicManaPercent_LEVEL - 1) * periodicManaPercent);
                 if (regenAmount > periodicManaPercent_CAP) regenAmount = periodicManaPercent_CAP;
-                int amt = 0;
                 regenAmount = regenAmount * player.statManaMax2;
 
                 if (TimeReady(player.whoAmI, TIME_IND_SELF_MANA, periodicManaPercent_TIME_MSEC, true))
