@@ -40,7 +40,7 @@ public static class Commons
     }
 
     /// <summary>
-    /// Try to get from tag, else return specified default. Supports int, float, double, bool, long, and string.
+    /// Try to get from tag, else default to specified value. Supports int, float, double, bool, long, and string.
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <param name="tag"></param>

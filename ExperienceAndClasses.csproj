@@ -51,7 +51,8 @@
     <SignAssembly>false</SignAssembly>
   </PropertyGroup>
   <PropertyGroup>
-    <AssemblyOriginatorKeyFile>a.pfx</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>
+    </AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Buffs\Auras.cs" />
@@ -59,8 +60,8 @@
     <Compile Include="Buffs\Helpers.cs" />
     <Compile Include="Commons.cs" />
     <Compile Include="Dusts\Dusts.cs" />
-    <Compile Include="Items\Helpers.cs" />
     <Compile Include="Items\ClassTokens.cs" />
+    <Compile Include="Items\Helpers.cs" />
     <Compile Include="Items\Orbs.cs" />
     <Compile Include="ExperienceAndClasses.cs" />
     <Compile Include="Methods\ChatCommands.cs" />
@@ -105,9 +106,6 @@
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Service References\" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="a.pfx" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.5.2">
