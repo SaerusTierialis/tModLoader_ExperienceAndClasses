@@ -5,6 +5,7 @@ See forum for full patch notes.
 v1.2.2
 -updated for tModLoader v0.10.0.1
 -token descriptions currently always display as if they were equipped (does not affect actual stats)
+-crawltipede (and similar) exp glitch should be fixed
 
 v1.2.1
 -updated for tModLoader v0.9.2.3 (for v1.3.5, v2)
