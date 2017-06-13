@@ -16,10 +16,13 @@ namespace ExperienceAndClasses.Items
         public int tier = 1;
         public string desc = "Starter class." +
                          "\n\nClass advancement is available at level " + Recipes.ClassRecipes.TIER_LEVEL_REQUIREMENTS[1 + 1] + ".";
-        public string desc2 = "";
 
         public override void ModifyTooltips(List<TooltipLine> tooltips)
         {
+            MyPlayer myLocalPlayer = Main.LocalPlayer.GetModPlayer<MyPlayer>(mod);
+            int numberClasses = myLocalPlayer.classTokensEquipped.Count;
+            string desc2 = Helpers.ClassTokenEffects(mod, Main.LocalPlayer, this, name, false, myLocalPlayer, numberClasses, true);
+
             if (desc2.Length > 0)
             {
                 TooltipLine line = new TooltipLine(mod, "desc2", desc2);
@@ -31,11 +34,11 @@ namespace ExperienceAndClasses.Items
         public override void UpdateInventory(Player player)
         {
             //update description in inventory (remove current bonuses)
-            if (Main.LocalPlayer.Equals(player)) Helpers.ClassTokenEffects(mod, Main.LocalPlayer, this, name, false, new MyPlayer());
+            if (Main.LocalPlayer.Equals(player)) item.RebuildTooltip(); //Helpers.ClassTokenEffects(mod, Main.LocalPlayer, this, name, false, new MyPlayer());
             base.UpdateInventory(player);
         }
 
-        public override void SetDefaults()
+        public override void SetStaticDefaults()
         {
             //tier string
             string tierString = "?";
@@ -44,19 +47,24 @@ namespace ExperienceAndClasses.Items
             //basic properties
             //item.name = "Class Token: " + name + " (Tier " + tierString + ")";
             DisplayName.SetDefault("Class Token: " + name + " (Tier " + tierString + ")");
+
+            //add class description
+            //item.toolTip = desc;
+            Tooltip.SetDefault(desc);
+        }
+
+        public override void SetDefaults()
+        {
             item.width = 36;
             item.height = 36;
             item.value = 0;
             item.rare = 10;
             item.accessory = true;
 
-            //add class description
-            //item.toolTip = desc;
-            Tooltip.SetDefault(desc);
-
             //add class bonuses description
             Helpers.ClassTokenEffects(mod, Main.LocalPlayer, this, name, false, new MyPlayer());
         }
+
         public override void AddRecipes()
         {
             if (tier==1) Commons.QuckRecipe(mod, new int[,] { }, this, 1, new Recipes.ClassRecipes(mod, tier));

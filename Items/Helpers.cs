@@ -10,7 +10,7 @@ namespace ExperienceAndClasses.Items
     {
         /* General */
         public static readonly int LAST_AT_LEVEL = 100; //highest "At Level X" bonus
-        public static readonly List<int> VANITY_SLOTS = Enumerable.Range(13, 18).ToList();
+        //public static readonly List<int> VANITY_SLOTS = Enumerable.Range(13, 18).ToList();
 
         /* Aura */
         public static readonly float AURA_DISTANCE = 1000f;
@@ -241,7 +241,7 @@ namespace ExperienceAndClasses.Items
         /// <param name="job"></param>
         /// <param name="applyEffects"></param>
         /// <param name="myPlayer"></param>
-        public static void ClassTokenEffects(Mod mod, Player player, ModItem item, string job, bool applyEffects, MyPlayer myPlayer = null, int numberClasses=1)
+        public static string ClassTokenEffects(Mod mod, Player player, ModItem item, string job, bool applyEffects, MyPlayer myPlayer = null, int numberClasses=1, bool isEquipped=false)
         {
             //auto-generate class bonuses (var names match player attributes)
             float statLifeMax2 = 0f;
@@ -645,9 +645,8 @@ namespace ExperienceAndClasses.Items
             //experience and ignore class caps
             double experience = 0;
             bool ignoreCaps = false;
-            if (applyEffects)
+            if (applyEffects | isEquipped)
             {
-
                 experience = myPlayer.GetExp();
                 ignoreCaps = myPlayer.ignoreCaps;
             }
@@ -1404,9 +1403,10 @@ namespace ExperienceAndClasses.Items
             //bonuses += "\n\nExp to next level: " + exp_have + "/" + exp_need + " (" + Math.Round((double)100 * exp_have / exp_need, 2) + "%)";
 
             //create tooltip
-            if (applyEffects) desc += "\n\n" + bonuses;
+            if (applyEffects | isEquipped) desc += "\n\n" + bonuses;
             //item.toolTip2 = desc;
-            (item as ClassToken_Novice).desc2 = desc;
+            //((ClassToken_Novice)item).desc2 = desc;
+            return desc;
         }
     }
 }
