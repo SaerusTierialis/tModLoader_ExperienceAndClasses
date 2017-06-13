@@ -21,7 +21,13 @@ namespace ExperienceAndClasses.Items
         {
             MyPlayer myLocalPlayer = Main.LocalPlayer.GetModPlayer<MyPlayer>(mod);
             int numberClasses = myLocalPlayer.classTokensEquipped.Count;
-            string desc2 = Helpers.ClassTokenEffects(mod, Main.LocalPlayer, this, name, false, myLocalPlayer, numberClasses, true);
+
+            bool isEquipped = false;
+            foreach (var i in myLocalPlayer.classTokensEquipped)
+            {
+                if (i.Item2.Equals(name)) isEquipped = true;
+            }
+            string desc2 = Helpers.ClassTokenEffects(mod, Main.LocalPlayer, this, name, false, myLocalPlayer, numberClasses, isEquipped);
 
             if (desc2.Length > 0)
             {
