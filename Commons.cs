@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
@@ -7,6 +9,7 @@ public static class Commons
 {
     /// <summary>
     /// Creates and finalizes a recipe. Ingredients must be formatted new int[,] { {id1, num1}, {id2, num2}, ... }. Can build on an existing recipe.
+    /// NOTE: Duplicate items in a recipe causes a bug where only one stack is checked/needed. The included GlobalRecipe should fix this. 
     /// </summary>
     /// <param name="mod"></param>
     /// <param name="ingredients"></param>
@@ -37,6 +40,43 @@ public static class Commons
 
         //complete
         recipe.AddRecipe();
+    }
+
+    /// <summary>
+    /// Prevents potential bug in QuckRecipe
+    /// </summary>
+    class MyRecipe : GlobalRecipe
+    {
+        public override bool RecipeAvailable(Recipe recipe)
+        {
+            List<int> types = new List<int> ();
+            List<int> stacks = new List<int>();
+
+            Item[] ingedients = recipe.requiredItem;
+            int ind;
+            for (int i=0; i<ingedients.Length; i++)
+            {
+                ind = types.IndexOf(ingedients[i].type);
+                if (ind >= 0)
+                {
+                    stacks[ind] += ingedients[i].stack;
+                }
+                else
+                {
+                    types.Add(ingedients[i].type);
+                    stacks.Add(ingedients[i].stack);
+                }
+            }
+            for (int i=0; i<types.Count; i++)
+            {
+                if (Main.LocalPlayer.CountItem(types[i],stacks[i]) < stacks[i])
+                {
+                    return false;
+                }
+            }
+
+            return base.RecipeAvailable(recipe);
+        }
     }
 
     /// <summary>

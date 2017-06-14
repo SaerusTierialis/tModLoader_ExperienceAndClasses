@@ -2,6 +2,9 @@ This mod introduces an RPG-style class and leveling system where all monsters pr
 
 See forum for full patch notes.
 
+v1.2.3
+-token descriptions will show the "Current Bonuses" only if that class is equipped (any duplicate token in your inventory will still show this text)
+
 v1.2.2
 -updated for tModLoader v0.10.0.1
 -token descriptions currently always display as if they were equipped (does not affect actual stats)
