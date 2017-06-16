@@ -4,6 +4,8 @@ See forum for full patch notes.
 
 v1.2.3
 -token descriptions will show the "Current Bonuses" only if that class is equipped (any duplicate token in your inventory will still show this text)
+-fixed bug that allowed summoner to be crafted with 1 orb instead of 2 (also affects MM and SB, implemented in a way to keep it from happening with anything ever again)
+-fixed a potential exp calculation glitch
 
 v1.2.2
 -updated for tModLoader v0.10.0.1
