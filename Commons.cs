@@ -43,7 +43,7 @@ public static class Commons
     }
 
     /// <summary>
-    /// Prevents potential bug in QuckRecipe
+    /// Prevents potential bug in QuckRecipe.
     /// </summary>
     class MyRecipe : GlobalRecipe
     {
