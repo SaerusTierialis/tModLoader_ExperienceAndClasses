@@ -19,7 +19,7 @@ namespace ExperienceAndClasses.Recipes
             if (Main.LocalPlayer.GetModPlayer<MyPlayer>(mod).GetExp() < experienceNeeded)
                 return false;
             else
-                return base.RecipeAvailable();
+                return Commons.EnforceDuplicatesInRecipe(this);//base.RecipeAvailable();
         }
 
         public override void OnCraft(Item item)
@@ -107,7 +107,7 @@ namespace ExperienceAndClasses.Recipes
             if (levelMin >= 0 && levelCurrent < levelMin) return false;
             if (levelMax >= 0 && levelCurrent > levelMax) return false;
 
-            if (tierCurrent == tier || (tierCurrent > tier && includeHigherTier) || (tierCurrent < tier && includeLowerTier)) return true;
+            if (tierCurrent == tier || (tierCurrent > tier && includeHigherTier) || (tierCurrent < tier && includeLowerTier)) return Commons.EnforceDuplicatesInRecipe(this);
             else return false;
         }
     }

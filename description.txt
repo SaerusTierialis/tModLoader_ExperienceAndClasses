@@ -2,9 +2,12 @@ This mod introduces an RPG-style class and leveling system where all monsters pr
 
 See forum for full patch notes.
 
+v1.2.4
+-fixed crafting bug that was affecting other mods (introduced in v1.2.3)
+
 v1.2.3
 -token descriptions will show the "Current Bonuses" only if that class is equipped (any duplicate token in your inventory will still show this text)
--fixed bug that allowed summoner to be crafted with 1 orb instead of 2 (also affects MM and SB, implemented in a way to keep it from happening with anything ever again)
+-fixed bug that allowed summoner to be crafted with 1 orb instead of 2 (also affected MM and SB, implemented in a way to keep it from happening with anything ever again)
 -fixed a potential exp calculation glitch
 
 v1.2.2

@@ -9,7 +9,7 @@ public static class Commons
 {
     /// <summary>
     /// Creates and finalizes a recipe. Ingredients must be formatted new int[,] { {id1, num1}, {id2, num2}, ... }. Can build on an existing recipe.
-    /// NOTE: Duplicate items in a recipe causes a bug where only one stack is checked/needed. The included GlobalRecipe should fix this. 
+    /// NOTE: Duplicate items in a recipe cause a bug where only one stack is checked/needed. The method below can be used to solve this.
     /// </summary>
     /// <param name="mod"></param>
     /// <param name="ingredients"></param>
@@ -43,40 +43,40 @@ public static class Commons
     }
 
     /// <summary>
-    /// Prevents potential bug in QuckRecipe.
+    /// Combines duplicate items and checks if the player has enough. Workaround for duplicate item recipe bug.
+    /// Returns true if the player has enough of the item.
     /// </summary>
-    class MyRecipe : GlobalRecipe
+    /// <param name="recipe"></param>
+    /// <returns></returns>
+    public static bool EnforceDuplicatesInRecipe(ModRecipe recipe)
     {
-        public override bool RecipeAvailable(Recipe recipe)
+        List<int> types = new List<int>();
+        List<int> stacks = new List<int>();
+
+        Item[] ingedients = recipe.requiredItem;
+        int ind;
+        for (int i = 0; i < ingedients.Length; i++)
         {
-            List<int> types = new List<int> ();
-            List<int> stacks = new List<int>();
-
-            Item[] ingedients = recipe.requiredItem;
-            int ind;
-            for (int i=0; i<ingedients.Length; i++)
+            ind = types.IndexOf(ingedients[i].type);
+            if (ind >= 0)
             {
-                ind = types.IndexOf(ingedients[i].type);
-                if (ind >= 0)
-                {
-                    stacks[ind] += ingedients[i].stack;
-                }
-                else
-                {
-                    types.Add(ingedients[i].type);
-                    stacks.Add(ingedients[i].stack);
-                }
+                stacks[ind] += ingedients[i].stack;
             }
-            for (int i=0; i<types.Count; i++)
+            else
             {
-                if (Main.LocalPlayer.CountItem(types[i],stacks[i]) < stacks[i])
-                {
-                    return false;
-                }
+                types.Add(ingedients[i].type);
+                stacks.Add(ingedients[i].stack);
             }
-
-            return base.RecipeAvailable(recipe);
         }
+        for (int i = 0; i < types.Count; i++)
+        {
+            if (Main.LocalPlayer.CountItem(types[i], stacks[i]) < stacks[i])
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /// <summary>
