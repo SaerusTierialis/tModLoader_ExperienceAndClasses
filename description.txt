@@ -2,6 +2,9 @@ This mod introduces an RPG-style class and leveling system where all monsters pr
 
 See forum for full patch notes.
 
+v1.2.5
+-fixed a crafting bug that affected recipe groups used by tokens
+
 v1.2.4
 -fixed crafting bug that was affecting other mods (introduced in v1.2.3)
 

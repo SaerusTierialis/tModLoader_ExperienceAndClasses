@@ -52,7 +52,6 @@ public static class Commons
     {
         List<int> types = new List<int>();
         List<int> stacks = new List<int>();
-
         Item[] ingedients = recipe.requiredItem;
         int ind;
         for (int i = 0; i < ingedients.Length; i++)
@@ -68,9 +67,11 @@ public static class Commons
                 stacks.Add(ingedients[i].stack);
             }
         }
+        int count;
         for (int i = 0; i < types.Count; i++)
         {
-            if (Main.LocalPlayer.CountItem(types[i], stacks[i]) < stacks[i])
+            count = Main.LocalPlayer.CountItem(types[i], stacks[i]);
+            if (count > 0 & count < stacks[i])
             {
                 return false;
             }
