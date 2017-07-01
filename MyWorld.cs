@@ -52,7 +52,7 @@ namespace ExperienceAndClasses
 
                 //write
                 if (ExperienceAndClasses.requireAuth) Console.WriteLine("Experience&Classes Auth Code: " + ExperienceAndClasses.authCode);
-                else Console.WriteLine("WARNING: Require Auth mode is disabled. To enable, enter singleplayer and type /expnoauth.");
+                //else Console.WriteLine("WARNING: Require Auth mode is disabled. To enable, enter singleplayer and type /expnoauth.");
             }
         }
 
