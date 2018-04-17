@@ -6,6 +6,7 @@ using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
 using System.Collections.Generic;
 using Terraria.Localization;
+using Terraria.GameInput;
 
 namespace ExperienceAndClasses
 {
@@ -86,7 +87,7 @@ namespace ExperienceAndClasses
             //in the rare case that the player is not synced with the server, don't do anything
             if (Main.netMode == 2 && experience == -1)
             {
-                NetMessage.SendData(25, -1, -1, NetworkText.FromLiteral("Failed to change the experience value for player #" +player.whoAmI+":"+player.name +" (player not yet synced)"), 255, 255, 0, 0, 0);
+                NetMessage.BroadcastChatMessage(NetworkText.FromLiteral("Failed to change the experience value for player #" +player.whoAmI+":"+player.name +" (player not yet synced)"), ExperienceAndClasses.MESSAGE_COLOUR_RED);
                 return;
             }
 
@@ -138,12 +139,12 @@ namespace ExperienceAndClasses
             if (level>priorLevel)
             {
                 if (Main.netMode == 0) Main.NewText("You have reached level " + level + "!");
-                    else NetMessage.SendData(25, -1, -1, NetworkText.FromLiteral(player.name+" has reached level "+level+"!"), 255, 0, 255, 0, 0);
+                    else NetMessage.BroadcastChatMessage( NetworkText.FromLiteral(player.name+" has reached level "+level+"!"), ExperienceAndClasses.MESSAGE_COLOUR_GREEN);
             }
             else if (level<priorLevel)
             {
                 if (Main.netMode == 0) Main.NewText("You has fallen to level " + level + "!");
-                    else NetMessage.SendData(25, -1, -1, NetworkText.FromLiteral(player.name + " has dropped to level " + level + "!"), 255, 255, 0, 0, 0);
+                    else NetMessage.BroadcastChatMessage( NetworkText.FromLiteral(player.name + " has dropped to level " + level + "!"), ExperienceAndClasses.MESSAGE_COLOUR_RED);
             }
         }
 
@@ -451,7 +452,8 @@ namespace ExperienceAndClasses
                 {
                     player.immune = true;
                     player.immuneTime = 80;
-                    NetMessage.SendData(62, -1, -1, null, player.whoAmI, 2f, 0f, 0f, 0, 0, 0);
+                    player.NinjaDodge();
+                    NetMessage.SendData(62, -1, -1, null, player.whoAmI, 2f, 0f, 0f, 0, 0, 0); //might not work anymore
                     return false;
                 }
             }
@@ -459,5 +461,30 @@ namespace ExperienceAndClasses
             return base.PreHurt(pvp, quiet, ref damage, ref hitDirection, ref crit, ref customDamage, ref playSound, ref genGore, ref damageSource);
         }
 
+        public override void ProcessTriggers(TriggersSet triggersSet) //CLIENT-SIDE ONLY
+        {
+            if (ExperienceAndClasses.HOTKEY_ACTIVATE_ABILITY.Current)
+            {
+                Main.NewText("PRESS_A");
+                Console.WriteLine("PRESS_B");
+
+                //check frozen, etc
+
+                if (triggersSet.Left)//works
+                {
+                    Main.NewText("LEFT");
+                    player.moveSpeed = 0f;
+                }
+                else if (triggersSet.Up)
+                {
+                    Main.NewText("UP");
+                    player.jump = 0;
+                }
+                else if (triggersSet.Down)
+                {
+                    Main.NewText("DOWN");
+                }
+            }
+        }
     }
 }

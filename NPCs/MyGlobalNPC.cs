@@ -33,7 +33,7 @@ namespace ExperienceAndClasses.NPCs
                                 }
                                 else if (Main.netMode == 2)
                                 {
-                                    NetMessage.SendData(25, -1, -1, NetworkText.FromLiteral("A Boss Orb has dropped for " + Main.player[playerIndex].name+"!"), 255, 233, 36, 91, 0);
+                                    NetMessage.BroadcastChatMessage(NetworkText.FromLiteral("A Boss Orb has dropped for " + Main.player[playerIndex].name+"!"), ExperienceAndClasses.MESSAGE_COLOUR_BOSS_ORB);
                                 }
                                 //item
                                 Item.NewItem((int)npc.position.X, (int)npc.position.Y, npc.width, npc.height, mod.ItemType("Boss_Orb"));
@@ -72,7 +72,7 @@ namespace ExperienceAndClasses.NPCs
                                 }
                                 else if (Main.netMode == 2)
                                 {
-                                    NetMessage.SendData(25, -1, -1, NetworkText.FromLiteral("An Ascension Orb has dropped for " + player.name+"!"), 255, 4, 195, 249, 0);
+                                    NetMessage.BroadcastChatMessage(NetworkText.FromLiteral("An Ascension Orb has dropped for " + player.name+"!"), ExperienceAndClasses.MESSAGE_COLOUR_ASCENSION_ORB);
                                 }
                                 //item
                                 Item.NewItem((int)npc.position.X, (int)npc.position.Y, npc.width, npc.height, mod.ItemType("Monster_Orb"));

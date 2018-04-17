@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System;
 using System.IO;
 using Terraria.Localization;
+using Microsoft.Xna.Framework;
 
 //needed for compiling outside of Terraria
 public class Application
@@ -44,6 +45,17 @@ namespace ExperienceAndClasses
         private UserInterface myUserInterface;
         public MyUI myUI;
 
+        //message colours
+        public static Color MESSAGE_COLOUR_RED = new Color(255, 0, 0);
+        public static Color MESSAGE_COLOUR_GREEN = new Color(0, 255, 0);
+        public static Color MESSAGE_COLOUR_YELLOW = new Color(255, 255, 0);
+        public static Color MESSAGE_COLOUR_MAGENTA = new Color(255, 0, 255);
+        public static Color MESSAGE_COLOUR_BOSS_ORB = new Color(233, 36, 91);
+        public static Color MESSAGE_COLOUR_ASCENSION_ORB = new Color(4, 195, 249);
+
+        //active abilities
+        public static ModHotKey HOTKEY_ACTIVATE_ABILITY;
+
         //EXP
         public const int MAX_LEVEL = 3000;
         public const double EXP_ITEM_VALUE = 1;
@@ -76,6 +88,12 @@ namespace ExperienceAndClasses
             myUserInterface = new UserInterface();
             myUserInterface.SetState(myUI);
             MyUI.visible = true;
+            HOTKEY_ACTIVATE_ABILITY = RegisterHotKey("Ability", "Q");
+        }
+
+        public override void Unload()
+        {
+            HOTKEY_ACTIVATE_ABILITY = null;
         }
 
         /* ~~~~~~~~~~~~~~~~~~~~~ HANDLE PACKETS ~~~~~~~~~~~~~~~~~~~~~ */
@@ -103,7 +121,7 @@ namespace ExperienceAndClasses
                 case ExpModMessageType.ServerRequestExperience:
                     Methods.PacketSender.ClientTellExperience(mod);
 
-                    if ((Main.netMode==2 && traceMap) || (Main.netMode==1 && traceChar)) NetMessage.SendData(25, -1, -1, NetworkText.FromLiteral("TRACE:Recieved ServerRequestExperience"), 255, 255, 0, 255, 0);
+                    if ((Main.netMode==2 && traceMap) || (Main.netMode==1 && traceChar)) NetMessage.BroadcastChatMessage(NetworkText.FromLiteral("TRACE:Recieved ServerRequestExperience"), ExperienceAndClasses.MESSAGE_COLOUR_MAGENTA);
                     break;
 
                 //Player's response to server's request for experience (also send hasLootedMonsterOrb, explvlcap, and expdmgred)
@@ -114,7 +132,7 @@ namespace ExperienceAndClasses
                     myPlayer.hasLootedMonsterOrb = reader.ReadBoolean();
                     myPlayer.explvlcap = reader.ReadInt32();
                     myPlayer.expdmgred = reader.ReadInt32();
-                    NetMessage.SendData(25, -1, -1, NetworkText.FromLiteral("Experience synced for player #" +player.whoAmI+":"+player.name), 255, 255, 255, 0, 0);
+                    NetMessage.BroadcastChatMessage(NetworkText.FromLiteral("Experience synced for player #" +player.whoAmI+":"+player.name), ExperienceAndClasses.MESSAGE_COLOUR_YELLOW);
                     Console.WriteLine("Experience synced for player #" + player.whoAmI + ":" + player.name);
 
                     //tell everyone else how much exp the new player has
@@ -133,17 +151,17 @@ namespace ExperienceAndClasses
                         else lvlcap = "disabled";
                     if (myPlayer.expdmgred > 0) dmgred = myPlayer.expdmgred.ToString() +"%";
                         else dmgred = "disabled";
-                    NetMessage.SendData(25, player.whoAmI, -1, NetworkText.FromLiteral("Require Auth: " +requireAuth+"\nExperience Rate: "+(globalExpModifier *100)+ 
-                        "%\nIgnore Class Caps: "+globalIgnoreCaps+"\nLevel Cap: "+ lvlcap + "\nClass Damage Reduction: "+
-                        dmgred), 255, 255, 255, 0, 0);
+                    NetMessage.SendChatMessageToClient(NetworkText.FromLiteral("Require Auth: " + requireAuth + "\nExperience Rate: " + (globalExpModifier * 100) +
+                        "%\nIgnore Class Caps: " + globalIgnoreCaps + "\nLevel Cap: " + lvlcap + "\nClass Damage Reduction: " +
+                        dmgred), ExperienceAndClasses.MESSAGE_COLOUR_YELLOW, player.whoAmI);
 
-                    if ((Main.netMode==2 && traceMap) || (Main.netMode==1 && traceChar)) NetMessage.SendData(25, -1, -1, NetworkText.FromLiteral("TRACE:Recieved ClientTellExperience from player #" + indNewPlayer + ":" + player.name+" = "+ player.GetModPlayer<MyPlayer>(this).experience+" (has found first orb:"+ player.GetModPlayer<MyPlayer>(this).hasLootedMonsterOrb+")"), 255, 255, 0, 255, 0);
+                    if ((Main.netMode==2 && traceMap) || (Main.netMode==1 && traceChar)) NetMessage.BroadcastChatMessage(NetworkText.FromLiteral("TRACE:Recieved ClientTellExperience from player #" + indNewPlayer + ":" + player.name+" = "+ player.GetModPlayer<MyPlayer>(this).experience+" (has found first orb:"+ player.GetModPlayer<MyPlayer>(this).hasLootedMonsterOrb+")"), ExperienceAndClasses.MESSAGE_COLOUR_MAGENTA);
                     break;
 
                 //Server telling player that they have now recieved their first Ascension Orb
                 case ExpModMessageType.ServerFirstAscensionOrb:
                     localMyPlayer.hasLootedMonsterOrb = true;
-                    if ((Main.netMode==2 && traceMap) || (Main.netMode==1 && traceChar)) NetMessage.SendData(25, -1, -1, NetworkText.FromLiteral("TRACE:Recieved ServerFirstAscensionOrb"), 255, 255, 0, 255, 0);
+                    if ((Main.netMode==2 && traceMap) || (Main.netMode==1 && traceChar)) NetMessage.BroadcastChatMessage(NetworkText.FromLiteral("TRACE:Recieved ServerFirstAscensionOrb"),  ExperienceAndClasses.MESSAGE_COLOUR_MAGENTA);
                     break;
 
                 //Server telling everyone a player's new exp value
@@ -164,7 +182,7 @@ namespace ExperienceAndClasses
                     myPlayer.expdmgred = expdmgred;
 
                     if (Main.LocalPlayer.Equals(player)) myUI.updateValue(newExp);
-                    if ((Main.netMode==2 && traceMap) || (Main.netMode==1 && traceChar)) NetMessage.SendData(25, -1, -1, NetworkText.FromLiteral("TRACE:Recieved ServerForceExperience for player #" + player.whoAmI + ":" + player.name + " = " + newExp), 255, 255, 0, 255, 0);
+                    if ((Main.netMode==2 && traceMap) || (Main.netMode==1 && traceChar)) NetMessage.BroadcastChatMessage(NetworkText.FromLiteral("TRACE:Recieved ServerForceExperience for player #" + player.whoAmI + ":" + player.name + " = " + newExp), ExperienceAndClasses.MESSAGE_COLOUR_MAGENTA);
                     break;
 
                 //Player telling the server to adjust experience (e.g., craft token)
@@ -177,7 +195,7 @@ namespace ExperienceAndClasses
                     myPlayer = player.GetModPlayer<MyPlayer>(this);
                     myPlayer.AddExp(expAdd);
 
-                    if ((Main.netMode==2 && traceMap) || (Main.netMode==1 && traceChar)) NetMessage.SendData(25, -1, -1, NetworkText.FromLiteral("TRACE:Recieved ClientTellAddExp from player #" + player.whoAmI +":"+player.name+" = " + expAdd), 255, 255, 0, 255, 0);
+                    if ((Main.netMode==2 && traceMap) || (Main.netMode==1 && traceChar)) NetMessage.BroadcastChatMessage(NetworkText.FromLiteral("TRACE:Recieved ClientTellAddExp from player #" + player.whoAmI +":"+player.name+" = " + expAdd), ExperienceAndClasses.MESSAGE_COLOUR_MAGENTA);
                     break;
 
                 //Similar to ClientTellAddExp, but requires auth
@@ -199,7 +217,7 @@ namespace ExperienceAndClasses
                         Console.WriteLine("Rejected command request from player #" + player.whoAmI + ":" + player.name + " " + text);
                     }
 
-                    if ((Main.netMode==2 && traceMap) || (Main.netMode==1 && traceChar)) NetMessage.SendData(25, -1, -1, NetworkText.FromLiteral("TRACE:Recieved ClientRequestAddExp from player #" + player.whoAmI + ":" + player.name + " = " + expAdd), 255, 255, 0, 255, 0);
+                    if ((Main.netMode==2 && traceMap) || (Main.netMode==1 && traceChar)) NetMessage.BroadcastChatMessage(NetworkText.FromLiteral("TRACE:Recieved ClientRequestAddExp from player #" + player.whoAmI + ":" + player.name + " = " + expAdd), ExperienceAndClasses.MESSAGE_COLOUR_MAGENTA);
                     break;
 
                 //Player asking to set exprate, requires auth
@@ -217,14 +235,14 @@ namespace ExperienceAndClasses
                         Console.WriteLine("Accepted command request from player #" + player.whoAmI + ":" + player.name + " " + text);
 
                         //announce
-                        NetMessage.SendData(25, -1, -1, NetworkText.FromLiteral("Experience Rate:" + (globalExpModifier*100)+"%"), 255, 255, 255, 0, 0);
+                        NetMessage.BroadcastChatMessage(NetworkText.FromLiteral("Experience Rate:" + (globalExpModifier*100)+"%"), ExperienceAndClasses.MESSAGE_COLOUR_YELLOW);
                     }
                     else
                     {
                         Console.WriteLine("Rejected command request from player #" + player.whoAmI + ":" + player.name + " " + text);
                     }
 
-                    if ((Main.netMode==2 && traceMap) || (Main.netMode==1 && traceChar)) NetMessage.SendData(25, -1, -1, NetworkText.FromLiteral("TRACE:Recieved ClientRequestExpRate from player #" + player.whoAmI + ":" + player.name + " = " + exprate), 255, 255, 0, 255, 0);
+                    if ((Main.netMode==2 && traceMap) || (Main.netMode==1 && traceChar)) NetMessage.BroadcastChatMessage(NetworkText.FromLiteral("TRACE:Recieved ClientRequestExpRate from player #" + player.whoAmI + ":" + player.name + " = " + exprate), ExperienceAndClasses.MESSAGE_COLOUR_MAGENTA);
                     break;
 
                 //Player asking to toggle class caps, requires auth
@@ -245,14 +263,14 @@ namespace ExperienceAndClasses
                         Methods.PacketSender.ServerToggleClassCap(mod, globalIgnoreCaps);
 
                         //announce
-                        NetMessage.SendData(25, -1, -1, NetworkText.FromLiteral("Ignore Class Caps:" + globalIgnoreCaps), 255, 255, 255, 0, 0);
+                        NetMessage.BroadcastChatMessage(NetworkText.FromLiteral("Ignore Class Caps:" + globalIgnoreCaps), ExperienceAndClasses.MESSAGE_COLOUR_YELLOW);
                     }
                     else
                     {
                         Console.WriteLine("Rejected command request from player #" + player.whoAmI + ":" + player.name + " " + text);
                     }
 
-                    if ((Main.netMode==2 && traceMap) || (Main.netMode==1 && traceChar)) NetMessage.SendData(25, -1, -1, NetworkText.FromLiteral("TRACE:Recieved ClientRequestToggleCap from player #" + player.whoAmI + ":" + player.name), 255, 255, 0, 255, 0);
+                    if ((Main.netMode==2 && traceMap) || (Main.netMode==1 && traceChar)) NetMessage.BroadcastChatMessage(NetworkText.FromLiteral("TRACE:Recieved ClientRequestToggleCap from player #" + player.whoAmI + ":" + player.name), ExperienceAndClasses.MESSAGE_COLOUR_MAGENTA);
                     break;
 
                 //Server setting class caps on/off
@@ -263,7 +281,7 @@ namespace ExperienceAndClasses
                     //act
                     globalIgnoreCaps = newBool;
 
-                    if ((Main.netMode==2 && traceMap) || (Main.netMode==1 && traceChar)) NetMessage.SendData(25, -1, -1, NetworkText.FromLiteral("TRACE:Recieved ServerToggleCap = " + globalIgnoreCaps), 255, 255, 0, 255, 0);
+                    if ((Main.netMode==2 && traceMap) || (Main.netMode==1 && traceChar)) NetMessage.BroadcastChatMessage(NetworkText.FromLiteral("TRACE:Recieved ServerToggleCap = " + globalIgnoreCaps), ExperienceAndClasses.MESSAGE_COLOUR_MAGENTA);
                     break;
 
                 //Player telling server to make an announcement
@@ -276,9 +294,9 @@ namespace ExperienceAndClasses
                     int green = reader.ReadInt32();
                     int blue = reader.ReadInt32();
                     //act
-                    if ((Main.netMode==2 && traceMap) || (Main.netMode==1 && traceChar)) NetMessage.SendData(25, -1, -1, NetworkText.FromLiteral(message), 255, red, green, blue, 0);
+                    if ((Main.netMode==2 && traceMap) || (Main.netMode==1 && traceChar)) NetMessage.BroadcastChatMessage(NetworkText.FromLiteral(message), new Color(red, green, blue));
 
-                    if ((Main.netMode==2 && traceMap) || (Main.netMode==1 && traceChar)) NetMessage.SendData(25, -1, -1, NetworkText.FromLiteral("TRACE:Recieved PlayerRequestAnnouncement from player #" + player.whoAmI + ":" + player.name + " = " + message), 255, 255, 0, 255, 0);
+                    if ((Main.netMode==2 && traceMap) || (Main.netMode==1 && traceChar)) NetMessage.BroadcastChatMessage(NetworkText.FromLiteral("TRACE:Recieved PlayerRequestAnnouncement from player #" + player.whoAmI + ":" + player.name + " = " + message), ExperienceAndClasses.MESSAGE_COLOUR_MAGENTA);
                     break;
 
                 //Server sends full exp list to new player (also explvlcap and expdmgred)
@@ -301,7 +319,7 @@ namespace ExperienceAndClasses
                         }
                     }
 
-                    if ((Main.netMode==2 && traceMap) || (Main.netMode==1 && traceChar)) NetMessage.SendData(25, -1, -1, NetworkText.FromLiteral("TRACE:Recieved ServerFullExpList"), 255, 255, 0, 255, 0);
+                    if ((Main.netMode==2 && traceMap) || (Main.netMode==1 && traceChar)) NetMessage.BroadcastChatMessage(NetworkText.FromLiteral("TRACE:Recieved ServerFullExpList"), ExperienceAndClasses.MESSAGE_COLOUR_MAGENTA);
                     break;
 
                 //Player asks server what the exprate is
@@ -310,9 +328,9 @@ namespace ExperienceAndClasses
                     //read
                     player = Main.player[reader.ReadInt32()];
                     //act
-                    NetMessage.SendData(25, player.whoAmI, -1, NetworkText.FromLiteral("The current exprate is " + (globalExpModifier * 100) + "%."), 255, 255, 255, 0, 0);
+                    NetMessage.SendChatMessageToClient(NetworkText.FromLiteral("The current exprate is " + (globalExpModifier * 100) + "%."), ExperienceAndClasses.MESSAGE_COLOUR_YELLOW, player.whoAmI);
 
-                    if ((Main.netMode==2 && traceMap) || (Main.netMode==1 && traceChar)) NetMessage.SendData(25, -1, -1, NetworkText.FromLiteral("TRACE:Recieved ClientAsksExpRate from player #" + player.whoAmI + ":" + player.name), 255, 255, 0, 255, 0);
+                    if ((Main.netMode==2 && traceMap) || (Main.netMode==1 && traceChar)) NetMessage.BroadcastChatMessage(NetworkText.FromLiteral("TRACE:Recieved ClientAsksExpRate from player #" + player.whoAmI + ":" + player.name), ExperienceAndClasses.MESSAGE_COLOUR_MAGENTA);
                     break;
 
                 //Player attempt auth
@@ -325,14 +343,14 @@ namespace ExperienceAndClasses
                     myPlayer = player.GetModPlayer<MyPlayer>(this);
                     if (code == -1 || myPlayer.auth)
                     {
-                        NetMessage.SendData(25, player.whoAmI, -1, NetworkText.FromLiteral("Auth:" + myPlayer.auth), 255, 255, 255, 0, 0);
+                        NetMessage.SendChatMessageToClient(NetworkText.FromLiteral("Auth:" + myPlayer.auth), ExperienceAndClasses.MESSAGE_COLOUR_YELLOW, player.whoAmI);
                     }
                     else 
                     {
                         if (authCode == code)
                         {
                             myPlayer.auth = true;
-                            NetMessage.SendData(25, player.whoAmI, -1, NetworkText.FromLiteral("Auth:" + myPlayer.auth), 255, 255, 255, 0, 0);
+                            NetMessage.SendChatMessageToClient(NetworkText.FromLiteral("Auth:" + myPlayer.auth), ExperienceAndClasses.MESSAGE_COLOUR_YELLOW, player.whoAmI);
                             Console.WriteLine("Accepted auth attempt from player #" + player.whoAmI + ":" + player.name + " " + code);
                         }
                         else
@@ -341,7 +359,7 @@ namespace ExperienceAndClasses
                         }
                     }
 
-                    if ((Main.netMode==2 && traceMap) || (Main.netMode==1 && traceChar)) NetMessage.SendData(25, -1, -1, NetworkText.FromLiteral("TRACE:Recieved ClientTryAuth from player #" + player.whoAmI + ":" + player.name + " " + code), 255, 255, 0, 255, 0);
+                    if ((Main.netMode==2 && traceMap) || (Main.netMode==1 && traceChar)) NetMessage.BroadcastChatMessage(NetworkText.FromLiteral("TRACE:Recieved ClientTryAuth from player #" + player.whoAmI + ":" + player.name + " " + code), ExperienceAndClasses.MESSAGE_COLOUR_MAGENTA);
                     break;
 
                 //Player tells server that they would like to change their level cap
@@ -353,10 +371,10 @@ namespace ExperienceAndClasses
                     myPlayer = player.GetModPlayer<MyPlayer>(this);
                     myPlayer.explvlcap = explvlcap;
                     myPlayer.AddExp(0); //easy way to update all
-                    if (myPlayer.explvlcap == -1) NetMessage.SendData(25, player.whoAmI, -1, NetworkText.FromLiteral("Level cap is disabled."), 255, 255, 255, 0, 0);
-                        else NetMessage.SendData(25, player.whoAmI, -1, NetworkText.FromLiteral("Level cap is " + myPlayer.explvlcap+"."), 255, 255, 255, 0, 0);
+                    if (myPlayer.explvlcap == -1) NetMessage.SendChatMessageToClient(NetworkText.FromLiteral("Level cap is disabled."), ExperienceAndClasses.MESSAGE_COLOUR_YELLOW, player.whoAmI);
+                    else NetMessage.SendChatMessageToClient(NetworkText.FromLiteral("Level cap is " + myPlayer.explvlcap + "."), ExperienceAndClasses.MESSAGE_COLOUR_YELLOW, player.whoAmI);
 
-                    if ((Main.netMode==2 && traceMap) || (Main.netMode==1 && traceChar)) NetMessage.SendData(25, -1, -1, NetworkText.FromLiteral("TRACE:Recieved ClientUpdateLvlCap from player #" + player.whoAmI + ":" + player.name + " " + explvlcap), 255, 255, 0, 255, 0);
+                    if ((Main.netMode==2 && traceMap) || (Main.netMode==1 && traceChar)) NetMessage.BroadcastChatMessage(NetworkText.FromLiteral("TRACE:Recieved ClientUpdateLvlCap from player #" + player.whoAmI + ":" + player.name + " " + explvlcap), ExperienceAndClasses.MESSAGE_COLOUR_MAGENTA);
                     break;
 
                 //Player tells server that they would like to change their damage reduction
@@ -368,10 +386,10 @@ namespace ExperienceAndClasses
                     myPlayer = player.GetModPlayer<MyPlayer>(this);
                     myPlayer.expdmgred = expdmgred;
                     myPlayer.AddExp(0); //easy way to update all
-                    if (myPlayer.expdmgred == -1) NetMessage.SendData(25, player.whoAmI, -1, NetworkText.FromLiteral("Damage reduction is disabled."), 255, 255, 255, 0, 0);
-                     else NetMessage.SendData(25, player.whoAmI, -1, NetworkText.FromLiteral("Damage reduction is " + myPlayer.expdmgred+ "%."), 255, 255, 255, 0, 0);
+                    if (myPlayer.expdmgred == -1) NetMessage.SendChatMessageToClient(NetworkText.FromLiteral("Damage reduction is disabled."), ExperienceAndClasses.MESSAGE_COLOUR_YELLOW, player.whoAmI);
+                    else NetMessage.SendChatMessageToClient(NetworkText.FromLiteral("Damage reduction is " + myPlayer.expdmgred + "%."), ExperienceAndClasses.MESSAGE_COLOUR_YELLOW, player.whoAmI);
 
-                    if ((Main.netMode==2 && traceMap) || (Main.netMode==1 && traceChar)) NetMessage.SendData(25, -1, -1, NetworkText.FromLiteral("TRACE:Recieved ClientUpdateDmgRed from player #" + player.whoAmI + ":" + player.name + " " + expdmgred), 255, 255, 0, 255, 0);
+                    if ((Main.netMode==2 && traceMap) || (Main.netMode==1 && traceChar)) NetMessage.BroadcastChatMessage(NetworkText.FromLiteral("TRACE:Recieved ClientUpdateDmgRed from player #" + player.whoAmI + ":" + player.name + " " + expdmgred), ExperienceAndClasses.MESSAGE_COLOUR_MAGENTA);
                     break;
 
                 default:
