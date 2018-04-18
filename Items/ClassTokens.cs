@@ -4,6 +4,7 @@ using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace ExperienceAndClasses.Items
 {
@@ -16,6 +17,8 @@ namespace ExperienceAndClasses.Items
         public int tier = 1;
         public string desc = "Starter class." +
                          "\n\nClass advancement is available at level " + Recipes.ClassRecipes.TIER_LEVEL_REQUIREMENTS[1 + 1] + ".";
+
+        public int[] abilityIDs = Enumerable.Repeat(Abilities.ID_UNDEFINED, ExperienceAndClasses.MAXIMUM_NUMBER_OF_ABILITIES).ToArray();
 
         public override void ModifyTooltips(List<TooltipLine> tooltips)
         {
@@ -75,10 +78,23 @@ namespace ExperienceAndClasses.Items
         {
             if (tier==1) Commons.QuckRecipe(mod, new int[,] { }, this, 1, new Recipes.ClassRecipes(mod, tier));
         }
+
         public override void UpdateAccessory(Player player, bool hideVisual)
         {
+            MyPlayer myPlayer = player.GetModPlayer<MyPlayer>(mod);
+
             //Helpers.ClassTokenEffects(mod, player, item, name, true);
-            player.GetModPlayer<MyPlayer>(mod).classTokensEquipped.Add(new Tuple<ModItem, string>(this, name));
+            myPlayer.classTokensEquipped.Add(new Tuple<ModItem, string>(this, name));
+
+            //track player's current set of abilities
+            foreach (int i in abilityIDs)
+            {
+                if (i != Abilities.ID_UNDEFINED)
+                {
+                    myPlayer.currentAbilityIDsPotential[myPlayer.currentAbilityPotentialsIndex] = i;
+                    myPlayer.currentAbilityPotentialsIndex++;
+                }
+            }
         }
     }
 
@@ -450,6 +466,8 @@ namespace ExperienceAndClasses.Items
                        "\n\nCan produce an Ichor Aura that occasionally inflicts"+
                          "\nIchor on all nearby enemies for a moment."+
                        "\n\nClass advancement is available at level " + Recipes.ClassRecipes.TIER_LEVEL_REQUIREMENTS[tier+1] + ".";
+            abilityIDs[0] = Abilities.ID_CLERIC_ACTIVE_HEAL;
+            abilityIDs[1] = Abilities.ID_CLERIC_ACTIVE_SANCTUARY;
         }
         public override void AddRecipes()
         {
@@ -469,6 +487,10 @@ namespace ExperienceAndClasses.Items
                          "\nLife Aura (healing) and Damage Aura (harm). The Saint" +
                          "\nalso has several immunities, mana cost reduction, and" +
                          "\ndecent life and defense.";
+            abilityIDs[0] = Abilities.ID_CLERIC_ACTIVE_HEAL;
+            abilityIDs[1] = Abilities.ID_CLERIC_ACTIVE_SANCTUARY;
+            abilityIDs[2] = Abilities.ID_CLERIC_ACTIVE_DIVINE_INTERVENTION;
+            abilityIDs[3] = Abilities.ID_CLERIC_ACTIVE_RESSURECTION;
         }
         public override void AddRecipes()
         {

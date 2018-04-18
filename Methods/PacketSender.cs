@@ -189,6 +189,23 @@ namespace ExperienceAndClasses.Methods
             packet.Send();
         }
 
+        /// <summary>
+        /// Player tells server that they would like to perform an ability.
+        /// </summary>
+        /// <param name="mod"></param>
+        /// <param name="abilityID"></param>
+        public static void ClientAbility(Mod mod, int abilityID, int level = 1)
+        {
+            if (Main.netMode != 1) return;
+
+            ModPacket packet = mod.GetPacket();
+            packet.Write((byte)ExpModMessageType.ClientAbility);
+            packet.Write(Main.LocalPlayer.whoAmI);
+            packet.Write(abilityID);
+            packet.Write(level);
+            packet.Send();
+        }
+
         /* ~~~~~~~~~~~~~~~~~~~~~ Packet Senders - Server ~~~~~~~~~~~~~~~~~~~~~ */
 
         /// <summary>
@@ -288,6 +305,45 @@ namespace ExperienceAndClasses.Methods
                     packet.Write(-1);
                 }
             }
+            packet.Send(toWho, toIgnore);
+        }
+
+        ///// <summary>
+        ///// Server telling client the outcome of an ability request
+        ///// </summary>
+        ///// <param name="mod"></param>
+        ///// <param name="abilityID"></param>
+        ///// <param name="outcome"></param>
+        ///// <param name="toWho"></param>
+        ///// <param name="toIgnore"></param>
+        //public static void ServerAbilityOutcome(Mod mod, int abilityID, int outcome, int toWho = -1, int toIgnore = -1)
+        //{
+        //    if (Main.netMode != 2) return;
+
+        //    ModPacket packet = mod.GetPacket();
+        //    packet.Write((byte)ExpModMessageType.ServerAbilityOutcome);
+        //    packet.Write(abilityID);
+        //    packet.Write(outcome);
+        //    packet.Send(toWho, toIgnore);
+        //}
+
+        /// <summary>
+        /// Server telling clients about an ability
+        /// </summary>
+        /// <param name="mod"></param>
+        /// <param name="player"></param>
+        /// <param name="abilityID"></param>
+        /// <param name="toWho"></param>
+        /// <param name="toIgnore"></param>
+        public static void ServerAbility(Mod mod, int playerIndex, int abilityID, int level, int toWho = -1, int toIgnore = -1)
+        {
+            if (Main.netMode != 2) return;
+
+            ModPacket packet = mod.GetPacket();
+            packet.Write((byte)ExpModMessageType.ServerAbility);
+            packet.Write(playerIndex);
+            packet.Write(abilityID);
+            packet.Write(level);
             packet.Send(toWho, toIgnore);
         }
     }

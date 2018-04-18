@@ -18,7 +18,7 @@ namespace ExperienceAndClasses.Items
         public static readonly int AURA_UPDATE_BUFF_TICKS = 50;
 
         /* Timing */
-        public static readonly long TIME_START = new DateTime(2017, 1, 1).Ticks;
+        public static readonly long TIME_START = new DateTime(2018, 1, 1).Ticks;
 
         public static readonly int TIME_IND_AURA = 0;
         public static readonly int TIME_IND_AURA_ICHOR = 1;
@@ -88,6 +88,8 @@ namespace ExperienceAndClasses.Items
         public static void AuraEffect(Player self, bool affectSelf, bool affectPlayerFriendly, bool affectNPCFriendly, bool affectPlayerHostile, bool affectNPCHostile,
             float healAmount = 0, float selfHealMultiplier=1f, float manaAmount = 0, float selfManaMultiplier=1f, float damageAmount=0, int buffID=-1, int buffDurationTicks=0)
         {
+            //this is reached by server and all players
+
             //return if there is nothing to do
             if (healAmount == 0 && damageAmount == 0 && buffID == -1) return;
             if (!affectPlayerFriendly && !affectPlayerHostile && !affectNPCFriendly && !affectNPCHostile) return;
@@ -663,7 +665,6 @@ namespace ExperienceAndClasses.Items
                 multiclass = ", Multiclass Penalty";
             }
 
-
             //reapply aura buff indicators?
             bool auraUpdate = false;
             if (applyEffects && TimeReady(player.whoAmI, TIME_IND_AURA, AURA_UPDATE_MSEC, true)) auraUpdate = true;
@@ -1235,20 +1236,20 @@ namespace ExperienceAndClasses.Items
                 bonuses += "\nopener attacks grant "+(OPENER_ATTACK_IMMUNE_MSEC[intBonus] / 1000f) + " second immunity (must be off cooldown)";
             }
 
-            //periodic party healing
-            if (periodicPartyHeal_LEVEL != -1 && level >= periodicPartyHeal_LEVEL)
-            {
-                float healAmount = (periodicPartyHeal * level); //- ((periodicPartyHeal_LEVEL-1)* periodicPartyHeal);
-                if (applyEffects)
-                {
-                    //apply indicator
-                    if (auraUpdate) AuraEffect(player, true, true, true, false, false, 0, 0, 0, 0, 0, mod.BuffType("Aura_Life"), AURA_UPDATE_BUFF_TICKS);
+            ////periodic party healing
+            //if (periodicPartyHeal_LEVEL != -1 && level >= periodicPartyHeal_LEVEL)
+            //{
+            //    float healAmount = (periodicPartyHeal * level); //- ((periodicPartyHeal_LEVEL-1)* periodicPartyHeal);
+            //    if (applyEffects)
+            //    {
+            //        //apply indicator
+            //        if (auraUpdate) AuraEffect(player, true, true, true, false, false, 0, 0, 0, 0, 0, mod.BuffType("Aura_Life"), AURA_UPDATE_BUFF_TICKS);
 
-                    //do heal
-                    if (TimeReady(player.whoAmI, TIME_IND_AURA_LIFE, periodicPartyHeal_TIME_MSEC, true)) AuraEffect(player, true, true, true, false, false, healAmount, 0.5f);
-                }
-                bonuses += "\noccasionally heals allies for " + (int)healAmount + " life (half for self)";
-            }
+            //        //do heal
+            //        if (TimeReady(player.whoAmI, TIME_IND_AURA_LIFE, periodicPartyHeal_TIME_MSEC, true)) AuraEffect(player, true, true, true, false, false, healAmount, 0.5f);
+            //    }
+            //    bonuses += "\noccasionally heals allies for " + (int)healAmount + " life (half for self)";
+            //}
 
             //periodic ichor aura
             if (periodicIchorAura_LEVEL != -1 && level >= periodicIchorAura_LEVEL)

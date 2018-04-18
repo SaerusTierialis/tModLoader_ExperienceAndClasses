@@ -7,6 +7,7 @@ using Terraria.ModLoader.IO;
 using System.Collections.Generic;
 using Terraria.Localization;
 using Terraria.GameInput;
+using System.Linq;
 
 namespace ExperienceAndClasses
 {
@@ -35,6 +36,16 @@ namespace ExperienceAndClasses
         public bool UITrans = false;
 
         public List<Tuple<ModItem, string>> classTokensEquipped;
+
+        //active abilities
+        public long[] abilityCooldowns = new long[Abilities.NUMBER_OF_IDs];
+        public int[] currentAbilityIDsPotential = Enumerable.Repeat(Abilities.ID_UNDEFINED, Abilities.NUMBER_OF_IDs).ToArray();
+        public int currentAbilityPotentialsIndex = 0;
+        public int[] currentAbilityIDs = Enumerable.Repeat(Abilities.ID_UNDEFINED, ExperienceAndClasses.MAXIMUM_NUMBER_OF_ABILITIES).ToArray();
+        public int currentAbilityIndex = 0;
+        public int abilityLevel = 0;
+        public int latestAbilityFail = Abilities.RETURN_FAIL_UNDEFINED;
+        public Boolean showFailMessages = true;
 
         //rogue
         public float percentMidas = 0;
@@ -272,6 +283,10 @@ namespace ExperienceAndClasses
             //empty current class list
             classTokensEquipped = new List<Tuple<ModItem, string>>();
 
+            //empty current ability list
+            currentAbilityIDsPotential = Enumerable.Repeat(Abilities.ID_UNDEFINED, Abilities.NUMBER_OF_IDs).ToArray();
+            currentAbilityPotentialsIndex = 0;
+
             //default var bonuses
             bonusCritPct = 0;
             openerBonusPct = 0;
@@ -291,6 +306,24 @@ namespace ExperienceAndClasses
             {
                 Items.Helpers.ClassTokenEffects(mod, player, i.Item1, i.Item2, true, this, numberClasses);
             }
+
+            //calculate level for abilities
+            abilityLevel = (int)Math.Floor((double)Methods.Experience.GetLevel(GetExp()) / numberClasses);
+
+            //limit abilities based on level requirements
+            currentAbilityIDs = Enumerable.Repeat(Abilities.ID_UNDEFINED, ExperienceAndClasses.MAXIMUM_NUMBER_OF_ABILITIES).ToArray();
+            int index = 0;
+            int id;
+            for (int i=0; i<currentAbilityPotentialsIndex; i++)
+            {
+                id = currentAbilityIDsPotential[i];
+                if ((abilityLevel >= Abilities.LEVEL_REQUIREMENT[id]) && (index < ExperienceAndClasses.MAXIMUM_NUMBER_OF_ABILITIES))
+                {
+                    currentAbilityIDs[index] = id;
+                    index++;
+                }
+            }
+            currentAbilityIndex = index;
 
             base.PostUpdateEquips();
         }
@@ -463,26 +496,52 @@ namespace ExperienceAndClasses
 
         public override void ProcessTriggers(TriggersSet triggersSet) //CLIENT-SIDE ONLY
         {
+            if (ExperienceAndClasses.HOTKEY_ACTIVATE_ABILITY.JustPressed)
+            {
+                latestAbilityFail = Abilities.RETURN_FAIL_UNDEFINED;
+                showFailMessages = true;
+            }
+
             if (ExperienceAndClasses.HOTKEY_ACTIVATE_ABILITY.Current)
             {
-                Main.NewText("PRESS_A");
-                Console.WriteLine("PRESS_B");
-
-                //check frozen, etc
-
-                if (triggersSet.Left)//works
+                //check modifieriers
+                int modifer = 0;
+                if (ExperienceAndClasses.HOTKEY_MODIFIER_4.Current)
                 {
-                    Main.NewText("LEFT");
-                    player.moveSpeed = 0f;
+                    modifer = 4;
                 }
-                else if (triggersSet.Up)
+                else if (ExperienceAndClasses.HOTKEY_MODIFIER_3.Current)
                 {
-                    Main.NewText("UP");
-                    player.jump = 0;
+                    modifer = 3;
                 }
-                else if (triggersSet.Down)
+                else if (ExperienceAndClasses.HOTKEY_MODIFIER_2.Current)
                 {
-                    Main.NewText("DOWN");
+                    modifer = 2;
+                }
+                else if (ExperienceAndClasses.HOTKEY_MODIFIER_1.Current)
+                {
+                    modifer = 1;
+                }
+
+                int abilityID = currentAbilityIDs[modifer - 1];
+                int outcome = Abilities.RETURN_FAIL_UNDEFINED;
+                if (modifer == 0 || (abilityID == Abilities.ID_UNDEFINED))
+                    return;
+                else
+                {
+                    outcome = Abilities.DoAbility(this, abilityID, abilityLevel);
+
+                    if (Main.netMode == 1 && outcome == Abilities.RETURN_SUCCESS)
+                    { 
+                        Methods.PacketSender.ClientAbility(mod, abilityID, abilityLevel);
+                        showFailMessages = false;
+                    }
+
+                    if (showFailMessages && (outcome != latestAbilityFail))
+                    {
+                        latestAbilityFail = outcome;
+                        Abilities.DoReturnMessage(latestAbilityFail, abilityID);
+                    }
                 }
             }
         }
