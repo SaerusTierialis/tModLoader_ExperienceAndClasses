@@ -16,19 +16,21 @@ namespace ExperienceAndClasses
         public static double MAX_EXPERIENCE = Methods.Experience.GetExpReqForLevel(ExperienceAndClasses.MAX_LEVEL, true);
 
         //general
-        public bool hasLootedMonsterOrb = false;
-
         public bool auth = false;
         public bool traceChar = false;
 
-        public double experience = -1;
-        public double experienceModifier = 1;
+        public bool experienceNeedsUpdate = false;
+        private long timeTickUpdate = 0;
 
-        public int explvlcap = -1;
-        public int expdmgred = -1;
+        public double experience = -1;
+
+        //these are now map-specific
+        //public double experienceModifier = 1;
+        //public int explvlcap = -1;
+        //public int expdmgred = -1;
+        //public bool ignoreCaps = false;
 
         public bool displayExp = false;
-        public bool ignoreCaps = false;
 
         public float UILeft = 400f;
         public float UITop = 100f;
@@ -77,7 +79,7 @@ namespace ExperienceAndClasses
             /*~~~~~~~~~~~~~~~~~~~~~~Single Player and Server Only~~~~~~~~~~~~~~~~~~~~~~*/
             if (Main.netMode == 1) return;
 
-            SetExp(experience + xp);
+            SetExp(GetExp() + xp);
         }
 
         //take xp from player
@@ -86,7 +88,7 @@ namespace ExperienceAndClasses
             /*~~~~~~~~~~~~~~~~~~~~~~Single Player and Server Only~~~~~~~~~~~~~~~~~~~~~~*/
             if (Main.netMode == 1) return;
 
-            SetExp(experience - xp);
+            SetExp(GetExp() - xp);
         }
 
         //set xp of player
@@ -96,13 +98,13 @@ namespace ExperienceAndClasses
             if (Main.netMode == 1) return;
 
             //in the rare case that the player is not synced with the server, don't do anything
-            if (Main.netMode == 2 && experience == -1)
+            double priorExp = GetExp();
+            if (Main.netMode == 2 && priorExp == -1)
             {
                 NetMessage.BroadcastChatMessage(NetworkText.FromLiteral("Failed to change the experience value for player #" +player.whoAmI+":"+player.name +" (player not yet synced)"), ExperienceAndClasses.MESSAGE_COLOUR_RED);
                 return;
             }
 
-            double priorExp = GetExp();
             int priorLevel = Methods.Experience.GetLevel(GetExp());
             experience = xp;
             LimitExp();
@@ -111,7 +113,9 @@ namespace ExperienceAndClasses
             //if server, tell client
             if (Main.netMode == 2)
             {
-                Methods.PacketSender.ServerForceExperience(mod, player);
+                experienceNeedsUpdate = true;
+                timeTickUpdate = DateTime.Now.Ticks + ExperienceAndClasses.TIME_TICKS_SYNC_EXP_AFTER_KILL;
+                //Methods.PacketSender.ServerForceExperience(mod, player);
             }
             else if (Main.netMode==0)
             {
@@ -129,12 +133,6 @@ namespace ExperienceAndClasses
 
             if (experience < 0) experience = 0;
             if (experience > MAX_EXPERIENCE) experience = MAX_EXPERIENCE;
-
-            if (explvlcap!=-1)
-            {
-                double expCap = Methods.Experience.GetExpReqForLevel(explvlcap, true);
-                if (experience > expCap) experience = expCap;
-            }
         }
 
         /// <summary>
@@ -184,17 +182,12 @@ namespace ExperienceAndClasses
             UITop = (mod as ExperienceAndClasses).myUI.getTop();
 
             return new TagCompound {
-                { "experience", experience},
-                {"experience_modifier", experienceModifier},
+                {"experience", experience},
                 {"display_exp", displayExp},
-                {"ignore_caps", ignoreCaps},
                 {"UI_left", UILeft},
                 {"UI_top", UITop},
                 {"UI_show", UIShow},
-                {"has_looted_monster_orb", hasLootedMonsterOrb},
                 {"UI_trans", UITrans},
-                {"explvlcap", explvlcap},
-                {"expdmgred", expdmgred},
                 {"traceChar", traceChar},
             };
         }
@@ -207,29 +200,14 @@ namespace ExperienceAndClasses
             if (experience < 0) experience = 0;
             if (experience > MAX_EXPERIENCE) experience = MAX_EXPERIENCE;
 
-            //load exp rate
-            experienceModifier = Commons.TryGet<double>(tag, "experience_modifier", 1);
-
             //load exp message
             displayExp = Commons.TryGet<bool>(tag, "display_exp", false);
-
-            //load ignore caps
-            ignoreCaps = Commons.TryGet<bool>(tag, "ignore_caps", false);
 
             //UI
             UILeft = Commons.TryGet<float>(tag, "UI_left", 400f);
             UITop = Commons.TryGet<float>(tag, "UI_top", 100f);
             UIShow = Commons.TryGet<bool>(tag, "UI_show", true);
             UITrans = Commons.TryGet<bool>(tag, "UI_trans", false);
-
-            //hasLootedMonsterOrb
-            hasLootedMonsterOrb = Commons.TryGet<bool>(tag, "has_looted_monster_orb", false);
-
-            //explvlcap
-            explvlcap = Commons.TryGet<int>(tag, "explvlcap", -1);
-
-            //expdmgred
-            expdmgred = Commons.TryGet<int>(tag, "expdmgred", -1);
 
             //trace
             traceChar = Commons.TryGet<bool>(tag, "traceChar", false);
@@ -247,8 +225,6 @@ namespace ExperienceAndClasses
 
         public override void OnEnterWorld(Player player)
         {
-            if (explvlcap == 0) explvlcap = -1; //should fix an odd bug
-
             if (player.Equals(Main.LocalPlayer))
             {
                 if (experience < 0) //occurs when a player who does not have the mod joins a server that uses the mod
@@ -266,11 +242,11 @@ namespace ExperienceAndClasses
                 if (Main.netMode == 0)
                 {
                     Main.NewText("Require Auth: " + ExperienceAndClasses.requireAuth);
-                    Main.NewText("Experience Rate: " + (experienceModifier*100)+"%");
-                    Main.NewText("Ignore Class Caps: " + ignoreCaps);
-                    if (explvlcap > 0) Main.NewText("Level Cap: " + explvlcap);
+                    Main.NewText("Experience Rate: " + (ExperienceAndClasses.globalExpModifier * 100)+"%");
+                    Main.NewText("Ignore Class Caps: " + ExperienceAndClasses.globalIgnoreCaps);
+                    if (ExperienceAndClasses.globalLevelCap > 0) Main.NewText("Level Cap: " + ExperienceAndClasses.globalLevelCap);
                         else Main.NewText("Level Cap: disabled");
-                    if (expdmgred > 0) Main.NewText("Reduce Class Damage: " + expdmgred + "%");
+                    if (ExperienceAndClasses.globalDamageReduction > 0) Main.NewText("Reduce Class Damage: " + ExperienceAndClasses.globalDamageReduction + "%");
                         else Main.NewText("Reduce Class Damage: disabled");
                 }
             }
@@ -347,7 +323,14 @@ namespace ExperienceAndClasses
                 }
             }
 
-            
+            if (Main.netMode == 2 && experienceNeedsUpdate)
+            {
+                if (DateTime.Now.Ticks > timeTickUpdate)
+                {
+                    Methods.PacketSender.ServerForceExperience(mod, player);
+                    experienceNeedsUpdate = false;
+                }
+            }
 
             base.PostUpdate();
         }
@@ -531,11 +514,7 @@ namespace ExperienceAndClasses
                 {
                     outcome = Abilities.DoAbility(this, abilityID, abilityLevel);
 
-                    if (Main.netMode == 1 && outcome == Abilities.RETURN_SUCCESS)
-                    { 
-                        Methods.PacketSender.ClientAbility(mod, abilityID, abilityLevel);
-                        showFailMessages = false;
-                    }
+                    if (outcome == Abilities.RETURN_SUCCESS) showFailMessages = false;
 
                     if (showFailMessages && (outcome != latestAbilityFail))
                     {

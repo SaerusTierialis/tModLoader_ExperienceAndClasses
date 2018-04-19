@@ -20,6 +20,8 @@ namespace ExperienceAndClasses
                 {"require_auth", ExperienceAndClasses.requireAuth},
                 {"global_exp_modifier", ExperienceAndClasses.globalExpModifier},
                 {"global_ignore_caps", ExperienceAndClasses.globalIgnoreCaps},
+                {"global_damage_reduction", ExperienceAndClasses.globalDamageReduction},
+                {"global_level_cap", ExperienceAndClasses.globalLevelCap},
                 {"traceMap", ExperienceAndClasses.traceMap},
             };
         }
@@ -28,8 +30,10 @@ namespace ExperienceAndClasses
         {
             ExperienceAndClasses.authCode = Commons.TryGet<double>(tag, "AUTH_CODE", -1);
             ExperienceAndClasses.requireAuth = Commons.TryGet<bool>(tag, "require_auth", true);
-            ExperienceAndClasses.globalExpModifier = Commons.TryGet<double>(tag, "global_exp_modifier", 1);
-            ExperienceAndClasses.globalIgnoreCaps = Commons.TryGet<bool>(tag, "global_ignore_caps", false);
+            ExperienceAndClasses.globalExpModifier = Commons.TryGet<double>(tag, "global_exp_modifier", ExperienceAndClasses.DEFAULT_EXPERIENCE_MODIFIER);
+            ExperienceAndClasses.globalIgnoreCaps = Commons.TryGet<bool>(tag, "global_ignore_caps", ExperienceAndClasses.DEFAULT_IGNORE_CAPS);
+            ExperienceAndClasses.globalDamageReduction = Commons.TryGet<int>(tag, "global_damage_reduction", ExperienceAndClasses.DEFAULT_DAMAGE_REDUCTION);
+            ExperienceAndClasses.globalLevelCap = Commons.TryGet<int>(tag, "global_level_cap", ExperienceAndClasses.DEFAULT_LEVEL_CAP);
             ExperienceAndClasses.traceMap = Commons.TryGet<bool>(tag, "traceMap", false);
         }
 

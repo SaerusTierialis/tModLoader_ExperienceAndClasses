@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using System;
 using Terraria;
+using Terraria.ID;
 
 namespace ExperienceAndClasses
 {
@@ -38,12 +39,12 @@ namespace ExperienceAndClasses
         {
             int id;
 
-            id = ID_CLERIC_ACTIVE_HEAL;
+            id = ID_CLERIC_ACTIVE_HEAL; //resize with level if graphic can be resized
             NAME[id] = "Heal";
             DESCRIPTION[id] = "placeholder";
             LEVEL_REQUIREMENT[id] = 10;
-            MANA_COST_PERCENT[id] = 0.50f;
-            COOLDOWN_SECS[id] = 10f;
+            MANA_COST_PERCENT[id] = 0.10f;
+            COOLDOWN_SECS[id] = 0.5f;
 
             id = ID_CLERIC_ACTIVE_SANCTUARY;
             NAME[id] = "Sanctuary";
@@ -52,7 +53,7 @@ namespace ExperienceAndClasses
             MANA_COST_PERCENT[id] = 0.90f;
             COOLDOWN_SECS[id] = 120f;
 
-            id = ID_CLERIC_ACTIVE_DIVINE_INTERVENTION;
+            id = ID_CLERIC_ACTIVE_DIVINE_INTERVENTION; //1sec dur, more if Cross necklace (longInvince???)
             NAME[id] = "Divine Intervention";
             DESCRIPTION[id] = "placeholder";
             LEVEL_REQUIREMENT[id] = 20;
@@ -94,20 +95,21 @@ namespace ExperienceAndClasses
             return cooldownSecs;
         }
 
-        public static int DoAbility(MyPlayer myPlayer, int abilityID, int level = 1, Boolean network = false)
+        /// <summary>
+        /// This is called ONLY by the client using the ability
+        /// </summary>
+        /// <param name="myPlayer"></param>
+        /// <param name="abilityID"></param>
+        /// <param name="level"></param>
+        /// <returns></returns>
+        public static int DoAbility(MyPlayer myPlayer, int abilityID, int level = 1)
         {
-            //skip if duplicate in network mode
-            Player player = myPlayer.player;
-            if (network && (Main.LocalPlayer.Equals(player)))
-            {
-                return RETURN_FAIL_REDUNDANT;
-            }
-
             //check if ID is potentially valid
             if ((abilityID >= NUMBER_OF_IDs) || (abilityID < 0))
                 return RETURN_FAIL_UNDEFINED;
 
             /* ~~~~~~~~~~~~ Setup ~~~~~~~~~~~~ */
+            Player player = myPlayer.player;
             long timeNow = DateTime.Now.Ticks;
             long timeAllow = myPlayer.abilityCooldowns[abilityID];
             int manaCost = CalculateManaCost(myPlayer, abilityID, level);
@@ -117,31 +119,27 @@ namespace ExperienceAndClasses
 
             /* ~~~~~~~~~~~~ Generic Checks ~~~~~~~~~~~~ */
 
-            if (!network)
-            {
-                //check for invalid statuses
-                if (player.frozen || player.dead) return RETURN_FAIL_STATUS;
+            //check for invalid statuses
+            if (player.frozen || player.dead) return RETURN_FAIL_STATUS;
 
-                //check mana cost
-                if (player.statMana < manaCost) return RETURN_FAIL_MANA;
+            //check mana cost
+            if (player.statMana < manaCost) return RETURN_FAIL_MANA;
 
-                //check cooldown
-                if (timeNow < timeAllow) return RETURN_FAIL_COOLDOWN;
-            }
+            //check cooldown
+            if (timeNow < timeAllow) return RETURN_FAIL_COOLDOWN;
 
             /* ~~~~~~~~~~~~ Ability-Specific Checks ~~~~~~~~~~~~ */
 
-            //if (!network)
-            //{
 
-            //}
 
             /* ~~~~~~~~~~~~ Ability-Specific Effects ~~~~~~~~~~~~ */
             //keep in mind that all clients will execute this!
             switch (abilityID)
             {
                 case ID_CLERIC_ACTIVE_HEAL:
-                    RadiusEffect(myPosition, player, true, true, true, false, false, 1000f, level * 2, 0.5f);
+                    // RadiusEffect(myPosition, true, true, true, false, false, 1000f, level * 2, 0.5f);
+                    // RadiusEffect(myPosition, false, false, false, true, true, 1000f, 0, 0, 0, 0, 10f);
+                    Projectile.NewProjectile(player.position.X, player.position.Y, 0, 0, ProjectileID.LostSoulFriendly, level * 2, 0, player.whoAmI);
                     break;
 
 
@@ -155,7 +153,11 @@ namespace ExperienceAndClasses
 
             /* ~~~~~~~~~~~~ Costs ~~~~~~~~~~~~ */
             player.statMana -= manaCost;
-            if (player.statMana < 0) player.statMana = 0;
+            if (player.statMana < 0)
+            {
+                player.statMana = 0;
+            }
+
             myPlayer.abilityCooldowns[abilityID] = timeNow + (long)(cooldownSecs * TimeSpan.TicksPerSecond);
 
             /* ~~~~~~~~~~~~ Success ~~~~~~~~~~~~ */
@@ -165,7 +167,7 @@ namespace ExperienceAndClasses
         /// <summary>
         /// Applies effect in radius self. Can apply buffs, healing, or damage.
         /// </summary>
-        public static void RadiusEffect(Vector2 center, Player sourcePlayer, bool affectSelf, bool affectPlayerFriendly, bool affectNPCFriendly, bool affectPlayerHostile, bool affectNPCHostile, float radius = 1000f,
+        public static void RadiusEffect(Vector2 center, bool affectSelf, bool affectPlayerFriendly, bool affectNPCFriendly, bool affectPlayerHostile, bool affectNPCHostile, float radius = 1000f,
             float healAmount = 0, float selfHealMultiplier = 1f, float manaAmount = 0, float selfManaMultiplier = 1f, float damageAmount = 0, int buffID = -1, int buffDurationTicks = 0)
         {
             //return if there is nothing to do
@@ -179,10 +181,10 @@ namespace ExperienceAndClasses
             int mana = (int)manaAmount;
             int manaSelf = (int)(manaAmount * selfManaMultiplier);
 
-            //init
+            //inits
+            Player sourcePlayer = Main.LocalPlayer;
+            int selfIndex = sourcePlayer.whoAmI;
             int amount, lifeCurrent = 0, lifeMax = 0, manaCurrent = 0, manaMax = 0;
-
-            //
             Player player = null;
             NPC npc = null;
             bool forPlayer = true; //if false, then for npc
@@ -192,8 +194,10 @@ namespace ExperienceAndClasses
                 //buff
                 if (buffID >= 0 && buffDurationTicks > 0)
                 {
-                    if (forPlayer) player.AddBuff(buffID, buffDurationTicks);
-                    else npc.AddBuff(buffID, buffDurationTicks);
+                    if (forPlayer && Main.LocalPlayer.Equals(player))
+                        player.AddBuff(buffID, buffDurationTicks);
+                    else if (Main.LocalPlayer.Equals(player))
+                        npc.AddBuff(buffID, buffDurationTicks);
                 }
 
                 //heal
@@ -222,8 +226,12 @@ namespace ExperienceAndClasses
                     {
                         if (forPlayer)
                         {
-                            if (Main.LocalPlayer.Equals(player)) player.HealEffect(amount);
                             player.statLife += amount;
+                            player.HealEffect(amount);
+                            if ((Main.netMode == 1) && (player.whoAmI != selfIndex))
+                            {
+                                NetMessage.SendData(MessageID.HealEffect, -1, selfIndex, null, player.whoAmI, (float)amount, 0.0f, 0.0f);
+                            }
                         }
                         else
                         {
@@ -246,9 +254,9 @@ namespace ExperienceAndClasses
 
                     if ((manaMax - manaCurrent) < amount) amount = manaMax - manaCurrent;
 
-                    if (amount > 0)
+                    if (amount > 0 && Main.LocalPlayer.Equals(player))
                     {
-                        if (Main.LocalPlayer.Equals(player)) player.ManaEffect(amount);
+                        player.ManaEffect(amount);
                         player.statMana += amount;
                     }
                 }
@@ -256,10 +264,20 @@ namespace ExperienceAndClasses
                 //damage
                 if (damage > 0)
                 {
+                    //TO DO: needs to send net message if npc is killed
                     if (forPlayer)
                         player.Hurt(Terraria.DataStructures.PlayerDeathReason.ByPlayer(sourcePlayer.whoAmI), damage, 0, true);
                     else
-                        sourcePlayer.ApplyDamageToNPC(npc, damage, 0, 0, false);
+                    {
+                        if (Main.netMode == 1)
+                        {
+                            NetMessage.SendData(MessageID.StrikeNPC, -1, -1, null, npc.whoAmI, damage, 0f, 0);
+                        }
+                        else
+                        {
+                            sourcePlayer.ApplyDamageToNPC(npc, damage, 0, 0, false); //multiplayer sync would be automatic, but npc death does not sync
+                        }
+                    }
                 }
             });
 
@@ -288,6 +306,9 @@ namespace ExperienceAndClasses
                 {
                     player = Main.player[playerIndex];
 
+                    if (!Collision.CanHit(sourcePlayer.position, 0, 0, player.position, player.width, player.height))
+                        continue;
+
                     if (sourcePlayer.team != 0 && player.team == sourcePlayer.team)
                         friendlyTeam = true;
                     else
@@ -315,6 +336,10 @@ namespace ExperienceAndClasses
                 for (int npc_index = 0; npc_index < npcs.Length; npc_index++)
                 {
                     npc = npcs[npc_index];
+
+                    if (!Collision.CanHit(sourcePlayer.position, 0, 0, npc.position, npc.width, npc.height))
+                        continue;
+
                     if (npc.active && npc.Distance(center) < radius && npc.lifeMax > 5 && ((npc.friendly && affectNPCFriendly) || (!npc.friendly && affectNPCHostile)))
                     {
                         apply();

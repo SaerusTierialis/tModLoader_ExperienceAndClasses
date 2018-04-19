@@ -650,15 +650,21 @@ namespace ExperienceAndClasses.Items
             if (applyEffects | isEquipped)
             {
                 experience = myPlayer.GetExp();
-                ignoreCaps = myPlayer.ignoreCaps;
+                ignoreCaps = ExperienceAndClasses.globalIgnoreCaps;
             }
-            if (Main.netMode == 1) ignoreCaps = ExperienceAndClasses.globalIgnoreCaps;
 
             //get level
             int level = Methods.Experience.GetLevel(experience);
 
-            //reduce effective level if multiclassing
+            //limit level
             string multiclass = "";
+            if ((ExperienceAndClasses.globalLevelCap > 0) && (level > ExperienceAndClasses.globalLevelCap))
+            {
+                multiclass = ", Level Capped By Map";
+                level = ExperienceAndClasses.globalLevelCap;
+            }
+
+            //reduce effective level if multiclassing
             if (numberClasses > 1)
             {
                 level = (int)Math.Floor((double)level / numberClasses);
@@ -671,8 +677,8 @@ namespace ExperienceAndClasses.Items
 
             /* Reduction From expdmgred */
             string reduction = "";
-            int dmgred = myPlayer.expdmgred;
-            if (dmgred != -1)
+            int dmgred = ExperienceAndClasses.globalDamageReduction;
+            if (dmgred > 0)
             {
                 float reduction_multiplier = (100f - (float)dmgred) / 100f;
 

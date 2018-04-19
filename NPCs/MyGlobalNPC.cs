@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Xna.Framework;
+using System;
 using Terraria;
 using Terraria.Localization;
 using Terraria.ModLoader;
@@ -7,133 +8,124 @@ namespace ExperienceAndClasses.NPCs
 {
     public class MyGlobalNPC : GlobalNPC
     {
-        public override bool CheckDead(NPC npc)
+        public override void NPCLoot(NPC npc) //bool CheckDead(NPC npc)
         {
-            /*~~~~~~~~~~~~~~~~~~~~~~Single Player and Server Only~~~~~~~~~~~~~~~~~~~~~~*/
-            //no exp for critters, statues, friendly, or anything that is too far away
-            if (Main.netMode!=1 && !npc.friendly && npc.lifeMax>5 && !npc.SpawnedFromStatue && (npc.boss || (Main.player[npc.FindClosestPlayer()].Distance(npc.position) <= 5000f)))
+            //singleplayer and server-side only
+            //no exp or loot for critters, statues, friendly, or anything that is too far away (unless it's a boss)
+            if (Main.netMode != 1 && !npc.friendly && npc.lifeMax > 5 && !npc.SpawnedFromStatue && (npc.boss || (Main.netMode == 2) || (Main.LocalPlayer.Distance(npc.position) <= ExperienceAndClasses.RANGE_EXP_AND_ASCENSION_ORB)))
             {
                 //declare
                 Player player;
                 MyPlayer myPlayer;
 
-                /*~~~~~~~~~~~~~~~~~~~~~~Boss and Ascension Orbs~~~~~~~~~~~~~~~~~~~~~~*/
-                if (npc.boss)
+                /*~~~~~~~~~~~~~~~~~~~~~~Sort out which players qualify~~~~~~~~~~~~~~~~~~~~~~*/
+
+                //store prior interactions
+                bool[] interactionsBefore = npc.playerInteraction;
+
+                //set npc-player interactions (will put them back after)
+                if (Main.netMode == 0)
+                {
+                    npc.ApplyInteraction(Main.LocalPlayer.whoAmI);
+                }
+                else
                 {
                     for (int playerIndex = 0; playerIndex < 255; playerIndex++)
                     {
+                        player = Main.player[playerIndex];
                         if (Main.player[playerIndex].active)
                         {
-                            if (Main.rand.Next(4) == 0) //25%
+                            if (npc.boss || player.Distance(npc.position) <= ExperienceAndClasses.RANGE_EXP_AND_ASCENSION_ORB)
                             {
-                                //announce
-                                if (Main.netMode == 0)
-                                {
-                                    Main.NewText("A Boss Orb has dropped!");
-                                }
-                                else if (Main.netMode == 2)
-                                {
-                                    NetMessage.BroadcastChatMessage(NetworkText.FromLiteral("A Boss Orb has dropped for " + Main.player[playerIndex].name+"!"), ExperienceAndClasses.MESSAGE_COLOUR_BOSS_ORB);
-                                }
-                                //item
-                                Item.NewItem((int)npc.position.X, (int)npc.position.Y, npc.width, npc.height, mod.ItemType("Boss_Orb"));
+                                npc.ApplyInteraction(playerIndex);
                             }
                         }
                     }
                 }
-                else //if (CalcBaseExp(npc) >= 2f) //non-boss with base exp >1
+
+                /*~~~~~~~~~~~~~~~~~~~~~~Boss and Ascension Orbs (singleplayer or server-side)~~~~~~~~~~~~~~~~~~~~~~*/
+
+                //boss orb
+                bool droppedBossOrb = false;
+                if (npc.boss && (Main.rand.Next(1000) < (int)(ExperienceAndClasses.PERCENT_CHANCE_BOSS_ORB * 10)))
                 {
-                    int chance;
+                    droppedBossOrb = true;
+                    npc.DropItemInstanced(npc.position, npc.Size, mod.ItemType("Boss_Orb"), 1, true);
+                }
+
+                //ascension orb
+                bool droppedMonsterOrb = false;
+                if (Main.rand.Next(1000) < (int)(ExperienceAndClasses.PERCENT_CHANCE_ASCENSION_ORB * 10))
+                {
+                    droppedMonsterOrb = true;
+                    npc.DropItemInstanced(npc.position, npc.Size, mod.ItemType("Monster_Orb"), 1, true);
+                }
+
+                //messages
+                if (Main.netMode == 0)
+                {
+                    if (droppedBossOrb) Main.NewText("A Boss Orb has dropped for you!", ExperienceAndClasses.MESSAGE_COLOUR_BOSS_ORB);
+                    if (droppedMonsterOrb) Main.NewText("An Ascension Orb has dropped for you!", ExperienceAndClasses.MESSAGE_COLOUR_ASCENSION_ORB);
+                }
+                else if (Main.netMode == 2)
+                {
+                    NetworkText text = NetworkText.FromLiteral("A Boss Orb has dropped for you!");
                     for (int playerIndex = 0; playerIndex < 255; playerIndex++)
                     {
-                        player = Main.player[playerIndex];
-                        if (player.active && player.Distance(npc.position) <= 5000f)
+                        if (Main.player[playerIndex].active && npc.playerInteraction[playerIndex])
                         {
-                            myPlayer = player.GetModPlayer<MyPlayer>(mod);
-                            if (myPlayer.hasLootedMonsterOrb) chance = 150;
-                                else chance = 75;
-                            if (Main.rand.Next(chance) == 0) // 1/200 (1/75 for first orb)
-                            {
-                                if (!myPlayer.hasLootedMonsterOrb)
-                                {
-                                    //records orb loot
-                                    myPlayer.hasLootedMonsterOrb = true;
-
-                                    if (Main.netMode == 2)
-                                    {
-                                        //server tells client to record this
-                                        Methods.PacketSender.ServerFirstAscensionOrb(mod, Main.player[playerIndex].whoAmI);
-                                    }
-                                }
-                                //announce
-                                if (Main.netMode == 0)
-                                {
-                                    Main.NewText("An Ascension Orb has dropped!");
-                                }
-                                else if (Main.netMode == 2)
-                                {
-                                    NetMessage.BroadcastChatMessage(NetworkText.FromLiteral("An Ascension Orb has dropped for " + player.name+"!"), ExperienceAndClasses.MESSAGE_COLOUR_ASCENSION_ORB);
-                                }
-                                //item
-                                Item.NewItem((int)npc.position.X, (int)npc.position.Y, npc.width, npc.height, mod.ItemType("Monster_Orb"));
-                            }
+                            if (droppedBossOrb) NetMessage.SendChatMessageToClient(text, ExperienceAndClasses.MESSAGE_COLOUR_BOSS_ORB, playerIndex);
+                            if (droppedMonsterOrb) NetMessage.SendChatMessageToClient(text, ExperienceAndClasses.MESSAGE_COLOUR_ASCENSION_ORB, playerIndex);
                         }
                     }
                 }
 
                 /*~~~~~~~~~~~~~~~~~~~~~~Experience~~~~~~~~~~~~~~~~~~~~~~*/
-                //get exp
+
+                //calculate base exp
                 double experience = Helpers.CalcBaseExp(npc);
 
-                //cycle all players
+                //reward all qualified players
                 double expGive;
                 for (int playerIndex = 0; playerIndex < 255; playerIndex++)
                 {
-                    //if player active...
-                    if (Main.player[playerIndex].active)
+                    if (Main.player[playerIndex].active && npc.playerInteraction[playerIndex])
                     {
-                        //get player-npc distance
                         player = Main.player[playerIndex];
                         myPlayer = player.GetModPlayer<MyPlayer>(mod);
+                        expGive = experience;
 
-                        //generous distance cutoff (a few screens)
-                        if ((myPlayer.experienceModifier>0) && (npc.boss || (player.Distance(npc.position) <= 5000f)))
+                        //10% bonus for well fed
+                        if (player.wellFed) expGive *= 1.1f;
+
+                        //apply rate bonus
+                        expGive *= ExperienceAndClasses.globalExpModifier;
+
+                        //min 1 exp
+                        if (expGive < 1f) expGive = 1f;
+
+                        //round down
+                        expGive = Math.Floor(expGive);
+
+                        //exp
+                        myPlayer.AddExp((int)expGive);
+
+                        //if singleplayer...
+                        if (Main.netMode == 0)
                         {
-                            //10% bonus for well fed
-                            expGive = experience;
-                            if (player.wellFed) expGive *= 1.1f;
-
-                            //apply rate bonus
-                            if (Main.netMode == 0)
-                                expGive *= myPlayer.experienceModifier; //single-player
-                            else
-                                expGive *= ExperienceAndClasses.globalExpModifier; //server
-
-                            //min 1 exp
-                            if (expGive < 1f) expGive = 1f;
-
-                            //floor
-                            expGive = Math.Floor(expGive);
-
-                            //give exp
-                            if (npc.boss || !player.dead)
-                            {
-                                //exp
-                                myPlayer.AddExp((int)expGive); //player.QuickSpawnItem(mod.ItemType("Experience"), (int)expGive);
-
-                                //if this is you...
-                                if (player.Equals(Main.LocalPlayer))
-                                {
-                                    //update UI if earning experience while dead
-                                    if (player.dead)
-                                        (mod as ExperienceAndClasses).myUI.updateValue(myPlayer.GetExp());
-                                }
-                            }
+                            //update UI if earning experience while dead (prevents visual bug)
+                            if (player.dead)
+                                (mod as ExperienceAndClasses).myUI.updateValue(myPlayer.GetExp());
                         }
                     }
                 }
+
+                /*~~~~~~~~~~~~~~~~~~~~~~Restore Interactions~~~~~~~~~~~~~~~~~~~~~~*/
+
+                npc.playerInteraction = interactionsBefore;
+
             }
-            return base.CheckDead(npc);
+            //return base.CheckDead(npc);
         }
     }
 }

@@ -32,14 +32,13 @@ namespace ExperienceAndClasses
         ClientTryAuth,
         ClientUpdateLvlCap,
         ClientUpdateDmgRed,
-        ClientAbility,
-        ServerFirstAscensionOrb,
+        //ClientAbility,
         ServerRequestExperience,
         ServerForceExperience,
         ServerFullExpList,
         ServerToggleClassCap,
-        ServerAbility
-        //ServerAbilityOutcome
+        //ServerAbility,
+        //ServerAbilityOutcome,
     }
 
     class ExperienceAndClasses : Mod
@@ -49,12 +48,12 @@ namespace ExperienceAndClasses
         public MyUI myUI;
 
         //message colours
-        public static Color MESSAGE_COLOUR_RED = new Color(255, 0, 0);
-        public static Color MESSAGE_COLOUR_GREEN = new Color(0, 255, 0);
-        public static Color MESSAGE_COLOUR_YELLOW = new Color(255, 255, 0);
-        public static Color MESSAGE_COLOUR_MAGENTA = new Color(255, 0, 255);
-        public static Color MESSAGE_COLOUR_BOSS_ORB = new Color(233, 36, 91);
-        public static Color MESSAGE_COLOUR_ASCENSION_ORB = new Color(4, 195, 249);
+        public static readonly Color MESSAGE_COLOUR_RED = new Color(255, 0, 0);
+        public static readonly Color MESSAGE_COLOUR_GREEN = new Color(0, 255, 0);
+        public static readonly Color MESSAGE_COLOUR_YELLOW = new Color(255, 255, 0);
+        public static readonly Color MESSAGE_COLOUR_MAGENTA = new Color(255, 0, 255);
+        public static readonly Color MESSAGE_COLOUR_BOSS_ORB = new Color(233, 36, 91);
+        public static readonly Color MESSAGE_COLOUR_ASCENSION_ORB = new Color(4, 195, 249);
 
         //active abilities
         public static ModHotKey HOTKEY_ACTIVATE_ABILITY;
@@ -62,23 +61,41 @@ namespace ExperienceAndClasses
         public static ModHotKey HOTKEY_MODIFIER_2;
         public static ModHotKey HOTKEY_MODIFIER_3;
         public static ModHotKey HOTKEY_MODIFIER_4;
-        public static int MAXIMUM_NUMBER_OF_ABILITIES = 4;
+        public static readonly int MAXIMUM_NUMBER_OF_ABILITIES = 4;
 
-        //EXP
+        //exp requirements and cap
         public const int MAX_LEVEL = 3000;
         public const double EXP_ITEM_VALUE = 1;
-        public readonly static double[] EARLY_EXP_REQ = new double[] { 0, 0, 10, 25, 50, 75, 100, 125, 150, 200, 350 };//{0, 0, 100, 250, 500, 750, 1000, 1500, 2000, 2500, 3000};
-        public static double[] EXP_REQ = new double[MAX_LEVEL + 1];
-        public static double[] EXP_REQ_TOTAL = new double[MAX_LEVEL + 1];
+        public static readonly double[] EARLY_EXP_REQ = new double[] { 0, 0, 10, 25, 50, 75, 100, 125, 150, 200, 350 };//{0, 0, 100, 250, 500, 750, 1000, 1500, 2000, 2500, 3000};
+        public static readonly double[] EXP_REQ = new double[MAX_LEVEL + 1];
+        public static readonly double[] EXP_REQ_TOTAL = new double[MAX_LEVEL + 1];
 
-        //for multiplayer only
+        //awarding experience and drops
+        public const float RANGE_EXP_AND_ASCENSION_ORB = 5000f;
+        public const float PERCENT_CHANCE_BOSS_ORB = 25.0f;
+        public const float PERCENT_CHANCE_ASCENSION_ORB = 25f; //0.7f;
+
+        //multiplayer constants
+        public const long TIME_TICKS_SYNC_EXP_AFTER_KILL = 500 * TimeSpan.TicksPerMillisecond;
+
+        //map settings constants
+        public const double DEFAULT_EXPERIENCE_MODIFIER = 1;
+        public const bool DEFAULT_IGNORE_CAPS = false;
+        public const int DEFAULT_DAMAGE_REDUCTION = 0;
+        public const int DEFAULT_LEVEL_CAP = 100;
+
+        //map settings
+        public static double globalExpModifier = DEFAULT_EXPERIENCE_MODIFIER;
+        public static bool globalIgnoreCaps = DEFAULT_IGNORE_CAPS;
+        public static int globalDamageReduction = DEFAULT_DAMAGE_REDUCTION;
+        public static int globalLevelCap = DEFAULT_LEVEL_CAP;
+
+        //for multiplayer only (non-constants)
         public static double authCode = -1;
         public static bool requireAuth = true;
-        public static double globalExpModifier = 1;
-        public static bool globalIgnoreCaps = false;
         public static bool traceMap = false;//for debuging
 
-        //const
+        //start
         public ExperienceAndClasses()
         {
             Methods.Experience.CalcExpReqs();
@@ -123,7 +140,7 @@ namespace ExperienceAndClasses
             Player player;
             MyPlayer myPlayer;
             bool newBool;
-            int explvlcap, expdmgred, abilityID, level;
+            int explvlcap, expdmgred; //, abilityID, level;
             MyPlayer localMyPlayer = null;
             bool traceChar = false;
             if (Main.netMode!=2)
@@ -146,7 +163,6 @@ namespace ExperienceAndClasses
                     player = Main.player[reader.ReadInt32()];
                     myPlayer = player.GetModPlayer<MyPlayer>(this);
                     myPlayer.experience = reader.ReadDouble();
-                    myPlayer.hasLootedMonsterOrb = reader.ReadBoolean();
                     myPlayer.explvlcap = reader.ReadInt32();
                     myPlayer.expdmgred = reader.ReadInt32();
                     NetMessage.BroadcastChatMessage(NetworkText.FromLiteral("Experience synced for player #" +player.whoAmI+":"+player.name), ExperienceAndClasses.MESSAGE_COLOUR_YELLOW);
@@ -172,13 +188,7 @@ namespace ExperienceAndClasses
                         "%\nIgnore Class Caps: " + globalIgnoreCaps + "\nLevel Cap: " + lvlcap + "\nClass Damage Reduction: " +
                         dmgred), ExperienceAndClasses.MESSAGE_COLOUR_YELLOW, player.whoAmI);
 
-                    if ((Main.netMode==2 && traceMap) || (Main.netMode==1 && traceChar)) NetMessage.BroadcastChatMessage(NetworkText.FromLiteral("TRACE:Recieved ClientTellExperience from player #" + indNewPlayer + ":" + player.name+" = "+ player.GetModPlayer<MyPlayer>(this).experience+" (has found first orb:"+ player.GetModPlayer<MyPlayer>(this).hasLootedMonsterOrb+")"), ExperienceAndClasses.MESSAGE_COLOUR_MAGENTA);
-                    break;
-
-                //Server telling player that they have now recieved their first Ascension Orb
-                case ExpModMessageType.ServerFirstAscensionOrb:
-                    localMyPlayer.hasLootedMonsterOrb = true;
-                    if ((Main.netMode==2 && traceMap) || (Main.netMode==1 && traceChar)) NetMessage.BroadcastChatMessage(NetworkText.FromLiteral("TRACE:Recieved ServerFirstAscensionOrb"),  ExperienceAndClasses.MESSAGE_COLOUR_MAGENTA);
+                    if ((Main.netMode==2 && traceMap) || (Main.netMode==1 && traceChar)) NetMessage.BroadcastChatMessage(NetworkText.FromLiteral("TRACE:Recieved ClientTellExperience from player #" + indNewPlayer + ":" + player.name+" = "+ player.GetModPlayer<MyPlayer>(this).experience), ExperienceAndClasses.MESSAGE_COLOUR_MAGENTA);
                     break;
 
                 //Server telling everyone a player's new exp value
@@ -221,19 +231,19 @@ namespace ExperienceAndClasses
                 //    if ((Main.netMode == 2 && traceMap) || (Main.netMode == 1 && traceChar)) NetMessage.BroadcastChatMessage(NetworkText.FromLiteral("TRACE:Recieved ServerAbilityOutcome for player #" + player.whoAmI + ":" + player.name + " = " + abilityID + " " + outcome), ExperienceAndClasses.MESSAGE_COLOUR_MAGENTA);
                 //    break;
 
-                case ExpModMessageType.ServerAbility:
-                    if (Main.netMode != 1) break; //client only
-                    //read
-                    player = Main.player[reader.ReadInt32()];
-                    abilityID = reader.ReadInt32();
-                    level = reader.ReadInt32();
-                    //act
-                    myPlayer = player.GetModPlayer<MyPlayer>(this);
-                    Abilities.DoAbility(myPlayer, abilityID, level, true);
+                //case ExpModMessageType.ServerAbility:
+                //    if (Main.netMode != 1) break; //client only
+                //    //read
+                //    player = Main.player[reader.ReadInt32()];
+                //    abilityID = reader.ReadInt32();
+                //    level = reader.ReadInt32();
+                //    //act
+                //    myPlayer = player.GetModPlayer<MyPlayer>(this);
+                //    Abilities.DoAbility(myPlayer, abilityID, level, true);
 
-                    if ((Main.netMode == 2 && traceMap) || (Main.netMode == 1 && traceChar))
-                        NetMessage.BroadcastChatMessage(NetworkText.FromLiteral("TRACE:Recieved ServerAbility for player #" + player.whoAmI + ":" + player.name + " = " + abilityID + " " + level), ExperienceAndClasses.MESSAGE_COLOUR_MAGENTA);
-                    break;
+                //    if ((Main.netMode == 2 && traceMap) || (Main.netMode == 1 && traceChar))
+                //        NetMessage.BroadcastChatMessage(NetworkText.FromLiteral("TRACE:Recieved ServerAbility for player #" + player.whoAmI + ":" + player.name + " = " + abilityID + " " + level), ExperienceAndClasses.MESSAGE_COLOUR_MAGENTA);
+                //    break;
 
                 //Player telling the server to adjust experience (e.g., craft token)
                 case ExpModMessageType.ClientTellAddExp:
@@ -445,22 +455,22 @@ namespace ExperienceAndClasses
                     if ((Main.netMode==2 && traceMap) || (Main.netMode==1 && traceChar)) NetMessage.BroadcastChatMessage(NetworkText.FromLiteral("TRACE:Recieved ClientUpdateDmgRed from player #" + player.whoAmI + ":" + player.name + " " + expdmgred), ExperienceAndClasses.MESSAGE_COLOUR_MAGENTA);
                     break;
 
-                //Player tells server that they would like to perform an ability.
-                case ExpModMessageType.ClientAbility:
-                    if (Main.netMode != 2) break; //server only
-                    //read
-                    player = Main.player[reader.ReadInt32()];
-                    abilityID = reader.ReadInt32();
-                    level = reader.ReadInt32();
-                    //act
-                    myPlayer = player.GetModPlayer<MyPlayer>(this);
-                    Abilities.DoAbility(myPlayer, abilityID, level, true);
-                    Methods.PacketSender.ServerAbility(mod, player.whoAmI, abilityID, level, -1, player.whoAmI);
+                ////Player tells server that they would like to perform an ability.
+                //case ExpModMessageType.ClientAbility:
+                //    if (Main.netMode != 2) break; //server only
+                //    //read
+                //    player = Main.player[reader.ReadInt32()];
+                //    abilityID = reader.ReadInt32();
+                //    level = reader.ReadInt32();
+                //    //act
+                //    myPlayer = player.GetModPlayer<MyPlayer>(this);
+                //    Abilities.DoAbility(myPlayer, abilityID, level, true);
+                //    Methods.PacketSender.ServerAbility(mod, player.whoAmI, abilityID, level, -1, player.whoAmI);
 
-                    //Methods.PacketSender.ServerAbilityOutcome(mod, abilityID, outcome, player.whoAmI, -1);
+                //    //Methods.PacketSender.ServerAbilityOutcome(mod, abilityID, outcome, player.whoAmI, -1);
 
-                    if ((Main.netMode == 2 && traceMap) || (Main.netMode == 1 && traceChar)) NetMessage.BroadcastChatMessage(NetworkText.FromLiteral("TRACE:Recieved ClientAbility from player #" + player.whoAmI + ":" + player.name + " " + abilityID + " " + level), ExperienceAndClasses.MESSAGE_COLOUR_MAGENTA);
-                    break;
+                //    if ((Main.netMode == 2 && traceMap) || (Main.netMode == 1 && traceChar)) NetMessage.BroadcastChatMessage(NetworkText.FromLiteral("TRACE:Recieved ClientAbility from player #" + player.whoAmI + ":" + player.name + " " + abilityID + " " + level), ExperienceAndClasses.MESSAGE_COLOUR_MAGENTA);
+                //    break;
 
                 default:
                     ErrorLogger.Log("Unknown Message type: " + msgType);
