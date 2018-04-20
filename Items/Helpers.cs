@@ -677,7 +677,7 @@ namespace ExperienceAndClasses.Items
 
             /* Reduction From expdmgred */
             string reduction = "";
-            int dmgred = ExperienceAndClasses.globalDamageReduction;
+            int dmgred = ExperienceAndClasses.globalClassDamageReduction;
             if (dmgred > 0)
             {
                 float reduction_multiplier = (100f - (float)dmgred) / 100f;

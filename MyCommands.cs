@@ -17,8 +17,10 @@ namespace ExperienceAndClasses
         {
             MyPlayer localMyPlayer = caller.Player.GetModPlayer<MyPlayer>(mod);
             localMyPlayer.UIShow = !localMyPlayer.UIShow;
-            if (localMyPlayer.UIShow) Main.NewText("Experience bar enabled. Display will be visible while wearing a Class Token.");
-            else Main.NewText("Experience bar hidden.");
+            if (localMyPlayer.UIShow)
+                Main.NewText("Experience bar enabled. Display will be visible while wearing a Class Token.");
+            else
+                Main.NewText("Experience bar hidden.");
         }
     }
 
@@ -28,7 +30,7 @@ namespace ExperienceAndClasses
         {
             name = "expbartrans";
             argstr = "";
-            desc = "toggle exp bar transparency";
+            desc = "toggle experience bar transparency";
         }
 
         public override void Action(CommandCaller caller, string input, string[] args)
@@ -38,8 +40,10 @@ namespace ExperienceAndClasses
 
             localMyPlayer.UITrans = !localMyPlayer.UITrans;
             myUI.setTrans(localMyPlayer.UITrans);
-            if (localMyPlayer.UITrans) Main.NewText("Experience bar is now transparent.");
-            else Main.NewText("Experience bar is now opaque.");
+            if
+                (localMyPlayer.UITrans) Main.NewText("Experience bar is now transparent.");
+            else
+                Main.NewText("Experience bar is now opaque.");
         }
     }
 
@@ -49,7 +53,7 @@ namespace ExperienceAndClasses
         {
             name = "expbarreset";
             argstr = "";
-            desc = "reset exp bar";
+            desc = "reset experience bar";
         }
 
         public override void Action(CommandCaller caller, string input, string[] args)
@@ -108,7 +112,7 @@ namespace ExperienceAndClasses
         {
             name = "expadd";
             argstr = "exp_amount";
-            desc = "adds an amount of experience";
+            desc = "adds an amount of experience (requires expauth in multiplayer)";
         }
 
         public override void Action(CommandCaller caller, string input, string[] args)
@@ -126,7 +130,7 @@ namespace ExperienceAndClasses
         {
             name = "expsub";
             argstr = "exp_amount";
-            desc = "subtracts an amount of experience";
+            desc = "subtracts an amount of experience (requires expauth in multiplayer)";
         }
 
         public override void Action(CommandCaller caller, string input, string[] args)
@@ -144,7 +148,7 @@ namespace ExperienceAndClasses
         {
             name = "expset";
             argstr = "exp_amount";
-            desc = "sets amount of experience";
+            desc = "sets amount of experience (requires expauth in multiplayer)";
         }
 
         public override void Action(CommandCaller caller, string input, string[] args)
@@ -160,14 +164,14 @@ namespace ExperienceAndClasses
         {
             name = "exprate";
             argstr = "[new_rate]";
-            desc = "displays or sets experience rate";
+            desc = "displays or sets experience rate (requires expauth in multiplayer)";
         }
 
         public override void Action(CommandCaller caller, string input, string[] args)
         {
             if (args.Length == 0)
             {
-                Methods.ChatCommands.CommandExpRate(mod);
+                Main.NewText("The current exprate is " + (ExperienceAndClasses.globalExpModifier * 100) + "%.");
             }
             else
             {
@@ -183,7 +187,7 @@ namespace ExperienceAndClasses
         {
             name = "explvladd";
             argstr = "[level_amount]";
-            desc = "add an amount of levels";
+            desc = "add an amount of levels (requires expauth in multiplayer)";
         }
 
         public override void Action(CommandCaller caller, string input, string[] args)
@@ -208,7 +212,7 @@ namespace ExperienceAndClasses
         {
             name = "explvlsub";
             argstr = "[level_amount]";
-            desc = "subtract an amount of levels";
+            desc = "subtract an amount of levels (requires expauth in multiplayer)";
         }
 
         public override void Action(CommandCaller caller, string input, string[] args)
@@ -234,14 +238,12 @@ namespace ExperienceAndClasses
         {
             name = "explvlset";
             argstr = "level_amount";
-            desc = "set amount of levels";
+            desc = "set amount of levels (requires expauth in multiplayer)";
         }
 
         public override void Action(CommandCaller caller, string input, string[] args)
         {
             if (args.Length == 0) return;
-
-            MyPlayer localMyPlayer = caller.Player.GetModPlayer<MyPlayer>(mod);
 
             int level = Int32.Parse(args[0]);
             Methods.ChatCommands.CommandSetExp(mod, Methods.Experience.GetExpReqForLevel(level, true), input);
@@ -279,7 +281,7 @@ namespace ExperienceAndClasses
         {
             name = "expclasscaps";
             argstr = "";
-            desc = "toggle enforcing class bonus caps";
+            desc = "toggle enforcing class bonus caps (map setting, requires expauth in multiplayer)";
         }
 
         public override void Action(CommandCaller caller, string input, string[] args)
@@ -294,12 +296,13 @@ namespace ExperienceAndClasses
         {
             name = "expauth";
             argstr = "[auth_code]";
-            desc = "displays auth status or attempts with with the auth_code";
+            desc = "displays auth status or attempts authorization with the auth_code";
         }
 
         public override void Action(CommandCaller caller, string input, string[] args)
         {
-            if (Main.netMode == 0) Main.NewText("Auth is only for multiplayer use.");
+            if (Main.netMode == 0)
+                Main.NewText("Auth is only for multiplayer use.");
             else
             {
                 if (args.Length == 0)
@@ -321,21 +324,26 @@ namespace ExperienceAndClasses
         {
             name = "explvlcap";
             argstr = "[level_cap]";
-            desc = "display or set a level cap for yourself (set -1 to disable)";
+            desc = "display or set the level cap (map setting, requires expauth in multiplayer, 0 to disable)";
         }
 
         public override void Action(CommandCaller caller, string input, string[] args)
         {
             if (args.Length == 0)
             {
-                MyPlayer localMyPlayer = caller.Player.GetModPlayer<MyPlayer>(mod);
-                if (localMyPlayer.explvlcap == -1) Main.NewText("Level cap is disabled.");
-                else Main.NewText("Level cap is " + localMyPlayer.explvlcap + ".");
+                if (ExperienceAndClasses.globalLevelCap <= 0)
+                {
+                    Main.NewText("Level cap is disabled.");
+                }
+                else
+                {
+                    Main.NewText("Level cap is " + ExperienceAndClasses.globalLevelCap + ".");
+                }
             }
             else
             {
                 int lvl = Int32.Parse(args[0]);
-                Methods.ChatCommands.CommandLvlCap(mod, lvl);
+                Methods.ChatCommands.CommandLvlCap(mod, lvl, input);
             }
         }
     }
@@ -346,22 +354,27 @@ namespace ExperienceAndClasses
         {
             name = "expdmgred";
             argstr = "[damage_reduction_percent]";
-            desc = "display or set a damage reduction for yourself (set -1 to disable)";
+            desc = "display or set the class damage reduction (map setting, requires expauth in multiplayer, 0 to disable)";
         }
 
         public override void Action(CommandCaller caller, string input, string[] args)
         {
             if (args.Length == 0)
             {
-                MyPlayer localMyPlayer = caller.Player.GetModPlayer<MyPlayer>(mod);
-                if (localMyPlayer.expdmgred == -1) Main.NewText("Damage reduction is disabled.");
-                else Main.NewText("Damage reduction is " + localMyPlayer.expdmgred + "%.");
+                if (ExperienceAndClasses.globalClassDamageReduction <= 0)
+                {
+                    Main.NewText("Damage reduction is disabled.");
+                }
+                else
+                {
+                    Main.NewText("Damage reduction is " + ExperienceAndClasses.globalClassDamageReduction + "%.");
+                }
             }
             else
             {
                 int dmgred = Int32.Parse(args[0]);
                 if (dmgred <= 0) dmgred = -1;
-                Methods.ChatCommands.CommandDmgRed(mod, dmgred);
+                Methods.ChatCommands.CommandDmgRed(mod, dmgred, input);
             }
         }
     }
@@ -372,12 +385,12 @@ namespace ExperienceAndClasses
         {
             name = "expnoauth";
             argstr = "";
-            desc = "toggles auth requirement for current map";
+            desc = "toggles auth requirement for current map (requires expauth in multiplayer)";
         }
 
         public override void Action(CommandCaller caller, string input, string[] args)
         {
-            Methods.ChatCommands.CommandRequireAuth();
+            Methods.ChatCommands.CommandRequireAuth(mod, input);
         }
     }
 
@@ -387,15 +400,17 @@ namespace ExperienceAndClasses
         {
             name = "exptrace";
             argstr = "";
-            desc = "toggles trace for debuging character";
+            desc = "toggles trace for debuging this character";
         }
 
         public override void Action(CommandCaller caller, string input, string[] args)
         {
             MyPlayer localMyPlayer = caller.Player.GetModPlayer<MyPlayer>(mod);
             localMyPlayer.traceChar = !localMyPlayer.traceChar;
-            if (localMyPlayer.traceChar) Main.NewText("Character trace is enabled.");
-            else Main.NewText("Character trace is disabled");
+            if (localMyPlayer.traceChar)
+                Main.NewText("Character trace is enabled.");
+            else
+                Main.NewText("Character trace is disabled");
         }
     }
 
@@ -405,18 +420,12 @@ namespace ExperienceAndClasses
         {
             name = "expmaptrace";
             argstr = "";
-            desc = "toggles trace for debuging map";
+            desc = "toggles trace for debuging this map (requires expauth in multiplayer)";
         }
 
         public override void Action(CommandCaller caller, string input, string[] args)
         {
-            if (Main.netMode != 0) Main.NewText("Auth is only for singleplayer use.");
-            else
-            {
-                ExperienceAndClasses.traceMap = !ExperienceAndClasses.traceMap;
-                if (ExperienceAndClasses.traceMap) Main.NewText("Map trace is enabled.");
-                else Main.NewText("Map trace is disabled");
-            }
+            Methods.ChatCommands.CommandMapTrace(mod, input);
         }
     }
 
@@ -426,40 +435,39 @@ namespace ExperienceAndClasses
         {
             name = "expauthcode";
             argstr = "[new_auth_code]";
-            desc = "display or change the map auth code";
+            desc = "display or change the map expauth code (code changes always requires expauth in multiplayer)";
         }
 
         public override void Action(CommandCaller caller, string input, string[] args)
         {
             if (args.Length == 0)
             {
-                Methods.ChatCommands.CommandShowAuthCode();
+                Methods.ChatCommands.CommandShowAuthCode(mod);
             }
             else
             {
                 double newCode = Double.Parse(args[0]);
                 if (newCode < 0) newCode = 0;
                 newCode = Math.Round(newCode);
-                Methods.ChatCommands.CommandSetAuthCode(newCode);
+                Methods.ChatCommands.CommandSetAuthCode(mod, newCode, input);
             }
         }
     }
 
-    /*
-    class Command_temp : CommandTemplate
+    class Command_expsettings : CommandTemplate
     {
-        public Command_temp()
+        public Command_expsettings()
         {
-            name = "";
+            name = "expsettings";
             argstr = "";
-            desc = "";
+            desc = "displays the current settings";
         }
 
         public override void Action(CommandCaller caller, string input, string[] args)
         {
+            Methods.ChatCommands.CommandDisplaySettings();
         }
     }
-    */
 
     public abstract class CommandTemplate : ModCommand
     {

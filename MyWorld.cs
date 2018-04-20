@@ -7,11 +7,15 @@ namespace ExperienceAndClasses
 {
     public class MyWorld : ModWorld
     {
-        public const double TIME_BETWEEN_REQUEST_MSEC = 500;
-        public const double TIME_BETWEEN_AUTH_CODE_MSEC = 120*1000;
+        public const double TIME_BETWEEN_REQUEST_MSEC = 1*1000;
+        //public const double TIME_BETWEEN_AUTH_CODE_MSEC = 120*1000;
+        public const double TIME_BETWEEN_SYNC_SETTINGS = 10*1000;
 
         public static DateTime timeLastRequests = DateTime.MinValue;
-        public static DateTime timeLastAuthCode = DateTime.MinValue;
+        //public static DateTime timeLastAuthCode = DateTime.MinValue;
+        public static DateTime timeLastSyncSettings = DateTime.MinValue;
+
+        public static bool codeWritten = false;
 
         public override TagCompound Save()
         {
@@ -20,7 +24,7 @@ namespace ExperienceAndClasses
                 {"require_auth", ExperienceAndClasses.requireAuth},
                 {"global_exp_modifier", ExperienceAndClasses.globalExpModifier},
                 {"global_ignore_caps", ExperienceAndClasses.globalIgnoreCaps},
-                {"global_damage_reduction", ExperienceAndClasses.globalDamageReduction},
+                {"global_damage_reduction", ExperienceAndClasses.globalClassDamageReduction},
                 {"global_level_cap", ExperienceAndClasses.globalLevelCap},
                 {"traceMap", ExperienceAndClasses.traceMap},
             };
@@ -30,33 +34,50 @@ namespace ExperienceAndClasses
         {
             ExperienceAndClasses.authCode = Commons.TryGet<double>(tag, "AUTH_CODE", -1);
             ExperienceAndClasses.requireAuth = Commons.TryGet<bool>(tag, "require_auth", true);
+            ExperienceAndClasses.traceMap = Commons.TryGet<bool>(tag, "traceMap", false);
             ExperienceAndClasses.globalExpModifier = Commons.TryGet<double>(tag, "global_exp_modifier", ExperienceAndClasses.DEFAULT_EXPERIENCE_MODIFIER);
             ExperienceAndClasses.globalIgnoreCaps = Commons.TryGet<bool>(tag, "global_ignore_caps", ExperienceAndClasses.DEFAULT_IGNORE_CAPS);
-            ExperienceAndClasses.globalDamageReduction = Commons.TryGet<int>(tag, "global_damage_reduction", ExperienceAndClasses.DEFAULT_DAMAGE_REDUCTION);
+            ExperienceAndClasses.globalClassDamageReduction = Commons.TryGet<int>(tag, "global_damage_reduction", ExperienceAndClasses.DEFAULT_DAMAGE_REDUCTION);
             ExperienceAndClasses.globalLevelCap = Commons.TryGet<int>(tag, "global_level_cap", ExperienceAndClasses.DEFAULT_LEVEL_CAP);
-            ExperienceAndClasses.traceMap = Commons.TryGet<bool>(tag, "traceMap", false);
+
+            //create AUTH_CODE if it doesn't exist yet (first time map is run)
+            if (ExperienceAndClasses.authCode == -1) ExperienceAndClasses.authCode = Main.rand.Next(1000) + ((Main.rand.Next(8) + 1) * 1000) + ((Main.rand.Next(8) + 1) * 10000) + ((Main.rand.Next(8) + 1) * 100000);
         }
 
         public override void PostUpdate()
         {
+            if (!codeWritten && Main.ActivePlayersCount>0)
+            {
+                Console.WriteLine("Experience&Classes expauth code: " + ExperienceAndClasses.authCode);
+                codeWritten = true;
+            }
+
             //initial client experience and settings sync
             if (DateTime.Now.AddMilliseconds(-TIME_BETWEEN_REQUEST_MSEC).CompareTo(timeLastRequests) > 0)
             {
                 timeLastRequests = DateTime.Now;
                 doClientRequests();
             }
-            //write auth code to console
-            else if (DateTime.Now.AddMilliseconds(-TIME_BETWEEN_AUTH_CODE_MSEC).CompareTo(timeLastAuthCode) > 0)
+            ////write auth code to console
+            //else if (DateTime.Now.AddMilliseconds(-TIME_BETWEEN_AUTH_CODE_MSEC).CompareTo(timeLastAuthCode) > 0)
+            //{
+            //    //update time of write
+            //    timeLastAuthCode = DateTime.Now;
+
+            //    //create AUTH_CODE if it doesn't exist yet (first time map is run)
+            //    if (ExperienceAndClasses.authCode == -1) ExperienceAndClasses.authCode = Main.rand.Next(1000) + ((Main.rand.Next(8) + 1) * 1000) + ((Main.rand.Next(8) + 1) * 10000) + ((Main.rand.Next(8) + 1) * 100000);
+
+            //    //write
+            //    Console.WriteLine("Experience&Classes Auth Code: " + ExperienceAndClasses.authCode);
+            //    //else Console.WriteLine("WARNING: Require Auth mode is disabled. To enable, enter singleplayer and type /expnoauth.");
+            //}
+            else if (DateTime.Now.AddMilliseconds(-TIME_BETWEEN_SYNC_SETTINGS).CompareTo(timeLastSyncSettings) > 0)
             {
                 //update time of write
-                timeLastAuthCode = DateTime.Now;
+                timeLastSyncSettings = DateTime.Now;
 
-                //create AUTH_CODE if it doesn't exist yet (first time map is run)
-                if (ExperienceAndClasses.authCode == -1) ExperienceAndClasses.authCode = Main.rand.Next(1000) + ((Main.rand.Next(8) + 1) * 1000) + ((Main.rand.Next(8) + 1) * 10000) + ((Main.rand.Next(8) + 1) * 100000);
-
-                //write
-                if (ExperienceAndClasses.requireAuth) Console.WriteLine("Experience&Classes Auth Code: " + ExperienceAndClasses.authCode);
-                //else Console.WriteLine("WARNING: Require Auth mode is disabled. To enable, enter singleplayer and type /expnoauth.");
+                //send latest settings
+                Methods.PacketSender.ServerUpdateSettings(mod);
             }
         }
 
@@ -76,11 +97,8 @@ namespace ExperienceAndClasses
                     myPlayer = Main.player[i].GetModPlayer<MyPlayer>(mod);
                     if (myPlayer.GetExp() == -1)// && target_time.CompareTo(time_last_player_request[i])>0)
                     {
-                        //request experience from player
-                        Methods.PacketSender.ServerRequestExperience(mod, i);
-
-                        //also share class caps status to ensure that token tooltips are correct
-                        Methods.PacketSender.ServerToggleClassCap(mod, ExperienceAndClasses.globalIgnoreCaps);
+                        //Server's request to new player (includes map settings)
+                        Methods.PacketSender.ServerNewPlayerSync(mod, i);
                     }
                 }
             }

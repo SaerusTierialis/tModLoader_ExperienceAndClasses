@@ -30,25 +30,6 @@ namespace ExperienceAndClasses.Methods
             }
         }
 
-
-        /// <summary>
-        /// Command to check experience rate (global if multiplayer).
-        /// </summary>
-        /// <param name="mod"></param>
-        public static void CommandExpRate(Mod mod)
-        {
-            if (Main.netMode == 0)
-            {
-                Main.NewText("Your current exprate is " + (Main.LocalPlayer.GetModPlayer<MyPlayer>(mod).experienceModifier * 100) + "%.");
-            }
-            else if (Main.netMode == 1)
-            {
-                Methods.PacketSender.ClientAsksExpRate(mod);
-                Main.NewText("Request for exprate has been sent to the server.");
-            }
-        }
-
-
         /// <summary>
         /// Command to set experience rate (auth and global if multiplayer).
         /// </summary>
@@ -60,13 +41,13 @@ namespace ExperienceAndClasses.Methods
             MyPlayer myPlayer = Main.LocalPlayer.GetModPlayer<MyPlayer>(mod);
             if (Main.netMode == 0)
             {
-                myPlayer.experienceModifier = rate;
-                Main.NewText("The new exprate is " + (myPlayer.experienceModifier * 100) + "%.");
+                ExperienceAndClasses.globalExpModifier = rate;
+                Main.NewText("The new exprate is " + (ExperienceAndClasses.globalExpModifier * 100) + "%.");
             }
             else if (Main.netMode == 1)
             {
-                Methods.PacketSender.ClientRequestExpRate(mod, rate, text);
-                Main.NewTextMultiline("Request that exprate be set to " + (rate * 100) + "% has been sent to the server." +
+                PacketSender.ClientRequestExpRate(mod, rate, text);
+                Main.NewTextMultiline("Request that experience rate be set to " + (rate * 100) + "% has been sent to the server." +
                                     "\nIf you are authorized, the change should occur shortly. Use /expauth [code]" +
                                     "\nto become authorized. The code is displayed in the server console.");
             }
@@ -84,8 +65,8 @@ namespace ExperienceAndClasses.Methods
             MyPlayer myPlayer = player.GetModPlayer<MyPlayer>(mod);
             if (Main.netMode == 0)
             {
-                myPlayer.ignoreCaps = !myPlayer.ignoreCaps;
-                if (myPlayer.ignoreCaps)
+                ExperienceAndClasses.globalIgnoreCaps = !ExperienceAndClasses.globalIgnoreCaps;
+                if (ExperienceAndClasses.globalIgnoreCaps)
                 {
                     Main.NewText("Class bonus caps disabled.");
                 }
@@ -96,7 +77,7 @@ namespace ExperienceAndClasses.Methods
             }
             else if (Main.netMode == 1)
             {
-                Methods.PacketSender.ClientRequestToggleClassCap(mod, !ExperienceAndClasses.globalIgnoreCaps, text);
+                PacketSender.ClientRequestIgnoreCaps(mod, !ExperienceAndClasses.globalIgnoreCaps, text);
                 Main.NewTextMultiline("Request to toggle the class caps feature has been sent to the server." +
                                     "\nIf you are authorized, the change should occur shortly. Use /expauth [code]" +
                                     "\nto become authorized. The code is displayed in the server console.");
@@ -112,111 +93,193 @@ namespace ExperienceAndClasses.Methods
         public static void CommandAuth(Mod mod, double code)//code -1 to check auth
         {
             if (Main.netMode != 1) return;
-            Methods.PacketSender.ClientTryAuth(mod, code);
+            PacketSender.ClientTryAuth(mod, code);
             Main.NewTextMultiline("Request to authenticate has been sent to the server." +
                                 "\nIf successful, you will receive a response shortly.");
         }
 
 
         /// <summary>
-        /// Command to set current character's level cap (request if multiplayer).
+        /// Command to set level cap (request if multiplayer)
         /// </summary>
         /// <param name="mod"></param>
         /// <param name="level"></param>
-        public static void CommandLvlCap(Mod mod, int level)
+        public static void CommandLvlCap(Mod mod, int level, string text)
         {
-            if (level < -1 || level == 0 || level > ExperienceAndClasses.MAX_LEVEL) return;
+            if (level > ExperienceAndClasses.MAX_LEVEL)
+            {
+                level = ExperienceAndClasses.MAX_LEVEL;
+            }
 
             Player player = Main.LocalPlayer;
             MyPlayer myPlayer = player.GetModPlayer<MyPlayer>(mod);
             if (Main.netMode == 0)
             {
-                int priorLevel = Methods.Experience.GetLevel(myPlayer.GetExp());
-                myPlayer.explvlcap = level;
-                myPlayer.LimitExp();
-                myPlayer.LevelUp(priorLevel);
-                (mod as ExperienceAndClasses).myUI.updateValue(myPlayer.GetExp());
-                if (level == -1) Main.NewText("Level cap disabled.");
-                else Main.NewText("Level cap set to " + myPlayer.explvlcap + ".");
+                int priorLevel = Experience.GetLevel(myPlayer.GetExp());
+                ExperienceAndClasses.globalLevelCap = level;
+                if (ExperienceAndClasses.globalLevelCap <= 0)
+                {
+                    Main.NewText("Level cap disabled.");
+                }
+                else
+                {
+                    Main.NewText("Level cap set to " + ExperienceAndClasses.globalLevelCap + ".");
+                }
             }
             else if (Main.netMode == 1)
             {
-                Methods.PacketSender.ClientUpdateLvlCap(mod, level);
-                Main.NewText("Request to change level cap to " + level + " has been sent to the server.");
+                PacketSender.ClientRequestLevelCap(mod, level, text);
+                Main.NewTextMultiline("Request to set level cap to " + level + " has been sent to the server." +
+                                    "\nIf you are authorized, the change should occur shortly. Use /expauth [code]" +
+                                    "\nto become authorized. The code is displayed in the server console.");
             }
         }
 
 
         /// <summary>
-        /// Command to set current character's class damage reduction (request if multiplayer).
+        /// Command to set class damage reduction (request if multiplayer)
         /// </summary>
         /// <param name="mod"></param>
         /// <param name="damageReductionPercent"></param>
-        public static void CommandDmgRed(Mod mod, int damageReductionPercent)
+        public static void CommandDmgRed(Mod mod, int damageReductionPercent, string text)
         {
-            if (damageReductionPercent < -1 || damageReductionPercent > 100) return;
+            if (damageReductionPercent <= 0)
+            {
+                damageReductionPercent = 0;
+            }
+            else if (damageReductionPercent > 100)
+            {
+                damageReductionPercent = 100; ;
+            }
 
             Player player = Main.LocalPlayer;
             MyPlayer myPlayer = player.GetModPlayer<MyPlayer>(mod);
             if (Main.netMode == 0)
             {
-                myPlayer.expdmgred = damageReductionPercent;
-                if (damageReductionPercent == -1) Main.NewText("Damage reduction disabled.");
-                else Main.NewText("Damage reduction set to " + myPlayer.expdmgred + ".");
+                ExperienceAndClasses.globalClassDamageReduction = damageReductionPercent;
+                if (damageReductionPercent <= 0)
+                {
+                    Main.NewText("Damage reduction disabled.");
+                }
+                else
+                {
+                    Main.NewText("Damage reduction set to " + ExperienceAndClasses.globalClassDamageReduction + ".");
+                }
             }
             else if (Main.netMode == 1)
             {
-                Methods.PacketSender.ClientUpdateDmgRed(mod, damageReductionPercent);
-                Main.NewText("Request to change damage reduction to " + damageReductionPercent + "% has been sent to the server.");
+                PacketSender.ClientRequestDamageReduction(mod, damageReductionPercent, text);
+                Main.NewTextMultiline("Request to set class damage reduction to " + damageReductionPercent + " has been sent to the server." +
+                                    "\nIf you are authorized, the change should occur shortly. Use /expauth [code]" +
+                                    "\nto become authorized. The code is displayed in the server console.");
             }
         }
 
         /// <summary>
-        /// Command for toggling auth requirement of a map while in singleplayer.
+        /// Command for toggling auth requirement of a map
         /// </summary>
-        public static void CommandRequireAuth()
+        public static void CommandRequireAuth(Mod mod, string text)
         {
-            if (Main.netMode != 0)
-            {
-                Main.NewText("This command functions only in singleplayer mode.");
-            }
-            else
+            if (Main.netMode == 0)
             {
                 ExperienceAndClasses.requireAuth = !ExperienceAndClasses.requireAuth;
-                if (ExperienceAndClasses.requireAuth) Main.NewText("Require Auth has been enabled. mod map will now require auth in multiplayer mode.");
-                else Main.NewText("Require Auth has been disabled. mod map will no longer require auth in multiplayer mode.");
-            }
-        }
-
-        /// <summary>
-        /// Command for showing the map's auth code in singleplayer.
-        /// </summary>
-        public static void CommandShowAuthCode()
-        {
-            if (Main.netMode != 0)
-            {
-                Main.NewText("This command functions only in singleplayer mode.");
+                if (ExperienceAndClasses.requireAuth)
+                    Main.NewText("Require expauth has been enabled. This map will now require expauth in multiplayer mode.");
+                else
+                    Main.NewText("Require expauth has been disabled. This map will no longer require expauth in multiplayer mode.");
             }
             else
             {
-                Main.NewText("This map's auth code is " + ExperienceAndClasses.authCode);
+                PacketSender.ClientRequestNoAuth(mod, text);
+                Main.NewTextMultiline("Request to toggle noauth mode has been sent to the server." +
+                                    "\nIf you are authorized, the change should occur shortly. Use /expauth [code]" +
+                                    "\nto become authorized. The code is displayed in the server console.");
             }
         }
 
         /// <summary>
-        /// Command for setting teh map's auth code in singleplayer.
+        /// Command for toggling map trace
+        /// </summary>
+        /// <param name="mod"></param>
+        /// <param name="text"></param>
+        public static void CommandMapTrace(Mod mod, string text)
+        {
+            if (Main.netMode == 0)
+            {
+                ExperienceAndClasses.traceMap = !ExperienceAndClasses.traceMap;
+                if (ExperienceAndClasses.traceMap)
+                    Main.NewText("Map trace is enabled.");
+                else
+                    Main.NewText("Map trace is disabled");
+            }
+            else
+            {
+                PacketSender.ClientRequestMapTrace(mod, text);
+                Main.NewTextMultiline("Request to toggle map trace has been sent to the server." +
+                                    "\nIf you are authorized, the change should occur shortly. Use /expauth [code]" +
+                                    "\nto become authorized. The code is displayed in the server console.");
+            }
+        }
+
+        public static void CommandDisplaySettings()
+        {
+            string lvlcap, dmgred;
+
+            if (ExperienceAndClasses.globalLevelCap > 0)
+            {
+                lvlcap = ExperienceAndClasses.globalLevelCap.ToString();
+            }
+            else
+            {
+                lvlcap = "disabled";
+            }
+
+            if (ExperienceAndClasses.globalClassDamageReduction > 0)
+            {
+                dmgred = ExperienceAndClasses.globalClassDamageReduction.ToString() + "%";
+            }
+            else
+            {
+                dmgred = "disabled";
+            }
+
+            Main.NewTextMultiline("Require Authorization: " + ExperienceAndClasses.requireAuth + "\nExperience Rate: " + (ExperienceAndClasses.globalExpModifier * 100) +
+                        "%\nIgnore Class Caps: " + ExperienceAndClasses.globalIgnoreCaps + "\nLevel Cap: " + lvlcap + "\nClass Damage Reduction: " +
+                        dmgred, false, ExperienceAndClasses.MESSAGE_COLOUR_YELLOW);
+        }
+
+        /// <summary>
+        /// Command for showing the map's auth code in singleplayer
+        /// </summary>
+        public static void CommandShowAuthCode(Mod mod)
+        {
+            if (Main.netMode == 0)
+            {
+                Main.NewText("This map's expauth code is " + ExperienceAndClasses.authCode);
+            }
+            else
+            {
+                Main.NewText("The expauth code is only visible in the console while hosting multiplayer or by using this command in singleplayer mode.", ExperienceAndClasses.MESSAGE_COLOUR_RED);
+            }
+        }
+
+        /// <summary>
+        /// Command for setting the map's auth code (in multiplayer, expauth is always needed)
         /// </summary>
         /// <param name="newCode"></param>
-        public static void CommandSetAuthCode(double newCode)
+        public static void CommandSetAuthCode(Mod mod, double newCode, string text)
         {
-            if (Main.netMode != 0)
-            {
-                Main.NewText("This command functions only in singleplayer mode.");
-            }
-            else
+            if (Main.netMode == 0)
             {
                 ExperienceAndClasses.authCode = newCode;
                 Main.NewText("This map's auth code is now " + ExperienceAndClasses.authCode);
+            }
+            else
+            {
+                PacketSender.ClientRequestSetAuthCode(mod, newCode, text);
+                Main.NewTextMultiline("Request to set expauth code to " + newCode + " has been sent to the server." +
+                                    "\nIf you are authorized, the change should occur shortly. Use /expauth [code]" +
+                                    "\nto become authorized. The code is displayed in the server console.");
             }
         }
     }

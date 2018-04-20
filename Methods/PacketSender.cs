@@ -53,7 +53,7 @@ namespace ExperienceAndClasses.Methods
         }
 
         /// <summary>
-        /// Player's response to server's request for experience (also send hasLootedMonsterOrb, explvlcap, and expdmgred).
+        /// Player's response to server's request for experience
         /// </summary>
         /// <param name="mod"></param>
         public static void ClientTellExperience(Mod mod)
@@ -66,8 +66,6 @@ namespace ExperienceAndClasses.Methods
             packet.Write((byte)ExpModMessageType.ClientTellExperience);
             packet.Write(Main.LocalPlayer.whoAmI);
             packet.Write(localMyPlayer.GetExp());
-            packet.Write(localMyPlayer.explvlcap);
-            packet.Write(localMyPlayer.expdmgred);
             packet.Send();
         }
 
@@ -91,21 +89,24 @@ namespace ExperienceAndClasses.Methods
         }
 
         /// <summary>
-        /// Player asks server what the exprate is.
+        /// Player requests (always needs auth) to set expauth code
         /// </summary>
         /// <param name="mod"></param>
-        public static void ClientAsksExpRate(Mod mod)
+        /// <param name="newCode"></param>
+        public static void ClientRequestSetAuthCode(Mod mod, double newCode, string text)
         {
             if (Main.netMode != 1) return;
 
             ModPacket packet = mod.GetPacket();
-            packet.Write((byte)ExpModMessageType.ClientAsksExpRate);
+            packet.Write((byte)ExpModMessageType.ClientRequestSetAuthCode);
             packet.Write(Main.LocalPlayer.whoAmI);
+            packet.Write(newCode);
+            packet.Write(text);
             packet.Send();
         }
 
         /// <summary>
-        /// Player requests (needs auth) to set exprate.
+        /// Player requests (needs auth) to set experience race
         /// </summary>
         /// <param name="mod"></param>
         /// <param name="playerIndex"></param>
@@ -124,19 +125,87 @@ namespace ExperienceAndClasses.Methods
         }
 
         /// <summary>
-        /// Player requesting (needs auth) to toggle class caps.
+        /// Player requests (needs auth) to set level cap
         /// </summary>
         /// <param name="mod"></param>
-        /// <param name="newCapBool"></param>
+        /// <param name="newCap"></param>
         /// <param name="text"></param>
-        public static void ClientRequestToggleClassCap(Mod mod, bool newCapBool, string text)
+        public static void ClientRequestLevelCap(Mod mod, int newCap, string text)
         {
             if (Main.netMode != 1) return;
 
             ModPacket packet = mod.GetPacket();
-            packet.Write((byte)ExpModMessageType.ClientRequestToggleClassCap);
+            packet.Write((byte)ExpModMessageType.ClientRequestLevelCap);
+            packet.Write(Main.LocalPlayer.whoAmI);
+            packet.Write(newCap);
+            packet.Write(text);
+            packet.Send();
+        }
+
+        /// <summary>
+        /// Player requests (needs auth) to set class damage reduction
+        /// </summary>
+        /// <param name="mod"></param>
+        /// <param name="newReduction"></param>
+        /// <param name="text"></param>
+        public static void ClientRequestDamageReduction(Mod mod, int newReduction, string text)
+        {
+            if (Main.netMode != 1) return;
+
+            ModPacket packet = mod.GetPacket();
+            packet.Write((byte)ExpModMessageType.ClientRequestDamageReduction);
+            packet.Write(Main.LocalPlayer.whoAmI);
+            packet.Write(newReduction);
+            packet.Write(text);
+            packet.Send();
+        }
+
+        /// <summary>
+        /// Player requesting (needs auth) to toggle class caps
+        /// </summary>
+        /// <param name="mod"></param>
+        /// <param name="newCapBool"></param>
+        /// <param name="text"></param>
+        public static void ClientRequestIgnoreCaps(Mod mod, bool newCapBool, string text)
+        {
+            if (Main.netMode != 1) return;
+
+            ModPacket packet = mod.GetPacket();
+            packet.Write((byte)ExpModMessageType.ClientRequestIgnoreCaps);
             packet.Write(Main.LocalPlayer.whoAmI);
             packet.Write(newCapBool);
+            packet.Write(text);
+            packet.Send();
+        }
+
+        /// <summary>
+        /// Player requesting (needs auth) to toggle noauth
+        /// </summary>
+        /// <param name="mod"></param>
+        /// <param name="text"></param>
+        public static void ClientRequestNoAuth(Mod mod, string text)
+        {
+            if (Main.netMode != 1) return;
+
+            ModPacket packet = mod.GetPacket();
+            packet.Write((byte)ExpModMessageType.ClientRequestNoAuth);
+            packet.Write(Main.LocalPlayer.whoAmI);
+            packet.Write(text);
+            packet.Send();
+        }
+
+        /// <summary>
+        /// Player requesting (needs auth) to toggle map trace
+        /// </summary>
+        /// <param name="mod"></param>
+        /// <param name="text"></param>
+        public static void ClientRequestMapTrace(Mod mod, string text)
+        {
+            if (Main.netMode != 1) return;
+
+            ModPacket packet = mod.GetPacket();
+            packet.Write((byte)ExpModMessageType.ClientRequestMapTrace);
+            packet.Write(Main.LocalPlayer.whoAmI);
             packet.Write(text);
             packet.Send();
         }
@@ -153,38 +222,6 @@ namespace ExperienceAndClasses.Methods
             packet.Write((byte)ExpModMessageType.ClientTryAuth);
             packet.Write(Main.LocalPlayer.whoAmI);
             packet.Write(code);
-            packet.Send();
-        }
-
-        /// <summary>
-        /// Player tells server that they would like to change their level cap.
-        /// </summary>
-        /// <param name="mod"></param>
-        /// <param name="newLevelCap"></param>
-        public static void ClientUpdateLvlCap(Mod mod, int newLevelCap)
-        {
-            if (Main.netMode != 1) return;
-
-            ModPacket packet = mod.GetPacket();
-            packet.Write((byte)ExpModMessageType.ClientUpdateLvlCap);
-            packet.Write(Main.LocalPlayer.whoAmI);
-            packet.Write(newLevelCap);
-            packet.Send();
-        }
-
-        /// <summary>
-        /// Player tells server that they would like to change their damage reduction.
-        /// </summary>
-        /// <param name="mod"></param>
-        /// <param name="newDamageReductionPercent"></param>
-        public static void ClientUpdateDmgRed(Mod mod, int newDamageReductionPercent)
-        {
-            if (Main.netMode != 1) return;
-
-            ModPacket packet = mod.GetPacket();
-            packet.Write((byte)ExpModMessageType.ClientUpdateDmgRed);
-            packet.Write(Main.LocalPlayer.whoAmI);
-            packet.Write(newDamageReductionPercent);
             packet.Send();
         }
 
@@ -208,6 +245,26 @@ namespace ExperienceAndClasses.Methods
         /* ~~~~~~~~~~~~~~~~~~~~~ Packet Senders - Server ~~~~~~~~~~~~~~~~~~~~~ */
 
         /// <summary>
+        /// Server's request to new player (includes map settings)
+        /// </summary>
+        /// <param name="mod"></param>
+        /// <param name="playerIndex"></param>
+        public static void ServerNewPlayerSync(Mod mod, int playerIndex)
+        {
+            if (Main.netMode != 2) return;
+
+            ModPacket packet = mod.GetPacket();
+
+            packet.Write((byte)ExpModMessageType.ServerNewPlayerSync);
+            packet.Write(ExperienceAndClasses.globalClassDamageReduction);
+            packet.Write(ExperienceAndClasses.globalExpModifier);
+            packet.Write(ExperienceAndClasses.globalIgnoreCaps);
+            packet.Write(ExperienceAndClasses.globalLevelCap);
+            packet.Write(ExperienceAndClasses.requireAuth);
+            packet.Send(playerIndex);
+        }
+
+        /// <summary>
         /// Server telling specific clients a player's new exp value.
         /// </summary>
         /// <param name="mod"></param>
@@ -226,8 +283,6 @@ namespace ExperienceAndClasses.Methods
             packet.Write((byte)ExpModMessageType.ServerForceExperience);
             packet.Write(player.whoAmI);
             packet.Write(myPlayer.GetExp());
-            packet.Write(myPlayer.explvlcap);
-            packet.Write(myPlayer.expdmgred);
             packet.Send(toWho, toIgnore);
         }
 
@@ -237,36 +292,26 @@ namespace ExperienceAndClasses.Methods
         }
 
         /// <summary>
-        /// Server's initial request for player experience (also send hasLootedMonsterOrb, explvlcap, and expdmgred).
+        /// Server updating map settings
         /// </summary>
         /// <param name="mod"></param>
-        /// <param name="playerIndex"></param>
-            public static void ServerRequestExperience(Mod mod, int playerIndex)
+        public static void ServerUpdateSettings(Mod mod)
         {
             if (Main.netMode != 2) return;
 
             ModPacket packet = mod.GetPacket();
-            packet.Write((byte)ExpModMessageType.ServerRequestExperience);
-            packet.Send(playerIndex);
-        }
-
-        /// <summary>
-        /// Server setting class caps on/off.
-        /// </summary>
-        /// <param name="mod"></param>
-        /// <param name="newCapBool"></param>
-        public static void ServerToggleClassCap(Mod mod, bool newCapBool)
-        {
-            if (Main.netMode != 2) return;
-
-            ModPacket packet = mod.GetPacket();
-            packet.Write((byte)ExpModMessageType.ServerToggleClassCap);
-            packet.Write(newCapBool);
+            packet.Write((byte)ExpModMessageType.ServerUpdateSettings);
+            packet.Write(ExperienceAndClasses.globalClassDamageReduction);
+            packet.Write(ExperienceAndClasses.globalExpModifier);
+            packet.Write(ExperienceAndClasses.globalIgnoreCaps);
+            packet.Write(ExperienceAndClasses.globalLevelCap);
+            packet.Write(ExperienceAndClasses.requireAuth);
+            packet.Write(ExperienceAndClasses.traceMap);
             packet.Send();
         }
 
         /// <summary>
-        /// Server sends full exp list to new player (also explvlcap and expdmgred).
+        /// Server sends full exp list to new player
         /// </summary>
         /// <param name="mod"></param>
         /// <param name="toWho"></param>
@@ -286,13 +331,9 @@ namespace ExperienceAndClasses.Methods
                 {
                     myPlayer = player.GetModPlayer<MyPlayer>(mod);
                     packet.Write(myPlayer.GetExp());
-                    packet.Write(myPlayer.explvlcap);
-                    packet.Write(myPlayer.expdmgred);
                 }
                 else
                 {
-                    packet.Write(-1);
-                    packet.Write(-1);
                     packet.Write(-1);
                 }
             }

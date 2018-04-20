@@ -69,13 +69,14 @@ namespace ExperienceAndClasses.NPCs
                 }
                 else if (Main.netMode == 2)
                 {
-                    NetworkText text = NetworkText.FromLiteral("A Boss Orb has dropped for you!");
+                    NetworkText textBoss = NetworkText.FromLiteral("A Boss Orb has dropped for you!");
+                    NetworkText textMonster = NetworkText.FromLiteral("An Ascension Orb has dropped for you!");
                     for (int playerIndex = 0; playerIndex < 255; playerIndex++)
                     {
                         if (Main.player[playerIndex].active && npc.playerInteraction[playerIndex])
                         {
-                            if (droppedBossOrb) NetMessage.SendChatMessageToClient(text, ExperienceAndClasses.MESSAGE_COLOUR_BOSS_ORB, playerIndex);
-                            if (droppedMonsterOrb) NetMessage.SendChatMessageToClient(text, ExperienceAndClasses.MESSAGE_COLOUR_ASCENSION_ORB, playerIndex);
+                            if (droppedBossOrb) NetMessage.SendChatMessageToClient(textBoss, ExperienceAndClasses.MESSAGE_COLOUR_BOSS_ORB, playerIndex);
+                            if (droppedMonsterOrb) NetMessage.SendChatMessageToClient(textMonster, ExperienceAndClasses.MESSAGE_COLOUR_ASCENSION_ORB, playerIndex);
                         }
                     }
                 }

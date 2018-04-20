@@ -115,7 +115,6 @@ namespace ExperienceAndClasses
             {
                 experienceNeedsUpdate = true;
                 timeTickUpdate = DateTime.Now.Ticks + ExperienceAndClasses.TIME_TICKS_SYNC_EXP_AFTER_KILL;
-                //Methods.PacketSender.ServerForceExperience(mod, player);
             }
             else if (Main.netMode==0)
             {
@@ -241,13 +240,20 @@ namespace ExperienceAndClasses
                 //settings
                 if (Main.netMode == 0)
                 {
-                    Main.NewText("Require Auth: " + ExperienceAndClasses.requireAuth);
-                    Main.NewText("Experience Rate: " + (ExperienceAndClasses.globalExpModifier * 100)+"%");
-                    Main.NewText("Ignore Class Caps: " + ExperienceAndClasses.globalIgnoreCaps);
-                    if (ExperienceAndClasses.globalLevelCap > 0) Main.NewText("Level Cap: " + ExperienceAndClasses.globalLevelCap);
-                        else Main.NewText("Level Cap: disabled");
-                    if (ExperienceAndClasses.globalDamageReduction > 0) Main.NewText("Reduce Class Damage: " + ExperienceAndClasses.globalDamageReduction + "%");
-                        else Main.NewText("Reduce Class Damage: disabled");
+                    //Main.NewText("Require Auth: " + ExperienceAndClasses.requireAuth);
+                    //Main.NewText("Experience Rate: " + (ExperienceAndClasses.globalExpModifier * 100)+"%");
+                    //Main.NewText("Ignore Class Caps: " + ExperienceAndClasses.globalIgnoreCaps);
+
+                    //if (ExperienceAndClasses.globalLevelCap > 0)
+                    //    Main.NewText("Level Cap: " + ExperienceAndClasses.globalLevelCap);
+                    // else
+                    //    Main.NewText("Level Cap: disabled");
+
+                    //if (ExperienceAndClasses.globalClassDamageReduction > 0)
+                    //    Main.NewText("Reduce Class Damage: " + ExperienceAndClasses.globalClassDamageReduction + "%");
+                    //else
+                    //    Main.NewText("Reduce Class Damage: disabled");
+                    Methods.ChatCommands.CommandDisplaySettings();
                 }
             }
 

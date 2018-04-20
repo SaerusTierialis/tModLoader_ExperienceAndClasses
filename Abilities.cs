@@ -13,7 +13,7 @@ namespace ExperienceAndClasses
         public const int RETURN_FAIL_MANA = -3;
         public const int RETURN_FAIL_COOLDOWN = -4;
         public const int RETURN_FAIL_REQUIREMENTS = -5;
-        public const int RETURN_FAIL_REDUNDANT = -6;
+        public const int RETURN_FAIL_EXTERNAL = -6;
 
         public const string MESSAGE_FAIL_MANA = "insufficient mana!";
         public const string MESSAGE_FAIL_COOLDOWN = "not yet ready!";
@@ -119,6 +119,9 @@ namespace ExperienceAndClasses
 
             /* ~~~~~~~~~~~~ Generic Checks ~~~~~~~~~~~~ */
 
+            //don't allow server calls or calls from other clients
+            if (Main.netMode == 2 || !Main.LocalPlayer.Equals(player)) return RETURN_FAIL_EXTERNAL;
+
             //check for invalid statuses
             if (player.frozen || player.dead) return RETURN_FAIL_STATUS;
 
@@ -168,7 +171,7 @@ namespace ExperienceAndClasses
         /// Applies effect in radius self. Can apply buffs, healing, or damage.
         /// </summary>
         public static void RadiusEffect(Vector2 center, bool affectSelf, bool affectPlayerFriendly, bool affectNPCFriendly, bool affectPlayerHostile, bool affectNPCHostile, float radius = 1000f,
-            float healAmount = 0, float selfHealMultiplier = 1f, float manaAmount = 0, float selfManaMultiplier = 1f, float damageAmount = 0, int buffID = -1, int buffDurationTicks = 0)
+            float healAmount = 0, float selfHealMultiplier = 1f, float manaAmount = 0, float selfManaMultiplier = 1f, float damageAmount = 0, int buffID = -1, int buffDurationTicks = 0, bool requireLineOfSight = false)
         {
             //return if there is nothing to do
             if (healAmount == 0 && damageAmount == 0 && buffID == -1) return;
@@ -306,7 +309,7 @@ namespace ExperienceAndClasses
                 {
                     player = Main.player[playerIndex];
 
-                    if (!Collision.CanHit(sourcePlayer.position, 0, 0, player.position, player.width, player.height))
+                    if (requireLineOfSight && !Collision.CanHit(sourcePlayer.position, 0, 0, player.position, player.width, player.height))
                         continue;
 
                     if (sourcePlayer.team != 0 && player.team == sourcePlayer.team)
@@ -337,7 +340,7 @@ namespace ExperienceAndClasses
                 {
                     npc = npcs[npc_index];
 
-                    if (!Collision.CanHit(sourcePlayer.position, 0, 0, npc.position, npc.width, npc.height))
+                    if (requireLineOfSight && !Collision.CanHit(sourcePlayer.position, 0, 0, npc.position, npc.width, npc.height))
                         continue;
 
                     if (npc.active && npc.Distance(center) < radius && npc.lifeMax > 5 && ((npc.friendly && affectNPCFriendly) || (!npc.friendly && affectNPCHostile)))
