@@ -7,77 +7,82 @@ namespace ExperienceAndClasses
 {
     public class MyWorld : ModWorld
     {
-        public const double TIME_BETWEEN_REQUEST_MSEC = 1*1000;
-        //public const double TIME_BETWEEN_AUTH_CODE_MSEC = 120*1000;
-        public const double TIME_BETWEEN_SYNC_SETTINGS = 10*1000;
-
+        public const double TIME_BETWEEN_REQUEST_MSEC = 1000;
         public static DateTime timeLastRequests = DateTime.MinValue;
-        //public static DateTime timeLastAuthCode = DateTime.MinValue;
-        public static DateTime timeLastSyncSettings = DateTime.MinValue;
 
-        public static bool codeWritten = false;
+        public const double TIME_BETWEEN_SYNC_EXP_CHANGES_MSEC = 500;
+        public static DateTime timeLastSyncExpChanges = DateTime.MinValue;
+
+        public const double TIME_BETWEEN_SYNC_MAP_SETTINGS_MSEC = 20 * 1000;
+        public static DateTime timeLastSyncMapSettings = DateTime.MinValue;
+
+        public const double TIME_BETWEEN_SYNC_EXP_ALL_MSEC = 20 * 1000;
+        public static DateTime timeLastSyncExpAll = DateTime.MinValue;
+
+        public static bool expmapAuthCodeWritten = false;
+
+        public static bool[] clientNeedsExpUpdate = new bool[256];
+        public static int clientNeedsExpUpdate_counter = 0;
+        public static int[] clientNeedsExpUpdate_indices = new int[256];
 
         public override TagCompound Save()
         {
             return new TagCompound {
-                {"AUTH_CODE", ExperienceAndClasses.authCode},
-                {"require_auth", ExperienceAndClasses.requireAuth},
-                {"global_exp_modifier", ExperienceAndClasses.globalExpModifier},
-                {"global_ignore_caps", ExperienceAndClasses.globalIgnoreCaps},
-                {"global_damage_reduction", ExperienceAndClasses.globalClassDamageReduction},
-                {"global_level_cap", ExperienceAndClasses.globalLevelCap},
-                {"traceMap", ExperienceAndClasses.traceMap},
+                {"AUTH_CODE", ExperienceAndClasses.mapAuthCode},
+                {"require_auth", ExperienceAndClasses.mapRequireAuth},
+                {"global_exp_modifier", ExperienceAndClasses.mapExpModifier},
+                {"global_ignore_caps", ExperienceAndClasses.mapIgnoreCaps},
+                {"global_damage_reduction", ExperienceAndClasses.mapClassDamageReduction},
+                {"global_level_cap", ExperienceAndClasses.mapLevelCap},
+                {"global_death_penalty", ExperienceAndClasses.mapDeathPenalty},
+                {"traceMap", ExperienceAndClasses.mapTrace},
             };
         }
 
         public override void Load(TagCompound tag)
         {
-            ExperienceAndClasses.authCode = Commons.TryGet<double>(tag, "AUTH_CODE", -1);
-            ExperienceAndClasses.requireAuth = Commons.TryGet<bool>(tag, "require_auth", true);
-            ExperienceAndClasses.traceMap = Commons.TryGet<bool>(tag, "traceMap", false);
-            ExperienceAndClasses.globalExpModifier = Commons.TryGet<double>(tag, "global_exp_modifier", ExperienceAndClasses.DEFAULT_EXPERIENCE_MODIFIER);
-            ExperienceAndClasses.globalIgnoreCaps = Commons.TryGet<bool>(tag, "global_ignore_caps", ExperienceAndClasses.DEFAULT_IGNORE_CAPS);
-            ExperienceAndClasses.globalClassDamageReduction = Commons.TryGet<int>(tag, "global_damage_reduction", ExperienceAndClasses.DEFAULT_DAMAGE_REDUCTION);
-            ExperienceAndClasses.globalLevelCap = Commons.TryGet<int>(tag, "global_level_cap", ExperienceAndClasses.DEFAULT_LEVEL_CAP);
+            ExperienceAndClasses.mapAuthCode = Commons.TryGet<double>(tag, "AUTH_CODE", -1);
+            ExperienceAndClasses.mapRequireAuth = Commons.TryGet<bool>(tag, "require_auth", true);
+            ExperienceAndClasses.mapTrace = Commons.TryGet<bool>(tag, "traceMap", false);
+            ExperienceAndClasses.mapExpModifier = Commons.TryGet<double>(tag, "global_exp_modifier", ExperienceAndClasses.DEFAULT_EXPERIENCE_MODIFIER);
+            ExperienceAndClasses.mapIgnoreCaps = Commons.TryGet<bool>(tag, "global_ignore_caps", ExperienceAndClasses.DEFAULT_IGNORE_CAPS);
+            ExperienceAndClasses.mapClassDamageReduction = Commons.TryGet<int>(tag, "global_damage_reduction", ExperienceAndClasses.DEFAULT_DAMAGE_REDUCTION);
+            ExperienceAndClasses.mapLevelCap = Commons.TryGet<int>(tag, "global_level_cap", ExperienceAndClasses.DEFAULT_LEVEL_CAP);
+            ExperienceAndClasses.mapDeathPenalty = Commons.TryGet<double>(tag, "global_death_penalty", ExperienceAndClasses.DEFAULT_DEATH_PENALTY);
 
             //create AUTH_CODE if it doesn't exist yet (first time map is run)
-            if (ExperienceAndClasses.authCode == -1) ExperienceAndClasses.authCode = Main.rand.Next(1000) + ((Main.rand.Next(8) + 1) * 1000) + ((Main.rand.Next(8) + 1) * 10000) + ((Main.rand.Next(8) + 1) * 100000);
+            if (ExperienceAndClasses.mapAuthCode == -1) ExperienceAndClasses.mapAuthCode = Main.rand.Next(1000) + ((Main.rand.Next(8) + 1) * 1000) + ((Main.rand.Next(8) + 1) * 10000) + ((Main.rand.Next(8) + 1) * 100000);
         }
 
         public override void PostUpdate()
         {
-            if (!codeWritten && Main.ActivePlayersCount>0)
+            if (!expmapAuthCodeWritten && Main.ActivePlayersCount>0)
             {
-                Console.WriteLine("Experience&Classes expauth code: " + ExperienceAndClasses.authCode);
-                codeWritten = true;
+                Console.WriteLine("Experience&Classes expauth code: " + ExperienceAndClasses.mapAuthCode);
+                expmapAuthCodeWritten = true;
             }
 
             //initial client experience and settings sync
-            if (DateTime.Now.AddMilliseconds(-TIME_BETWEEN_REQUEST_MSEC).CompareTo(timeLastRequests) > 0)
+            DateTime now = DateTime.Now;
+            if (now.AddMilliseconds(-TIME_BETWEEN_REQUEST_MSEC).CompareTo(timeLastRequests) > 0)
             {
-                timeLastRequests = DateTime.Now;
-                doClientRequests();
+                timeLastRequests = now;
+                SendClientFirstSyncs();
             }
-            ////write auth code to console
-            //else if (DateTime.Now.AddMilliseconds(-TIME_BETWEEN_AUTH_CODE_MSEC).CompareTo(timeLastAuthCode) > 0)
-            //{
-            //    //update time of write
-            //    timeLastAuthCode = DateTime.Now;
-
-            //    //create AUTH_CODE if it doesn't exist yet (first time map is run)
-            //    if (ExperienceAndClasses.authCode == -1) ExperienceAndClasses.authCode = Main.rand.Next(1000) + ((Main.rand.Next(8) + 1) * 1000) + ((Main.rand.Next(8) + 1) * 10000) + ((Main.rand.Next(8) + 1) * 100000);
-
-            //    //write
-            //    Console.WriteLine("Experience&Classes Auth Code: " + ExperienceAndClasses.authCode);
-            //    //else Console.WriteLine("WARNING: Require Auth mode is disabled. To enable, enter singleplayer and type /expnoauth.");
-            //}
-            else if (DateTime.Now.AddMilliseconds(-TIME_BETWEEN_SYNC_SETTINGS).CompareTo(timeLastSyncSettings) > 0)
+            else if (now.AddMilliseconds(-TIME_BETWEEN_SYNC_MAP_SETTINGS_MSEC).CompareTo(timeLastSyncMapSettings) > 0)
             {
-                //update time of write
-                timeLastSyncSettings = DateTime.Now;
-
-                //send latest settings
-                Methods.PacketSender.ServerUpdateSettings(mod);
+                timeLastSyncMapSettings = now;
+                Methods.PacketSender.ServerUpdateMapSettings(mod);
+            }
+            else if (now.AddMilliseconds(-TIME_BETWEEN_SYNC_EXP_CHANGES_MSEC).CompareTo(timeLastSyncExpChanges) > 0)
+            {
+                timeLastSyncExpChanges = now;
+                Methods.PacketSender.ServerSyncExp(mod);
+            }
+            else if (now.AddMilliseconds(-TIME_BETWEEN_SYNC_EXP_ALL_MSEC).CompareTo(timeLastSyncExpAll) > 0)
+            {
+                timeLastSyncExpAll = now;
+                Methods.PacketSender.ServerSyncExp(mod, true);
             }
         }
 
@@ -86,7 +91,7 @@ namespace ExperienceAndClasses
         /// Requests are repeated once every TIME_BETWEEN_REQUEST_MSEC until the response is received
         /// (indicated by experience values other than -1).
         /// </summary>
-        public void doClientRequests()
+        public void SendClientFirstSyncs()
         {
             MyPlayer myPlayer;
             //DateTime target_time = DateTime.Now.AddMilliseconds(-TIME_BETWEEN_REQUEST_MSEC);
@@ -100,6 +105,20 @@ namespace ExperienceAndClasses
                         //Server's request to new player (includes map settings)
                         Methods.PacketSender.ServerNewPlayerSync(mod, i);
                     }
+                }
+            }
+        }
+
+        public static void FlagAllForSyncExp()
+        {
+            clientNeedsExpUpdate_counter = 0;
+            for (int playerIndex = 0; playerIndex<255; playerIndex++)
+            {
+                if (Main.player[playerIndex].active)
+                {
+                    clientNeedsExpUpdate[playerIndex] = true;
+                    clientNeedsExpUpdate_indices[clientNeedsExpUpdate_counter] = playerIndex;
+                    clientNeedsExpUpdate_counter++;
                 }
             }
         }

@@ -23,14 +23,13 @@ namespace ExperienceAndClasses.Items
         public override void ModifyTooltips(List<TooltipLine> tooltips)
         {
             MyPlayer myLocalPlayer = Main.LocalPlayer.GetModPlayer<MyPlayer>(mod);
-            int numberClasses = myLocalPlayer.classTokensEquipped.Count;
 
             bool isEquipped = false;
             foreach (var i in myLocalPlayer.classTokensEquipped)
             {
                 if (i.Item2.Equals(name)) isEquipped = true;
             }
-            string desc2 = Helpers.ClassTokenEffects(mod, Main.LocalPlayer, this, name, false, myLocalPlayer, numberClasses, isEquipped);
+            string desc2 = Helpers.ClassTokenEffects(mod, Main.LocalPlayer, this, name, false, myLocalPlayer, isEquipped);
 
             if (desc2.Length > 0)
             {
@@ -43,7 +42,7 @@ namespace ExperienceAndClasses.Items
         public override void UpdateInventory(Player player)
         {
             //update description in inventory (remove current bonuses)
-            if (Main.LocalPlayer.Equals(player)) item.RebuildTooltip(); //Helpers.ClassTokenEffects(mod, Main.LocalPlayer, this, name, false, new MyPlayer());
+            if (Main.LocalPlayer.Equals(player)) item.RebuildTooltip();
             base.UpdateInventory(player);
         }
 
@@ -83,7 +82,6 @@ namespace ExperienceAndClasses.Items
         {
             MyPlayer myPlayer = player.GetModPlayer<MyPlayer>(mod);
 
-            //Helpers.ClassTokenEffects(mod, player, item, name, true);
             myPlayer.classTokensEquipped.Add(new Tuple<ModItem, string>(this, name));
 
             //track player's current set of abilities

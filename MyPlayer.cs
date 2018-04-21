@@ -19,9 +19,6 @@ namespace ExperienceAndClasses
         public bool auth = false;
         public bool traceChar = false;
 
-        public bool experienceNeedsUpdate = false;
-        private long timeTickUpdate = 0;
-
         public double experience = -1;
 
         //these are now map-specific
@@ -29,6 +26,9 @@ namespace ExperienceAndClasses
         //public int explvlcap = -1;
         //public int expdmgred = -1;
         //public bool ignoreCaps = false;
+
+        public long afkTime = 0;
+        public bool afk = false;
 
         public bool displayExp = false;
 
@@ -38,6 +38,9 @@ namespace ExperienceAndClasses
         public bool UITrans = false;
 
         public List<Tuple<ModItem, string>> classTokensEquipped;
+        public int numberClasses = 1;
+        public int effectiveLevel = 0;
+        public bool levelCapped = false;
 
         //active abilities
         public long[] abilityCooldowns = new long[Abilities.NUMBER_OF_IDs];
@@ -45,7 +48,6 @@ namespace ExperienceAndClasses
         public int currentAbilityPotentialsIndex = 0;
         public int[] currentAbilityIDs = Enumerable.Repeat(Abilities.ID_UNDEFINED, ExperienceAndClasses.MAXIMUM_NUMBER_OF_ABILITIES).ToArray();
         public int currentAbilityIndex = 0;
-        public int abilityLevel = 0;
         public int latestAbilityFail = Abilities.RETURN_FAIL_UNDEFINED;
         public Boolean showFailMessages = true;
 
@@ -110,12 +112,14 @@ namespace ExperienceAndClasses
             LimitExp();
             LevelUp(priorLevel);
 
-            //if server, tell client
-            if (Main.netMode == 2)
+            //if server, mark for update
+            if (Main.netMode == 2 && !MyWorld.clientNeedsExpUpdate[player.whoAmI])
             {
-                experienceNeedsUpdate = true;
-                timeTickUpdate = DateTime.Now.Ticks + ExperienceAndClasses.TIME_TICKS_SYNC_EXP_AFTER_KILL;
+                MyWorld.clientNeedsExpUpdate[player.whoAmI] = true;
+                MyWorld.clientNeedsExpUpdate_indices[MyWorld.clientNeedsExpUpdate_counter] = player.whoAmI;
+                MyWorld.clientNeedsExpUpdate_counter++;
             }
+            //if singleplayer, it's already done so display
             else if (Main.netMode==0)
             {
                 ExpMsg(experience - priorExp);
@@ -144,15 +148,25 @@ namespace ExperienceAndClasses
             if (Main.netMode == 1) return;
 
             int level = Methods.Experience.GetLevel(GetExp());
-            if (level>priorLevel)
+            if (level != priorLevel)
             {
-                if (Main.netMode == 0) Main.NewText("You have reached level " + level + "!");
-                    else NetMessage.BroadcastChatMessage( NetworkText.FromLiteral(player.name+" has reached level "+level+"!"), ExperienceAndClasses.MESSAGE_COLOUR_GREEN);
-            }
-            else if (level<priorLevel)
-            {
-                if (Main.netMode == 0) Main.NewText("You has fallen to level " + level + "!");
-                    else NetMessage.BroadcastChatMessage( NetworkText.FromLiteral(player.name + " has dropped to level " + level + "!"), ExperienceAndClasses.MESSAGE_COLOUR_RED);
+                //if server, full sync immediately
+                if (Main.netMode == 2) Methods.PacketSender.ServerSyncExp(mod, true);
+
+                if (level > priorLevel)
+                {
+                    if (Main.netMode == 0)
+                        Main.NewText("You have reached level " + level + "!");
+                    else
+                        NetMessage.BroadcastChatMessage(NetworkText.FromLiteral(player.name + " has reached level " + level + "!"), ExperienceAndClasses.MESSAGE_COLOUR_GREEN);
+                }
+                else if (level < priorLevel)
+                {
+                    if (Main.netMode == 0)
+                        Main.NewText("You has fallen to level " + level + "!");
+                    else
+                        NetMessage.BroadcastChatMessage(NetworkText.FromLiteral(player.name + " has dropped to level " + level + "!"), ExperienceAndClasses.MESSAGE_COLOUR_RED);
+                }
             }
         }
 
@@ -226,6 +240,9 @@ namespace ExperienceAndClasses
         {
             if (player.Equals(Main.LocalPlayer))
             {
+                //afk timing
+                afkTime = DateTime.Now.Ticks;
+
                 if (experience < 0) //occurs when a player who does not have the mod joins a server that uses the mod
                 {
                     experience = 0;
@@ -240,17 +257,17 @@ namespace ExperienceAndClasses
                 //settings
                 if (Main.netMode == 0)
                 {
-                    //Main.NewText("Require Auth: " + ExperienceAndClasses.requireAuth);
-                    //Main.NewText("Experience Rate: " + (ExperienceAndClasses.globalExpModifier * 100)+"%");
-                    //Main.NewText("Ignore Class Caps: " + ExperienceAndClasses.globalIgnoreCaps);
+                    //Main.NewText("Require Auth: " + ExperienceAndClasses.mapRequireAuth);
+                    //Main.NewText("Experience Rate: " + (ExperienceAndClasses.mapExpModifier * 100)+"%");
+                    //Main.NewText("Ignore Class Caps: " + ExperienceAndClasses.mapIgnoreCaps);
 
-                    //if (ExperienceAndClasses.globalLevelCap > 0)
-                    //    Main.NewText("Level Cap: " + ExperienceAndClasses.globalLevelCap);
+                    //if (ExperienceAndClasses.mapLevelCap > 0)
+                    //    Main.NewText("Level Cap: " + ExperienceAndClasses.mapLevelCap);
                     // else
                     //    Main.NewText("Level Cap: disabled");
 
-                    //if (ExperienceAndClasses.globalClassDamageReduction > 0)
-                    //    Main.NewText("Reduce Class Damage: " + ExperienceAndClasses.globalClassDamageReduction + "%");
+                    //if (ExperienceAndClasses.mapClassDamageReduction > 0)
+                    //    Main.NewText("Reduce Class Damage: " + ExperienceAndClasses.mapClassDamageReduction + "%");
                     //else
                     //    Main.NewText("Reduce Class Damage: disabled");
                     Methods.ChatCommands.CommandDisplaySettings();
@@ -282,24 +299,37 @@ namespace ExperienceAndClasses
 
         public override void PostUpdateEquips()
         {
+            //number of classes
+            numberClasses = classTokensEquipped.Count;
+            if (numberClasses < 1) numberClasses = 1;
+
             //apply class effects
-            int numberClasses = classTokensEquipped.Count;
             foreach (var i in classTokensEquipped)
             {
-                Items.Helpers.ClassTokenEffects(mod, player, i.Item1, i.Item2, true, this, numberClasses);
+                Items.Helpers.ClassTokenEffects(mod, player, i.Item1, i.Item2, true, this);
             }
 
-            //calculate level for abilities
-            abilityLevel = (int)Math.Floor((double)Methods.Experience.GetLevel(GetExp()) / numberClasses);
+            //calculate effective level for bonuses and abilities
+            effectiveLevel = Methods.Experience.GetLevel(GetExp());
+            if (effectiveLevel > ExperienceAndClasses.mapLevelCap)
+            {
+                effectiveLevel = ExperienceAndClasses.mapLevelCap;
+                levelCapped = true;
+            }
+            else
+            {
+                levelCapped = false;
+            }
+            effectiveLevel = (int)Math.Floor((double)effectiveLevel / numberClasses);
 
-            //limit abilities based on level requirements
+                //limit abilities based on level requirements
             currentAbilityIDs = Enumerable.Repeat(Abilities.ID_UNDEFINED, ExperienceAndClasses.MAXIMUM_NUMBER_OF_ABILITIES).ToArray();
             int index = 0;
             int id;
             for (int i=0; i<currentAbilityPotentialsIndex; i++)
             {
                 id = currentAbilityIDsPotential[i];
-                if ((abilityLevel >= Abilities.LEVEL_REQUIREMENT[id]) && (index < ExperienceAndClasses.MAXIMUM_NUMBER_OF_ABILITIES))
+                if ((effectiveLevel >= Abilities.LEVEL_REQUIREMENT[id]) && (index < ExperienceAndClasses.MAXIMUM_NUMBER_OF_ABILITIES))
                 {
                     currentAbilityIDs[index] = id;
                     index++;
@@ -329,13 +359,11 @@ namespace ExperienceAndClasses
                 }
             }
 
-            if (Main.netMode == 2 && experienceNeedsUpdate)
+            //check if afk
+            if (!afk && (Main.netMode == 1) && (afkTime > 0) && ((DateTime.Now.Ticks - afkTime) > ExperienceAndClasses.AFK_TIME_TICKS))
             {
-                if (DateTime.Now.Ticks > timeTickUpdate)
-                {
-                    Methods.PacketSender.ServerForceExperience(mod, player);
-                    experienceNeedsUpdate = false;
-                }
+                afk = true;
+                Methods.PacketSender.ClientAFK(mod);
             }
 
             base.PostUpdate();
@@ -347,22 +375,28 @@ namespace ExperienceAndClasses
             if (!pvp && (Main.netMode==0 || Main.netMode==2))
             {
                 int level = Methods.Experience.GetLevel(GetExp());
-
-                double maxLoss = Methods.Experience.GetExpReqForLevel(level + 1, false) * 0.1;
-                double expSoFar = Methods.Experience.GetExpTowardsNextLevel(GetExp());
-
-                double expLoss = maxLoss;
-                if (expSoFar < maxLoss)
+                if ((level < ExperienceAndClasses.LEVEL_START_APPLYING_DEATH_PENALTY) || (ExperienceAndClasses.mapDeathPenalty <= 0) || afk)
                 {
-                    expLoss = expSoFar;
+                    // no penalty
                 }
-                expLoss = Math.Floor(expLoss);
-
-                SubtractExp(expLoss); //notifies client if server
-
-                if (Main.netMode==0)
+                else
                 {
-                    (mod as ExperienceAndClasses).myUI.updateValue(GetExp());
+                    double maxLoss = Methods.Experience.GetExpReqForLevel(level + 1, false) * (ExperienceAndClasses.mapDeathPenalty / 100);
+                    double expSoFar = Methods.Experience.GetExpTowardsNextLevel(GetExp());
+
+                    double expLoss = maxLoss;
+                    if (expSoFar < maxLoss)
+                    {
+                        expLoss = expSoFar;
+                    }
+                    expLoss = Math.Floor(expLoss);
+
+                    SubtractExp(expLoss); //notifies client if server
+
+                    if (Main.netMode == 0)
+                    {
+                        (mod as ExperienceAndClasses).myUI.updateValue(GetExp());
+                    }
                 }
             }
 
@@ -371,6 +405,9 @@ namespace ExperienceAndClasses
 
         public override void ModifyHitNPC(Item item, NPC target, ref int damage, ref float knockback, ref bool crit)
         {
+            //resolve afk desync if any
+            afk = false;
+
             //on-hit midas
             if (Main.rand.Next(100) < (percentMidas * 100)) target.AddBuff(Terraria.ID.BuffID.Midas, 300);
 
@@ -409,8 +446,19 @@ namespace ExperienceAndClasses
             base.ModifyHitNPC(item, target, ref damage, ref knockback, ref crit);
         }
 
+        public override bool Shoot(Item item, ref Vector2 position, ref float speedX, ref float speedY, ref int type, ref int damage, ref float knockBack)
+        {
+            //resolve afk desync if any
+            afk = false;
+
+            return base.Shoot(item, ref position, ref speedX, ref speedY, ref type, ref damage, ref knockBack);
+        }
+
         public override void ModifyHitNPCWithProj(Projectile proj, NPC target, ref int damage, ref float knockback, ref bool crit, ref int hitDirection)
         {
+            //resolve afk desync if any
+            afk = false;
+
             //on-hit midas
             if (Main.rand.Next(100) < (percentMidas * 100)) target.AddBuff(Terraria.ID.BuffID.Midas, 300);
 
@@ -485,6 +533,17 @@ namespace ExperienceAndClasses
 
         public override void ProcessTriggers(TriggersSet triggersSet) //CLIENT-SIDE ONLY
         {
+            //track afk
+            if (Main.netMode == 1 && (triggersSet.MouseLeft || triggersSet.MouseMiddle || triggersSet.MouseRight || triggersSet.Jump || triggersSet.Up || triggersSet.Down || triggersSet.Left || triggersSet.Right))
+            {
+                afkTime = DateTime.Now.Ticks;
+                if (afk)
+                {
+                    afk = false;
+                    Methods.PacketSender.ClientUnAFK(mod);
+                }
+            }
+
             if (ExperienceAndClasses.HOTKEY_ACTIVATE_ABILITY.JustPressed)
             {
                 latestAbilityFail = Abilities.RETURN_FAIL_UNDEFINED;
@@ -518,7 +577,8 @@ namespace ExperienceAndClasses
                     return;
                 else
                 {
-                    outcome = Abilities.DoAbility(this, abilityID, abilityLevel);
+                    outcome = Abilities.DoAbility(this, abilityID, effectiveLevel);
+                    Methods.PacketSender.ClientAbility(mod, abilityID, effectiveLevel);
 
                     if (outcome == Abilities.RETURN_SUCCESS) showFailMessages = false;
 

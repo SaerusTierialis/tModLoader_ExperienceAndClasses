@@ -93,12 +93,12 @@ namespace ExperienceAndClasses.Methods
         /// </summary>
         /// <param name="mod"></param>
         /// <param name="newCode"></param>
-        public static void ClientRequestSetAuthCode(Mod mod, double newCode, string text)
+        public static void ClientRequestSetmapAuthCode(Mod mod, double newCode, string text)
         {
             if (Main.netMode != 1) return;
 
             ModPacket packet = mod.GetPacket();
-            packet.Write((byte)ExpModMessageType.ClientRequestSetAuthCode);
+            packet.Write((byte)ExpModMessageType.ClientRequestSetmapAuthCode);
             packet.Write(Main.LocalPlayer.whoAmI);
             packet.Write(newCode);
             packet.Write(text);
@@ -211,6 +211,24 @@ namespace ExperienceAndClasses.Methods
         }
 
         /// <summary>
+        /// Player requesting (needs auth) to set death penalty
+        /// </summary>
+        /// <param name="mod"></param>
+        /// <param name="rate"></param>
+        /// <param name="text"></param>
+        public static void ClientRequestDeathPenalty(Mod mod, double rate, string text)
+        {
+            if (Main.netMode != 1) return;
+
+            ModPacket packet = mod.GetPacket();
+            packet.Write((byte)ExpModMessageType.ClientRequestDeathPenalty);
+            packet.Write(Main.LocalPlayer.whoAmI);
+            packet.Write(rate);
+            packet.Write(text);
+            packet.Send();
+        }
+
+        /// <summary>
         /// Player attempt auth.
         /// </summary>
         /// <param name="code"></param>
@@ -225,22 +243,51 @@ namespace ExperienceAndClasses.Methods
             packet.Send();
         }
 
-        ///// <summary>
-        ///// Player tells server that they would like to perform an ability.
-        ///// </summary>
-        ///// <param name="mod"></param>
-        ///// <param name="abilityID"></param>
-        //public static void ClientAbility(Mod mod, int abilityID, int level = 1)
-        //{
-        //    if (Main.netMode != 1) return;
+        /// <summary>
+        /// Player telling server that they are away
+        /// </summary>
+        /// <param name="mod"></param>
+        public static void ClientAFK(Mod mod)
+        {
+            if (Main.netMode != 1) return;
 
-        //    ModPacket packet = mod.GetPacket();
-        //    packet.Write((byte)ExpModMessageType.ClientAbility);
-        //    packet.Write(Main.LocalPlayer.whoAmI);
-        //    packet.Write(abilityID);
-        //    packet.Write(level);
-        //    packet.Send();
-        //}
+            ModPacket packet = mod.GetPacket();
+            packet.Write((byte)ExpModMessageType.ClientAFK);
+            packet.Write(Main.LocalPlayer.whoAmI);
+            packet.Send();
+        }
+
+        /// <summary>
+        /// Player telling server that they are back
+        /// </summary>
+        /// <param name="mod"></param>
+        public static void ClientUnAFK(Mod mod)
+        {
+            if (Main.netMode != 1) return;
+
+            ModPacket packet = mod.GetPacket();
+            packet.Write((byte)ExpModMessageType.ClientUnAFK);
+            packet.Write(Main.LocalPlayer.whoAmI);
+            packet.Send();
+        }
+
+        /// <summary>
+        /// Player tells server that they are performing an ability
+        /// </summary>
+        /// <param name="mod"></param>
+        /// <param name="abilityID"></param>
+        public static void ClientAbility(Mod mod, int abilityID, int level = 1, double rand = 0)
+        {
+            if (Main.netMode != 1) return;
+
+            ModPacket packet = mod.GetPacket();
+            packet.Write((byte)ExpModMessageType.ClientAbility);
+            packet.Write(Main.LocalPlayer.whoAmI);
+            packet.Write(abilityID);
+            packet.Write(level);
+            packet.Write(rand);
+            packet.Send();
+        }
 
         /* ~~~~~~~~~~~~~~~~~~~~~ Packet Senders - Server ~~~~~~~~~~~~~~~~~~~~~ */
 
@@ -256,11 +303,13 @@ namespace ExperienceAndClasses.Methods
             ModPacket packet = mod.GetPacket();
 
             packet.Write((byte)ExpModMessageType.ServerNewPlayerSync);
-            packet.Write(ExperienceAndClasses.globalClassDamageReduction);
-            packet.Write(ExperienceAndClasses.globalExpModifier);
-            packet.Write(ExperienceAndClasses.globalIgnoreCaps);
-            packet.Write(ExperienceAndClasses.globalLevelCap);
-            packet.Write(ExperienceAndClasses.requireAuth);
+            packet.Write(ExperienceAndClasses.mapClassDamageReduction);
+            packet.Write(ExperienceAndClasses.mapExpModifier);
+            packet.Write(ExperienceAndClasses.mapIgnoreCaps);
+            packet.Write(ExperienceAndClasses.mapLevelCap);
+            packet.Write(ExperienceAndClasses.mapRequireAuth);
+            packet.Write(ExperienceAndClasses.mapTrace);
+            packet.Write(ExperienceAndClasses.mapDeathPenalty);
             packet.Send(playerIndex);
         }
 
@@ -295,88 +344,64 @@ namespace ExperienceAndClasses.Methods
         /// Server updating map settings
         /// </summary>
         /// <param name="mod"></param>
-        public static void ServerUpdateSettings(Mod mod)
+        public static void ServerUpdateMapSettings(Mod mod)
         {
             if (Main.netMode != 2) return;
 
             ModPacket packet = mod.GetPacket();
-            packet.Write((byte)ExpModMessageType.ServerUpdateSettings);
-            packet.Write(ExperienceAndClasses.globalClassDamageReduction);
-            packet.Write(ExperienceAndClasses.globalExpModifier);
-            packet.Write(ExperienceAndClasses.globalIgnoreCaps);
-            packet.Write(ExperienceAndClasses.globalLevelCap);
-            packet.Write(ExperienceAndClasses.requireAuth);
-            packet.Write(ExperienceAndClasses.traceMap);
+            packet.Write((byte)ExpModMessageType.ServerUpdateMapSettings);
+            packet.Write(ExperienceAndClasses.mapClassDamageReduction);
+            packet.Write(ExperienceAndClasses.mapExpModifier);
+            packet.Write(ExperienceAndClasses.mapIgnoreCaps);
+            packet.Write(ExperienceAndClasses.mapLevelCap);
+            packet.Write(ExperienceAndClasses.mapRequireAuth);
+            packet.Write(ExperienceAndClasses.mapTrace);
+            packet.Write(ExperienceAndClasses.mapDeathPenalty);
             packet.Send();
         }
 
         /// <summary>
-        /// Server sends full exp list to new player
+        /// Server resyncs any recent exp changes
         /// </summary>
         /// <param name="mod"></param>
         /// <param name="toWho"></param>
         /// <param name="toIgnore"></param>
-        public static void ServerFullExpList(Mod mod, int toWho, int toIgnore)
+        public static void ServerSyncExp(Mod mod, bool full = false)
         {
             if (Main.netMode != 2) return;
 
+            if (full) MyWorld.FlagAllForSyncExp();
+
+            if (MyWorld.clientNeedsExpUpdate_counter <= 0) return;
+
             Player player;
             MyPlayer myPlayer;
+
             ModPacket packet = mod.GetPacket();
-            packet.Write((byte)ExpModMessageType.ServerFullExpList);
-            for (int i = 0; i <= 255; i++)
+            packet.Write((byte)ExpModMessageType.ServerSyncExp);
+            packet.Write(MyWorld.clientNeedsExpUpdate_counter); //number of clients updated
+            for (int ind = 0; ind < MyWorld.clientNeedsExpUpdate_counter; ind++)
             {
-                player = Main.player[i];
-                if (Main.player[i].active)
+                player = Main.player[MyWorld.clientNeedsExpUpdate_indices[ind]];
+                packet.Write(player.whoAmI); //each player index to updated
+                if (player.active)
                 {
                     myPlayer = player.GetModPlayer<MyPlayer>(mod);
-                    packet.Write(myPlayer.GetExp());
+                    packet.Write(myPlayer.GetExp()); //each player exp to updated
                 }
                 else
                 {
-                    packet.Write(-1);
+                    packet.Write(-1); //each player exp to updated
                 }
+
+                //reset
+                MyWorld.clientNeedsExpUpdate_indices[ind] = 0;
+                MyWorld.clientNeedsExpUpdate[player.whoAmI] = false;
             }
-            packet.Send(toWho, toIgnore);
+            packet.Send();
+
+            //reset
+            MyWorld.clientNeedsExpUpdate_counter = 0;
         }
-
-        ///// <summary>
-        ///// Server telling client the outcome of an ability request
-        ///// </summary>
-        ///// <param name="mod"></param>
-        ///// <param name="abilityID"></param>
-        ///// <param name="outcome"></param>
-        ///// <param name="toWho"></param>
-        ///// <param name="toIgnore"></param>
-        //public static void ServerAbilityOutcome(Mod mod, int abilityID, int outcome, int toWho = -1, int toIgnore = -1)
-        //{
-        //    if (Main.netMode != 2) return;
-
-        //    ModPacket packet = mod.GetPacket();
-        //    packet.Write((byte)ExpModMessageType.ServerAbilityOutcome);
-        //    packet.Write(abilityID);
-        //    packet.Write(outcome);
-        //    packet.Send(toWho, toIgnore);
-        //}
-
-        ///// <summary>
-        ///// Server telling clients about an ability
-        ///// </summary>
-        ///// <param name="mod"></param>
-        ///// <param name="player"></param>
-        ///// <param name="abilityID"></param>
-        ///// <param name="toWho"></param>
-        ///// <param name="toIgnore"></param>
-        //public static void ServerAbility(Mod mod, int playerIndex, int abilityID, int level, int toWho = -1, int toIgnore = -1)
-        //{
-        //    if (Main.netMode != 2) return;
-
-        //    ModPacket packet = mod.GetPacket();
-        //    packet.Write((byte)ExpModMessageType.ServerAbility);
-        //    packet.Write(playerIndex);
-        //    packet.Write(abilityID);
-        //    packet.Write(level);
-        //    packet.Send(toWho, toIgnore);
-        //}
     }
 }

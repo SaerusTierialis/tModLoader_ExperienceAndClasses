@@ -23,21 +23,58 @@ namespace ExperienceAndClasses.NPCs
                 //store prior interactions
                 bool[] interactionsBefore = npc.playerInteraction;
 
-                //set npc-player interactions (will put them back after)
+                //will have 3 sets of interactions
+                bool[] interactionsExp = interactionsBefore;
+                bool[] interactionsBossOrb = new bool[interactionsExp.Length];
+                bool[] interactionsMonsterOrb = new bool[interactionsExp.Length];
+
+                //default to no drop
+                bool droppedBossOrb = false;
+                bool droppedMonsterOrb = false;
+
+                //check qualifications and loot
                 if (Main.netMode == 0)
                 {
-                    npc.ApplyInteraction(Main.LocalPlayer.whoAmI);
+                    //always qualify in singleplayer
+                    interactionsExp[Main.LocalPlayer.whoAmI] = true;
+                    if (npc.boss && (Main.rand.Next(1000) < (int)(ExperienceAndClasses.PERCENT_CHANCE_BOSS_ORB * 10)))
+                    {
+                        interactionsBossOrb[Main.LocalPlayer.whoAmI] = true;
+                        droppedBossOrb = true;
+                    }
+                    if (Main.rand.Next(1000) < (int)(ExperienceAndClasses.PERCENT_CHANCE_ASCENSION_ORB * 10))
+                    {
+                        interactionsMonsterOrb[Main.LocalPlayer.whoAmI] = true;
+                        droppedMonsterOrb = true;
+                    }
                 }
-                else
+                else if (Main.netMode == 2)
                 {
                     for (int playerIndex = 0; playerIndex < 255; playerIndex++)
                     {
                         player = Main.player[playerIndex];
                         if (Main.player[playerIndex].active)
                         {
+                            //qualify if prior interaction or if boss or if nearby
                             if (npc.boss || player.Distance(npc.position) <= ExperienceAndClasses.RANGE_EXP_AND_ASCENSION_ORB)
                             {
-                                npc.ApplyInteraction(playerIndex);
+                                interactionsExp[playerIndex] = true;
+                            }
+                            //unqualify for exp and orbs if afk
+                            myPlayer = player.GetModPlayer<MyPlayer>(mod);
+                            if (myPlayer.afk)
+                            {
+                                interactionsExp[playerIndex] = false;
+                            }
+                            if (interactionsExp[playerIndex] && npc.boss && (Main.rand.Next(1000) < (int)(ExperienceAndClasses.PERCENT_CHANCE_BOSS_ORB * 10)))
+                            {
+                                interactionsBossOrb[playerIndex] = true;
+                                droppedBossOrb = true;
+                            }
+                            if (interactionsExp[playerIndex] && Main.rand.Next(1000) < (int)(ExperienceAndClasses.PERCENT_CHANCE_ASCENSION_ORB * 10))
+                            {
+                                interactionsMonsterOrb[playerIndex] = true;
+                                droppedMonsterOrb = true;
                             }
                         }
                     }
@@ -46,18 +83,16 @@ namespace ExperienceAndClasses.NPCs
                 /*~~~~~~~~~~~~~~~~~~~~~~Boss and Ascension Orbs (singleplayer or server-side)~~~~~~~~~~~~~~~~~~~~~~*/
 
                 //boss orb
-                bool droppedBossOrb = false;
-                if (npc.boss && (Main.rand.Next(1000) < (int)(ExperienceAndClasses.PERCENT_CHANCE_BOSS_ORB * 10)))
+                npc.playerInteraction = interactionsBossOrb;
+                if (droppedBossOrb)
                 {
-                    droppedBossOrb = true;
                     npc.DropItemInstanced(npc.position, npc.Size, mod.ItemType("Boss_Orb"), 1, true);
                 }
 
                 //ascension orb
-                bool droppedMonsterOrb = false;
-                if (Main.rand.Next(1000) < (int)(ExperienceAndClasses.PERCENT_CHANCE_ASCENSION_ORB * 10))
+                npc.playerInteraction = interactionsMonsterOrb;
+                if (droppedMonsterOrb)
                 {
-                    droppedMonsterOrb = true;
                     npc.DropItemInstanced(npc.position, npc.Size, mod.ItemType("Monster_Orb"), 1, true);
                 }
 
@@ -73,15 +108,18 @@ namespace ExperienceAndClasses.NPCs
                     NetworkText textMonster = NetworkText.FromLiteral("An Ascension Orb has dropped for you!");
                     for (int playerIndex = 0; playerIndex < 255; playerIndex++)
                     {
-                        if (Main.player[playerIndex].active && npc.playerInteraction[playerIndex])
+                        if (Main.player[playerIndex].active)
                         {
-                            if (droppedBossOrb) NetMessage.SendChatMessageToClient(textBoss, ExperienceAndClasses.MESSAGE_COLOUR_BOSS_ORB, playerIndex);
-                            if (droppedMonsterOrb) NetMessage.SendChatMessageToClient(textMonster, ExperienceAndClasses.MESSAGE_COLOUR_ASCENSION_ORB, playerIndex);
+                            if (droppedBossOrb && interactionsBossOrb[playerIndex]) NetMessage.SendChatMessageToClient(textBoss, ExperienceAndClasses.MESSAGE_COLOUR_BOSS_ORB, playerIndex);
+                            if (droppedMonsterOrb && interactionsMonsterOrb[playerIndex]) NetMessage.SendChatMessageToClient(textMonster, ExperienceAndClasses.MESSAGE_COLOUR_ASCENSION_ORB, playerIndex);
                         }
                     }
                 }
 
                 /*~~~~~~~~~~~~~~~~~~~~~~Experience~~~~~~~~~~~~~~~~~~~~~~*/
+
+                //set interaction
+                npc.playerInteraction = interactionsExp;
 
                 //calculate base exp
                 double experience = Helpers.CalcBaseExp(npc);
@@ -100,7 +138,7 @@ namespace ExperienceAndClasses.NPCs
                         if (player.wellFed) expGive *= 1.1f;
 
                         //apply rate bonus
-                        expGive *= ExperienceAndClasses.globalExpModifier;
+                        expGive *= ExperienceAndClasses.mapExpModifier;
 
                         //min 1 exp
                         if (expGive < 1f) expGive = 1f;

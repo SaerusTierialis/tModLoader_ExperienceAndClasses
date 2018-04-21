@@ -18,9 +18,9 @@ namespace ExperienceAndClasses
             MyPlayer localMyPlayer = caller.Player.GetModPlayer<MyPlayer>(mod);
             localMyPlayer.UIShow = !localMyPlayer.UIShow;
             if (localMyPlayer.UIShow)
-                Main.NewText("Experience bar enabled. Display will be visible while wearing a Class Token.");
+                Main.NewText("Experience bar enabled. Display will be visible while wearing a Class Token.", ExperienceAndClasses.MESSAGE_COLOUR_YELLOW);
             else
-                Main.NewText("Experience bar hidden.");
+                Main.NewText("Experience bar hidden.", ExperienceAndClasses.MESSAGE_COLOUR_YELLOW);
         }
     }
 
@@ -41,9 +41,9 @@ namespace ExperienceAndClasses
             localMyPlayer.UITrans = !localMyPlayer.UITrans;
             myUI.setTrans(localMyPlayer.UITrans);
             if
-                (localMyPlayer.UITrans) Main.NewText("Experience bar is now transparent.");
+                (localMyPlayer.UITrans) Main.NewText("Experience bar is now transparent.", ExperienceAndClasses.MESSAGE_COLOUR_YELLOW);
             else
-                Main.NewText("Experience bar is now opaque.");
+                Main.NewText("Experience bar is now opaque.", ExperienceAndClasses.MESSAGE_COLOUR_YELLOW);
         }
     }
 
@@ -65,7 +65,7 @@ namespace ExperienceAndClasses
             localMyPlayer.UIShow = true;
             localMyPlayer.UITrans = false;
             myUI.setTrans(localMyPlayer.UITrans);
-            Main.NewText("Experience bar reset.");
+            Main.NewText("Experience bar reset.", ExperienceAndClasses.MESSAGE_COLOUR_YELLOW);
         }
     }
 
@@ -102,7 +102,7 @@ namespace ExperienceAndClasses
                     message += "\n" + player.name + ", Level " + level + "(" + Math.Round((double)expHave / (double)expNeed * 100, 2) + "%), " + job;
                 }
             }
-            Main.NewTextMultiline(message);
+            Main.NewTextMultiline(message, false, ExperienceAndClasses.MESSAGE_COLOUR_YELLOW);
         }
     }
 
@@ -171,12 +171,35 @@ namespace ExperienceAndClasses
         {
             if (args.Length == 0)
             {
-                Main.NewText("The current exprate is " + (ExperienceAndClasses.globalExpModifier * 100) + "%.");
+                Main.NewText("The current exprate is " + (ExperienceAndClasses.mapExpModifier * 100) + "%.", ExperienceAndClasses.MESSAGE_COLOUR_YELLOW);
             }
             else
             {
                 double rate = Double.Parse(args[0]);
                 Methods.ChatCommands.CommandSetExpRate(mod, rate / 100, input);
+            }
+        }
+    }
+
+    class Command_expdeath : CommandTemplate
+    {
+        public Command_expdeath()
+        {
+            name = "expdeath";
+            argstr = "[new_rate]";
+            desc = "displays or sets experience penalty on death (requires expauth in multiplayer)";
+        }
+
+        public override void Action(CommandCaller caller, string input, string[] args)
+        {
+            if (args.Length == 0)
+            {
+                Main.NewText("The current death penalty is " + (ExperienceAndClasses.mapDeathPenalty * 100) + "%.", ExperienceAndClasses.MESSAGE_COLOUR_YELLOW);
+            }
+            else
+            {
+                double rate = Double.Parse(args[0]);
+                Methods.ChatCommands.CommandSetDeathPenalty(mod, rate / 100, input);
             }
         }
     }
@@ -266,11 +289,11 @@ namespace ExperienceAndClasses
             localMyPlayer.displayExp = !localMyPlayer.displayExp;
             if (localMyPlayer.displayExp)
             {
-                Main.NewText("Experience messages enabled.");
+                Main.NewText("Experience messages enabled.", ExperienceAndClasses.MESSAGE_COLOUR_YELLOW);
             }
             else
             {
-                Main.NewText("Experience messages disabled.");
+                Main.NewText("Experience messages disabled.", ExperienceAndClasses.MESSAGE_COLOUR_YELLOW);
             }
         }
     }
@@ -331,13 +354,13 @@ namespace ExperienceAndClasses
         {
             if (args.Length == 0)
             {
-                if (ExperienceAndClasses.globalLevelCap <= 0)
+                if (ExperienceAndClasses.mapLevelCap <= 0)
                 {
-                    Main.NewText("Level cap is disabled.");
+                    Main.NewText("Level cap is disabled.", ExperienceAndClasses.MESSAGE_COLOUR_YELLOW);
                 }
                 else
                 {
-                    Main.NewText("Level cap is " + ExperienceAndClasses.globalLevelCap + ".");
+                    Main.NewText("Level cap is " + ExperienceAndClasses.mapLevelCap + ".", ExperienceAndClasses.MESSAGE_COLOUR_YELLOW);
                 }
             }
             else
@@ -361,13 +384,13 @@ namespace ExperienceAndClasses
         {
             if (args.Length == 0)
             {
-                if (ExperienceAndClasses.globalClassDamageReduction <= 0)
+                if (ExperienceAndClasses.mapClassDamageReduction <= 0)
                 {
-                    Main.NewText("Damage reduction is disabled.");
+                    Main.NewText("Damage reduction is disabled.", ExperienceAndClasses.MESSAGE_COLOUR_YELLOW);
                 }
                 else
                 {
-                    Main.NewText("Damage reduction is " + ExperienceAndClasses.globalClassDamageReduction + "%.");
+                    Main.NewText("Damage reduction is " + ExperienceAndClasses.mapClassDamageReduction + "%.", ExperienceAndClasses.MESSAGE_COLOUR_YELLOW);
                 }
             }
             else
@@ -390,7 +413,7 @@ namespace ExperienceAndClasses
 
         public override void Action(CommandCaller caller, string input, string[] args)
         {
-            Methods.ChatCommands.CommandRequireAuth(mod, input);
+            Methods.ChatCommands.CommandmapRequireAuth(mod, input);
         }
     }
 
@@ -408,9 +431,9 @@ namespace ExperienceAndClasses
             MyPlayer localMyPlayer = caller.Player.GetModPlayer<MyPlayer>(mod);
             localMyPlayer.traceChar = !localMyPlayer.traceChar;
             if (localMyPlayer.traceChar)
-                Main.NewText("Character trace is enabled.");
+                Main.NewText("Character trace is enabled.", ExperienceAndClasses.MESSAGE_COLOUR_YELLOW);
             else
-                Main.NewText("Character trace is disabled");
+                Main.NewText("Character trace is disabled", ExperienceAndClasses.MESSAGE_COLOUR_YELLOW);
         }
     }
 
@@ -429,11 +452,11 @@ namespace ExperienceAndClasses
         }
     }
 
-    class Command_expauthcode : CommandTemplate
+    class Command_expmapAuthCode : CommandTemplate
     {
-        public Command_expauthcode()
+        public Command_expmapAuthCode()
         {
-            name = "expauthcode";
+            name = "expmapAuthCode";
             argstr = "[new_auth_code]";
             desc = "display or change the map expauth code (code changes always requires expauth in multiplayer)";
         }
@@ -442,14 +465,14 @@ namespace ExperienceAndClasses
         {
             if (args.Length == 0)
             {
-                Methods.ChatCommands.CommandShowAuthCode(mod);
+                Methods.ChatCommands.CommandShowmapAuthCode(mod);
             }
             else
             {
                 double newCode = Double.Parse(args[0]);
                 if (newCode < 0) newCode = 0;
                 newCode = Math.Round(newCode);
-                Methods.ChatCommands.CommandSetAuthCode(mod, newCode, input);
+                Methods.ChatCommands.CommandSetmapAuthCode(mod, newCode, input);
             }
         }
     }

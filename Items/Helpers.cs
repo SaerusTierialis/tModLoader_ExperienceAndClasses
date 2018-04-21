@@ -243,7 +243,7 @@ namespace ExperienceAndClasses.Items
         /// <param name="job"></param>
         /// <param name="applyEffects"></param>
         /// <param name="myPlayer"></param>
-        public static string ClassTokenEffects(Mod mod, Player player, ModItem item, string job, bool applyEffects, MyPlayer myPlayer = null, int numberClasses=1, bool isEquipped=false)
+        public static string ClassTokenEffects(Mod mod, Player player, ModItem item, string job, bool applyEffects, MyPlayer myPlayer = null, bool isEquipped=false)
         {
             //auto-generate class bonuses (var names match player attributes)
             float statLifeMax2 = 0f;
@@ -650,25 +650,23 @@ namespace ExperienceAndClasses.Items
             if (applyEffects | isEquipped)
             {
                 experience = myPlayer.GetExp();
-                ignoreCaps = ExperienceAndClasses.globalIgnoreCaps;
+                ignoreCaps = ExperienceAndClasses.mapIgnoreCaps;
             }
 
-            //get level
-            int level = Methods.Experience.GetLevel(experience);
+            //get effective level
+            int level = myPlayer.effectiveLevel;
 
-            //limit level
+            //note if cap level
             string multiclass = "";
-            if ((ExperienceAndClasses.globalLevelCap > 0) && (level > ExperienceAndClasses.globalLevelCap))
+            if (myPlayer.levelCapped)
             {
-                multiclass = ", Level Capped By Map";
-                level = ExperienceAndClasses.globalLevelCap;
+                multiclass += ", Level Capped By Map";
             }
 
-            //reduce effective level if multiclassing
-            if (numberClasses > 1)
+            //note if level reduced by multiclassing
+            if (myPlayer.numberClasses > 1)
             {
-                level = (int)Math.Floor((double)level / numberClasses);
-                multiclass = ", Multiclass Penalty";
+                multiclass += ", Multiclass Penalty";
             }
 
             //reapply aura buff indicators?
@@ -677,7 +675,7 @@ namespace ExperienceAndClasses.Items
 
             /* Reduction From expdmgred */
             string reduction = "";
-            int dmgred = ExperienceAndClasses.globalClassDamageReduction;
+            int dmgred = ExperienceAndClasses.mapClassDamageReduction;
             if (dmgred > 0)
             {
                 float reduction_multiplier = (100f - (float)dmgred) / 100f;

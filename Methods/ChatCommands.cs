@@ -1,4 +1,6 @@
-﻿using Terraria;
+﻿using System;
+using Terraria;
+using Terraria.Localization;
 using Terraria.ModLoader;
 
 namespace ExperienceAndClasses.Methods
@@ -18,7 +20,7 @@ namespace ExperienceAndClasses.Methods
             if (Main.netMode == 0)
             {
                 myPlayer.SetExp(exp);
-                Main.NewText("Set experience to " + exp + ".");
+                Main.NewText("Set experience to " + exp + ".", ExperienceAndClasses.MESSAGE_COLOUR_YELLOW);
             }
             else if (Main.netMode == 1)
             {
@@ -38,11 +40,11 @@ namespace ExperienceAndClasses.Methods
         /// <param name="text"></param>
         public static void CommandSetExpRate(Mod mod, double rate, string text)
         {
-            MyPlayer myPlayer = Main.LocalPlayer.GetModPlayer<MyPlayer>(mod);
+            if (rate < 0) rate = 0;
             if (Main.netMode == 0)
             {
-                ExperienceAndClasses.globalExpModifier = rate;
-                Main.NewText("The new exprate is " + (ExperienceAndClasses.globalExpModifier * 100) + "%.");
+                ExperienceAndClasses.mapExpModifier = rate;
+                Main.NewText("The new exprate is " + (ExperienceAndClasses.mapExpModifier * 100) + "%.", ExperienceAndClasses.MESSAGE_COLOUR_YELLOW);
             }
             else if (Main.netMode == 1)
             {
@@ -53,6 +55,31 @@ namespace ExperienceAndClasses.Methods
             }
         }
 
+        /// <summary>
+        /// Command to set death penalty (auth and global if multiplayer)
+        /// </summary>
+        /// <param name="mod"></param>
+        /// <param name="rate"></param>
+        /// <param name="text"></param>
+        public static void CommandSetDeathPenalty(Mod mod, double rate, string text)
+        {
+            if (rate < 0)
+                rate = 0;
+            else if (rate > 100)
+                rate = 100;
+            if (Main.netMode == 0)
+            {
+                ExperienceAndClasses.mapDeathPenalty = rate;
+                Main.NewText("The new death penalty is " + (ExperienceAndClasses.mapDeathPenalty * 100) + "%.", ExperienceAndClasses.MESSAGE_COLOUR_YELLOW);
+            }
+            else if (Main.netMode == 1)
+            {
+                PacketSender.ClientRequestDeathPenalty(mod, rate, text);
+                Main.NewTextMultiline("Request that death penalty be set to " + (rate * 100) + "% has been sent to the server." +
+                                    "\nIf you are authorized, the change should occur shortly. Use /expauth [code]" +
+                                    "\nto become authorized. The code is displayed in the server console.");
+            }
+        }
 
         /// <summary>
         /// Command to toggle class caps (auth and global if multiplayer).
@@ -65,19 +92,19 @@ namespace ExperienceAndClasses.Methods
             MyPlayer myPlayer = player.GetModPlayer<MyPlayer>(mod);
             if (Main.netMode == 0)
             {
-                ExperienceAndClasses.globalIgnoreCaps = !ExperienceAndClasses.globalIgnoreCaps;
-                if (ExperienceAndClasses.globalIgnoreCaps)
+                ExperienceAndClasses.mapIgnoreCaps = !ExperienceAndClasses.mapIgnoreCaps;
+                if (ExperienceAndClasses.mapIgnoreCaps)
                 {
-                    Main.NewText("Class bonus caps disabled.");
+                    Main.NewText("Class bonus caps disabled.", ExperienceAndClasses.MESSAGE_COLOUR_YELLOW);
                 }
                 else
                 {
-                    Main.NewText("Class bonus caps enabled.");
+                    Main.NewText("Class bonus caps enabled.", ExperienceAndClasses.MESSAGE_COLOUR_YELLOW);
                 }
             }
             else if (Main.netMode == 1)
             {
-                PacketSender.ClientRequestIgnoreCaps(mod, !ExperienceAndClasses.globalIgnoreCaps, text);
+                PacketSender.ClientRequestIgnoreCaps(mod, !ExperienceAndClasses.mapIgnoreCaps, text);
                 Main.NewTextMultiline("Request to toggle the class caps feature has been sent to the server." +
                                     "\nIf you are authorized, the change should occur shortly. Use /expauth [code]" +
                                     "\nto become authorized. The code is displayed in the server console.");
@@ -116,14 +143,14 @@ namespace ExperienceAndClasses.Methods
             if (Main.netMode == 0)
             {
                 int priorLevel = Experience.GetLevel(myPlayer.GetExp());
-                ExperienceAndClasses.globalLevelCap = level;
-                if (ExperienceAndClasses.globalLevelCap <= 0)
+                ExperienceAndClasses.mapLevelCap = level;
+                if (ExperienceAndClasses.mapLevelCap <= 0)
                 {
-                    Main.NewText("Level cap disabled.");
+                    Main.NewText("Level cap disabled.", ExperienceAndClasses.MESSAGE_COLOUR_YELLOW);
                 }
                 else
                 {
-                    Main.NewText("Level cap set to " + ExperienceAndClasses.globalLevelCap + ".");
+                    Main.NewText("Level cap set to " + ExperienceAndClasses.mapLevelCap + ".", ExperienceAndClasses.MESSAGE_COLOUR_YELLOW);
                 }
             }
             else if (Main.netMode == 1)
@@ -156,14 +183,14 @@ namespace ExperienceAndClasses.Methods
             MyPlayer myPlayer = player.GetModPlayer<MyPlayer>(mod);
             if (Main.netMode == 0)
             {
-                ExperienceAndClasses.globalClassDamageReduction = damageReductionPercent;
+                ExperienceAndClasses.mapClassDamageReduction = damageReductionPercent;
                 if (damageReductionPercent <= 0)
                 {
-                    Main.NewText("Damage reduction disabled.");
+                    Main.NewText("Damage reduction disabled.", ExperienceAndClasses.MESSAGE_COLOUR_YELLOW);
                 }
                 else
                 {
-                    Main.NewText("Damage reduction set to " + ExperienceAndClasses.globalClassDamageReduction + ".");
+                    Main.NewText("Damage reduction set to " + ExperienceAndClasses.mapClassDamageReduction + ".", ExperienceAndClasses.MESSAGE_COLOUR_YELLOW);
                 }
             }
             else if (Main.netMode == 1)
@@ -178,15 +205,15 @@ namespace ExperienceAndClasses.Methods
         /// <summary>
         /// Command for toggling auth requirement of a map
         /// </summary>
-        public static void CommandRequireAuth(Mod mod, string text)
+        public static void CommandmapRequireAuth(Mod mod, string text)
         {
             if (Main.netMode == 0)
             {
-                ExperienceAndClasses.requireAuth = !ExperienceAndClasses.requireAuth;
-                if (ExperienceAndClasses.requireAuth)
-                    Main.NewText("Require expauth has been enabled. This map will now require expauth in multiplayer mode.");
+                ExperienceAndClasses.mapRequireAuth = !ExperienceAndClasses.mapRequireAuth;
+                if (ExperienceAndClasses.mapRequireAuth)
+                    Main.NewText("Require expauth has been enabled. This map will now require expauth in multiplayer mode.", ExperienceAndClasses.MESSAGE_COLOUR_YELLOW);
                 else
-                    Main.NewText("Require expauth has been disabled. This map will no longer require expauth in multiplayer mode.");
+                    Main.NewText("Require expauth has been disabled. This map will no longer require expauth in multiplayer mode.", ExperienceAndClasses.MESSAGE_COLOUR_YELLOW);
             }
             else
             {
@@ -206,11 +233,11 @@ namespace ExperienceAndClasses.Methods
         {
             if (Main.netMode == 0)
             {
-                ExperienceAndClasses.traceMap = !ExperienceAndClasses.traceMap;
-                if (ExperienceAndClasses.traceMap)
-                    Main.NewText("Map trace is enabled.");
+                ExperienceAndClasses.mapTrace = !ExperienceAndClasses.mapTrace;
+                if (ExperienceAndClasses.mapTrace)
+                    Main.NewText("Map trace is enabled.", ExperienceAndClasses.MESSAGE_COLOUR_YELLOW);
                 else
-                    Main.NewText("Map trace is disabled");
+                    Main.NewText("Map trace is disabled", ExperienceAndClasses.MESSAGE_COLOUR_YELLOW);
             }
             else
             {
@@ -225,37 +252,37 @@ namespace ExperienceAndClasses.Methods
         {
             string lvlcap, dmgred;
 
-            if (ExperienceAndClasses.globalLevelCap > 0)
+            if (ExperienceAndClasses.mapLevelCap > 0)
             {
-                lvlcap = ExperienceAndClasses.globalLevelCap.ToString();
+                lvlcap = ExperienceAndClasses.mapLevelCap.ToString();
             }
             else
             {
                 lvlcap = "disabled";
             }
 
-            if (ExperienceAndClasses.globalClassDamageReduction > 0)
+            if (ExperienceAndClasses.mapClassDamageReduction > 0)
             {
-                dmgred = ExperienceAndClasses.globalClassDamageReduction.ToString() + "%";
+                dmgred = ExperienceAndClasses.mapClassDamageReduction.ToString() + "%";
             }
             else
             {
                 dmgred = "disabled";
             }
 
-            Main.NewTextMultiline("Require Authorization: " + ExperienceAndClasses.requireAuth + "\nExperience Rate: " + (ExperienceAndClasses.globalExpModifier * 100) +
-                        "%\nIgnore Class Caps: " + ExperienceAndClasses.globalIgnoreCaps + "\nLevel Cap: " + lvlcap + "\nClass Damage Reduction: " +
-                        dmgred, false, ExperienceAndClasses.MESSAGE_COLOUR_YELLOW);
+            Main.NewTextMultiline("Require Authorization: " + ExperienceAndClasses.mapRequireAuth + "\nExperience Rate: " + (ExperienceAndClasses.mapExpModifier * 100) +
+                        "%\nIgnore Class Caps: " + ExperienceAndClasses.mapIgnoreCaps + "\nLevel Cap: " + lvlcap + "\nClass Damage Reduction: " +
+                        dmgred + "\nDeath Penalty: " + (ExperienceAndClasses.mapDeathPenalty * 100) + "%", false, ExperienceAndClasses.MESSAGE_COLOUR_YELLOW);
         }
 
         /// <summary>
         /// Command for showing the map's auth code in singleplayer
         /// </summary>
-        public static void CommandShowAuthCode(Mod mod)
+        public static void CommandShowmapAuthCode(Mod mod)
         {
             if (Main.netMode == 0)
             {
-                Main.NewText("This map's expauth code is " + ExperienceAndClasses.authCode);
+                Main.NewText("This map's expauth code is " + ExperienceAndClasses.mapAuthCode, ExperienceAndClasses.MESSAGE_COLOUR_YELLOW);
             }
             else
             {
@@ -267,19 +294,32 @@ namespace ExperienceAndClasses.Methods
         /// Command for setting the map's auth code (in multiplayer, expauth is always needed)
         /// </summary>
         /// <param name="newCode"></param>
-        public static void CommandSetAuthCode(Mod mod, double newCode, string text)
+        public static void CommandSetmapAuthCode(Mod mod, double newCode, string text)
         {
             if (Main.netMode == 0)
             {
-                ExperienceAndClasses.authCode = newCode;
-                Main.NewText("This map's auth code is now " + ExperienceAndClasses.authCode);
+                ExperienceAndClasses.mapAuthCode = newCode;
+                Main.NewText("This map's auth code is now " + ExperienceAndClasses.mapAuthCode, ExperienceAndClasses.MESSAGE_COLOUR_YELLOW);
             }
             else
             {
-                PacketSender.ClientRequestSetAuthCode(mod, newCode, text);
+                PacketSender.ClientRequestSetmapAuthCode(mod, newCode, text);
                 Main.NewTextMultiline("Request to set expauth code to " + newCode + " has been sent to the server." +
                                     "\nIf you are authorized, the change should occur shortly. Use /expauth [code]" +
                                     "\nto become authorized. The code is displayed in the server console.");
+            }
+        }
+
+        public static void Trace(string text)
+        {
+            if (Main.netMode == 2)
+            {
+                Console.WriteLine(text);
+                NetMessage.BroadcastChatMessage(NetworkText.FromLiteral(text), ExperienceAndClasses.MESSAGE_COLOUR_MAGENTA);
+            }
+            else
+            {
+                Main.NewText(text, ExperienceAndClasses.MESSAGE_COLOUR_MAGENTA);
             }
         }
     }
