@@ -14,6 +14,7 @@ namespace ExperienceAndClasses
         public const int RETURN_FAIL_COOLDOWN = -4;
         public const int RETURN_FAIL_REQUIREMENTS = -5;
         public const int RETURN_FAIL_EXTERNAL = -6;
+        public const int RETURN_FAIL_LINE_OF_SIGHT = -6;
 
         public const string MESSAGE_FAIL_MANA = "insufficient mana!";
         public const string MESSAGE_FAIL_COOLDOWN = "not yet ready!";
@@ -28,6 +29,7 @@ namespace ExperienceAndClasses
 
         public const int NUMBER_OF_IDs = 4; //don't forget to update this
         public static string[] NAME = new string[NUMBER_OF_IDs];
+        public static string[] SHORTFORM = new string[NUMBER_OF_IDs];
         public static string[] DESCRIPTION = new string[NUMBER_OF_IDs];
         public static int[] LEVEL_REQUIREMENT = new int[NUMBER_OF_IDs];
         public static float[] MANA_COST = new float[NUMBER_OF_IDs];
@@ -41,6 +43,7 @@ namespace ExperienceAndClasses
 
             id = ID_CLERIC_ACTIVE_HEAL; //resize with level if graphic can be resized
             NAME[id] = "Heal";
+            SHORTFORM[id] = "Heal";
             DESCRIPTION[id] = "placeholder";
             LEVEL_REQUIREMENT[id] = 10;
             MANA_COST_PERCENT[id] = 0.10f;
@@ -48,6 +51,7 @@ namespace ExperienceAndClasses
 
             id = ID_CLERIC_ACTIVE_SANCTUARY;
             NAME[id] = "Sanctuary";
+            SHORTFORM[id] = "Sanc";
             DESCRIPTION[id] = "placeholder";
             LEVEL_REQUIREMENT[id] = 15;
             MANA_COST_PERCENT[id] = 0.90f;
@@ -55,6 +59,7 @@ namespace ExperienceAndClasses
 
             id = ID_CLERIC_ACTIVE_DIVINE_INTERVENTION; //1sec dur, more if Cross necklace (longInvince???)
             NAME[id] = "Divine Intervention";
+            SHORTFORM[id] = "DI";
             DESCRIPTION[id] = "placeholder";
             LEVEL_REQUIREMENT[id] = 20;
             MANA_COST_PERCENT[id] = 0.50f;
@@ -62,6 +67,7 @@ namespace ExperienceAndClasses
 
             id = ID_CLERIC_ACTIVE_RESSURECTION;
             NAME[id] = "Ressurection";
+            SHORTFORM[id] = "Res";
             DESCRIPTION[id] = "placeholder";
             LEVEL_REQUIREMENT[id] = 30;
             MANA_COST_PERCENT[id] = 0.90f;
@@ -145,6 +151,14 @@ namespace ExperienceAndClasses
                     Projectile.NewProjectile(player.position.X, player.position.Y, 0, 0, ProjectileID.LostSoulFriendly, level * 2, 0, player.whoAmI);
                     break;
 
+                case ID_CLERIC_ACTIVE_SANCTUARY:
+                    break;
+
+                case ID_CLERIC_ACTIVE_DIVINE_INTERVENTION:
+                    break;
+
+                case ID_CLERIC_ACTIVE_RESSURECTION:
+                    break;
 
 
 
@@ -351,7 +365,7 @@ namespace ExperienceAndClasses
             }
         }
 
-        public static void DoReturnMessage(int returnValue, int abilityID)
+        public static void SendReturnMessage(int returnValue, int abilityID)
         {
             string abilityName = NAME[abilityID];
             switch (returnValue)
@@ -371,5 +385,6 @@ namespace ExperienceAndClasses
                     break;
             }
         }
+
     }
 }

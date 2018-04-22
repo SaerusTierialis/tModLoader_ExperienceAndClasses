@@ -8,58 +8,202 @@ using System;
 
 namespace ExperienceAndClasses.UI
 {
-    class MyUI : UIState
+    class UIExp : UIState
     {
-        public UIPanel expCounterPanel;
-        public UIMoneyDisplay moneyDiplay;
-        public UIPanel expBar;
-        public UIPanel expBarBack;
+        public static readonly Color COLOUR_TEXT_INNER = Color.White;
+        public static readonly Color COLOUR_TEXT_OUTTER = Color.Black;
+
+        public static readonly int NUMBER_OF_BARS = 1 + ExperienceAndClasses.MAXIMUM_NUMBER_OF_ABILITIES;
+        protected static readonly Color COLOUR_PANEL = new Color(73, 94, 171);
+        protected static readonly Color COLOUR_BAR_BACKGROUND = Color.Gray;
+        protected static readonly Color COLOUR_BAR_FOREGROUND_EXP = Color.GreenYellow;
+        protected static readonly Color COLOUR_BAR_FOREGROUND_ABILITY = new Color(206, 239, 107); //new Color(255, 242, 0); //new Color(163, 73, 174);
+        protected static readonly byte ALPHA_PANEL = 255;
+        protected static readonly byte ALPHA_PANEL_TRANSPARENT = 0;
+        protected static readonly byte ALPHA_BAR_EXP_FOREGROUND = 255;
+        protected static readonly byte ALPHA_BAR_EXP_FOREGROUND_TRANSPARENT = 150;
+        protected static readonly byte ALPHA_BAR_EXP_BACKGROUND = 255;
+        protected static readonly byte ALPHA_BAR_EXP_BACKGROUND_TRANSPARENT = 200;
+
+        protected const float PANEL_WIDTH = 200f;
+        protected const float PANEL_HEIGHT_BASE = 37f;
+        protected const float PANEL_HEIGHT_PER_BAR = 24f;
+
+        protected const float BAR_EXP_TOP_FIRST = 35f;
+        protected const float BAR_EXP_LEFT = 5f;
+        protected const float BAR_EXP_LEFT_INDENT = 40f;
+        protected const float BAR_EXP_WIDTH = PANEL_WIDTH - (BAR_EXP_LEFT * 2);
+        protected const float BAR_EXP_WIDTH_INDENT = PANEL_WIDTH - BAR_EXP_LEFT_INDENT - BAR_EXP_LEFT;
+        protected const float BAR_EXP_HEIGHT = 22f;
+
+        protected const float TEXT_LEVEL_X = 5f;
+        protected const float TEXT_LEVEL_Y = 10f;
+
+        protected const float TEXT_PCT_X = PANEL_WIDTH - TEXT_LEVEL_X;
+        protected const float TEXT_PCT_Y = TEXT_LEVEL_Y;
+
+        protected const float TEXT_ABILITY_X = (TEXT_LEVEL_X + BAR_EXP_LEFT_INDENT) / 2f;
+        protected const float TEXT_ABILITY_Y_DOWN = 2f;
+
+        protected static UIPanel panel;
+        private static UIExpOverlay overlay;
+        public static UIBar[] bars = new UIBar[NUMBER_OF_BARS];
+
+        protected static int numberActiveBars = 0;
+        protected static string[] labelsExp = new string[2];
+        protected static string[,] labelsBars = new string[2, NUMBER_OF_BARS];
+
         public static bool visible = true;
+        public static bool transparency = false;
+        public static MyPlayer localMyPlayer;
 
         public override void OnInitialize()
         {
-            expCounterPanel = new UIPanel();
-            expCounterPanel.SetPadding(0);
-            expCounterPanel.Left.Set(400f, 0f);
-            expCounterPanel.Top.Set(100f, 0f);
-            expCounterPanel.Width.Set(170f, 0f);
-            expCounterPanel.Height.Set(70f, 0f);
-            expCounterPanel.BackgroundColor = new Color(73, 94, 171);
+            panel = new UIPanel();
+            panel.SetPadding(0);
+            panel.Left.Set(0, 0f);
+            panel.Top.Set(0, 0f);
+            panel.Width.Set(PANEL_WIDTH, 0f);
+            panel.Height.Set(PANEL_HEIGHT_BASE + (NUMBER_OF_BARS * PANEL_HEIGHT_PER_BAR), 0f);
+            panel.BackgroundColor = COLOUR_PANEL;
 
-            expCounterPanel.OnMouseDown += new UIElement.MouseEvent(DragStart);
-            expCounterPanel.OnMouseUp += new UIElement.MouseEvent(DragEnd);
+            panel.OnMouseDown += new UIElement.MouseEvent(DragStart);
+            panel.OnMouseUp += new UIElement.MouseEvent(DragEnd);
 
-            expBarBack = new UIPanel();
-            expBarBack.Left.Set(0, 0f);
-            expBarBack.Top.Set(36, 0f);
-            expBarBack.Width.Set(100f, 1f);
-            expBarBack.Height.Set(0, 0.33f);
-            expBarBack.BackgroundColor = Color.Gray;
-            expCounterPanel.Append(expBarBack);
+            //add all bars that could be needed
+            for (int i = 0; i< NUMBER_OF_BARS; i++)
+            {
+                if (i == 0)
+                    bars[i] = new UIBar(panel, BAR_EXP_LEFT, BAR_EXP_TOP_FIRST + (i * PANEL_HEIGHT_PER_BAR), BAR_EXP_WIDTH, BAR_EXP_HEIGHT, transparency, ALPHA_BAR_EXP_BACKGROUND, ALPHA_BAR_EXP_FOREGROUND, ALPHA_BAR_EXP_BACKGROUND_TRANSPARENT, ALPHA_BAR_EXP_FOREGROUND_TRANSPARENT, COLOUR_BAR_BACKGROUND, COLOUR_BAR_FOREGROUND_EXP);
+                else
+                    bars[i] = new UIBar(panel, BAR_EXP_LEFT_INDENT, BAR_EXP_TOP_FIRST + (i * PANEL_HEIGHT_PER_BAR), BAR_EXP_WIDTH_INDENT, BAR_EXP_HEIGHT, transparency, ALPHA_BAR_EXP_BACKGROUND, ALPHA_BAR_EXP_FOREGROUND, ALPHA_BAR_EXP_BACKGROUND_TRANSPARENT, ALPHA_BAR_EXP_FOREGROUND_TRANSPARENT, COLOUR_BAR_BACKGROUND, COLOUR_BAR_FOREGROUND_ABILITY);
+            }
 
-            expBar = new UIPanel();
-            expBar.Left.Set(0, 0f);
-            expBar.Top.Set(36, 0f);
-            expBar.Width.Set(100f, 1f);
-            expBar.Height.Set(0, 0.33f);
-            expBar.BackgroundColor = Color.GreenYellow;
-            expCounterPanel.Append(expBar);
+            overlay = new UIExpOverlay();
+            overlay.Left.Set(0f, 0f);
+            overlay.Top.Set(0f, 0f);
+            overlay.Width.Set(panel.Width.Pixels, 0f);
+            overlay.Height.Set(panel.Height.Pixels, 1f);
+            panel.Append(overlay);
 
-            moneyDiplay = new UIMoneyDisplay(expBar);
-            moneyDiplay.Left.Set(15, 0f);
-            moneyDiplay.Top.Set(20, 0f);
-            moneyDiplay.Width.Set(100f, 0f);
-            moneyDiplay.Height.Set(0, 1f);
-            expCounterPanel.Append(moneyDiplay);
+            base.Append(panel);
+        }
 
-            base.Append(expCounterPanel);
+        public void Init(MyPlayer myPlayer)
+        {
+            localMyPlayer = myPlayer;
+        }
+
+        public void Update(SpriteBatch spriteBatch)
+        {
+            if (localMyPlayer == null) return;
+
+            numberActiveBars = 0;
+
+            //exp/level and prep main text
+            double exp = localMyPlayer.GetExp();
+            int level = Methods.Experience.GetLevel(exp);
+            double expHave = Methods.Experience.GetExpTowardsNextLevel(exp);
+            double expNeed = Methods.Experience.GetExpReqForLevel(level + 1, false);
+            float pct = (float)(expHave / expNeed);
+            float pctShow = (float)Math.Round((double)pct * 100, 2);
+            if (pctShow == 100) pctShow = 99.99f;
+            if (exp == MyPlayer.MAX_EXPERIENCE)
+            {
+                pct = 1f;
+                pctShow = 100;
+                expHave = 0;
+                expNeed = 0;
+            }
+            labelsExp[0] = "LEVEL: " + level;
+            labelsExp[1] = pctShow + "%";
+
+            //exp bar
+            if (!localMyPlayer.UIExpBar)
+            {
+                //bar
+                bars[numberActiveBars].left = BAR_EXP_LEFT;
+                bars[numberActiveBars].width = BAR_EXP_WIDTH;
+                bars[numberActiveBars].colourFgd = COLOUR_BAR_FOREGROUND_EXP;
+                bars[numberActiveBars].Activate();
+                bars[numberActiveBars].SetValue(pct);
+                //text
+                labelsBars[0, numberActiveBars] = null;
+                if (expNeed <= 999999999 && expNeed > 0)
+                {
+                    labelsBars[1, numberActiveBars] = expHave + " / " + expNeed;
+                }
+                else
+                {
+                    labelsBars[1, numberActiveBars] = null;
+                }
+                numberActiveBars++;
+            }
+
+            //ability bars
+            int abilityID;
+            for (int i = 0; i < ExperienceAndClasses.MAXIMUM_NUMBER_OF_ABILITIES; i++)
+            {
+                abilityID = localMyPlayer.currentAbilityIDs[i];
+                if (abilityID != Abilities.ID_UNDEFINED)
+                {
+                    //bar
+                    bars[numberActiveBars].left = BAR_EXP_LEFT_INDENT;
+                    bars[numberActiveBars].width = BAR_EXP_WIDTH_INDENT;
+                    bars[numberActiveBars].Activate();
+                    //set bar values and get text to diplay
+                    labelsBars[0, numberActiveBars] = Abilities.SHORTFORM[abilityID];
+                    labelsBars[1, numberActiveBars] = DisplayCooldown(abilityID, numberActiveBars);
+                    numberActiveBars++;
+                }
+            }
+
+            //remove extra bars
+            for (int i = numberActiveBars; i < NUMBER_OF_BARS; i++)
+            {
+                if (bars[i].active) bars[i].Deactivate();
+            }
+
+            //adjust panel size
+            panel.Height.Set(PANEL_HEIGHT_BASE + (numberActiveBars * PANEL_HEIGHT_PER_BAR), 0f);
+        }
+
+        public void SetPosition(float left, float top)
+        {
+            panel.Left.Set(left, 0f);
+            panel.Top.Set(top, 0f);
+            Recalculate();
+        }
+
+        public float GetLeft() { return panel.Left.Pixels; }
+        public float GetTop() { return panel.Top.Pixels; }
+
+        public void SetTransparency(bool newTransparency)
+        {
+            transparency = newTransparency;
+            if (transparency)
+            {
+                panel.BackgroundColor.A = ALPHA_PANEL_TRANSPARENT;
+            }
+            else
+            {
+                panel.BackgroundColor.A = ALPHA_PANEL;
+            }
+            for (int i = 0; i < NUMBER_OF_BARS; i++)
+            {
+                if (bars[i].active)
+                {
+                    bars[i].SetTransparency(transparency);
+                }
+            }
+            Recalculate();
         }
 
         Vector2 offset;
         public bool dragging = false;
         private void DragStart(UIMouseEvent evt, UIElement listeningElement)
         {
-            offset = new Vector2(evt.MousePosition.X - expCounterPanel.Left.Pixels, evt.MousePosition.Y - expCounterPanel.Top.Pixels);
+            offset = new Vector2(evt.MousePosition.X - panel.Left.Pixels, evt.MousePosition.Y - panel.Top.Pixels);
             dragging = true;
         }
 
@@ -68,8 +212,8 @@ namespace ExperienceAndClasses.UI
             Vector2 end = evt.MousePosition;
             dragging = false;
 
-            expCounterPanel.Left.Set(end.X - offset.X, 0f);
-            expCounterPanel.Top.Set(end.Y - offset.Y, 0f);
+            panel.Left.Set(end.X - offset.X, 0f);
+            panel.Top.Set(end.Y - offset.Y, 0f);
 
             Recalculate();
         }
@@ -77,124 +221,172 @@ namespace ExperienceAndClasses.UI
         protected override void DrawSelf(SpriteBatch spriteBatch)
         {
             Vector2 MousePosition = new Vector2((float)Main.mouseX, (float)Main.mouseY);
-            if (expCounterPanel.ContainsPoint(MousePosition))
+            if (panel.ContainsPoint(MousePosition))
             {
                 Main.LocalPlayer.mouseInterface = true;
             }
             if (dragging)
             {
-                expCounterPanel.Left.Set(MousePosition.X - offset.X, 0f);
-                expCounterPanel.Top.Set(MousePosition.Y - offset.Y, 0f);
-                Recalculate();
+                panel.Left.Set(MousePosition.X - offset.X, 0f);
+                panel.Top.Set(MousePosition.Y - offset.Y, 0f);
             }
-        }
-
-        public void updateValue(double experience)//, Mod mod)
-        {
-            moneyDiplay.exp = experience;
-        }
-
-        public void setPosition(float left, float top)
-        {
-            //Main.NewText("SET POSITION");
-            expCounterPanel.Left.Set(left, 0f);
-            expCounterPanel.Top.Set(top, 0f);
+            base.DrawSelf(spriteBatch);
+            Update(spriteBatch);
             Recalculate();
         }
 
-        public float getLeft() { return expCounterPanel.Left.Pixels; }
-        public float getTop() { return expCounterPanel.Top.Pixels; }
-
-        public void setTrans(bool isTrans)
+        public static string DisplayCooldown(int abilityID, int barIndex)
         {
-            if (isTrans)
+            float cooldownSec = 0;
+            float cooldownPct = 0f;
+            string cooldownText = null;
+
+            //determine bar percent and text to overlay
+            long timeNow = DateTime.Now.Ticks;
+            long timeAllow = localMyPlayer.abilityCooldowns[abilityID];
+            switch (abilityID)
             {
-                expCounterPanel.BackgroundColor.A = 0;
-                expBarBack.BackgroundColor.A = 150;
-                expBar.BackgroundColor.A = 200;
+                //any unique cooldown displays
+
+                default:
+                    cooldownSec = (float)(timeAllow - timeNow) / TimeSpan.TicksPerSecond;
+                    if (cooldownSec < 0) cooldownSec = 0;
+                    cooldownPct = (Abilities.COOLDOWN_SECS[abilityID] - cooldownSec) / Abilities.COOLDOWN_SECS[abilityID];
+                    if (cooldownPct != 1f) cooldownText = Math.Round((double)cooldownSec, 1).ToString();
+                    break;
+            }
+
+            //set bar value
+            bars[barIndex].SetValue(cooldownPct, COLOUR_BAR_FOREGROUND_ABILITY);
+
+            //return text for overlay
+            return cooldownText;
+        }
+
+        class UIExpOverlay : UIElement
+        {
+            public const float SCALE_MAIN = 1f;
+            public const float SCALE_SMALL = 0.85f;
+            public static readonly Vector2 ORIGIN = new Vector2(0f);
+            protected override void DrawSelf(SpriteBatch spriteBatch)
+            {
+                float x = Parent.Left.Pixels;
+                float y = Parent.Top.Pixels;
+                Vector2 textSize;
+                //Vector2 v2PctShow = Main.fontMouseText.MeasureString(strPctShow);
+                //Utils.DrawBorderStringFourWay(spriteBatch, Main.fontMouseText, "LEVEL: " + level, shopx, shopy, Color.White, Color.Black, new Vector2(0.3f), 0.75f);
+
+                //text for level and percent exp
+                Utils.DrawBorderStringFourWay(spriteBatch, Main.fontMouseText, labelsExp[0], x + TEXT_LEVEL_X, y + TEXT_LEVEL_Y, COLOUR_TEXT_INNER, COLOUR_TEXT_OUTTER, ORIGIN, SCALE_MAIN);
+                textSize = Main.fontMouseText.MeasureString(labelsExp[1]) * SCALE_MAIN;
+                Utils.DrawBorderStringFourWay(spriteBatch, Main.fontMouseText, labelsExp[1], x + TEXT_PCT_X - textSize.X, y + TEXT_PCT_Y, COLOUR_TEXT_INNER, COLOUR_TEXT_OUTTER, ORIGIN, SCALE_MAIN);
+
+                //text for each bar
+                float barCenter;
+                for (int i = 0; i < NUMBER_OF_BARS; i++)
+                {
+                    if (labelsBars[0, i] != null)
+                    {
+                        textSize = Main.fontMouseText.MeasureString(labelsBars[0, i]) * SCALE_SMALL;
+                        Utils.DrawBorderStringFourWay(spriteBatch, Main.fontMouseText, labelsBars[0, i], x + TEXT_ABILITY_X - (textSize.X/2), y + bars[i].top + TEXT_ABILITY_Y_DOWN, COLOUR_TEXT_INNER, COLOUR_TEXT_OUTTER, ORIGIN, SCALE_SMALL);
+                    }
+                    if (labelsBars[1, i] != null)
+                    {
+                        barCenter = bars[i].left + (bars[i].width / 2);
+                        textSize = Main.fontMouseText.MeasureString(labelsBars[1, i]) * SCALE_SMALL;
+                        Utils.DrawBorderStringFourWay(spriteBatch, Main.fontMouseText, labelsBars[1, i], x + barCenter - (textSize.X / 2), y + bars[i].top + TEXT_ABILITY_Y_DOWN, COLOUR_TEXT_INNER, COLOUR_TEXT_OUTTER, ORIGIN, SCALE_SMALL);
+                    }
+                }
+            }
+        }
+    }
+
+    //some of this implementation is crap - redo if bored or reusing
+    class UIBar
+    {
+        public UIPanel bgd, fgd, parentPanel;
+        public bool active, transparency;
+        public float left, top, width, height;
+        public byte alphaBgd, alphaFgd, alphaBgdTrans, alphaFgdTrans;
+        public Color colourBgd, colourFgd;
+
+        public UIBar(UIPanel parentPanel, float left, float top, float width, float height, bool transparency, byte alphaBgd, byte alphaFgd, byte alphaBgdTrans, byte alphaFgdTrans, Color colourBgd, Color colourFgd)
+        {
+            this.parentPanel = parentPanel;
+            this.left = left;
+            this.top = top;
+            this.width = width;
+            this.height = height;
+            this.transparency = transparency;
+            this.alphaBgd = alphaBgd;
+            this.alphaFgd = alphaFgd;
+            this.alphaBgdTrans = alphaBgdTrans;
+            this.alphaFgdTrans = alphaFgdTrans;
+            this.colourBgd = colourBgd;
+            this.colourFgd = colourFgd;
+
+            Activate();
+        }
+
+        private const float MIN_BAR_VALUE_SHOW = 0.11f;
+        public void SetValue(float value)
+        {
+            value = MIN_BAR_VALUE_SHOW + (value * (1f - MIN_BAR_VALUE_SHOW));
+            fgd.Width.Set(width * value, 0f);
+            fgd.Recalculate();
+        }
+
+        public void SetValue(float value, Color colourFgd)
+        {
+            this.colourFgd = colourFgd;
+            SetValue(value);
+        }
+
+        public void SetTransparency(bool transparency)
+        {
+            if (transparency)
+            {
+                bgd.BackgroundColor.A = alphaBgdTrans;
+                fgd.BackgroundColor.A = alphaFgdTrans;
             }
             else
             {
-                expCounterPanel.BackgroundColor.A = 255;
-                expBarBack.BackgroundColor.A = 255;
-                expBar.BackgroundColor.A = 255;
+                bgd.BackgroundColor.A = alphaBgd;
+                fgd.BackgroundColor.A = alphaFgd;
             }
-            Recalculate();
         }
-    }
 
-    public class UIMoneyDisplay : UIElement
-    {
-        public double exp;
-        public UIPanel expBar;
-
-        public UIMoneyDisplay(UIPanel bar)
+        public void Activate()
         {
-            Width.Set(100, 0f);
-            Height.Set(40, 0f);
-            expBar = bar;
+            if (!active) bgd = new UIPanel();
+            bgd.Left.Set(left, 0f);
+            bgd.Top.Set(top, 0f);
+            bgd.Width.Set(width, 0f);
+            bgd.Height.Set(height, 0f);
+            bgd.BackgroundColor = colourBgd;
+            if (!active) parentPanel.Append(bgd);
+            bgd.Recalculate();
+
+            if (!active) fgd = new UIPanel();
+            fgd.Left.Set(left, 0f);
+            fgd.Top.Set(top, 0f);
+            fgd.Width.Set(width, 0f);
+            fgd.Height.Set(height, 0f);
+            fgd.BackgroundColor = colourFgd;
+            if (!active) parentPanel.Append(fgd);
+            fgd.Recalculate();
+
+            SetTransparency(transparency);
+
+            active = true;
         }
 
-        protected override void DrawSelf(SpriteBatch spriteBatch)
+        public void Deactivate()
         {
-            CalculatedStyle innerDimensions = base.GetInnerDimensions();
-            //Vector2 drawPos = new Vector2(innerDimensions.X + 5f, innerDimensions.Y + 30f);
+            active = false;
 
-            float shopx = innerDimensions.X - 2f;
-            float shopy = innerDimensions.Y - 5f;
-
-            int level = Methods.Experience.GetLevel(exp);
-            double expHave = Methods.Experience.GetExpTowardsNextLevel(exp);
-            double expNeed = Methods.Experience.GetExpReqForLevel(level+1,false);
-            float pct = (float)(expHave / expNeed);
-            float pctShow = (float)Math.Round((double)pct * 100, 2);
-            if (pctShow == 100) pctShow = 99.99f;
-
-            if (exp==MyPlayer.MAX_EXPERIENCE)
-            {
-                pct = 1f;
-                pctShow = 100;
-                expHave = 0;
-                expNeed = 0;
-            }
-
-            string strExpNum = expHave + "/" + expNeed;
-            Vector2 v2ExpNum = Main.fontMouseText.MeasureString(strExpNum);
-
-            string strPctShow = pctShow + "%";
-            Vector2 v2PctShow = Main.fontMouseText.MeasureString(strPctShow);
-
-            Utils.DrawBorderStringFourWay(spriteBatch, Main.fontMouseText, "LEVEL: " + level, shopx, shopy, Color.White, Color.Black, new Vector2(0.3f), 0.75f);
-
-            Utils.DrawBorderStringFourWay(spriteBatch, Main.fontMouseText, strPctShow, shopx + 120f - (v2PctShow.X/3), shopy, Color.White, Color.Black, new Vector2(0.3f), 0.75f);
-            //shopx + (float)(24 * 4)
-
-            if (expNeed<=999999999 && expNeed>0)
-                Utils.DrawBorderStringFourWay(spriteBatch, Main.fontMouseText, strExpNum, (shopx+65f) - (v2ExpNum.X/3), shopy + 25f, Color.White, Color.Black, new Vector2(0.3f), 0.75f);
-
-            //shopx + (float)(24 * 1.6f)
-
-            if (pct<.10f)
-            {
-                pct = .10f;
-            }
-            expBar.Width.Set(0f, pct);
-            expBar.Recalculate();
+            bgd.Remove();
+            fgd.Remove();
         }
-
-    }
-
-    public class MoneyCounterGlobalItem : GlobalItem
-    {
-        /*
-        public override void UpdateInventory(Item item, Player player)
-        {
-            if (item.type == mod.ItemType("Experience"))
-            {
-                (mod as ExperienceAndClasses).myUI.updateValue(player, mod);
-            }
-            base.UpdateInventory(item, player);
-        }
-        */
     }
 }

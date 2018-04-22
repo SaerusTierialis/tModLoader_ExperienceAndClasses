@@ -4,13 +4,13 @@ using Terraria.ModLoader;
 
 namespace ExperienceAndClasses
 {
-    class Command_expbar : CommandTemplate
+    class Command_expui : CommandTemplate
     {
-        public Command_expbar()
+        public Command_expui()
         {
-            name = "expbar";
+            name = "expui";
             argstr = "";
-            desc = "toggle exp bar visibility";
+            desc = "toggle experience and cooldown ui visibility";
         }
 
         public override void Action(CommandCaller caller, string input, string[] args)
@@ -18,28 +18,48 @@ namespace ExperienceAndClasses
             MyPlayer localMyPlayer = caller.Player.GetModPlayer<MyPlayer>(mod);
             localMyPlayer.UIShow = !localMyPlayer.UIShow;
             if (localMyPlayer.UIShow)
-                Main.NewText("Experience bar enabled. Display will be visible while wearing a Class Token.", ExperienceAndClasses.MESSAGE_COLOUR_YELLOW);
+                Main.NewText("Experience and cooldown ui enabled.", ExperienceAndClasses.MESSAGE_COLOUR_YELLOW);
             else
-                Main.NewText("Experience bar hidden.", ExperienceAndClasses.MESSAGE_COLOUR_YELLOW);
+                Main.NewText("Experience and cooldown ui disabled.", ExperienceAndClasses.MESSAGE_COLOUR_YELLOW);
         }
     }
 
-    class Command_expbartrans : CommandTemplate
+    class Command_expuibar : CommandTemplate
     {
-        public Command_expbartrans()
+        public Command_expuibar()
         {
-            name = "expbartrans";
+            name = "expuibar";
             argstr = "";
-            desc = "toggle experience bar transparency";
+            desc = "toggle experience bar in the experience and cooldown ui";
         }
 
         public override void Action(CommandCaller caller, string input, string[] args)
         {
             MyPlayer localMyPlayer = caller.Player.GetModPlayer<MyPlayer>(mod);
-            UI.MyUI myUI = (mod as ExperienceAndClasses).myUI;
+            localMyPlayer.UIExpBar = !localMyPlayer.UIExpBar;
+            if (localMyPlayer.UIShow)
+                Main.NewText("Experience bar enabled.", ExperienceAndClasses.MESSAGE_COLOUR_YELLOW);
+            else
+                Main.NewText("Experience bar disabled.", ExperienceAndClasses.MESSAGE_COLOUR_YELLOW);
+        }
+    }
+
+    class Command_expuitrans : CommandTemplate
+    {
+        public Command_expuitrans()
+        {
+            name = "expuitrans";
+            argstr = "";
+            desc = "toggle experience and cooldown ui transparency";
+        }
+
+        public override void Action(CommandCaller caller, string input, string[] args)
+        {
+            MyPlayer localMyPlayer = caller.Player.GetModPlayer<MyPlayer>(mod);
+            UI.UIExp myUI = (mod as ExperienceAndClasses).uiExp;
 
             localMyPlayer.UITrans = !localMyPlayer.UITrans;
-            myUI.setTrans(localMyPlayer.UITrans);
+            myUI.SetTransparency(localMyPlayer.UITrans);
             if
                 (localMyPlayer.UITrans) Main.NewText("Experience bar is now transparent.", ExperienceAndClasses.MESSAGE_COLOUR_YELLOW);
             else
@@ -47,24 +67,26 @@ namespace ExperienceAndClasses
         }
     }
 
-    class Command_expbarreset : CommandTemplate
+    class Command_expuireset : CommandTemplate
     {
-        public Command_expbarreset()
+        public Command_expuireset()
         {
-            name = "expbarreset";
+            name = "expuireset";
             argstr = "";
-            desc = "reset experience bar";
+            desc = "reset experience and cooldown ui";
         }
 
         public override void Action(CommandCaller caller, string input, string[] args)
         {
             MyPlayer localMyPlayer = caller.Player.GetModPlayer<MyPlayer>(mod);
-            UI.MyUI myUI = (mod as ExperienceAndClasses).myUI;
+            UI.UIExp myUI = (mod as ExperienceAndClasses).uiExp;
 
-            myUI.setPosition(400f, 100f);
+            myUI.SetPosition(400f, 100f);
             localMyPlayer.UIShow = true;
+            localMyPlayer.UIExpBar = true;
             localMyPlayer.UITrans = false;
-            myUI.setTrans(localMyPlayer.UITrans);
+            myUI.SetTransparency(localMyPlayer.UITrans);
+            //myUI.Update();
             Main.NewText("Experience bar reset.", ExperienceAndClasses.MESSAGE_COLOUR_YELLOW);
         }
     }

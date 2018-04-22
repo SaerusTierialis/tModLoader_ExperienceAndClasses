@@ -31,7 +31,7 @@ namespace ExperienceAndClasses.NPCs
                 //default to no drop
                 bool droppedBossOrb = false;
                 bool droppedMonsterOrb = false;
-
+                
                 //check qualifications and loot
                 if (Main.netMode == 0)
                 {
@@ -153,8 +153,8 @@ namespace ExperienceAndClasses.NPCs
                         if (Main.netMode == 0)
                         {
                             //update UI if earning experience while dead (prevents visual bug)
-                            if (player.dead)
-                                (mod as ExperienceAndClasses).myUI.updateValue(myPlayer.GetExp());
+                            //if (player.dead)
+                            //    (mod as ExperienceAndClasses).uiExp.Update();
                         }
                     }
                 }

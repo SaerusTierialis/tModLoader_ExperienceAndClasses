@@ -35,6 +35,7 @@ namespace ExperienceAndClasses
         public float UILeft = 400f;
         public float UITop = 100f;
         public bool UIShow = true;
+        public bool UIExpBar = true;
         public bool UITrans = false;
 
         public List<Tuple<ModItem, string>> classTokensEquipped;
@@ -191,8 +192,8 @@ namespace ExperienceAndClasses
         //save xp
         public override TagCompound Save()
         {
-            UILeft = (mod as ExperienceAndClasses).myUI.getLeft();
-            UITop = (mod as ExperienceAndClasses).myUI.getTop();
+            UILeft = (mod as ExperienceAndClasses).uiExp.GetLeft();
+            UITop = (mod as ExperienceAndClasses).uiExp.GetTop();
 
             return new TagCompound {
                 {"experience", experience},
@@ -200,6 +201,7 @@ namespace ExperienceAndClasses
                 {"UI_left", UILeft},
                 {"UI_top", UITop},
                 {"UI_show", UIShow},
+                {"UI_expbar_show", UIExpBar},
                 {"UI_trans", UITrans},
                 {"traceChar", traceChar},
             };
@@ -220,6 +222,7 @@ namespace ExperienceAndClasses
             UILeft = Commons.TryGet<float>(tag, "UI_left", 400f);
             UITop = Commons.TryGet<float>(tag, "UI_top", 100f);
             UIShow = Commons.TryGet<bool>(tag, "UI_show", true);
+            UIExpBar = Commons.TryGet<bool>(tag, "UI_expbar_show", true);
             UITrans = Commons.TryGet<bool>(tag, "UI_trans", false);
 
             //trace
@@ -249,10 +252,11 @@ namespace ExperienceAndClasses
                     player.PutItemInInventory(mod.ItemType("ClassToken_Novice"));
                 }
 
-                UI.MyUI.visible = true;
-                (mod as ExperienceAndClasses).myUI.setTrans(UITrans);
-                (mod as ExperienceAndClasses).myUI.setPosition(UILeft, UITop);
-                (mod as ExperienceAndClasses).myUI.updateValue(GetExp());
+                UI.UIExp.visible = true;
+                (mod as ExperienceAndClasses).uiExp.Init(this);
+                (mod as ExperienceAndClasses).uiExp.SetTransparency(UITrans);
+                (mod as ExperienceAndClasses).uiExp.SetPosition(UILeft, UITop);
+                //(mod as ExperienceAndClasses).uiExp.Update();
 
                 //settings
                 if (Main.netMode == 0)
@@ -346,16 +350,16 @@ namespace ExperienceAndClasses
             if (player.Equals(Main.LocalPlayer))
             {
                 //update UI if local single-player
-                if(Main.netMode==0) (mod as ExperienceAndClasses).myUI.updateValue(GetExp());
+                //if(Main.netMode==0) (mod as ExperienceAndClasses).uiExp.Update();
 
                 //UI visibility
                 if (UIShow)
                 {
-                    UI.MyUI.visible = true;
+                    UI.UIExp.visible = true;
                 }
                 else
                 {
-                    UI.MyUI.visible = false;
+                    UI.UIExp.visible = false;
                 }
             }
 
@@ -393,10 +397,10 @@ namespace ExperienceAndClasses
 
                     SubtractExp(expLoss); //notifies client if server
 
-                    if (Main.netMode == 0)
-                    {
-                        (mod as ExperienceAndClasses).myUI.updateValue(GetExp());
-                    }
+                    //if (Main.netMode == 0)
+                    //{
+                    //    (mod as ExperienceAndClasses).uiExp.Update();
+                    //}
                 }
             }
 
@@ -578,14 +582,14 @@ namespace ExperienceAndClasses
                 else
                 {
                     outcome = Abilities.DoAbility(this, abilityID, effectiveLevel);
-                    Methods.PacketSender.ClientAbility(mod, abilityID, effectiveLevel);
+                    //Methods.PacketSender.ClientAbility(mod, abilityID, effectiveLevel);
 
                     if (outcome == Abilities.RETURN_SUCCESS) showFailMessages = false;
 
                     if (showFailMessages && (outcome != latestAbilityFail))
                     {
                         latestAbilityFail = outcome;
-                        Abilities.DoReturnMessage(latestAbilityFail, abilityID);
+                        Abilities.SendReturnMessage(latestAbilityFail, abilityID);
                     }
                 }
             }

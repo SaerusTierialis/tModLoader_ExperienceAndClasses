@@ -74,8 +74,8 @@
     <Compile Include="NPCs\Helpers.cs" />
     <Compile Include="NPCs\MyGlobalNPC.cs" />
     <Compile Include="Projectiles\MyGlobalProjectile.cs" />
-    <Compile Include="Recipes\Helpers.cs" />
-    <Compile Include="Recipes\RecipeTypes.cs" />
+    <Compile Include="UI\Recipes\Helpers.cs" />
+    <Compile Include="UI\Recipes\RecipeTypes.cs" />
     <Compile Include="UI\MyUI.cs" />
   </ItemGroup>
   <ItemGroup>

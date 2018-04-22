@@ -271,23 +271,23 @@ namespace ExperienceAndClasses.Methods
             packet.Send();
         }
 
-        /// <summary>
-        /// Player tells server that they are performing an ability
-        /// </summary>
-        /// <param name="mod"></param>
-        /// <param name="abilityID"></param>
-        public static void ClientAbility(Mod mod, int abilityID, int level = 1, double rand = 0)
-        {
-            if (Main.netMode != 1) return;
+        ///// <summary>
+        ///// Player tells server that they are performing an ability
+        ///// </summary>
+        ///// <param name="mod"></param>
+        ///// <param name="abilityID"></param>
+        //public static void ClientAbility(Mod mod, int abilityID, int level = 1, double rand = 0)
+        //{
+        //    if (Main.netMode != 1) return;
 
-            ModPacket packet = mod.GetPacket();
-            packet.Write((byte)ExpModMessageType.ClientAbility);
-            packet.Write(Main.LocalPlayer.whoAmI);
-            packet.Write(abilityID);
-            packet.Write(level);
-            packet.Write(rand);
-            packet.Send();
-        }
+        //    ModPacket packet = mod.GetPacket();
+        //    packet.Write((byte)ExpModMessageType.ClientAbility);
+        //    packet.Write(Main.LocalPlayer.whoAmI);
+        //    packet.Write(abilityID);
+        //    packet.Write(level);
+        //    packet.Write(rand);
+        //    packet.Send();
+        //}
 
         /* ~~~~~~~~~~~~~~~~~~~~~ Packet Senders - Server ~~~~~~~~~~~~~~~~~~~~~ */
 

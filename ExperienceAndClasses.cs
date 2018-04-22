@@ -42,7 +42,7 @@ namespace ExperienceAndClasses
         ClientAFK,
         ClientUnAFK,
 
-        ClientAbility,
+        //ClientAbility,
 
         //Server packets are sent by server to clients
 
@@ -56,7 +56,7 @@ namespace ExperienceAndClasses
     {
         //UI
         private UserInterface myUserInterface;
-        public MyUI myUI;
+        public UIExp uiExp;
 
         //message colours
         public static readonly Color MESSAGE_COLOUR_RED = new Color(255, 0, 0);
@@ -121,11 +121,11 @@ namespace ExperienceAndClasses
         //load
         public override void Load()
         {
-            myUI = new MyUI();
-            myUI.Activate();
+            uiExp = new UIExp();
+            uiExp.Activate();
             myUserInterface = new UserInterface();
-            myUserInterface.SetState(myUI);
-            MyUI.visible = true;
+            myUserInterface.SetState(uiExp);
+            UIExp.visible = true;
             HOTKEY_ACTIVATE_ABILITY = RegisterHotKey("Ability", "Q");
             HOTKEY_MODIFIER_1 = RegisterHotKey("Modifier 1", "Q");
             HOTKEY_MODIFIER_2 = RegisterHotKey("Modifier 2", "W");
@@ -214,8 +214,8 @@ namespace ExperienceAndClasses
                         myPlayer.experience = newExp;
                         myPlayer.ExpMsg(expChange);
 
-                        if (Main.LocalPlayer.Equals(player))
-                            myUI.updateValue(newExp);
+                        //if (Main.LocalPlayer.Equals(player))
+                        //    uiExp.Update();
                     }
 
                     if ((Main.netMode==2 && mapTrace) || (Main.netMode==1 && traceChar))
@@ -607,8 +607,8 @@ namespace ExperienceAndClasses
                             myPlayer.experience = newExp;
                             myPlayer.ExpMsg(expChange);
 
-                            if (Main.LocalPlayer.Equals(player))
-                                myUI.updateValue(newExp);
+                            //if (Main.LocalPlayer.Equals(player))
+                            //    uiExp.Update();
                         }
                     }
 
@@ -644,21 +644,21 @@ namespace ExperienceAndClasses
                     if (mapTrace || traceChar) Methods.ChatCommands.Trace("TRACE:Recieved ClientTryAuth from player #" + player.whoAmI + ":" + player.name + " " + code);
                     break;
 
-                //Player tells server that they are performing an ability
-                case ExpModMessageType.ClientAbility:
-                    //read
-                    player = Main.player[reader.ReadInt32()];
+                ////Player tells server that they are performing an ability
+                //case ExpModMessageType.ClientAbility:
+                //    //read
+                //    player = Main.player[reader.ReadInt32()];
 
-                    //act
-                    Console.WriteLine("ABILITY_A");
-                    Main.NewText("ABILITY_B");
+                //    //act
+                //    Console.WriteLine("ABILITY_A");
+                //    Main.NewText("ABILITY_B");
 
-                    if (mapTrace || traceChar) Methods.ChatCommands.Trace("TRACE:Recieved ClientAbility from player #" + player.whoAmI + ":" + player.name);
-                    break;
+                //    if (mapTrace || traceChar) Methods.ChatCommands.Trace("TRACE:Recieved ClientAbility from player #" + player.whoAmI + ":" + player.name);
+                //    break;
 
-                default:
-                    //ErrorLogger.Log("Unknown Message type: " + msgType);
-                    break;
+                //default:
+                //    //ErrorLogger.Log("Unknown Message type: " + msgType);
+                //    break;
             }
         }
 
@@ -677,10 +677,10 @@ namespace ExperienceAndClasses
                     "Experience UI",
                     delegate
                     {
-                        if (MyUI.visible)
+                        if (UIExp.visible)
                         {
                             myUserInterface.Update(Main._drawInterfaceGameTime);
-                            myUI.Draw(Main.spriteBatch);
+                            uiExp.Draw(Main.spriteBatch);
                         }
                         return true;
                     },
