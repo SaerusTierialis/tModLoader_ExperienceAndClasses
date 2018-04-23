@@ -10,7 +10,7 @@ namespace ExperienceAndClasses
         public const double TIME_BETWEEN_REQUEST_MSEC = 1000;
         public static DateTime timeLastRequests = DateTime.MinValue;
 
-        public const double TIME_BETWEEN_SYNC_EXP_CHANGES_MSEC = 500;
+        public const double TIME_BETWEEN_SYNC_EXP_CHANGES_MSEC = 250;
         public static DateTime timeLastSyncExpChanges = DateTime.MinValue;
 
         public const double TIME_BETWEEN_SYNC_MAP_SETTINGS_MSEC = 20 * 1000;

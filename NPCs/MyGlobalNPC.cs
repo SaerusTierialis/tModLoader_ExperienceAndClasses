@@ -105,7 +105,7 @@ namespace ExperienceAndClasses.NPCs
                     {
                         player = Main.player[playerIndex];
                     }
-                    myPlayer = Main.LocalPlayer.GetModPlayer<MyPlayer>(mod);
+                    myPlayer = player.GetModPlayer<MyPlayer>(mod);
 
                     //only reward if not afk
                     if (!myPlayer.afk)
@@ -132,7 +132,7 @@ namespace ExperienceAndClasses.NPCs
                             expGive = Math.Floor(expGive);
 
                             //exp
-                            myPlayer.AddExp((int)expGive);
+                            myPlayer.AddExp(expGive);
 
                             /*~~~~~~~~~~~~~~~~~~~~~~ monster orb ~~~~~~~~~~~~~~~~~~~~~~*/
                             if (Main.rand.Next(1000) < (int)(chanceMonster * 10))

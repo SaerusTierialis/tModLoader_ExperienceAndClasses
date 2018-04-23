@@ -383,15 +383,15 @@ namespace ExperienceAndClasses.Methods
             for (int ind = 0; ind < MyWorld.clientNeedsExpUpdate_counter; ind++)
             {
                 player = Main.player[MyWorld.clientNeedsExpUpdate_indices[ind]];
-                packet.Write(player.whoAmI); //each player index to updated
+                packet.Write(player.whoAmI);
                 if (player.active)
                 {
                     myPlayer = player.GetModPlayer<MyPlayer>(mod);
-                    packet.Write(myPlayer.GetExp()); //each player exp to updated
+                    packet.Write(myPlayer.GetExp());
                 }
                 else
                 {
-                    packet.Write(-1); //each player exp to updated
+                    packet.Write(-1);
                 }
 
                 //reset
