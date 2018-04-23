@@ -7,6 +7,8 @@ namespace ExperienceAndClasses
 {
     class Abilities
     {
+        public const float THRESHOLD_SHOW_OFF_COOLDOWN_MSG = 5f;
+
         public const int RETURN_SUCCESS = 1;
         public const int RETURN_FAIL_UNDEFINED = -1;
         public const int RETURN_FAIL_STATUS = -2;
@@ -35,6 +37,7 @@ namespace ExperienceAndClasses
         public static float[] MANA_COST = new float[NUMBER_OF_IDs];
         public static float[] MANA_COST_PERCENT = new float[NUMBER_OF_IDs];
         public static float[] COOLDOWN_SECS = new float[NUMBER_OF_IDs];
+        public static bool[] ON_COOLDOWN = new bool[NUMBER_OF_IDs];
 
         /* ~~~~~~~~~~~~ Ability Values ~~~~~~~~~~~~ */
         public static void Initialize()
@@ -47,7 +50,7 @@ namespace ExperienceAndClasses
             DESCRIPTION[id] = "placeholder";
             LEVEL_REQUIREMENT[id] = 10;
             MANA_COST_PERCENT[id] = 0.10f;
-            COOLDOWN_SECS[id] = 0.5f;
+            COOLDOWN_SECS[id] = 5f;
 
             id = ID_CLERIC_ACTIVE_SANCTUARY;
             NAME[id] = "Sanctuary";
@@ -145,27 +148,31 @@ namespace ExperienceAndClasses
             //keep in mind that all clients will execute this!
             switch (abilityID)
             {
-                case ID_CLERIC_ACTIVE_HEAL:
-                    // RadiusEffect(myPosition, true, true, true, false, false, 1000f, level * 2, 0.5f);
-                    // RadiusEffect(myPosition, false, false, false, true, true, 1000f, 0, 0, 0, 0, 10f);
-                    Projectile.NewProjectile(player.position.X, player.position.Y, 0, 0, ProjectileID.LostSoulFriendly, level * 2, 0, player.whoAmI);
-                    break;
+                //case ID_CLERIC_ACTIVE_HEAL:
+                //    // RadiusEffect(myPosition, true, true, true, false, false, 1000f, level * 2, 0.5f);
+                //    // RadiusEffect(myPosition, false, false, false, true, true, 1000f, 0, 0, 0, 0, 10f);
+                //    //Projectile.NewProjectile(player.position.X, player.position.Y, 0, 0, ProjectileID.LostSoulFriendly, level * 2, 0, player.whoAmI);
+                //    break;
 
-                case ID_CLERIC_ACTIVE_SANCTUARY:
-                    break;
+                //case ID_CLERIC_ACTIVE_SANCTUARY:
+                //    break;
 
-                case ID_CLERIC_ACTIVE_DIVINE_INTERVENTION:
-                    break;
+                //case ID_CLERIC_ACTIVE_DIVINE_INTERVENTION:
+                //    break;
 
-                case ID_CLERIC_ACTIVE_RESSURECTION:
-                    break;
+                //case ID_CLERIC_ACTIVE_RESSURECTION:
+                //    break;
 
 
 
 
                 default:
                     //undefined ability
-                    return RETURN_FAIL_UNDEFINED;
+
+                    //return RETURN_FAIL_UNDEFINED;
+                    Main.NewText(NAME[abilityID] + " Placeholder", ExperienceAndClasses.MESSAGE_COLOUR_RED);
+                    CombatText.NewText(player.getRect(), ExperienceAndClasses.MESSAGE_COLOUR_RED, NAME[abilityID] + " Placeholder");
+                    break;
             }
 
             /* ~~~~~~~~~~~~ Costs ~~~~~~~~~~~~ */
@@ -174,7 +181,7 @@ namespace ExperienceAndClasses
             {
                 player.statMana = 0;
             }
-
+            if (cooldownSecs > 0) ON_COOLDOWN[abilityID] = true;
             myPlayer.abilityCooldowns[abilityID] = timeNow + (long)(cooldownSecs * TimeSpan.TicksPerSecond);
 
             /* ~~~~~~~~~~~~ Success ~~~~~~~~~~~~ */

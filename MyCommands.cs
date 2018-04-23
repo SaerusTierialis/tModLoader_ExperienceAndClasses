@@ -4,6 +4,26 @@ using Terraria.ModLoader;
 
 namespace ExperienceAndClasses
 {
+    class Command_expafk : CommandTemplate //allowAFK
+    {
+        public Command_expafk()
+        {
+            name = "expafk";
+            argstr = "";
+            desc = "toggle whether to enter AFK mode after " + (ExperienceAndClasses.AFK_TIME_TICKS / TimeSpan.TicksPerSecond) + " seconds";
+        }
+
+        public override void Action(CommandCaller caller, string input, string[] args)
+        {
+            MyPlayer localMyPlayer = caller.Player.GetModPlayer<MyPlayer>(mod);
+            localMyPlayer.allowAFK = !localMyPlayer.allowAFK;
+            if (localMyPlayer.allowAFK)
+                Main.NewText("AFK mode is enabled.", ExperienceAndClasses.MESSAGE_COLOUR_YELLOW);
+            else
+                Main.NewText("AFK mode disabled.", ExperienceAndClasses.MESSAGE_COLOUR_YELLOW);
+        }
+    }
+
     class Command_expui : CommandTemplate
     {
         public Command_expui()
@@ -193,7 +213,7 @@ namespace ExperienceAndClasses
         {
             if (args.Length == 0)
             {
-                Main.NewText("The current exprate is " + (ExperienceAndClasses.mapExpModifier * 100) + "%.", ExperienceAndClasses.MESSAGE_COLOUR_YELLOW);
+                Main.NewText("The current exprate is " + (ExperienceAndClasses.worldExpModifier * 100) + "%.", ExperienceAndClasses.MESSAGE_COLOUR_YELLOW);
             }
             else
             {
@@ -216,7 +236,7 @@ namespace ExperienceAndClasses
         {
             if (args.Length == 0)
             {
-                Main.NewText("The current death penalty is " + (ExperienceAndClasses.mapDeathPenalty * 100) + "%.", ExperienceAndClasses.MESSAGE_COLOUR_YELLOW);
+                Main.NewText("The current death penalty is " + (ExperienceAndClasses.worldDeathPenalty * 100) + "%.", ExperienceAndClasses.MESSAGE_COLOUR_YELLOW);
             }
             else
             {
@@ -376,13 +396,13 @@ namespace ExperienceAndClasses
         {
             if (args.Length == 0)
             {
-                if (ExperienceAndClasses.mapLevelCap <= 0)
+                if (ExperienceAndClasses.worldLevelCap <= 0)
                 {
                     Main.NewText("Level cap is disabled.", ExperienceAndClasses.MESSAGE_COLOUR_YELLOW);
                 }
                 else
                 {
-                    Main.NewText("Level cap is " + ExperienceAndClasses.mapLevelCap + ".", ExperienceAndClasses.MESSAGE_COLOUR_YELLOW);
+                    Main.NewText("Level cap is " + ExperienceAndClasses.worldLevelCap + ".", ExperienceAndClasses.MESSAGE_COLOUR_YELLOW);
                 }
             }
             else
@@ -406,13 +426,13 @@ namespace ExperienceAndClasses
         {
             if (args.Length == 0)
             {
-                if (ExperienceAndClasses.mapClassDamageReduction <= 0)
+                if (ExperienceAndClasses.worldClassDamageReduction <= 0)
                 {
                     Main.NewText("Damage reduction is disabled.", ExperienceAndClasses.MESSAGE_COLOUR_YELLOW);
                 }
                 else
                 {
-                    Main.NewText("Damage reduction is " + ExperienceAndClasses.mapClassDamageReduction + "%.", ExperienceAndClasses.MESSAGE_COLOUR_YELLOW);
+                    Main.NewText("Damage reduction is " + ExperienceAndClasses.worldClassDamageReduction + "%.", ExperienceAndClasses.MESSAGE_COLOUR_YELLOW);
                 }
             }
             else
@@ -487,7 +507,7 @@ namespace ExperienceAndClasses
         {
             if (args.Length == 0)
             {
-                Methods.ChatCommands.CommandShowmapAuthCode(mod);
+                Methods.ChatCommands.CommandShowmapAuthCode();
             }
             else
             {
@@ -510,7 +530,7 @@ namespace ExperienceAndClasses
 
         public override void Action(CommandCaller caller, string input, string[] args)
         {
-            Methods.ChatCommands.CommandDisplaySettings();
+            Methods.ChatCommands.CommandDisplaySettings(mod);
         }
     }
 

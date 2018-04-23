@@ -40,11 +40,12 @@ namespace ExperienceAndClasses.Methods
         /// <param name="text"></param>
         public static void CommandSetExpRate(Mod mod, double rate, string text)
         {
-            if (rate < 0) rate = 0;
+            if (rate < 0)
+                rate = 0;
             if (Main.netMode == 0)
             {
-                ExperienceAndClasses.mapExpModifier = rate;
-                Main.NewText("The new exprate is " + (ExperienceAndClasses.mapExpModifier * 100) + "%.", ExperienceAndClasses.MESSAGE_COLOUR_YELLOW);
+                ExperienceAndClasses.worldExpModifier = rate;
+                Main.NewText("The new exprate is " + (ExperienceAndClasses.worldExpModifier * 100) + "%.", ExperienceAndClasses.MESSAGE_COLOUR_YELLOW);
             }
             else if (Main.netMode == 1)
             {
@@ -65,12 +66,12 @@ namespace ExperienceAndClasses.Methods
         {
             if (rate < 0)
                 rate = 0;
-            else if (rate > 100)
-                rate = 100;
+            else if (rate > 1)
+                rate = 1;
             if (Main.netMode == 0)
             {
-                ExperienceAndClasses.mapDeathPenalty = rate;
-                Main.NewText("The new death penalty is " + (ExperienceAndClasses.mapDeathPenalty * 100) + "%.", ExperienceAndClasses.MESSAGE_COLOUR_YELLOW);
+                ExperienceAndClasses.worldDeathPenalty = rate;
+                Main.NewText("The new death penalty is " + (ExperienceAndClasses.worldDeathPenalty * 100) + "%.", ExperienceAndClasses.MESSAGE_COLOUR_YELLOW);
             }
             else if (Main.netMode == 1)
             {
@@ -92,8 +93,8 @@ namespace ExperienceAndClasses.Methods
             MyPlayer myPlayer = player.GetModPlayer<MyPlayer>(mod);
             if (Main.netMode == 0)
             {
-                ExperienceAndClasses.mapIgnoreCaps = !ExperienceAndClasses.mapIgnoreCaps;
-                if (ExperienceAndClasses.mapIgnoreCaps)
+                ExperienceAndClasses.worldIgnoreCaps = !ExperienceAndClasses.worldIgnoreCaps;
+                if (ExperienceAndClasses.worldIgnoreCaps)
                 {
                     Main.NewText("Class bonus caps disabled.", ExperienceAndClasses.MESSAGE_COLOUR_YELLOW);
                 }
@@ -104,7 +105,7 @@ namespace ExperienceAndClasses.Methods
             }
             else if (Main.netMode == 1)
             {
-                PacketSender.ClientRequestIgnoreCaps(mod, !ExperienceAndClasses.mapIgnoreCaps, text);
+                PacketSender.ClientRequestIgnoreCaps(mod, !ExperienceAndClasses.worldIgnoreCaps, text);
                 Main.NewTextMultiline("Request to toggle the class caps feature has been sent to the server." +
                                     "\nIf you are authorized, the change should occur shortly. Use /expauth [code]" +
                                     "\nto become authorized. The code is displayed in the server console.");
@@ -143,14 +144,14 @@ namespace ExperienceAndClasses.Methods
             if (Main.netMode == 0)
             {
                 int priorLevel = Experience.GetLevel(myPlayer.GetExp());
-                ExperienceAndClasses.mapLevelCap = level;
-                if (ExperienceAndClasses.mapLevelCap <= 0)
+                ExperienceAndClasses.worldLevelCap = level;
+                if (ExperienceAndClasses.worldLevelCap <= 0)
                 {
                     Main.NewText("Level cap disabled.", ExperienceAndClasses.MESSAGE_COLOUR_YELLOW);
                 }
                 else
                 {
-                    Main.NewText("Level cap set to " + ExperienceAndClasses.mapLevelCap + ".", ExperienceAndClasses.MESSAGE_COLOUR_YELLOW);
+                    Main.NewText("Level cap set to " + ExperienceAndClasses.worldLevelCap + ".", ExperienceAndClasses.MESSAGE_COLOUR_YELLOW);
                 }
             }
             else if (Main.netMode == 1)
@@ -183,14 +184,14 @@ namespace ExperienceAndClasses.Methods
             MyPlayer myPlayer = player.GetModPlayer<MyPlayer>(mod);
             if (Main.netMode == 0)
             {
-                ExperienceAndClasses.mapClassDamageReduction = damageReductionPercent;
+                ExperienceAndClasses.worldClassDamageReduction = damageReductionPercent;
                 if (damageReductionPercent <= 0)
                 {
                     Main.NewText("Damage reduction disabled.", ExperienceAndClasses.MESSAGE_COLOUR_YELLOW);
                 }
                 else
                 {
-                    Main.NewText("Damage reduction set to " + ExperienceAndClasses.mapClassDamageReduction + ".", ExperienceAndClasses.MESSAGE_COLOUR_YELLOW);
+                    Main.NewText("Damage reduction set to " + ExperienceAndClasses.worldClassDamageReduction + ".", ExperienceAndClasses.MESSAGE_COLOUR_YELLOW);
                 }
             }
             else if (Main.netMode == 1)
@@ -209,8 +210,8 @@ namespace ExperienceAndClasses.Methods
         {
             if (Main.netMode == 0)
             {
-                ExperienceAndClasses.mapRequireAuth = !ExperienceAndClasses.mapRequireAuth;
-                if (ExperienceAndClasses.mapRequireAuth)
+                ExperienceAndClasses.worldRequireAuth = !ExperienceAndClasses.worldRequireAuth;
+                if (ExperienceAndClasses.worldRequireAuth)
                     Main.NewText("Require expauth has been enabled. This map will now require expauth in multiplayer mode.", ExperienceAndClasses.MESSAGE_COLOUR_YELLOW);
                 else
                     Main.NewText("Require expauth has been disabled. This map will no longer require expauth in multiplayer mode.", ExperienceAndClasses.MESSAGE_COLOUR_YELLOW);
@@ -233,8 +234,8 @@ namespace ExperienceAndClasses.Methods
         {
             if (Main.netMode == 0)
             {
-                ExperienceAndClasses.mapTrace = !ExperienceAndClasses.mapTrace;
-                if (ExperienceAndClasses.mapTrace)
+                ExperienceAndClasses.worldTrace = !ExperienceAndClasses.worldTrace;
+                if (ExperienceAndClasses.worldTrace)
                     Main.NewText("Map trace is enabled.", ExperienceAndClasses.MESSAGE_COLOUR_YELLOW);
                 else
                     Main.NewText("Map trace is disabled", ExperienceAndClasses.MESSAGE_COLOUR_YELLOW);
@@ -248,41 +249,41 @@ namespace ExperienceAndClasses.Methods
             }
         }
 
-        public static void CommandDisplaySettings()
+        public static void CommandDisplaySettings(Mod mod)
         {
             string lvlcap, dmgred;
 
-            if (ExperienceAndClasses.mapLevelCap > 0)
+            if (ExperienceAndClasses.worldLevelCap > 0)
             {
-                lvlcap = ExperienceAndClasses.mapLevelCap.ToString();
+                lvlcap = ExperienceAndClasses.worldLevelCap.ToString();
             }
             else
             {
                 lvlcap = "disabled";
             }
 
-            if (ExperienceAndClasses.mapClassDamageReduction > 0)
+            if (ExperienceAndClasses.worldClassDamageReduction > 0)
             {
-                dmgred = ExperienceAndClasses.mapClassDamageReduction.ToString() + "%";
+                dmgred = ExperienceAndClasses.worldClassDamageReduction.ToString() + "%";
             }
             else
             {
                 dmgred = "disabled";
             }
 
-            Main.NewTextMultiline("Require Authorization: " + ExperienceAndClasses.mapRequireAuth + "\nExperience Rate: " + (ExperienceAndClasses.mapExpModifier * 100) +
-                        "%\nIgnore Class Caps: " + ExperienceAndClasses.mapIgnoreCaps + "\nLevel Cap: " + lvlcap + "\nClass Damage Reduction: " +
-                        dmgred + "\nDeath Penalty: " + (ExperienceAndClasses.mapDeathPenalty * 100) + "%", false, ExperienceAndClasses.MESSAGE_COLOUR_YELLOW);
+            Main.NewTextMultiline("Require Authorization (world): " + ExperienceAndClasses.worldRequireAuth + "\nExperience Rate (world): " + (ExperienceAndClasses.worldExpModifier * 100) +
+                        "%\nIgnore Class Caps (world): " + ExperienceAndClasses.worldIgnoreCaps + "\nLevel Cap (world): " + lvlcap + "\nClass Damage Reduction (world): " +
+                        dmgred + "\nDeath Penalty (world): " + (ExperienceAndClasses.worldDeathPenalty * 100) + "%" + "\nEnable AFK (char): " + Main.LocalPlayer.GetModPlayer<MyPlayer>(mod).allowAFK, false, ExperienceAndClasses.MESSAGE_COLOUR_YELLOW);
         }
 
         /// <summary>
         /// Command for showing the map's auth code in singleplayer
         /// </summary>
-        public static void CommandShowmapAuthCode(Mod mod)
+        public static void CommandShowmapAuthCode()
         {
             if (Main.netMode == 0)
             {
-                Main.NewText("This map's expauth code is " + ExperienceAndClasses.mapAuthCode, ExperienceAndClasses.MESSAGE_COLOUR_YELLOW);
+                Main.NewText("This map's expauth code is " + ExperienceAndClasses.worldAuthCode, ExperienceAndClasses.MESSAGE_COLOUR_YELLOW);
             }
             else
             {
@@ -298,8 +299,8 @@ namespace ExperienceAndClasses.Methods
         {
             if (Main.netMode == 0)
             {
-                ExperienceAndClasses.mapAuthCode = newCode;
-                Main.NewText("This map's auth code is now " + ExperienceAndClasses.mapAuthCode, ExperienceAndClasses.MESSAGE_COLOUR_YELLOW);
+                ExperienceAndClasses.worldAuthCode = newCode;
+                Main.NewText("This map's auth code is now " + ExperienceAndClasses.worldAuthCode, ExperienceAndClasses.MESSAGE_COLOUR_YELLOW);
             }
             else
             {

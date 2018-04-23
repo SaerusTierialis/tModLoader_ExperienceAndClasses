@@ -259,6 +259,13 @@ namespace ExperienceAndClasses.UI
             //set bar value
             bars[barIndex].SetValue(cooldownPct, COLOUR_BAR_FOREGROUND_ABILITY);
 
+            //display off cooldown message
+            if ((cooldownSec <= 0) && Abilities.ON_COOLDOWN[abilityID])
+            {
+                Abilities.ON_COOLDOWN[abilityID] = false;
+                if (Abilities.COOLDOWN_SECS[abilityID] >= Abilities.THRESHOLD_SHOW_OFF_COOLDOWN_MSG) CombatText.NewText(localMyPlayer.player.getRect(), ExperienceAndClasses.MESSAGE_COLOUR_OFF_COOLDOWN, Abilities.NAME[abilityID] + " Ready!");
+            }
+
             //return text for overlay
             return cooldownText;
         }
@@ -283,7 +290,7 @@ namespace ExperienceAndClasses.UI
 
                 //text for each bar
                 float barCenter;
-                for (int i = 0; i < NUMBER_OF_BARS; i++)
+                for (int i = 0; i < numberActiveBars; i++)
                 {
                     if (labelsBars[0, i] != null)
                     {

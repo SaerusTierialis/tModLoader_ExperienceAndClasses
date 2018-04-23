@@ -650,7 +650,7 @@ namespace ExperienceAndClasses.Items
             if (applyEffects | isEquipped)
             {
                 experience = myPlayer.GetExp();
-                ignoreCaps = ExperienceAndClasses.mapIgnoreCaps;
+                ignoreCaps = ExperienceAndClasses.worldIgnoreCaps;
             }
 
             //get effective level
@@ -675,7 +675,7 @@ namespace ExperienceAndClasses.Items
 
             /* Reduction From expdmgred */
             string reduction = "";
-            int dmgred = ExperienceAndClasses.mapClassDamageReduction;
+            int dmgred = ExperienceAndClasses.worldClassDamageReduction;
             if (dmgred > 0)
             {
                 float reduction_multiplier = (100f - (float)dmgred) / 100f;

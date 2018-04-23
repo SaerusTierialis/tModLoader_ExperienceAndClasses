@@ -303,13 +303,13 @@ namespace ExperienceAndClasses.Methods
             ModPacket packet = mod.GetPacket();
 
             packet.Write((byte)ExpModMessageType.ServerNewPlayerSync);
-            packet.Write(ExperienceAndClasses.mapClassDamageReduction);
-            packet.Write(ExperienceAndClasses.mapExpModifier);
-            packet.Write(ExperienceAndClasses.mapIgnoreCaps);
-            packet.Write(ExperienceAndClasses.mapLevelCap);
-            packet.Write(ExperienceAndClasses.mapRequireAuth);
-            packet.Write(ExperienceAndClasses.mapTrace);
-            packet.Write(ExperienceAndClasses.mapDeathPenalty);
+            packet.Write(ExperienceAndClasses.worldClassDamageReduction);
+            packet.Write(ExperienceAndClasses.worldExpModifier);
+            packet.Write(ExperienceAndClasses.worldIgnoreCaps);
+            packet.Write(ExperienceAndClasses.worldLevelCap);
+            packet.Write(ExperienceAndClasses.worldRequireAuth);
+            packet.Write(ExperienceAndClasses.worldTrace);
+            packet.Write(ExperienceAndClasses.worldDeathPenalty);
             packet.Send(playerIndex);
         }
 
@@ -350,13 +350,13 @@ namespace ExperienceAndClasses.Methods
 
             ModPacket packet = mod.GetPacket();
             packet.Write((byte)ExpModMessageType.ServerUpdateMapSettings);
-            packet.Write(ExperienceAndClasses.mapClassDamageReduction);
-            packet.Write(ExperienceAndClasses.mapExpModifier);
-            packet.Write(ExperienceAndClasses.mapIgnoreCaps);
-            packet.Write(ExperienceAndClasses.mapLevelCap);
-            packet.Write(ExperienceAndClasses.mapRequireAuth);
-            packet.Write(ExperienceAndClasses.mapTrace);
-            packet.Write(ExperienceAndClasses.mapDeathPenalty);
+            packet.Write(ExperienceAndClasses.worldClassDamageReduction);
+            packet.Write(ExperienceAndClasses.worldExpModifier);
+            packet.Write(ExperienceAndClasses.worldIgnoreCaps);
+            packet.Write(ExperienceAndClasses.worldLevelCap);
+            packet.Write(ExperienceAndClasses.worldRequireAuth);
+            packet.Write(ExperienceAndClasses.worldTrace);
+            packet.Write(ExperienceAndClasses.worldDeathPenalty);
             packet.Send();
         }
 

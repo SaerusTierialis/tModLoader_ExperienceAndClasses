@@ -1,6 +1,50 @@
 This mod introduces an RPG-style class and leveling system where all monsters provide experience based on their health, defense, and damage stats. Your current level and progression is presented in a movable UI box. As you level, you unlock various bonuses and progress through three tiers of classes with several choices along the way.
 
-See forum for full patch notes.
+A MAJOR overhaul is now underway. See the forums or discord for more details!
+
+
+CHANGELOG:
+
+v1.3.0 (it's a big one!)
+
+1. Major Change To Settings:
+Character-specific settings have been removed except the toggle for displaying experience gains. All of these are now map-specific settings. A single set of commands can adjust these settings in both singleplayer and multiplayer (requires expauth in multiplayer unless you disable this feature). You can use /help in-game to review these commands. The map settings include (a) experience rate, (b) level cap, (c) ignore class caps such as mana cost reduction limits, (d) a customizable damage reduction applied to all class bonuses, (e) no-authorization-needed mode, (f) death penalty, and (g) map tracing for debug. Death penalty is now based on percent of accumulated experience towards the next level rather than percent of experience needed for next level. This means that the overall penalty is reduced but the penalty is greatest when you're close to a level. Death penalty can now be adjusted (default is 10%, set 0% to completely disable). Death penalty no longer applies until level 10.
+
+2. Changes To Level Cap Setting:
+The level cap feature now only limits class bonuses (tooltip notes if you are capped). Your actual level can exceed this cap and you can continue to gain experience beyond the cap. The new default level cap is 100 instead of no cap (set 0 to disable). The maximum possible level is still 3000.
+
+3.AFK Protection:
+If you haven't moved, jumped, or clicked for 60 seconds then you will be protected from death penalties to experience but you will also be unable to gain experience. Type /expafk to toggle this feature on/off (client-side, saves to your character, on by default).
+
+4. Changes To Boss/Ascension Orb Drops:
+Boss and ascension orbs are now instanced drops so any that you see are just for you! Also, you are now qualified for an ascension orb if you are far away but had previously interacted with the npc (damage, debuff, were hit, etc). AFK players will not receive orb drops. You now receive messages for your own orb drops only (let me know if you want an option to disable these messages). Boss and Ascension Orbs can no longer be crafted into xp but are instead directly consumable.
+The xp value boss orbs now scale with level up to five times the current value (10,000xp at level 100) but the drop rate is now dependant on the difficulty (xp) of the boss killed relative to the current value of the orb. This prevents farming low tier bosses for silly amounts of xp. Boss orbs have a minimum drop chance of 5% and a maximum of 50%. Ascension Orbs are now worth 1/3 as much as a boss orb and have a constant drop rate from all monsters. All orb drop rates are now higher in expert mode.
+
+5. Other New Features:
+* added hotkeys for future abilities (one main key plus a few modifier keys, customizable, note that tModLoader allows multiple functions to be be assigned to a single key)
+* experience ui now also displays active ability cooldowns, the experience bar can be toggled with /expuibar and the whole ui can be toggled with /expui
+* added /expsettings command to view current settings
+
+6. Other Changes:
+* experience gain message changed to overhead display, turned on by default for new characters (was off by default, use /expmsg to toggle back on)
+* overall experience from eater of worlds should be more consistent (less dependant on order of body parts killed, based on vanilla stats)
+* cleric abilities are usable but will not do anything yet
+
+7. Bug Fixes:
+* resolved an issue that prevented most messages from sending after v1.2.8
+* added a workaround for a cosmetic dodge-related bug
+* fixed a npc desync that could occur under rare circumstances
+* eater of worlds can now drop boss orbs (each segment has 1/50 the normal chance)
+
+8. Technical:
+* experience now syncs in "chunks" in multiplayer (resolves a small bug, substantially reduces network load, and should help reduce the potential for desync)
+* server is no longer spammed with expauth code every 2 minutes, now the code displays once at start and every time an auth-requiring command is rejected
+* any desync in experience or settings should now automatically resolve within 20 seconds at most
+* various performance improvements that should help low-spec computers and cases where a client is run on the same machine as the server
+* character trace works again (my bad!)
+
+9. Known Bugs:
+* cooldowns continue while paused in singleplayer
 
 v1.2.8
 -Updated for tModLoader v0.10.1.3

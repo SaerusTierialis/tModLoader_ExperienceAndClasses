@@ -65,6 +65,8 @@ namespace ExperienceAndClasses
         public static readonly Color MESSAGE_COLOUR_MAGENTA = new Color(255, 0, 255);
         public static readonly Color MESSAGE_COLOUR_BOSS_ORB = new Color(233, 36, 91);
         public static readonly Color MESSAGE_COLOUR_ASCENSION_ORB = new Color(4, 195, 249);
+        public static readonly Color MESSAGE_COLOUR_OFF_COOLDOWN = new Color(163,73, 164);
+        //public static readonly Color MESSAGE_COLOUR_EXP = new Color(21, 111, 48);
 
         //active abilities
         public static ModHotKey HOTKEY_ACTIVATE_ABILITY;
@@ -72,6 +74,10 @@ namespace ExperienceAndClasses
         public static ModHotKey HOTKEY_MODIFIER_2;
         public static ModHotKey HOTKEY_MODIFIER_3;
         public static ModHotKey HOTKEY_MODIFIER_4;
+        public static ModHotKey HOTKEY_ABILITY_1;
+        public static ModHotKey HOTKEY_ABILITY_2;
+        public static ModHotKey HOTKEY_ABILITY_3;
+        public static ModHotKey HOTKEY_ABILITY_4;
         public static readonly int MAXIMUM_NUMBER_OF_ABILITIES = 4;
 
         //exp requirements and cap
@@ -83,29 +89,31 @@ namespace ExperienceAndClasses
 
         //awarding experience and drops
         public const float RANGE_EXP_AND_ASCENSION_ORB = 5000f;
-        public const float PERCENT_CHANCE_BOSS_ORB = 25.0f;
-        public const float PERCENT_CHANCE_ASCENSION_ORB = 0.7f;
+        public const float PERCENT_CHANCE_BOSS_ORB_BASE = 5.0f;
+        public const float PERCENT_CHANCE_BOSS_ORB_VARIABLE = 45.0f;
+        public const float PERCENT_CHANCE_ASCENSION_ORB = 0.3f;
+        public const float PERCENT_CHANCE_ASCENSION_ORB_EXPERT = 0.5f; 
 
         //misc
         public const int LEVEL_START_APPLYING_DEATH_PENALTY = 10;
         public const long AFK_TIME_TICKS = 60 * TimeSpan.TicksPerSecond;
 
         //map settings constants
-        public const double DEFAULT_EXPERIENCE_MODIFIER = 1;
+        public const double DEFAULT_EXPERIENCE_MODIFIER = 1.0;
         public const bool DEFAULT_IGNORE_CAPS = false;
         public const int DEFAULT_DAMAGE_REDUCTION = 0;
         public const int DEFAULT_LEVEL_CAP = 100;
-        public const double DEFAULT_DEATH_PENALTY = 10.0;
+        public const double DEFAULT_DEATH_PENALTY = 0.1;
 
         //map settings
-        public static double mapExpModifier = DEFAULT_EXPERIENCE_MODIFIER;
-        public static bool mapIgnoreCaps = DEFAULT_IGNORE_CAPS;
-        public static int mapClassDamageReduction = DEFAULT_DAMAGE_REDUCTION;
-        public static int mapLevelCap = DEFAULT_LEVEL_CAP;
-        public static double mapDeathPenalty = DEFAULT_DEATH_PENALTY;
-        public static double mapAuthCode = -1;
-        public static bool mapRequireAuth = true;
-        public static bool mapTrace = false;
+        public static double worldExpModifier = DEFAULT_EXPERIENCE_MODIFIER;
+        public static bool worldIgnoreCaps = DEFAULT_IGNORE_CAPS;
+        public static int worldClassDamageReduction = DEFAULT_DAMAGE_REDUCTION;
+        public static int worldLevelCap = DEFAULT_LEVEL_CAP;
+        public static double worldDeathPenalty = DEFAULT_DEATH_PENALTY;
+        public static double worldAuthCode = -1;
+        public static bool worldRequireAuth = true;
+        public static bool worldTrace = false;
 
         //start
         public ExperienceAndClasses()
@@ -131,6 +139,10 @@ namespace ExperienceAndClasses
             HOTKEY_MODIFIER_2 = RegisterHotKey("Modifier 2", "W");
             HOTKEY_MODIFIER_3 = RegisterHotKey("Modifier 3", "LeftShift");
             HOTKEY_MODIFIER_4 = RegisterHotKey("Modifier 4", "LeftControl");
+            HOTKEY_ABILITY_1 = RegisterHotKey("Ability 1", "Q");
+            HOTKEY_ABILITY_2 = RegisterHotKey("Ability 2", "E");
+            HOTKEY_ABILITY_3 = RegisterHotKey("Ability 3", "R");
+            HOTKEY_ABILITY_4 = RegisterHotKey("Ability 4", "F");
         }
 
         public override void Unload()
@@ -140,6 +152,11 @@ namespace ExperienceAndClasses
             HOTKEY_MODIFIER_2 = null;
             HOTKEY_MODIFIER_3 = null;
             HOTKEY_MODIFIER_4 = null;
+            HOTKEY_ABILITY_1 = null;
+            HOTKEY_ABILITY_2 = null;
+            HOTKEY_ABILITY_3 = null;
+            HOTKEY_ABILITY_4 = null;
+
         }
 
         /* ~~~~~~~~~~~~~~~~~~~~~ HANDLE PACKETS ~~~~~~~~~~~~~~~~~~~~~ */
@@ -166,21 +183,21 @@ namespace ExperienceAndClasses
                 //Server's request to new player (includes map settings)
                 case ExpModMessageType.ServerNewPlayerSync:
                     //set map settings
-                    mapClassDamageReduction = reader.ReadInt32();
-                    mapExpModifier = reader.ReadDouble();
-                    mapIgnoreCaps = reader.ReadBoolean();
-                    mapLevelCap = reader.ReadInt32();
-                    mapRequireAuth = reader.ReadBoolean();
-                    mapTrace = reader.ReadBoolean();
-                    mapDeathPenalty = reader.ReadDouble();
+                    worldClassDamageReduction = reader.ReadInt32();
+                    worldExpModifier = reader.ReadDouble();
+                    worldIgnoreCaps = reader.ReadBoolean();
+                    worldLevelCap = reader.ReadInt32();
+                    worldRequireAuth = reader.ReadBoolean();
+                    worldTrace = reader.ReadBoolean();
+                    worldDeathPenalty = reader.ReadDouble();
 
                     //send back personal exp
                     Methods.PacketSender.ClientTellExperience(mod);
 
                     //display settings locally
-                    Methods.ChatCommands.CommandDisplaySettings();
+                    Methods.ChatCommands.CommandDisplaySettings(mod);
 
-                    if (mapTrace || traceChar) Methods.ChatCommands.Trace("TRACE:Recieved ServerNewPlayerSync");
+                    if (worldTrace || traceChar) Methods.ChatCommands.Trace("TRACE:Recieved ServerNewPlayerSync");
                     break;
 
                 //Player's response to server's request for experience
@@ -197,7 +214,7 @@ namespace ExperienceAndClasses
                         Methods.PacketSender.ServerSyncExp(mod, true);
                     }
                     
-                    if (mapTrace || traceChar) Methods.ChatCommands.Trace("TRACE:Recieved ClientTellExperience from player #" + player.whoAmI + ":" + player.name+" = "+ player.GetModPlayer<MyPlayer>(this).experience);
+                    if (worldTrace || traceChar) Methods.ChatCommands.Trace("TRACE:Recieved ClientTellExperience from player #" + player.whoAmI + ":" + player.name+" = "+ player.GetModPlayer<MyPlayer>(this).experience);
                     break;
 
                 //Server telling everyone a player's new exp value
@@ -218,7 +235,7 @@ namespace ExperienceAndClasses
                         //    uiExp.Update();
                     }
 
-                    if ((Main.netMode==2 && mapTrace) || (Main.netMode==1 && traceChar))
+                    if ((Main.netMode==2 && worldTrace) || (Main.netMode==1 && traceChar))
                         NetMessage.BroadcastChatMessage(NetworkText.FromLiteral("TRACE:Recieved ServerForceExperience for player #" + player.whoAmI + ":" + player.name + " = " + newExp), ExperienceAndClasses.MESSAGE_COLOUR_MAGENTA);
                     break;
 
@@ -232,7 +249,7 @@ namespace ExperienceAndClasses
                     myPlayer = player.GetModPlayer<MyPlayer>(this);
                     myPlayer.AddExp(expAdd);
 
-                    if (mapTrace || traceChar) Methods.ChatCommands.Trace("TRACE:Recieved ClientTellAddExp from player #" + player.whoAmI + ":" + player.name + " = " + expAdd);
+                    if (worldTrace || traceChar) Methods.ChatCommands.Trace("TRACE:Recieved ClientTellAddExp from player #" + player.whoAmI + ":" + player.name + " = " + expAdd);
                     break;
 
                 //Similar to ClientTellAddExp, but requires auth
@@ -244,17 +261,17 @@ namespace ExperienceAndClasses
                     text = reader.ReadString();
                     //act
                     myPlayer = player.GetModPlayer<MyPlayer>(this);
-                    if (myPlayer.auth || !mapRequireAuth)
+                    if (myPlayer.auth || !worldRequireAuth)
                     {
                         myPlayer.AddExp(expAdd);
                         Console.WriteLine("Accepted command request from player #" + player.whoAmI + ":" + player.name + " " + text);
                     }
                     else
                     {
-                        Console.WriteLine("Rejected command request from player #" + player.whoAmI + ":" + player.name + " " + text + "\nExperience&Classes expauth code: " + ExperienceAndClasses.mapAuthCode);
+                        Console.WriteLine("Rejected command request from player #" + player.whoAmI + ":" + player.name + " " + text + "\nExperience&Classes expauth code: " + ExperienceAndClasses.worldAuthCode);
                     }
 
-                    if (mapTrace || traceChar) Methods.ChatCommands.Trace("TRACE:Recieved ClientRequestAddExp from player #" + player.whoAmI + ":" + player.name + " = " + expAdd);
+                    if (worldTrace || traceChar) Methods.ChatCommands.Trace("TRACE:Recieved ClientRequestAddExp from player #" + player.whoAmI + ":" + player.name + " = " + expAdd);
                     break;
 
                 //Player requests (always needs auth) to set expauth code
@@ -267,9 +284,9 @@ namespace ExperienceAndClasses
                     myPlayer = player.GetModPlayer<MyPlayer>(this);
                     if (myPlayer.auth)
                     {
-                        mapAuthCode = newCode;
+                        worldAuthCode = newCode;
                         Console.WriteLine("Accepted command request from player #" + player.whoAmI + ":" + player.name + " " + text);
-                        Console.WriteLine("New expauth code: " + mapAuthCode);
+                        Console.WriteLine("New expauth code: " + worldAuthCode);
                         //remove expauth from everyone
                         for (int playerIndex = 0; playerIndex < 255; playerIndex++)
                         {
@@ -281,17 +298,17 @@ namespace ExperienceAndClasses
                         }
                         NetMessage.BroadcastChatMessage(NetworkText.FromLiteral("The expauth code has been changed by " + player.name + ". Authorizations have been reset."), MESSAGE_COLOUR_RED);
                     }
-                    else if (!mapRequireAuth)
+                    else if (!worldRequireAuth)
                     {
                         NetMessage.SendChatMessageToClient(NetworkText.FromLiteral("This command requires expauth even when noauth is enabled."), MESSAGE_COLOUR_RED, player.whoAmI);
-                        Console.WriteLine("Rejected command request from player #" + player.whoAmI + ":" + player.name + " " + text + "\nExperience&Classes expauth code: " + ExperienceAndClasses.mapAuthCode);
+                        Console.WriteLine("Rejected command request from player #" + player.whoAmI + ":" + player.name + " " + text + "\nExperience&Classes expauth code: " + ExperienceAndClasses.worldAuthCode);
                     }
                     else
                     {
-                        Console.WriteLine("Rejected command request from player #" + player.whoAmI + ":" + player.name + " " + text + "\nExperience&Classes expauth code: " + ExperienceAndClasses.mapAuthCode);
+                        Console.WriteLine("Rejected command request from player #" + player.whoAmI + ":" + player.name + " " + text + "\nExperience&Classes expauth code: " + ExperienceAndClasses.worldAuthCode);
                     }
 
-                    if (mapTrace || traceChar) Methods.ChatCommands.Trace("TRACE:Recieved ClientRequestSetmapAuthCode from player #" + player.whoAmI + ":" + player.name + " = " + newCode);
+                    if (worldTrace || traceChar) Methods.ChatCommands.Trace("TRACE:Recieved ClientRequestSetmapAuthCode from player #" + player.whoAmI + ":" + player.name + " = " + newCode);
                     break;
 
                 //Player asking to set experience rate, requires auth
@@ -303,9 +320,9 @@ namespace ExperienceAndClasses
                     text = reader.ReadString();
                     //act
                     myPlayer = player.GetModPlayer<MyPlayer>(this);
-                    if (myPlayer.auth || !mapRequireAuth)
+                    if (myPlayer.auth || !worldRequireAuth)
                     {
-                        mapExpModifier = exprate;
+                        worldExpModifier = exprate;
                         Methods.PacketSender.ServerUpdateMapSettings(mod);
                         Console.WriteLine("Accepted command request from player #" + player.whoAmI + ":" + player.name + " " + text);
 
@@ -314,10 +331,10 @@ namespace ExperienceAndClasses
                     }
                     else
                     {
-                        Console.WriteLine("Rejected command request from player #" + player.whoAmI + ":" + player.name + " " + text + "\nExperience&Classes expauth code: " + ExperienceAndClasses.mapAuthCode);
+                        Console.WriteLine("Rejected command request from player #" + player.whoAmI + ":" + player.name + " " + text + "\nExperience&Classes expauth code: " + ExperienceAndClasses.worldAuthCode);
                     }
 
-                    if (mapTrace || traceChar) Methods.ChatCommands.Trace("TRACE:Recieved ClientRequestExpRate from player #" + player.whoAmI + ":" + player.name + " = " + exprate);
+                    if (worldTrace || traceChar) Methods.ChatCommands.Trace("TRACE:Recieved ClientRequestExpRate from player #" + player.whoAmI + ":" + player.name + " = " + exprate);
                     break;
 
                 //Player requests(needs auth) to set level cap
@@ -329,9 +346,9 @@ namespace ExperienceAndClasses
                     text = reader.ReadString();
                     //act
                     myPlayer = player.GetModPlayer<MyPlayer>(this);
-                    if (myPlayer.auth || !mapRequireAuth)
+                    if (myPlayer.auth || !worldRequireAuth)
                     {
-                        mapLevelCap = newInt;
+                        worldLevelCap = newInt;
                         Methods.PacketSender.ServerUpdateMapSettings(mod);
                         Console.WriteLine("Accepted command request from player #" + player.whoAmI + ":" + player.name + " " + text);
 
@@ -340,10 +357,10 @@ namespace ExperienceAndClasses
                     }
                     else
                     {
-                        Console.WriteLine("Rejected command request from player #" + player.whoAmI + ":" + player.name + " " + text + "\nExperience&Classes expauth code: " + ExperienceAndClasses.mapAuthCode);
+                        Console.WriteLine("Rejected command request from player #" + player.whoAmI + ":" + player.name + " " + text + "\nExperience&Classes expauth code: " + ExperienceAndClasses.worldAuthCode);
                     }
 
-                    if (mapTrace || traceChar) Methods.ChatCommands.Trace("TRACE:Recieved ClientRequestLevelCap from player #" + player.whoAmI + ":" + player.name + " = " + newInt);
+                    if (worldTrace || traceChar) Methods.ChatCommands.Trace("TRACE:Recieved ClientRequestLevelCap from player #" + player.whoAmI + ":" + player.name + " = " + newInt);
                     break;
 
                 //Player requests (needs auth) to set class damage reduction
@@ -355,9 +372,9 @@ namespace ExperienceAndClasses
                     text = reader.ReadString();
                     //act
                     myPlayer = player.GetModPlayer<MyPlayer>(this);
-                    if (myPlayer.auth || !mapRequireAuth)
+                    if (myPlayer.auth || !worldRequireAuth)
                     {
-                        mapClassDamageReduction = newInt;
+                        worldClassDamageReduction = newInt;
                         Methods.PacketSender.ServerUpdateMapSettings(mod);
                         Console.WriteLine("Accepted command request from player #" + player.whoAmI + ":" + player.name + " " + text);
 
@@ -366,10 +383,10 @@ namespace ExperienceAndClasses
                     }
                     else
                     {
-                        Console.WriteLine("Rejected command request from player #" + player.whoAmI + ":" + player.name + " " + text + "\nExperience&Classes expauth code: " + ExperienceAndClasses.mapAuthCode);
+                        Console.WriteLine("Rejected command request from player #" + player.whoAmI + ":" + player.name + " " + text + "\nExperience&Classes expauth code: " + ExperienceAndClasses.worldAuthCode);
                     }
 
-                    if (mapTrace || traceChar) Methods.ChatCommands.Trace("TRACE:Recieved ClientRequestDamageReduction from player #" + player.whoAmI + ":" + player.name + " = " + newInt);
+                    if (worldTrace || traceChar) Methods.ChatCommands.Trace("TRACE:Recieved ClientRequestDamageReduction from player #" + player.whoAmI + ":" + player.name + " = " + newInt);
                     break;
 
                 //Player asking to toggle class caps, requires auth
@@ -381,9 +398,9 @@ namespace ExperienceAndClasses
                     text = reader.ReadString();
                     //act
                     myPlayer = player.GetModPlayer<MyPlayer>(this);
-                    if (myPlayer.auth || !mapRequireAuth)
+                    if (myPlayer.auth || !worldRequireAuth)
                     {
-                        mapIgnoreCaps = newBool;
+                        worldIgnoreCaps = newBool;
                         Methods.PacketSender.ServerUpdateMapSettings(mod);
                         Console.WriteLine("Accepted command request from player #" + player.whoAmI + ":" + player.name + " " + text);
 
@@ -392,10 +409,10 @@ namespace ExperienceAndClasses
                     }
                     else
                     {
-                        Console.WriteLine("Rejected command request from player #" + player.whoAmI + ":" + player.name + " " + text + "\nExperience&Classes expauth code: " + ExperienceAndClasses.mapAuthCode);
+                        Console.WriteLine("Rejected command request from player #" + player.whoAmI + ":" + player.name + " " + text + "\nExperience&Classes expauth code: " + ExperienceAndClasses.worldAuthCode);
                     }
 
-                    if (mapTrace || traceChar) Methods.ChatCommands.Trace("TRACE:Recieved ClientRequestToggleCap from player #" + player.whoAmI + ":" + player.name);
+                    if (worldTrace || traceChar) Methods.ChatCommands.Trace("TRACE:Recieved ClientRequestToggleCap from player #" + player.whoAmI + ":" + player.name);
                     break;
 
                 //Player requesting (needs auth) to toggle noauth
@@ -407,24 +424,24 @@ namespace ExperienceAndClasses
                     myPlayer = player.GetModPlayer<MyPlayer>(this);
                     if (myPlayer.auth)
                     {
-                        mapRequireAuth = !mapRequireAuth;
+                        worldRequireAuth = !worldRequireAuth;
                         Methods.PacketSender.ServerUpdateMapSettings(mod);
                         Console.WriteLine("Accepted command request from player #" + player.whoAmI + ":" + player.name + " " + text);
 
                         //announce
                         //NetMessage.BroadcastChatMessage(NetworkText.FromLiteral("Require Expauth: " + mapRequireAuth), ExperienceAndClasses.MESSAGE_COLOUR_YELLOW);
                     }
-                    else if (!mapRequireAuth)
+                    else if (!worldRequireAuth)
                     {
                         NetMessage.SendChatMessageToClient(NetworkText.FromLiteral("This command requires expauth even when noauth is enabled."), MESSAGE_COLOUR_RED, player.whoAmI);
-                        Console.WriteLine("Rejected command request from player #" + player.whoAmI + ":" + player.name + " " + text + "\nExperience&Classes expauth code: " + ExperienceAndClasses.mapAuthCode);
+                        Console.WriteLine("Rejected command request from player #" + player.whoAmI + ":" + player.name + " " + text + "\nExperience&Classes expauth code: " + ExperienceAndClasses.worldAuthCode);
                     }
                     else
                     {
-                        Console.WriteLine("Rejected command request from player #" + player.whoAmI + ":" + player.name + " " + text + "\nExperience&Classes expauth code: " + ExperienceAndClasses.mapAuthCode);
+                        Console.WriteLine("Rejected command request from player #" + player.whoAmI + ":" + player.name + " " + text + "\nExperience&Classes expauth code: " + ExperienceAndClasses.worldAuthCode);
                     }
 
-                    if (mapTrace || traceChar) Methods.ChatCommands.Trace("TRACE:Recieved ClientRequestNoAuth from player #" + player.whoAmI + ":" + player.name);
+                    if (worldTrace || traceChar) Methods.ChatCommands.Trace("TRACE:Recieved ClientRequestNoAuth from player #" + player.whoAmI + ":" + player.name);
                     break;
 
                 //Player requesting (needs auth) to toggle noauth
@@ -434,9 +451,9 @@ namespace ExperienceAndClasses
                     text = reader.ReadString();
                     //act
                     myPlayer = player.GetModPlayer<MyPlayer>(this);
-                    if (myPlayer.auth || !mapRequireAuth)
+                    if (myPlayer.auth || !worldRequireAuth)
                     {
-                        mapTrace = !mapTrace;
+                        worldTrace = !worldTrace;
                         Methods.PacketSender.ServerUpdateMapSettings(mod);
                         Console.WriteLine("Accepted command request from player #" + player.whoAmI + ":" + player.name + " " + text);
 
@@ -445,10 +462,10 @@ namespace ExperienceAndClasses
                     }
                     else
                     {
-                        Console.WriteLine("Rejected command request from player #" + player.whoAmI + ":" + player.name + " " + text + "\nExperience&Classes expauth code: " + ExperienceAndClasses.mapAuthCode);
+                        Console.WriteLine("Rejected command request from player #" + player.whoAmI + ":" + player.name + " " + text + "\nExperience&Classes expauth code: " + ExperienceAndClasses.worldAuthCode);
                     }
 
-                    if (mapTrace || traceChar) Methods.ChatCommands.Trace("TRACE:Recieved ClientRequestMapTrace from player #" + player.whoAmI + ":" + player.name);
+                    if (worldTrace || traceChar) Methods.ChatCommands.Trace("TRACE:Recieved ClientRequestMapTrace from player #" + player.whoAmI + ":" + player.name);
                     break;
 
                 //Player requesting (needs auth) to set death penalty
@@ -460,9 +477,9 @@ namespace ExperienceAndClasses
                     text = reader.ReadString();
                     //act
                     myPlayer = player.GetModPlayer<MyPlayer>(this);
-                    if (myPlayer.auth || !mapRequireAuth)
+                    if (myPlayer.auth || !worldRequireAuth)
                     {
-                        mapDeathPenalty = newDouble;
+                        worldDeathPenalty = newDouble;
                         Methods.PacketSender.ServerUpdateMapSettings(mod);
                         Console.WriteLine("Accepted command request from player #" + player.whoAmI + ":" + player.name + " " + text);
 
@@ -471,10 +488,10 @@ namespace ExperienceAndClasses
                     }
                     else
                     {
-                        Console.WriteLine("Rejected command request from player #" + player.whoAmI + ":" + player.name + " " + text + "\nExperience&Classes expauth code: " + ExperienceAndClasses.mapAuthCode);
+                        Console.WriteLine("Rejected command request from player #" + player.whoAmI + ":" + player.name + " " + text + "\nExperience&Classes expauth code: " + ExperienceAndClasses.worldAuthCode);
                     }
 
-                    if (mapTrace || traceChar) Methods.ChatCommands.Trace("TRACE:Recieved ClientRequestDeathPenalty from player #" + player.whoAmI + ":" + player.name + " = " + newDouble);
+                    if (worldTrace || traceChar) Methods.ChatCommands.Trace("TRACE:Recieved ClientRequestDeathPenalty from player #" + player.whoAmI + ":" + player.name + " = " + newDouble);
                     break;
 
                 //Player telling server that they are away
@@ -489,7 +506,7 @@ namespace ExperienceAndClasses
                     NetMessage.SendChatMessageToClient(NetworkText.FromLiteral("You are now AFK. You will not recieve death penalties to experience but you cannot gain experience either."), MESSAGE_COLOUR_RED, pIndex);
                     Console.WriteLine(pIndex + ":" + player.name + " is now AFK.");
 
-                    if (mapTrace || traceChar) Methods.ChatCommands.Trace("TRACE:Recieved ClientAFK from player #" + player.whoAmI + ":" + player.name);
+                    if (worldTrace || traceChar) Methods.ChatCommands.Trace("TRACE:Recieved ClientAFK from player #" + player.whoAmI + ":" + player.name);
                     break;
 
                 //Player telling server that they are back
@@ -504,7 +521,7 @@ namespace ExperienceAndClasses
                     NetMessage.SendChatMessageToClient(NetworkText.FromLiteral("You are no longer AFK."), MESSAGE_COLOUR_YELLOW, pIndex);
                     Console.WriteLine(pIndex + ":" + player.name + " is no longer AFK.");
 
-                    if (mapTrace || traceChar) Methods.ChatCommands.Trace("TRACE:Recieved ClientUnAFK from player #" + player.whoAmI + ":" + player.name);
+                    if (worldTrace || traceChar) Methods.ChatCommands.Trace("TRACE:Recieved ClientUnAFK from player #" + player.whoAmI + ":" + player.name);
                     break;
 
                 //Server updating map settings
@@ -513,61 +530,61 @@ namespace ExperienceAndClasses
 
                     //damage reduction
                     newInt = reader.ReadInt32();
-                    if (newInt != mapClassDamageReduction)
+                    if (newInt != worldClassDamageReduction)
                     {
-                        mapClassDamageReduction = newInt;
-                        Main.NewText("Updated Class Damage Reduction: " + mapClassDamageReduction + "%", MESSAGE_COLOUR_YELLOW);
+                        worldClassDamageReduction = newInt;
+                        Main.NewText("Updated Class Damage Reduction: " + worldClassDamageReduction + "%", MESSAGE_COLOUR_YELLOW);
                     }
 
                     //experience rate
                     experience = reader.ReadDouble();
-                    if (experience != mapExpModifier)
+                    if (experience != worldExpModifier)
                     {
-                        mapExpModifier = experience;
-                        Main.NewText("Updated Experience Rate: " + (mapExpModifier*100) + "%", MESSAGE_COLOUR_YELLOW);
+                        worldExpModifier = experience;
+                        Main.NewText("Updated Experience Rate: " + (worldExpModifier*100) + "%", MESSAGE_COLOUR_YELLOW);
                     }
 
                     //ignore class caps
                     newBool = reader.ReadBoolean();
-                    if (newBool != mapIgnoreCaps)
+                    if (newBool != worldIgnoreCaps)
                     {
-                        mapIgnoreCaps = newBool;
-                        Main.NewText("Updated Ignore Class Caps: " + mapIgnoreCaps, MESSAGE_COLOUR_YELLOW);
+                        worldIgnoreCaps = newBool;
+                        Main.NewText("Updated Ignore Class Caps: " + worldIgnoreCaps, MESSAGE_COLOUR_YELLOW);
                     }
 
                     //level cap
                     newInt = reader.ReadInt32();
-                    if (newInt != mapLevelCap)
+                    if (newInt != worldLevelCap)
                     {
-                        mapLevelCap = newInt;
-                        Main.NewText("Updated Level Cap: " + mapLevelCap, MESSAGE_COLOUR_YELLOW);
+                        worldLevelCap = newInt;
+                        Main.NewText("Updated Level Cap: " + worldLevelCap, MESSAGE_COLOUR_YELLOW);
                     }
 
                     //require auth
                     newBool = reader.ReadBoolean();
-                    if (newBool != mapRequireAuth)
+                    if (newBool != worldRequireAuth)
                     {
-                        mapRequireAuth = newBool;
-                        Main.NewText("Updated Require Authorization: " + mapRequireAuth, MESSAGE_COLOUR_YELLOW);
+                        worldRequireAuth = newBool;
+                        Main.NewText("Updated Require Authorization: " + worldRequireAuth, MESSAGE_COLOUR_YELLOW);
                     }
 
                     //map trace
                     newBool = reader.ReadBoolean();
-                    if (newBool != mapTrace)
+                    if (newBool != worldTrace)
                     {
-                        mapTrace = newBool;
-                        Main.NewText("Updated Map Trace: " + mapTrace, MESSAGE_COLOUR_YELLOW);
+                        worldTrace = newBool;
+                        Main.NewText("Updated Map Trace: " + worldTrace, MESSAGE_COLOUR_YELLOW);
                     }
 
                     //death penalty
                     newDouble = reader.ReadDouble();
-                    if (newDouble != mapDeathPenalty)
+                    if (newDouble != worldDeathPenalty)
                     {
-                        mapDeathPenalty = newDouble;
-                        Main.NewText("Updated Death Penalty: " + (mapDeathPenalty * 100) + "%", MESSAGE_COLOUR_YELLOW);
+                        worldDeathPenalty = newDouble;
+                        Main.NewText("Updated Death Penalty: " + (worldDeathPenalty * 100) + "%", MESSAGE_COLOUR_YELLOW);
                     }
 
-                    if (mapTrace || traceChar) Methods.ChatCommands.Trace("TRACE:Recieved ServerUpdateMapSettings = " + mapClassDamageReduction + " " + mapExpModifier + " " + mapIgnoreCaps + " " + mapLevelCap + " " + mapRequireAuth + " " + mapTrace + " " + mapDeathPenalty);
+                    if (worldTrace || traceChar) Methods.ChatCommands.Trace("TRACE:Recieved ServerUpdateMapSettings = " + worldClassDamageReduction + " " + (worldExpModifier*100) + " " + worldIgnoreCaps + " " + worldLevelCap + " " + worldRequireAuth + " " + worldTrace + " " + (worldDeathPenalty * 100));
                     break;
 
                 //Player telling server to make an announcement
@@ -580,12 +597,12 @@ namespace ExperienceAndClasses
                     int green = reader.ReadInt32();
                     int blue = reader.ReadInt32();
                     //act
-                    if ((Main.netMode==2 && mapTrace) || (Main.netMode==1 && traceChar))
+                    if ((Main.netMode==2 && worldTrace) || (Main.netMode==1 && traceChar))
                     {
                         NetMessage.BroadcastChatMessage(NetworkText.FromLiteral(message), new Color(red, green, blue));
                     }
 
-                    if (mapTrace || traceChar) Methods.ChatCommands.Trace("TRACE:Recieved PlayerRequestAnnouncement from player #" + player.whoAmI + ":" + player.name + " = " + message);
+                    if (worldTrace || traceChar) Methods.ChatCommands.Trace("TRACE:Recieved PlayerRequestAnnouncement from player #" + player.whoAmI + ":" + player.name + " = " + message);
                     break;
 
                 //Server resyncs any recent exp changes
@@ -612,7 +629,7 @@ namespace ExperienceAndClasses
                         }
                     }
 
-                    if (mapTrace || traceChar) Methods.ChatCommands.Trace("TRACE:Recieved ServerSyncExp");
+                    if (worldTrace || traceChar) Methods.ChatCommands.Trace("TRACE:Recieved ServerSyncExp");
                     break;
 
                 //Player attempt auth
@@ -629,7 +646,7 @@ namespace ExperienceAndClasses
                     }
                     else 
                     {
-                        if (mapAuthCode == code)
+                        if (worldAuthCode == code)
                         {
                             myPlayer.auth = true;
                             NetMessage.SendChatMessageToClient(NetworkText.FromLiteral("Auth: " + myPlayer.auth), ExperienceAndClasses.MESSAGE_COLOUR_YELLOW, player.whoAmI);
@@ -637,11 +654,11 @@ namespace ExperienceAndClasses
                         }
                         else
                         {
-                            Console.WriteLine("Rejected auth attempt from player #" + player.whoAmI + ":" + player.name + " " + code + "\nExperience&Classes expauth code: " + ExperienceAndClasses.mapAuthCode);
+                            Console.WriteLine("Rejected auth attempt from player #" + player.whoAmI + ":" + player.name + " " + code + "\nExperience&Classes expauth code: " + ExperienceAndClasses.worldAuthCode);
                         }
                     }
 
-                    if (mapTrace || traceChar) Methods.ChatCommands.Trace("TRACE:Recieved ClientTryAuth from player #" + player.whoAmI + ":" + player.name + " " + code);
+                    if (worldTrace || traceChar) Methods.ChatCommands.Trace("TRACE:Recieved ClientTryAuth from player #" + player.whoAmI + ":" + player.name + " " + code);
                     break;
 
                 ////Player tells server that they are performing an ability
