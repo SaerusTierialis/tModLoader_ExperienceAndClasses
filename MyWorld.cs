@@ -8,16 +8,16 @@ namespace ExperienceAndClasses
     public class MyWorld : ModWorld
     {
         public const double TIME_BETWEEN_REQUEST_MSEC = 1000;
-        public static DateTime timeLastRequests = DateTime.MinValue;
+        public static DateTime timeLastRequests = DateTime.Now;
 
         public const double TIME_BETWEEN_SYNC_EXP_CHANGES_MSEC = 250;
-        public static DateTime timeLastSyncExpChanges = DateTime.MinValue;
+        public static DateTime timeLastSyncExpChanges = DateTime.Now;
 
         public const double TIME_BETWEEN_SYNC_MAP_SETTINGS_MSEC = 20 * 1000;
-        public static DateTime timeLastSyncMapSettings = DateTime.MinValue;
+        public static DateTime timeLastSyncMapSettings = DateTime.Now;
 
         public const double TIME_BETWEEN_SYNC_EXP_ALL_MSEC = 20 * 1000;
-        public static DateTime timeLastSyncExpAll = DateTime.MinValue;
+        public static DateTime timeLastSyncExpAll = DateTime.Now;
 
         public static bool expmapAuthCodeWritten = false;
 

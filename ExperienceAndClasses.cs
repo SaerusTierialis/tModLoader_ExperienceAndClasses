@@ -78,6 +78,7 @@ namespace ExperienceAndClasses
         public static ModHotKey HOTKEY_ABILITY_2;
         public static ModHotKey HOTKEY_ABILITY_3;
         public static ModHotKey HOTKEY_ABILITY_4;
+        public static ModHotKey HOTKEY_ACCEPT_RESURRECTION;
         public static readonly int MAXIMUM_NUMBER_OF_ABILITIES = 4;
 
         //exp requirements and cap
@@ -91,8 +92,8 @@ namespace ExperienceAndClasses
         public const float RANGE_EXP_AND_ASCENSION_ORB = 5000f;
         public const float PERCENT_CHANCE_BOSS_ORB_BASE = 5.0f;
         public const float PERCENT_CHANCE_BOSS_ORB_VARIABLE = 45.0f;
-        public const float PERCENT_CHANCE_ASCENSION_ORB = 0.3f;
-        public const float PERCENT_CHANCE_ASCENSION_ORB_EXPERT = 0.5f; 
+        public const float PERCENT_CHANCE_ASCENSION_ORB = 0.6f;
+        public const float PERCENT_CHANCE_ASCENSION_ORB_EXPERT = 0.7f; 
 
         //misc
         public const int LEVEL_START_APPLYING_DEATH_PENALTY = 10;
@@ -143,6 +144,7 @@ namespace ExperienceAndClasses
             HOTKEY_ABILITY_2 = RegisterHotKey("Ability 2", "E");
             HOTKEY_ABILITY_3 = RegisterHotKey("Ability 3", "R");
             HOTKEY_ABILITY_4 = RegisterHotKey("Ability 4", "F");
+            HOTKEY_ACCEPT_RESURRECTION = RegisterHotKey("Accept Resurrection", "P");
         }
 
         public override void Unload()
@@ -156,6 +158,7 @@ namespace ExperienceAndClasses
             HOTKEY_ABILITY_2 = null;
             HOTKEY_ABILITY_3 = null;
             HOTKEY_ABILITY_4 = null;
+            HOTKEY_ACCEPT_RESURRECTION = null;
 
         }
 

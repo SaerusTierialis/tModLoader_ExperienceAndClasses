@@ -275,6 +275,7 @@ namespace ExperienceAndClasses.UI
             public const float SCALE_MAIN = 1f;
             public const float SCALE_SMALL = 0.85f;
             public static readonly Vector2 ORIGIN = new Vector2(0f);
+
             protected override void DrawSelf(SpriteBatch spriteBatch)
             {
                 float x = Parent.Left.Pixels;
@@ -391,7 +392,6 @@ namespace ExperienceAndClasses.UI
         public void Deactivate()
         {
             active = false;
-
             bgd.Remove();
             fgd.Remove();
         }

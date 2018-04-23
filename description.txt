@@ -5,6 +5,9 @@ A MAJOR overhaul is now underway. See the forums or discord for more details!
 
 CHANGELOG:
 
+v1.3.1
+* fixed multiplayer xp sync bug
+
 v1.3.0 (it's a big one!)
 
 1. Major Change To Settings:

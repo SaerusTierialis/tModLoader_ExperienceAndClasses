@@ -178,7 +178,7 @@ namespace ExperienceAndClasses
         /// <param name="experienceChange"></param>
         public void ExpMsg(double experienceChange)
         {
-            if (!Main.LocalPlayer.Equals(player)) return;
+            if (!Main.LocalPlayer.Equals(player) || Main.netMode==2) return;
 
             if (experienceChange>0 && displayExp)
             {
@@ -199,7 +199,12 @@ namespace ExperienceAndClasses
 
         public double GetBossOrbXP()
         {
-            return Math.Floor(Math.Min(197 + (3 * Math.Pow(GetLevel(), 1.76)), 10000) * ExperienceAndClasses.worldExpModifier);
+            double xp = Math.Min(197 + (3 * Math.Pow(GetLevel(), 1.76)), 10000);
+            double xp_min = 0.005 * Methods.Experience.GetExpReqForLevel(GetLevel() + 1, false);
+            if (xp < xp_min)
+                xp = xp_min;
+
+            return Math.Floor(xp * ExperienceAndClasses.worldExpModifier);
         }
 
         public double GetMonsterOrbXP()

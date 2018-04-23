@@ -104,6 +104,7 @@ namespace ExperienceAndClasses.NPCs
                     else
                     {
                         player = Main.player[playerIndex];
+                        if (!player.active) continue;
                     }
                     myPlayer = player.GetModPlayer<MyPlayer>(mod);
 
