@@ -215,8 +215,8 @@ namespace ExperienceAndClasses
         //save xp
         public override TagCompound Save()
         {
-            UILeft = (mod as ExperienceAndClasses).uiExp.GetLeft();
-            UITop = (mod as ExperienceAndClasses).uiExp.GetTop();
+            UILeft = UI.UIExp.GetLeft();
+            UITop = UI.UIExp.GetTop();
 
             return new TagCompound {
                 {"experience", experience},
@@ -277,10 +277,11 @@ namespace ExperienceAndClasses
                     player.PutItemInInventory(mod.ItemType("ClassToken_Novice"));
                 }
 
-                UI.UIExp.visible = true;
-                (mod as ExperienceAndClasses).uiExp.Init(this);
-                (mod as ExperienceAndClasses).uiExp.SetTransparency(UITrans);
-                (mod as ExperienceAndClasses).uiExp.SetPosition(UILeft, UITop);
+                UI.UIExp.Init(this);
+                UI.UIExp.SetTransparency(UITrans);
+                UI.UIExp.SetPosition(UILeft, UITop);
+                UI.UIExp.visible = UIShow;
+
                 //(mod as ExperienceAndClasses).uiExp.Update();
 
                 //settings
@@ -371,22 +372,22 @@ namespace ExperienceAndClasses
 
         public override void PostUpdate()
         {
-            //things to do if this is you
-            if (player.Equals(Main.LocalPlayer))
-            {
-                //update UI if local single-player
-                //if(Main.netMode==0) (mod as ExperienceAndClasses).uiExp.Update();
+            ////things to do if this is you
+            //if (player.Equals(Main.LocalPlayer))
+            //{
+            //    //update UI if local single-player
+            //    //if(Main.netMode==0) (mod as ExperienceAndClasses).uiExp.Update();
 
-                //UI visibility
-                if (UIShow)
-                {
-                    UI.UIExp.visible = true;
-                }
-                else
-                {
-                    UI.UIExp.visible = false;
-                }
-            }
+            //    //UI visibility
+            //    if (UIShow)
+            //    {
+            //        UI.UIExp.visible = true;
+            //    }
+            //    else
+            //    {
+            //        UI.UIExp.visible = false;
+            //    }
+            //}
 
             //check if afk
             if (!afk && allowAFK && (Main.netMode != 2) && (afkTime > 0) && ((DateTime.Now.Ticks - afkTime) > ExperienceAndClasses.AFK_TIME_TICKS))

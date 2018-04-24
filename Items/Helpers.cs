@@ -1018,9 +1018,10 @@ namespace ExperienceAndClasses.Items
             intBonus = (int)Math.Floor(dodgeChancePct * level);
             if (intBonus > 0)
             {
+                if (intBonus > dodgeChancePct_CAP) intBonus = dodgeChancePct_CAP;
+                bonuses += "\n+" + intBonus + "% dodge (might be further capped)";
                 if (!ignoreCaps && (myPlayer.dodgeChancePct + intBonus) > dodgeChancePct_CAP) intBonus = dodgeChancePct_CAP - myPlayer.dodgeChancePct;
                 if (applyEffects) myPlayer.dodgeChancePct += intBonus;
-                bonuses += "\n+" + intBonus + "% dodge";
             }
             if (dodgeChancePct>0f)
             {
@@ -1030,6 +1031,7 @@ namespace ExperienceAndClasses.Items
 
             //chance to inflict Midas on hit
             floatBonus = pctChanceMidas * level;
+            if (floatBonus >= 1f) floatBonus = 1f;
             if (floatBonus > 0)
             {
                 if (applyEffects) myPlayer.percentMidas += floatBonus;

@@ -1,7 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
-using Terraria.ModLoader;
 using Terraria.GameContent.UI.Elements;
 using Terraria.UI;
 using System;
@@ -46,16 +45,20 @@ namespace ExperienceAndClasses.UI
         protected const float TEXT_ABILITY_Y_DOWN = 2f;
 
         protected static UIPanel panel;
-        private static UIExpOverlay overlay;
         public static UIBar[] bars = new UIBar[NUMBER_OF_BARS];
 
         protected static int numberActiveBars = 0;
         protected static string[] labelsExp = new string[2];
         protected static string[,] labelsBars = new string[2, NUMBER_OF_BARS];
 
-        public static bool visible = true;
         public static bool transparency = false;
         public static MyPlayer localMyPlayer;
+        private static bool initialized = false;
+        public static bool visible = false;
+
+        public const float SCALE_MAIN = 1f;
+        public const float SCALE_SMALL = 0.85f;
+        public static readonly Vector2 ORIGIN = new Vector2(0f);
 
         public override void OnInitialize()
         {
@@ -71,7 +74,7 @@ namespace ExperienceAndClasses.UI
             panel.OnMouseUp += new UIElement.MouseEvent(DragEnd);
 
             //add all bars that could be needed
-            for (int i = 0; i< NUMBER_OF_BARS; i++)
+            for (int i = 0; i < NUMBER_OF_BARS; i++)
             {
                 if (i == 0)
                     bars[i] = new UIBar(panel, BAR_EXP_LEFT, BAR_EXP_TOP_FIRST + (i * PANEL_HEIGHT_PER_BAR), BAR_EXP_WIDTH, BAR_EXP_HEIGHT, transparency, ALPHA_BAR_EXP_BACKGROUND, ALPHA_BAR_EXP_FOREGROUND, ALPHA_BAR_EXP_BACKGROUND_TRANSPARENT, ALPHA_BAR_EXP_FOREGROUND_TRANSPARENT, COLOUR_BAR_BACKGROUND, COLOUR_BAR_FOREGROUND_EXP);
@@ -79,30 +82,26 @@ namespace ExperienceAndClasses.UI
                     bars[i] = new UIBar(panel, BAR_EXP_LEFT_INDENT, BAR_EXP_TOP_FIRST + (i * PANEL_HEIGHT_PER_BAR), BAR_EXP_WIDTH_INDENT, BAR_EXP_HEIGHT, transparency, ALPHA_BAR_EXP_BACKGROUND, ALPHA_BAR_EXP_FOREGROUND, ALPHA_BAR_EXP_BACKGROUND_TRANSPARENT, ALPHA_BAR_EXP_FOREGROUND_TRANSPARENT, COLOUR_BAR_BACKGROUND, COLOUR_BAR_FOREGROUND_ABILITY);
             }
 
-            overlay = new UIExpOverlay();
-            overlay.Left.Set(0f, 0f);
-            overlay.Top.Set(0f, 0f);
-            overlay.Width.Set(panel.Width.Pixels, 0f);
-            overlay.Height.Set(panel.Height.Pixels, 1f);
-            panel.Append(overlay);
-
             base.Append(panel);
         }
 
-        public void Init(MyPlayer myPlayer)
+        public static void Init(MyPlayer myPlayer)
         {
+            initialized = true;
             localMyPlayer = myPlayer;
         }
 
         public void Update(SpriteBatch spriteBatch)
         {
-            if (localMyPlayer == null) return;
+            if (!initialized) return;
 
             numberActiveBars = 0;
 
             //exp/level and prep main text
             double exp = localMyPlayer.GetExp();
-            int level = Methods.Experience.GetLevel(exp);
+            if (exp < 0) return;
+
+            int level = localMyPlayer.GetLevel();
             double expHave = Methods.Experience.GetExpTowardsNextLevel(exp);
             double expNeed = Methods.Experience.GetExpReqForLevel(level + 1, false);
             float pct = (float)(expHave / expNeed);
@@ -115,11 +114,11 @@ namespace ExperienceAndClasses.UI
                 expHave = 0;
                 expNeed = 0;
             }
-            labelsExp[0] = "LEVEL: " + level;
+            labelsExp[0] = "LEVEL: " + level; 
             labelsExp[1] = pctShow + "%";
 
             //exp bar
-            if (!localMyPlayer.UIExpBar)
+            if (localMyPlayer.UIExpBar)
             {
                 //bar
                 bars[numberActiveBars].left = BAR_EXP_LEFT;
@@ -168,17 +167,17 @@ namespace ExperienceAndClasses.UI
             panel.Height.Set(PANEL_HEIGHT_BASE + (numberActiveBars * PANEL_HEIGHT_PER_BAR), 0f);
         }
 
-        public void SetPosition(float left, float top)
+        public static void SetPosition(float left, float top)
         {
             panel.Left.Set(left, 0f);
             panel.Top.Set(top, 0f);
-            Recalculate();
+            //Recalculate();
         }
 
-        public float GetLeft() { return panel.Left.Pixels; }
-        public float GetTop() { return panel.Top.Pixels; }
+        public static float GetLeft() { return panel.Left.Pixels; }
+        public static float GetTop() { return panel.Top.Pixels; }
 
-        public void SetTransparency(bool newTransparency)
+        public static void SetTransparency(bool newTransparency)
         {
             transparency = newTransparency;
             if (transparency)
@@ -196,12 +195,12 @@ namespace ExperienceAndClasses.UI
                     bars[i].SetTransparency(transparency);
                 }
             }
-            Recalculate();
+            //Recalculate();
         }
 
-        Vector2 offset;
-        public bool dragging = false;
-        private void DragStart(UIMouseEvent evt, UIElement listeningElement)
+        private static Vector2 offset;
+        private static bool dragging = false;
+        private static void DragStart(UIMouseEvent evt, UIElement listeningElement)
         {
             offset = new Vector2(evt.MousePosition.X - panel.Left.Pixels, evt.MousePosition.Y - panel.Top.Pixels);
             dragging = true;
@@ -215,11 +214,13 @@ namespace ExperienceAndClasses.UI
             panel.Left.Set(end.X - offset.X, 0f);
             panel.Top.Set(end.Y - offset.Y, 0f);
 
-            Recalculate();
+            //Recalculate();
         }
 
         protected override void DrawSelf(SpriteBatch spriteBatch)
         {
+            if (!initialized) return;
+
             Vector2 MousePosition = new Vector2((float)Main.mouseX, (float)Main.mouseY);
             if (panel.ContainsPoint(MousePosition))
             {
@@ -230,9 +231,42 @@ namespace ExperienceAndClasses.UI
                 panel.Left.Set(MousePosition.X - offset.X, 0f);
                 panel.Top.Set(MousePosition.Y - offset.Y, 0f);
             }
-            base.DrawSelf(spriteBatch);
             Update(spriteBatch);
             Recalculate();
+        }
+
+        protected override void DrawChildren(SpriteBatch spriteBatch)
+        {
+            //draw the not text stuff (bars)
+            base.DrawChildren(spriteBatch);
+
+            //draw text
+            if (initialized)
+            {
+                Vector2 textSize;
+
+                //text for level and percent exp
+                Utils.DrawBorderStringFourWay(spriteBatch, Main.fontMouseText, labelsExp[0], panel.Left.Pixels + TEXT_LEVEL_X, panel.Top.Pixels + TEXT_LEVEL_Y, COLOUR_TEXT_INNER, COLOUR_TEXT_OUTTER, ORIGIN, SCALE_MAIN);
+                textSize = Main.fontMouseText.MeasureString(labelsExp[1]) * SCALE_MAIN;
+                Utils.DrawBorderStringFourWay(spriteBatch, Main.fontMouseText, labelsExp[1], panel.Left.Pixels + TEXT_PCT_X - textSize.X, panel.Top.Pixels + TEXT_PCT_Y, COLOUR_TEXT_INNER, COLOUR_TEXT_OUTTER, ORIGIN, SCALE_MAIN);
+
+                //text for each bar
+                float barCenter;
+                for (int i = 0; i < numberActiveBars; i++)
+                {
+                    if (labelsBars[0, i] != null)
+                    {
+                        textSize = Main.fontMouseText.MeasureString(labelsBars[0, i]) * SCALE_SMALL;
+                        Utils.DrawBorderStringFourWay(spriteBatch, Main.fontMouseText, labelsBars[0, i], panel.Left.Pixels + TEXT_ABILITY_X - (textSize.X / 2), panel.Top.Pixels + bars[i].top + TEXT_ABILITY_Y_DOWN, COLOUR_TEXT_INNER, COLOUR_TEXT_OUTTER, ORIGIN, SCALE_SMALL);
+                    }
+                    if (labelsBars[1, i] != null)
+                    {
+                        barCenter = bars[i].left + (bars[i].width / 2);
+                        textSize = Main.fontMouseText.MeasureString(labelsBars[1, i]) * SCALE_SMALL;
+                        Utils.DrawBorderStringFourWay(spriteBatch, Main.fontMouseText, labelsBars[1, i], panel.Left.Pixels + barCenter - (textSize.X / 2), panel.Top.Pixels + bars[i].top + TEXT_ABILITY_Y_DOWN, COLOUR_TEXT_INNER, COLOUR_TEXT_OUTTER, ORIGIN, SCALE_SMALL);
+                    }
+                }
+            }
         }
 
         public static string DisplayCooldown(int abilityID, int barIndex)
@@ -268,44 +302,6 @@ namespace ExperienceAndClasses.UI
 
             //return text for overlay
             return cooldownText;
-        }
-
-        class UIExpOverlay : UIElement
-        {
-            public const float SCALE_MAIN = 1f;
-            public const float SCALE_SMALL = 0.85f;
-            public static readonly Vector2 ORIGIN = new Vector2(0f);
-
-            protected override void DrawSelf(SpriteBatch spriteBatch)
-            {
-                float x = Parent.Left.Pixels;
-                float y = Parent.Top.Pixels;
-                Vector2 textSize;
-                //Vector2 v2PctShow = Main.fontMouseText.MeasureString(strPctShow);
-                //Utils.DrawBorderStringFourWay(spriteBatch, Main.fontMouseText, "LEVEL: " + level, shopx, shopy, Color.White, Color.Black, new Vector2(0.3f), 0.75f);
-
-                //text for level and percent exp
-                Utils.DrawBorderStringFourWay(spriteBatch, Main.fontMouseText, labelsExp[0], x + TEXT_LEVEL_X, y + TEXT_LEVEL_Y, COLOUR_TEXT_INNER, COLOUR_TEXT_OUTTER, ORIGIN, SCALE_MAIN);
-                textSize = Main.fontMouseText.MeasureString(labelsExp[1]) * SCALE_MAIN;
-                Utils.DrawBorderStringFourWay(spriteBatch, Main.fontMouseText, labelsExp[1], x + TEXT_PCT_X - textSize.X, y + TEXT_PCT_Y, COLOUR_TEXT_INNER, COLOUR_TEXT_OUTTER, ORIGIN, SCALE_MAIN);
-
-                //text for each bar
-                float barCenter;
-                for (int i = 0; i < numberActiveBars; i++)
-                {
-                    if (labelsBars[0, i] != null)
-                    {
-                        textSize = Main.fontMouseText.MeasureString(labelsBars[0, i]) * SCALE_SMALL;
-                        Utils.DrawBorderStringFourWay(spriteBatch, Main.fontMouseText, labelsBars[0, i], x + TEXT_ABILITY_X - (textSize.X/2), y + bars[i].top + TEXT_ABILITY_Y_DOWN, COLOUR_TEXT_INNER, COLOUR_TEXT_OUTTER, ORIGIN, SCALE_SMALL);
-                    }
-                    if (labelsBars[1, i] != null)
-                    {
-                        barCenter = bars[i].left + (bars[i].width / 2);
-                        textSize = Main.fontMouseText.MeasureString(labelsBars[1, i]) * SCALE_SMALL;
-                        Utils.DrawBorderStringFourWay(spriteBatch, Main.fontMouseText, labelsBars[1, i], x + barCenter - (textSize.X / 2), y + bars[i].top + TEXT_ABILITY_Y_DOWN, COLOUR_TEXT_INNER, COLOUR_TEXT_OUTTER, ORIGIN, SCALE_SMALL);
-                    }
-                }
-            }
         }
     }
 
@@ -395,5 +391,6 @@ namespace ExperienceAndClasses.UI
             bgd.Remove();
             fgd.Remove();
         }
+
     }
 }

@@ -1,5 +1,5 @@
 author = Saerus
-version = 1.3.1
+version = 1.3.2
 displayName = ExperienceAndClasses
 buildIgnore = *.csproj, *.user, obj\*, bin\*, .vs\*, *.xlsx, *.m, *.pptx, *.docx, *.tmp, *.zip, *.psd, *.sln, *.gitattributes, *.gitignore, Properties\*, Service References\*
 homepage = https://forums.terraria.org/index.php?threads/experience-and-classes.53048/

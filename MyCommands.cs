@@ -37,6 +37,8 @@ namespace ExperienceAndClasses
         {
             MyPlayer localMyPlayer = caller.Player.GetModPlayer<MyPlayer>(mod);
             localMyPlayer.UIShow = !localMyPlayer.UIShow;
+            UI.UIExp.visible = localMyPlayer.UIShow;
+
             if (localMyPlayer.UIShow)
                 Main.NewText("Experience and cooldown ui enabled.", ExperienceAndClasses.MESSAGE_COLOUR_YELLOW);
             else
@@ -57,7 +59,7 @@ namespace ExperienceAndClasses
         {
             MyPlayer localMyPlayer = caller.Player.GetModPlayer<MyPlayer>(mod);
             localMyPlayer.UIExpBar = !localMyPlayer.UIExpBar;
-            if (localMyPlayer.UIShow)
+            if (localMyPlayer.UIExpBar)
                 Main.NewText("Experience bar enabled.", ExperienceAndClasses.MESSAGE_COLOUR_YELLOW);
             else
                 Main.NewText("Experience bar disabled.", ExperienceAndClasses.MESSAGE_COLOUR_YELLOW);
@@ -76,10 +78,10 @@ namespace ExperienceAndClasses
         public override void Action(CommandCaller caller, string input, string[] args)
         {
             MyPlayer localMyPlayer = caller.Player.GetModPlayer<MyPlayer>(mod);
-            UI.UIExp myUI = (mod as ExperienceAndClasses).uiExp;
+            //UI.UIExp myUI = (mod as ExperienceAndClasses).uiExp;
 
             localMyPlayer.UITrans = !localMyPlayer.UITrans;
-            myUI.SetTransparency(localMyPlayer.UITrans);
+            UI.UIExp.SetTransparency(localMyPlayer.UITrans);
             if
                 (localMyPlayer.UITrans) Main.NewText("Experience bar is now transparent.", ExperienceAndClasses.MESSAGE_COLOUR_YELLOW);
             else
@@ -101,11 +103,11 @@ namespace ExperienceAndClasses
             MyPlayer localMyPlayer = caller.Player.GetModPlayer<MyPlayer>(mod);
             UI.UIExp myUI = (mod as ExperienceAndClasses).uiExp;
 
-            myUI.SetPosition(400f, 100f);
+            UI.UIExp.SetPosition(400f, 100f);
             localMyPlayer.UIShow = true;
             localMyPlayer.UIExpBar = true;
             localMyPlayer.UITrans = false;
-            myUI.SetTransparency(localMyPlayer.UITrans);
+            UI.UIExp.SetTransparency(localMyPlayer.UITrans);
             //myUI.Update();
             Main.NewText("Experience bar reset.", ExperienceAndClasses.MESSAGE_COLOUR_YELLOW);
         }

@@ -130,11 +130,6 @@ namespace ExperienceAndClasses
         //load
         public override void Load()
         {
-            uiExp = new UIExp();
-            uiExp.Activate();
-            myUserInterface = new UserInterface();
-            myUserInterface.SetState(uiExp);
-            UIExp.visible = true;
             HOTKEY_ACTIVATE_ABILITY = RegisterHotKey("Ability", "Q");
             HOTKEY_MODIFIER_1 = RegisterHotKey("Modifier 1", "Q");
             HOTKEY_MODIFIER_2 = RegisterHotKey("Modifier 2", "W");
@@ -145,6 +140,11 @@ namespace ExperienceAndClasses
             HOTKEY_ABILITY_3 = RegisterHotKey("Ability 3", "R");
             HOTKEY_ABILITY_4 = RegisterHotKey("Ability 4", "F");
             HOTKEY_ACCEPT_RESURRECTION = RegisterHotKey("Accept Resurrection", "P");
+
+            uiExp = new UIExp();
+            uiExp.Activate();
+            myUserInterface = new UserInterface();
+            myUserInterface.SetState(uiExp);
         }
 
         public override void Unload()
