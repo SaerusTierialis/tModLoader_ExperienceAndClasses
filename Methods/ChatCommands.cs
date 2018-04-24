@@ -271,9 +271,15 @@ namespace ExperienceAndClasses.Methods
                 dmgred = "disabled";
             }
 
-            Main.NewTextMultiline("Require Authorization (world): " + ExperienceAndClasses.worldRequireAuth + "\nExperience Rate (world): " + (ExperienceAndClasses.worldExpModifier * 100) +
-                        "%\nIgnore Class Caps (world): " + ExperienceAndClasses.worldIgnoreCaps + "\nLevel Cap (world): " + lvlcap + "\nClass Damage Reduction (world): " +
-                        dmgred + "\nDeath Penalty (world): " + (ExperienceAndClasses.worldDeathPenalty * 100) + "%" + "\nEnable AFK (char): " + Main.LocalPlayer.GetModPlayer<MyPlayer>(mod).allowAFK, false, ExperienceAndClasses.MESSAGE_COLOUR_YELLOW);
+            MyPlayer myPlayer = Main.LocalPlayer.GetModPlayer<MyPlayer>(mod);
+
+            Main.NewTextMultiline("World - Require Authorization: " + ExperienceAndClasses.worldRequireAuth + "\nWorld - Experience Rate: " + (ExperienceAndClasses.worldExpModifier * 100) +
+                        "%\nWorld - Ignore Class Caps: " + ExperienceAndClasses.worldIgnoreCaps + "\nWorld - Level Cap: " + lvlcap + "\nWorld - Class Damage Reduction: " +
+                        dmgred + "\nWorld - Death Penalty: " + (ExperienceAndClasses.worldDeathPenalty * 100) + "%", false, ExperienceAndClasses.MESSAGE_COLOUR_YELLOW);
+
+            Main.NewTextMultiline("Character - Enable AFK: " + myPlayer.allowAFK + "\nCharacter - Display XP Messages: " + myPlayer.displayExp + 
+                "\nCharacter - Display Cooldown Messages: " + myPlayer.displayCD + "\nCharacter - UI Exp Bar: " + myPlayer.UIExpBar + 
+                "\nCharacter - UI Cooldown Bars: " + myPlayer.UICDBars, false, ExperienceAndClasses.MESSAGE_COLOUR_YELLOW);
         }
 
         /// <summary>

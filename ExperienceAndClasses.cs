@@ -97,7 +97,7 @@ namespace ExperienceAndClasses
 
         //misc
         public const int LEVEL_START_APPLYING_DEATH_PENALTY = 10;
-        public const long AFK_TIME_TICKS = 60 * TimeSpan.TicksPerSecond;
+        public const long AFK_TIME_TICKS_SEC = 60;
 
         //map settings constants
         public const double DEFAULT_EXPERIENCE_MODIFIER = 1.0;

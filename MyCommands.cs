@@ -4,13 +4,53 @@ using Terraria.ModLoader;
 
 namespace ExperienceAndClasses
 {
+    class Command_expuibarcd : CommandTemplate //allowAFK
+    {
+        public Command_expuibarcd()
+        {
+            name = "expuibarcd";
+            argstr = "";
+            desc = "toggle cooldown bars in the experience and cooldown ui";
+        }
+
+        public override void Action(CommandCaller caller, string input, string[] args)
+        {
+            MyPlayer localMyPlayer = caller.Player.GetModPlayer<MyPlayer>(mod);
+            localMyPlayer.UICDBars = !localMyPlayer.UICDBars;
+            if (localMyPlayer.UICDBars)
+                Main.NewText("Cooldown bars enabled.", ExperienceAndClasses.MESSAGE_COLOUR_YELLOW);
+            else
+                Main.NewText("Cooldown bars disabled.", ExperienceAndClasses.MESSAGE_COLOUR_YELLOW);
+        }
+    }
+
+    class Command_expcd : CommandTemplate //allowAFK
+    {
+        public Command_expcd()
+        {
+            name = "expcd";
+            argstr = "";
+            desc = "toggle whether cooldown messages are displayed";
+        }
+
+        public override void Action(CommandCaller caller, string input, string[] args)
+        {
+            MyPlayer localMyPlayer = caller.Player.GetModPlayer<MyPlayer>(mod);
+            localMyPlayer.displayCD = !localMyPlayer.displayCD;
+            if (localMyPlayer.displayCD)
+                Main.NewText("Cooldown messages enabled.", ExperienceAndClasses.MESSAGE_COLOUR_YELLOW);
+            else
+                Main.NewText("Cooldown messages disabled.", ExperienceAndClasses.MESSAGE_COLOUR_YELLOW);
+        }
+    }
+
     class Command_expafk : CommandTemplate //allowAFK
     {
         public Command_expafk()
         {
             name = "expafk";
             argstr = "";
-            desc = "toggle whether to enter AFK mode after " + (ExperienceAndClasses.AFK_TIME_TICKS / TimeSpan.TicksPerSecond) + " seconds";
+            desc = "toggle whether to enter AFK mode after " + ExperienceAndClasses.AFK_TIME_TICKS_SEC + " seconds";
         }
 
         public override void Action(CommandCaller caller, string input, string[] args)
@@ -18,7 +58,7 @@ namespace ExperienceAndClasses
             MyPlayer localMyPlayer = caller.Player.GetModPlayer<MyPlayer>(mod);
             localMyPlayer.allowAFK = !localMyPlayer.allowAFK;
             if (localMyPlayer.allowAFK)
-                Main.NewText("AFK mode is enabled.", ExperienceAndClasses.MESSAGE_COLOUR_YELLOW);
+                Main.NewText("AFK mode enabled.", ExperienceAndClasses.MESSAGE_COLOUR_YELLOW);
             else
                 Main.NewText("AFK mode disabled.", ExperienceAndClasses.MESSAGE_COLOUR_YELLOW);
         }

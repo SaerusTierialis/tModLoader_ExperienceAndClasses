@@ -21,23 +21,22 @@ namespace ExperienceAndClasses
 
         public double experience = -1;
 
-        //these are now map-specific
-        //public double experienceModifier = 1;
-        //public int explvlcap = -1;
-        //public int expdmgred = -1;
-        //public bool ignoreCaps = false;
+        private double offlineXPChunk = 0;
+        private DateTime offlineXPTime = DateTime.MinValue;
 
         public bool allowAFK = true;
-        public long afkTime = 0;
+        public DateTime afkTime = DateTime.MinValue;
         public bool afk = false;
 
         public bool displayExp = true;
+        public bool displayCD = true;
 
         public float UILeft = 400f;
         public float UITop = 100f;
         public bool UIShow = true;
         public bool UIExpBar = true;
         public bool UITrans = false;
+        public bool UICDBars = true;
 
         public List<Tuple<ModItem, string>> classTokensEquipped;
         public int numberClasses = 1;
@@ -176,14 +175,29 @@ namespace ExperienceAndClasses
         /// Displays the local "You have gained/lost x experience." message. Loss is always displayed.
         /// </summary>
         /// <param name="experienceChange"></param>
-        public void ExpMsg(double experienceChange)
+        public void ExpMsg(double experienceChange, bool offlineChunk = false)
         {
             if (!Main.LocalPlayer.Equals(player) || Main.netMode==2) return;
 
-            if (experienceChange>0 && displayExp)
+            if (((experienceChange > 0) || offlineChunk) && displayExp)
             {
-                //Main.NewText("You have earned " + Math.Round(experienceChange) + " experience.", ExperienceAndClasses.MESSAGE_COLOUR_GREEN);
-                CombatText.NewText(player.getRect(), ExperienceAndClasses.MESSAGE_COLOUR_GREEN, "+" + Math.Round(experienceChange) + "XP");
+                if (Main.netMode == 1)
+                {
+                    //Main.NewText("You have earned " + Math.Round(experienceChange) + " experience.", ExperienceAndClasses.MESSAGE_COLOUR_GREEN);
+                    CombatText.NewText(player.getRect(), ExperienceAndClasses.MESSAGE_COLOUR_GREEN, "+" + Math.Round(experienceChange) + "XP");
+                }
+                else if (Main.netMode == 0)
+                {
+                    if (offlineChunk)
+                    {
+                        CombatText.NewText(player.getRect(), ExperienceAndClasses.MESSAGE_COLOUR_GREEN, "+" + Math.Round(offlineXPChunk) + "XP");
+                        offlineXPChunk = 0;
+                    }
+                    else
+                    {
+                        offlineXPChunk += experienceChange;
+                    }
+                }
             }
             else if (experienceChange<0)
             {
@@ -221,12 +235,14 @@ namespace ExperienceAndClasses
             return new TagCompound {
                 {"experience", experience},
                 {"display_exp", displayExp},
+                {"display_cd", displayCD},
                 {"allow_afk", allowAFK},
                 {"UI_left", UILeft},
                 {"UI_top", UITop},
                 {"UI_show", UIShow},
                 {"UI_expbar_show", UIExpBar},
                 {"UI_trans", UITrans},
+                {"UI_cdbars_show", UICDBars},
                 {"traceChar", traceChar},
             };
         }
@@ -241,6 +257,8 @@ namespace ExperienceAndClasses
 
             //settings
             displayExp = Commons.TryGet<bool>(tag, "display_exp", true);
+            displayCD = Commons.TryGet<bool>(tag, "display_cd", true);
+
             allowAFK = Commons.TryGet<bool>(tag, "allow_afk", true);
 
             //UI
@@ -249,6 +267,7 @@ namespace ExperienceAndClasses
             UIShow = Commons.TryGet<bool>(tag, "UI_show", true);
             UIExpBar = Commons.TryGet<bool>(tag, "UI_expbar_show", true);
             UITrans = Commons.TryGet<bool>(tag, "UI_trans", false);
+            UICDBars = Commons.TryGet<bool>(tag, "UI_cdbars_show", true);
 
             //trace
             traceChar = Commons.TryGet<bool>(tag, "traceChar", false);
@@ -269,7 +288,7 @@ namespace ExperienceAndClasses
             if (player.Equals(Main.LocalPlayer))
             {
                 //afk timing
-                afkTime = DateTime.Now.Ticks;
+                afkTime = DateTime.Now;
 
                 if (experience < 0) //occurs when a player who does not have the mod joins a server that uses the mod
                 {
@@ -352,7 +371,7 @@ namespace ExperienceAndClasses
             }
             effectiveLevel = (int)Math.Floor((double)effectiveLevel / numberClasses);
 
-                //limit abilities based on level requirements
+            //limit abilities based on level requirements
             currentAbilityIDs = Enumerable.Repeat(Abilities.ID_UNDEFINED, ExperienceAndClasses.MAXIMUM_NUMBER_OF_ABILITIES).ToArray();
             int index = 0;
             int id;
@@ -389,12 +408,24 @@ namespace ExperienceAndClasses
             //    }
             //}
 
+            DateTime now = DateTime.Now;
+
             //check if afk
-            if (!afk && allowAFK && (Main.netMode != 2) && (afkTime > 0) && ((DateTime.Now.Ticks - afkTime) > ExperienceAndClasses.AFK_TIME_TICKS))
+            if (!afk && allowAFK && (Main.netMode != 2) && (now.AddSeconds(-ExperienceAndClasses.AFK_TIME_TICKS_SEC).CompareTo(afkTime) > 0))
             {
                 if (Main.netMode == 0) Main.NewText("You are now AFK. You will not recieve death penalties to experience but you cannot gain experience either.", ExperienceAndClasses.MESSAGE_COLOUR_RED);
                 afk = true;
                 Methods.PacketSender.ClientAFK(mod);
+            }
+
+            //single player chunk update
+            if (Main.netMode == 0)
+            {
+                if ((offlineXPChunk > 0) && (now.AddMilliseconds(-MyWorld.TIME_BETWEEN_SYNC_EXP_CHANGES_MSEC).CompareTo(offlineXPTime) > 0))
+                {
+                    ExpMsg(0, true);
+                    offlineXPTime = now;
+                }
             }
 
             base.PostUpdate();
@@ -574,7 +605,7 @@ namespace ExperienceAndClasses
             //track afk
             if (Main.netMode != 2 && (triggersSet.MouseLeft || triggersSet.MouseMiddle || triggersSet.MouseRight || triggersSet.Jump || triggersSet.Up || triggersSet.Down || triggersSet.Left || triggersSet.Right))
             {
-                afkTime = DateTime.Now.Ticks;
+                afkTime = DateTime.Now;
                 if (afk)
                 {
                     if (Main.netMode == 0) Main.NewText("You are no longer AFK.", ExperienceAndClasses.MESSAGE_COLOUR_RED);

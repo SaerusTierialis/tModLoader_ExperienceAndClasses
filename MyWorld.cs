@@ -56,33 +56,36 @@ namespace ExperienceAndClasses
 
         public override void PostUpdate()
         {
-            if (!expmapAuthCodeWritten && Main.ActivePlayersCount>0)
+            if (Main.netMode == 2) // server only
             {
-                Console.WriteLine("Experience&Classes expauth code: " + ExperienceAndClasses.worldAuthCode);
-                expmapAuthCodeWritten = true;
-            }
+                if (!expmapAuthCodeWritten && Main.ActivePlayersCount > 0)
+                {
+                    Console.WriteLine("Experience&Classes expauth code: " + ExperienceAndClasses.worldAuthCode);
+                    expmapAuthCodeWritten = true;
+                }
 
-            //initial client experience and settings sync
-            DateTime now = DateTime.Now;
-            if (now.AddMilliseconds(-TIME_BETWEEN_REQUEST_MSEC).CompareTo(timeLastRequests) > 0)
-            {
-                timeLastRequests = now;
-                SendClientFirstSyncs();
-            }
-            else if (now.AddMilliseconds(-TIME_BETWEEN_SYNC_MAP_SETTINGS_MSEC).CompareTo(timeLastSyncMapSettings) > 0)
-            {
-                timeLastSyncMapSettings = now;
-                Methods.PacketSender.ServerUpdateMapSettings(mod);
-            }
-            else if (now.AddMilliseconds(-TIME_BETWEEN_SYNC_EXP_CHANGES_MSEC).CompareTo(timeLastSyncExpChanges) > 0)
-            {
-                timeLastSyncExpChanges = now;
-                Methods.PacketSender.ServerSyncExp(mod);
-            }
-            else if (now.AddMilliseconds(-TIME_BETWEEN_SYNC_EXP_ALL_MSEC).CompareTo(timeLastSyncExpAll) > 0)
-            {
-                timeLastSyncExpAll = now;
-                Methods.PacketSender.ServerSyncExp(mod, true);
+                //initial client experience and settings sync
+                DateTime now = DateTime.Now;
+                if (now.AddMilliseconds(-TIME_BETWEEN_REQUEST_MSEC).CompareTo(timeLastRequests) > 0)
+                {
+                    timeLastRequests = now;
+                    SendClientFirstSyncs();
+                }
+                else if (now.AddMilliseconds(-TIME_BETWEEN_SYNC_MAP_SETTINGS_MSEC).CompareTo(timeLastSyncMapSettings) > 0)
+                {
+                    timeLastSyncMapSettings = now;
+                    Methods.PacketSender.ServerUpdateMapSettings(mod);
+                }
+                else if (now.AddMilliseconds(-TIME_BETWEEN_SYNC_EXP_CHANGES_MSEC).CompareTo(timeLastSyncExpChanges) > 0)
+                {
+                    timeLastSyncExpChanges = now;
+                    Methods.PacketSender.ServerSyncExp(mod);
+                }
+                else if (now.AddMilliseconds(-TIME_BETWEEN_SYNC_EXP_ALL_MSEC).CompareTo(timeLastSyncExpAll) > 0)
+                {
+                    timeLastSyncExpAll = now;
+                    Methods.PacketSender.ServerSyncExp(mod, true);
+                }
             }
         }
 

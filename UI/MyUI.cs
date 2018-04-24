@@ -140,20 +140,23 @@ namespace ExperienceAndClasses.UI
             }
 
             //ability bars
-            int abilityID;
-            for (int i = 0; i < ExperienceAndClasses.MAXIMUM_NUMBER_OF_ABILITIES; i++)
+            if (localMyPlayer.UICDBars)
             {
-                abilityID = localMyPlayer.currentAbilityIDs[i];
-                if (abilityID != Abilities.ID_UNDEFINED)
+                int abilityID;
+                for (int i = 0; i < ExperienceAndClasses.MAXIMUM_NUMBER_OF_ABILITIES; i++)
                 {
-                    //bar
-                    bars[numberActiveBars].left = BAR_EXP_LEFT_INDENT;
-                    bars[numberActiveBars].width = BAR_EXP_WIDTH_INDENT;
-                    bars[numberActiveBars].Activate();
-                    //set bar values and get text to diplay
-                    labelsBars[0, numberActiveBars] = Abilities.SHORTFORM[abilityID];
-                    labelsBars[1, numberActiveBars] = DisplayCooldown(abilityID, numberActiveBars);
-                    numberActiveBars++;
+                    abilityID = localMyPlayer.currentAbilityIDs[i];
+                    if (abilityID != Abilities.ID_UNDEFINED)
+                    {
+                        //bar
+                        bars[numberActiveBars].left = BAR_EXP_LEFT_INDENT;
+                        bars[numberActiveBars].width = BAR_EXP_WIDTH_INDENT;
+                        bars[numberActiveBars].Activate();
+                        //set bar values and get text to diplay
+                        labelsBars[0, numberActiveBars] = Abilities.SHORTFORM[abilityID];
+                        labelsBars[1, numberActiveBars] = DisplayCooldown(abilityID, numberActiveBars);
+                        numberActiveBars++;
+                    }
                 }
             }
 
@@ -294,7 +297,7 @@ namespace ExperienceAndClasses.UI
             bars[barIndex].SetValue(cooldownPct, COLOUR_BAR_FOREGROUND_ABILITY);
 
             //display off cooldown message
-            if ((cooldownSec <= 0) && Abilities.ON_COOLDOWN[abilityID])
+            if ((cooldownSec <= 0) && Abilities.ON_COOLDOWN[abilityID] && localMyPlayer.displayCD)
             {
                 Abilities.ON_COOLDOWN[abilityID] = false;
                 if (Abilities.COOLDOWN_SECS[abilityID] >= Abilities.THRESHOLD_SHOW_OFF_COOLDOWN_MSG) CombatText.NewText(localMyPlayer.player.getRect(), ExperienceAndClasses.MESSAGE_COLOUR_OFF_COOLDOWN, Abilities.NAME[abilityID] + " Ready!");
