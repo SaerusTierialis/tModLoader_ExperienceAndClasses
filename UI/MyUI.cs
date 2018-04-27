@@ -54,7 +54,6 @@ namespace ExperienceAndClasses.UI
         public static bool transparency = false;
         public static MyPlayer localMyPlayer;
         private static bool initialized = false;
-        public static bool visible = false;
 
         public const float SCALE_MAIN = 1f;
         public const float SCALE_SMALL = 0.85f;
@@ -220,9 +219,17 @@ namespace ExperienceAndClasses.UI
             //Recalculate();
         }
 
+        public static bool AllowDraw()
+        {
+            if (!initialized || (!localMyPlayer.UIShow && (!Main.playerInventory || !localMyPlayer.UIInventory)))
+                return false;
+            else
+                return true;
+        }
+
         protected override void DrawSelf(SpriteBatch spriteBatch)
         {
-            if (!initialized) return;
+            if (!AllowDraw()) return;
 
             Vector2 MousePosition = new Vector2((float)Main.mouseX, (float)Main.mouseY);
             if (panel.ContainsPoint(MousePosition))
@@ -240,6 +247,8 @@ namespace ExperienceAndClasses.UI
 
         protected override void DrawChildren(SpriteBatch spriteBatch)
         {
+            if (!AllowDraw()) return;
+
             //draw the not text stuff (bars)
             base.DrawChildren(spriteBatch);
 
@@ -297,10 +306,10 @@ namespace ExperienceAndClasses.UI
             bars[barIndex].SetValue(cooldownPct, COLOUR_BAR_FOREGROUND_ABILITY);
 
             //display off cooldown message
-            if ((cooldownSec <= 0) && Abilities.ON_COOLDOWN[abilityID] && localMyPlayer.displayCD)
+            if ((cooldownSec <= 0) && Abilities.ON_COOLDOWN[abilityID])
             {
                 Abilities.ON_COOLDOWN[abilityID] = false;
-                if (Abilities.COOLDOWN_SECS[abilityID] >= Abilities.THRESHOLD_SHOW_OFF_COOLDOWN_MSG) CombatText.NewText(localMyPlayer.player.getRect(), ExperienceAndClasses.MESSAGE_COLOUR_OFF_COOLDOWN, Abilities.NAME[abilityID] + " Ready!");
+                if ((Abilities.COOLDOWN_SECS[abilityID] >= localMyPlayer.thresholdCDMsg) && (localMyPlayer.thresholdCDMsg >= 0f)) CombatText.NewText(localMyPlayer.player.getRect(), ExperienceAndClasses.MESSAGE_COLOUR_OFF_COOLDOWN, Abilities.NAME[abilityID] + " Ready!");
             }
 
             //return text for overlay

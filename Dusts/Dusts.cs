@@ -14,6 +14,15 @@ namespace ExperienceAndClasses.Dusts
         }
     }
 
+    public class Dust_AbilityGeneric : ModDust
+    {
+        public override void OnSpawn(Dust dust)
+        {
+            dust.noGravity = true;
+            dust.scale = 2f;
+        }
+    }
+
 
 
     /* TEMPLATES */

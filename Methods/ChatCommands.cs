@@ -251,7 +251,7 @@ namespace ExperienceAndClasses.Methods
 
         public static void CommandDisplaySettings(Mod mod)
         {
-            string lvlcap, dmgred;
+            string lvlcap, dmgred, threshCD;
 
             if (ExperienceAndClasses.worldLevelCap > 0)
             {
@@ -272,14 +272,24 @@ namespace ExperienceAndClasses.Methods
             }
 
             MyPlayer myPlayer = Main.LocalPlayer.GetModPlayer<MyPlayer>(mod);
+            if (myPlayer.thresholdCDMsg >= 0f)
+            {
+                threshCD = myPlayer.thresholdCDMsg + " seconds";
+            }
+            else
+            {
+                threshCD = "disabled";
+            }
 
             Main.NewTextMultiline("World - Require Authorization: " + ExperienceAndClasses.worldRequireAuth + "\nWorld - Experience Rate: " + (ExperienceAndClasses.worldExpModifier * 100) +
                         "%\nWorld - Ignore Class Caps: " + ExperienceAndClasses.worldIgnoreCaps + "\nWorld - Level Cap: " + lvlcap + "\nWorld - Class Damage Reduction: " +
                         dmgred + "\nWorld - Death Penalty: " + (ExperienceAndClasses.worldDeathPenalty * 100) + "%", false, ExperienceAndClasses.MESSAGE_COLOUR_YELLOW);
 
             Main.NewTextMultiline("Character - Enable AFK: " + myPlayer.allowAFK + "\nCharacter - Display XP Messages: " + myPlayer.displayExp + 
-                "\nCharacter - Display Cooldown Messages: " + myPlayer.displayCD + "\nCharacter - UI Exp Bar: " + myPlayer.UIExpBar + 
-                "\nCharacter - UI Cooldown Bars: " + myPlayer.UICDBars, false, ExperienceAndClasses.MESSAGE_COLOUR_YELLOW);
+                "\nCharacter - Cooldown Messages Threshold: " + threshCD, false, ExperienceAndClasses.MESSAGE_COLOUR_YELLOW);
+
+            Main.NewTextMultiline("Character - UI Show: " + myPlayer.UIShow + "\nCharacter - UI Force Inventory: " + myPlayer.UIInventory + 
+                "\nCharacter - UI Exp Bar: " + myPlayer.UIExpBar + "\nCharacter - UI Cooldown Bars: " + myPlayer.UICDBars, false, ExperienceAndClasses.MESSAGE_COLOUR_YELLOW);
         }
 
         /// <summary>

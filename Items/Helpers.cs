@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Xna.Framework;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Terraria;
@@ -734,7 +735,7 @@ namespace ExperienceAndClasses.Items
             intBonus = (int)(statManaMax2 * level);
             if (intBonus > 0)
             {
-                if ((player.statManaMax2 + intBonus) > 400) intBonus = 400 - player.statManaMax2;
+                //if ((player.statManaMax2 + intBonus) > 400) intBonus = 400 - player.statManaMax2;
                 if (applyEffects) player.statManaMax2 += intBonus;
                 bonuses += "\n+" + intBonus + " mana";
             }
@@ -1007,9 +1008,10 @@ namespace ExperienceAndClasses.Items
 
             //light
             floatBonus = light * level;
+            if (floatBonus > 1f) floatBonus = 1f;
             if (floatBonus > 0)
             {
-                if (applyEffects) Lighting.AddLight(player.position, 0.2f + floatBonus, 0.2f + floatBonus, 0.2f + floatBonus);
+                if (applyEffects) Lighting.AddLight(player.position, 0.2f + floatBonus, 0.2f + floatBonus, 0.1f + floatBonus);
                 bonuses += "\n+" + (floatBonus*100) + "% light";
             }
             if (light > 0) desc += "\n+" + (light*100) + "% light";

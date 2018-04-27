@@ -488,7 +488,7 @@ namespace ExperienceAndClasses.Items
             abilityIDs[0] = Abilities.ID_CLERIC_ACTIVE_HEAL;
             abilityIDs[1] = Abilities.ID_CLERIC_ACTIVE_SANCTUARY;
             abilityIDs[2] = Abilities.ID_CLERIC_ACTIVE_DIVINE_INTERVENTION;
-            abilityIDs[3] = Abilities.ID_CLERIC_ACTIVE_RESSURECTION;
+            abilityIDs[3] = Abilities.ID_CLERIC_ACTIVE_PARAGON;
         }
         public override void AddRecipes()
         {

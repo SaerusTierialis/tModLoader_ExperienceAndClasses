@@ -69,16 +69,11 @@ namespace ExperienceAndClasses
         //public static readonly Color MESSAGE_COLOUR_EXP = new Color(21, 111, 48);
 
         //active abilities
-        public static ModHotKey HOTKEY_ACTIVATE_ABILITY;
-        public static ModHotKey HOTKEY_MODIFIER_1;
-        public static ModHotKey HOTKEY_MODIFIER_2;
-        public static ModHotKey HOTKEY_MODIFIER_3;
-        public static ModHotKey HOTKEY_MODIFIER_4;
         public static ModHotKey HOTKEY_ABILITY_1;
         public static ModHotKey HOTKEY_ABILITY_2;
         public static ModHotKey HOTKEY_ABILITY_3;
         public static ModHotKey HOTKEY_ABILITY_4;
-        public static ModHotKey HOTKEY_ACCEPT_RESURRECTION;
+        public static ModHotKey HOTKEY_ALTERNATE_EFFECT;
         public static readonly int MAXIMUM_NUMBER_OF_ABILITIES = 4;
 
         //exp requirements and cap
@@ -116,6 +111,10 @@ namespace ExperienceAndClasses
         public static bool worldRequireAuth = true;
         public static bool worldTrace = false;
 
+        //shortcut
+        public static MyPlayer localMyPlayer;
+        public static Mod mod;
+
         //start
         public ExperienceAndClasses()
         {
@@ -130,35 +129,27 @@ namespace ExperienceAndClasses
         //load
         public override void Load()
         {
-            HOTKEY_ACTIVATE_ABILITY = RegisterHotKey("Ability", "Q");
-            HOTKEY_MODIFIER_1 = RegisterHotKey("Modifier 1", "Q");
-            HOTKEY_MODIFIER_2 = RegisterHotKey("Modifier 2", "W");
-            HOTKEY_MODIFIER_3 = RegisterHotKey("Modifier 3", "LeftShift");
-            HOTKEY_MODIFIER_4 = RegisterHotKey("Modifier 4", "LeftControl");
             HOTKEY_ABILITY_1 = RegisterHotKey("Ability 1", "Q");
             HOTKEY_ABILITY_2 = RegisterHotKey("Ability 2", "E");
             HOTKEY_ABILITY_3 = RegisterHotKey("Ability 3", "R");
             HOTKEY_ABILITY_4 = RegisterHotKey("Ability 4", "F");
-            HOTKEY_ACCEPT_RESURRECTION = RegisterHotKey("Accept Resurrection", "P");
+            HOTKEY_ALTERNATE_EFFECT = RegisterHotKey("Alternate Effect", "LeftShift");
 
             uiExp = new UIExp();
             uiExp.Activate();
             myUserInterface = new UserInterface();
             myUserInterface.SetState(uiExp);
+
+            mod = this;
         }
 
         public override void Unload()
         {
-            HOTKEY_ACTIVATE_ABILITY = null;
-            HOTKEY_MODIFIER_1 = null;
-            HOTKEY_MODIFIER_2 = null;
-            HOTKEY_MODIFIER_3 = null;
-            HOTKEY_MODIFIER_4 = null;
             HOTKEY_ABILITY_1 = null;
             HOTKEY_ABILITY_2 = null;
             HOTKEY_ABILITY_3 = null;
             HOTKEY_ABILITY_4 = null;
-            HOTKEY_ACCEPT_RESURRECTION = null;
+            HOTKEY_ALTERNATE_EFFECT = null;
 
         }
 
@@ -697,11 +688,8 @@ namespace ExperienceAndClasses
                     "Experience UI",
                     delegate
                     {
-                        if (UIExp.visible)
-                        {
-                            myUserInterface.Update(Main._drawInterfaceGameTime);
-                            uiExp.Draw(Main.spriteBatch);
-                        }
+                        myUserInterface.Update(Main._drawInterfaceGameTime);
+                        uiExp.Draw(Main.spriteBatch);
                         return true;
                     },
                     InterfaceScaleType.UI)

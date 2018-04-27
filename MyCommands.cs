@@ -29,16 +29,18 @@ namespace ExperienceAndClasses
         public Command_expcd()
         {
             name = "expcd";
-            argstr = "";
+            argstr = "seconds";
             desc = "toggle whether cooldown messages are displayed";
         }
 
         public override void Action(CommandCaller caller, string input, string[] args)
         {
             MyPlayer localMyPlayer = caller.Player.GetModPlayer<MyPlayer>(mod);
-            localMyPlayer.displayCD = !localMyPlayer.displayCD;
-            if (localMyPlayer.displayCD)
-                Main.NewText("Cooldown messages enabled.", ExperienceAndClasses.MESSAGE_COLOUR_YELLOW);
+            float thresh = float.Parse(args[0]);
+            if (thresh < 0f) thresh = -1f;
+            localMyPlayer.thresholdCDMsg = thresh;
+            if (localMyPlayer.thresholdCDMsg >= 0f)
+                Main.NewText("Cooldown message threshold is " + localMyPlayer.thresholdCDMsg + " seconds.", ExperienceAndClasses.MESSAGE_COLOUR_YELLOW);
             else
                 Main.NewText("Cooldown messages disabled.", ExperienceAndClasses.MESSAGE_COLOUR_YELLOW);
         }
@@ -77,12 +79,32 @@ namespace ExperienceAndClasses
         {
             MyPlayer localMyPlayer = caller.Player.GetModPlayer<MyPlayer>(mod);
             localMyPlayer.UIShow = !localMyPlayer.UIShow;
-            UI.UIExp.visible = localMyPlayer.UIShow;
 
             if (localMyPlayer.UIShow)
                 Main.NewText("Experience and cooldown ui enabled.", ExperienceAndClasses.MESSAGE_COLOUR_YELLOW);
             else
                 Main.NewText("Experience and cooldown ui disabled.", ExperienceAndClasses.MESSAGE_COLOUR_YELLOW);
+        }
+    }
+
+    class Command_expuiinv : CommandTemplate
+    {
+        public Command_expuiinv()
+        {
+            name = "expuiinv";
+            argstr = "";
+            desc = "toggle always showing experience and cooldown ui in inventory screen";
+        }
+
+        public override void Action(CommandCaller caller, string input, string[] args)
+        {
+            MyPlayer localMyPlayer = caller.Player.GetModPlayer<MyPlayer>(mod);
+            localMyPlayer.UIInventory = !localMyPlayer.UIInventory;
+
+            if (localMyPlayer.UIInventory)
+                Main.NewText("Experience and cooldown ui forced in inventory.", ExperienceAndClasses.MESSAGE_COLOUR_YELLOW);
+            else
+                Main.NewText("Experience and cooldown ui not forced in inventory.", ExperienceAndClasses.MESSAGE_COLOUR_YELLOW);
         }
     }
 

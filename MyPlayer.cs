@@ -25,11 +25,10 @@ namespace ExperienceAndClasses
         private DateTime offlineXPTime = DateTime.MinValue;
 
         public bool allowAFK = true;
-        public DateTime afkTime = DateTime.MinValue;
+        public DateTime afkTime = DateTime.MaxValue;
         public bool afk = false;
 
         public bool displayExp = true;
-        public bool displayCD = true;
 
         public float UILeft = 400f;
         public float UITop = 100f;
@@ -37,6 +36,7 @@ namespace ExperienceAndClasses
         public bool UIExpBar = true;
         public bool UITrans = false;
         public bool UICDBars = true;
+        public bool UIInventory = true;
 
         public List<Tuple<ModItem, string>> classTokensEquipped;
         public int numberClasses = 1;
@@ -51,6 +51,9 @@ namespace ExperienceAndClasses
         public int currentAbilityIndex = 0;
         public int latestAbilityFail = Abilities.RETURN_FAIL_UNDEFINED;
         public Boolean showFailMessages = true;
+        public float thresholdCDMsg = 3f;
+        public bool preventItemUse = false;
+        public DateTime timeAllowItemUse = DateTime.MinValue;
 
         //rogue
         public float percentMidas = 0;
@@ -235,7 +238,6 @@ namespace ExperienceAndClasses
             return new TagCompound {
                 {"experience", experience},
                 {"display_exp", displayExp},
-                {"display_cd", displayCD},
                 {"allow_afk", allowAFK},
                 {"UI_left", UILeft},
                 {"UI_top", UITop},
@@ -243,7 +245,9 @@ namespace ExperienceAndClasses
                 {"UI_expbar_show", UIExpBar},
                 {"UI_trans", UITrans},
                 {"UI_cdbars_show", UICDBars},
+                {"UI_inv_show", UIInventory},
                 {"traceChar", traceChar},
+                {"thresh_cd_message", thresholdCDMsg},
             };
         }
 
@@ -257,7 +261,7 @@ namespace ExperienceAndClasses
 
             //settings
             displayExp = Commons.TryGet<bool>(tag, "display_exp", true);
-            displayCD = Commons.TryGet<bool>(tag, "display_cd", true);
+            thresholdCDMsg = Commons.TryGet<float>(tag, "thresh_cd_message", 3f);
 
             allowAFK = Commons.TryGet<bool>(tag, "allow_afk", true);
 
@@ -268,6 +272,7 @@ namespace ExperienceAndClasses
             UIExpBar = Commons.TryGet<bool>(tag, "UI_expbar_show", true);
             UITrans = Commons.TryGet<bool>(tag, "UI_trans", false);
             UICDBars = Commons.TryGet<bool>(tag, "UI_cdbars_show", true);
+            UIInventory = Commons.TryGet<bool>(tag, "UI_inv_show", true);
 
             //trace
             traceChar = Commons.TryGet<bool>(tag, "traceChar", false);
@@ -299,26 +304,13 @@ namespace ExperienceAndClasses
                 UI.UIExp.Init(this);
                 UI.UIExp.SetTransparency(UITrans);
                 UI.UIExp.SetPosition(UILeft, UITop);
-                UI.UIExp.visible = UIShow;
 
-                //(mod as ExperienceAndClasses).uiExp.Update();
+                //set shortcuts
+                ExperienceAndClasses.localMyPlayer = this;
 
-                //settings
+                //settings if singleplayer
                 if (Main.netMode == 0)
                 {
-                    //Main.NewText("Require Auth: " + ExperienceAndClasses.mapRequireAuth);
-                    //Main.NewText("Experience Rate: " + (ExperienceAndClasses.mapExpModifier * 100)+"%");
-                    //Main.NewText("Ignore Class Caps: " + ExperienceAndClasses.mapIgnoreCaps);
-
-                    //if (ExperienceAndClasses.mapLevelCap > 0)
-                    //    Main.NewText("Level Cap: " + ExperienceAndClasses.mapLevelCap);
-                    // else
-                    //    Main.NewText("Level Cap: disabled");
-
-                    //if (ExperienceAndClasses.mapClassDamageReduction > 0)
-                    //    Main.NewText("Reduce Class Damage: " + ExperienceAndClasses.mapClassDamageReduction + "%");
-                    //else
-                    //    Main.NewText("Reduce Class Damage: disabled");
                     Methods.ChatCommands.CommandDisplaySettings(mod);
                 }
             }
@@ -418,7 +410,13 @@ namespace ExperienceAndClasses
                 Methods.PacketSender.ClientAFK(mod);
             }
 
-            //single player chunk update
+            //stop preventing item use
+            if (preventItemUse && (now.CompareTo(timeAllowItemUse) > 0))
+            {
+                preventItemUse = false;
+            }
+
+            //single player xp chunk update
             if (Main.netMode == 0)
             {
                 if ((offlineXPChunk > 0) && (now.AddMilliseconds(-MyWorld.TIME_BETWEEN_SYNC_EXP_CHANGES_MSEC).CompareTo(offlineXPTime) > 0))
@@ -602,6 +600,9 @@ namespace ExperienceAndClasses
 
         public override void ProcessTriggers(TriggersSet triggersSet) //CLIENT-SIDE ONLY
         {
+            //prevent weapon use after 
+            if (triggersSet.MouseLeft && preventItemUse && ((player.HeldItem.damage > 0) || player.HeldItem.useStyle==1 || player.HeldItem.useStyle == 3 || player.HeldItem.useStyle == 5)) player.controlUseItem = false;
+
             //track afk
             if (Main.netMode != 2 && (triggersSet.MouseLeft || triggersSet.MouseMiddle || triggersSet.MouseRight || triggersSet.Jump || triggersSet.Up || triggersSet.Down || triggersSet.Left || triggersSet.Right))
             {
@@ -614,39 +615,37 @@ namespace ExperienceAndClasses
                 }
             }
 
-            if (ExperienceAndClasses.HOTKEY_ACTIVATE_ABILITY.JustPressed || ExperienceAndClasses.HOTKEY_ABILITY_1.JustPressed || ExperienceAndClasses.HOTKEY_ABILITY_2.JustPressed || ExperienceAndClasses.HOTKEY_ABILITY_3.JustPressed || ExperienceAndClasses.HOTKEY_ABILITY_4.JustPressed)
+            if (ExperienceAndClasses.HOTKEY_ABILITY_1.JustPressed || ExperienceAndClasses.HOTKEY_ABILITY_2.JustPressed || ExperienceAndClasses.HOTKEY_ABILITY_3.JustPressed || ExperienceAndClasses.HOTKEY_ABILITY_4.JustPressed)
             {
                 latestAbilityFail = Abilities.RETURN_FAIL_UNDEFINED;
                 showFailMessages = true;
             }
 
             //which ability
-            int modifer = 0;
-            if (ExperienceAndClasses.HOTKEY_ABILITY_4.Current || (ExperienceAndClasses.HOTKEY_ACTIVATE_ABILITY.Current && ExperienceAndClasses.HOTKEY_MODIFIER_4.Current))
+            int abilitySlot = 0;
+            if (ExperienceAndClasses.HOTKEY_ABILITY_4.Current)
             {
-                modifer = 4;
+                abilitySlot = 4;
             }
-            else if (ExperienceAndClasses.HOTKEY_ABILITY_3.Current || (ExperienceAndClasses.HOTKEY_ACTIVATE_ABILITY.Current && ExperienceAndClasses.HOTKEY_MODIFIER_3.Current))
+            else if (ExperienceAndClasses.HOTKEY_ABILITY_3.Current)
             {
-                modifer = 3;
+                abilitySlot = 3;
             }
-            else if (ExperienceAndClasses.HOTKEY_ABILITY_2.Current || (ExperienceAndClasses.HOTKEY_ACTIVATE_ABILITY.Current && ExperienceAndClasses.HOTKEY_MODIFIER_2.Current))
+            else if (ExperienceAndClasses.HOTKEY_ABILITY_2.Current)
             {
-                modifer = 2;
+                abilitySlot = 2;
             }
-            else if (ExperienceAndClasses.HOTKEY_ABILITY_1.Current || (ExperienceAndClasses.HOTKEY_ACTIVATE_ABILITY.Current && ExperienceAndClasses.HOTKEY_MODIFIER_1.Current))
+            else if (ExperienceAndClasses.HOTKEY_ABILITY_1.Current)
             {
-                modifer = 1;
+                abilitySlot = 1;
             }
 
-            if (modifer > 0)
+            if (abilitySlot > 0)
             {
-                int abilityID = currentAbilityIDs[modifer - 1];
+                int abilityID = currentAbilityIDs[abilitySlot - 1];
                 if (abilityID != Abilities.ID_UNDEFINED)
                 {
-                    int outcome = Abilities.RETURN_FAIL_UNDEFINED;
-                    outcome = Abilities.DoAbility(this, abilityID, effectiveLevel);
-                    //Methods.PacketSender.ClientAbility(mod, abilityID, effectiveLevel);
+                    int outcome = Abilities.DoAbility(this, abilityID, effectiveLevel, ExperienceAndClasses.HOTKEY_ALTERNATE_EFFECT.Current);
 
                     if (outcome == Abilities.RETURN_SUCCESS) showFailMessages = false;
 
@@ -658,5 +657,12 @@ namespace ExperienceAndClasses
                 }
             }
         }
+
+        public void PreventItemUse(double milliseconds)
+        {
+            preventItemUse = true;
+            timeAllowItemUse = DateTime.Now.AddMilliseconds(milliseconds);
+        }
+
     }
 }
