@@ -1,18 +1,21 @@
 ﻿using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using Terraria;
 using Terraria.ID;
 
 namespace ExperienceAndClasses
 {
-    class Abilities
+    public class Abilities
     {
-        public enum Return : byte
+        /* ~~~~~~~~~~~~ Values ~~~~~~~~~~~~ */
+        public enum RETURN : byte
         {
+            UNUSED,
             SUCCESS,
             FAIL_NOT_IMPLEMENTRD,
-            FAIL_EXTERNAL,
+            FAIL_EXTERNAL_CALL,
             FAIL_MANA,
             FAIL_COOLDOWN,
             FAIL_REQUIREMENTS,
@@ -20,47 +23,65 @@ namespace ExperienceAndClasses
             FAIL_LINE_OF_SIGHT,
         }
 
-        public enum ID : ushort //support >255 just in case
+        public enum ABILITY_TYPE : byte
         {
-            UNDEFINED,
-            CLERIC_ACTIVE_HEAL,
-            CLERIC_ACTIVE_SANCTUARY,
-            CLERIC_ACTIVE_DIVINE_INTERVENTION,
-            CLERIC_ACTIVE_PARAGON,
+            NOT_IMPLEMENTED,
+            ACTIVE,
+            UPGRADE,
+            PASSIVE,
+        }
 
-            //add here
+        public enum ID : ushort //order does not matter except where specified
+        {
+            UNDEFINED, //leave this first
+
+            Cleric_Active_Heal,
+            Cleric_Active_Sanctuary,
+            Cleric_Active_Divine_Intervention,
+            Cleric_Active_Paragon,
 
             NUMBER_OF_IDs //leave this last
         }
 
-        /* ~~~~~~~~~~~~ Initialize Ability List ~~~~~~~~~~~~ */
-        public static Dictionary<ID, Ability> AbilityLookup = new Dictionary<ID, Ability>((int)ID.NUMBER_OF_IDs);
+        /* ~~~~~~~~~~~~ List of Abilities ~~~~~~~~~~~~ */
+        //contains the one and only instance of each ability
+        //not actually a "list" but an array
+
+        public static Ability[] AbilityLookup = new Ability[(int)ID.NUMBER_OF_IDs];
         public static void Initialize()
         {
-            //cleric actives
-            AbilityLookup.Add(ID.CLERIC_ACTIVE_HEAL, new CLERIC_ACTIVE_HEAL());
-            AbilityLookup.Add(ID.CLERIC_ACTIVE_SANCTUARY, new CLERIC_ACTIVE_SANCTUARY());
-            AbilityLookup.Add(ID.CLERIC_ACTIVE_DIVINE_INTERVENTION, new CLERIC_ACTIVE_DIVINE_INTERVENTION());
-            AbilityLookup.Add(ID.CLERIC_ACTIVE_PARAGON, new CLERIC_ACTIVE_PARAGON());
+            string[] IDs = Enum.GetNames(typeof(ID));
+            for (byte i = (byte)ID.UNDEFINED + 1; i < IDs.Length; i++)
+            {
+                AbilityLookup[i] = (Ability)(Assembly.GetExecutingAssembly().CreateInstance(IDs[i]));
+            }
         }
 
-        /* ~~~~~~~~~~~~ Abilities ~~~~~~~~~~~~ */
-        public class CLERIC_ACTIVE_HEAL : Ability
+        /* ~~~~~~~~~~~~ Abilities (includes all active, upgrade, passive, proc, etc) ~~~~~~~~~~~~ */
+        //singleton implementation
+
+        public class Cleric_Active_Heal : Ability
         {
-            public CLERIC_ACTIVE_HEAL()
+            static Cleric_Active_Heal()
             {
+                ability_type = ABILITY_TYPE.ACTIVE;
                 name = "Heal";
                 name_short = "Heal";
                 description = "";
                 cost_mana_percent = 0.35f;
                 cooldown_seconds = 3;
             }
+            protected new static RETURN UseEffects()
+            {
+                return RETURN.FAIL_NOT_IMPLEMENTRD;
+            }
         }
 
-        public class CLERIC_ACTIVE_SANCTUARY : Ability
+        public class Cleric_Active_Sanctuary : Ability
         {
-            public CLERIC_ACTIVE_SANCTUARY()
+            static Cleric_Active_Sanctuary()
             {
+                ability_type = ABILITY_TYPE.ACTIVE;
                 name = "Sanctuary";
                 name_short = "Sanc";
                 description = "";
@@ -69,10 +90,11 @@ namespace ExperienceAndClasses
             }
         }
 
-        public class CLERIC_ACTIVE_DIVINE_INTERVENTION : Ability
+        public class Cleric_Active_DivineIntervention : Ability
         {
-            public CLERIC_ACTIVE_DIVINE_INTERVENTION()
+            static Cleric_Active_DivineIntervention()
             {
+                ability_type = ABILITY_TYPE.ACTIVE;
                 name = "Divine Intervention";
                 name_short = "DI";
                 description = "";
@@ -81,10 +103,11 @@ namespace ExperienceAndClasses
             }
         }
 
-        public class CLERIC_ACTIVE_PARAGON : Ability
+        public class Cleric_Active_Paragon : Ability
         {
-            public CLERIC_ACTIVE_PARAGON()
+            static Cleric_Active_Paragon()
             {
+                ability_type = ABILITY_TYPE.ACTIVE;
                 name = "Paragon";
                 name_short = "Para";
                 description = "";
@@ -93,9 +116,19 @@ namespace ExperienceAndClasses
             }
         }
 
-        /* ~~~~~~~~~~~~ Ability Template ~~~~~~~~~~~~ */
+        /* ~~~~~~~~~~~~ Ability Abstract ~~~~~~~~~~~~ */
+        //singleton implementation
+        //all methods must NOT be static for easy access through lookup array
+        //fields should be static but it doesn't really matter
+
         public abstract class Ability
         {
+            //type of ability
+            protected static ABILITY_TYPE ability_type = ABILITY_TYPE.NOT_IMPLEMENTED;
+
+            //toggle on for constant passives for efficiency
+            protected static bool skip_checks_and_costs = false;
+
             //descriptives
             protected static string name = "undefined";
             protected static string name_short = "undefined";
@@ -118,46 +151,60 @@ namespace ExperienceAndClasses
             protected static double prevent_weapon_milliseconds = 400;
 
             //encapsulate whatever needs external access
-            protected static bool OnCooldown { get => cooldown_active; set => cooldown_active = value; }
-            protected static DateTime TimeOffCooldown { get => cooldown_time_end; set => cooldown_time_end = value; }
+            public ABILITY_TYPE AbilityType { get => ability_type; }
+            public string Name { get => name; }
 
-            public Return Use()
+            public RETURN Use(byte level=1, bool alternate=false)
             {
+                //not to be used by server, all abilities are client-side
+                if (Main.netMode == 2) return RETURN.FAIL_EXTERNAL_CALL;
+
+                //store outcome
+                RETURN return_value;
+
                 //pre-checks
-                Return return_value = UseChecks();
-                if (return_value != Return.SUCCESS) return return_value;
+                if (!skip_checks_and_costs)
+                {
+                    return_value = UseChecks();
+                    if (return_value != RETURN.SUCCESS) return return_value;
+                }
 
                 //do effect (override UseEffects)
                 return_value = UseEffects();
-                if (return_value != Return.SUCCESS) return return_value;
+                if (return_value != RETURN.SUCCESS) return return_value;
 
                 //on-use effects
                 if (visual_do) DoVisual(Main.LocalPlayer);
                 if (prevent_weapon_milliseconds > 0) ExperienceAndClasses.localMyPlayer.PreventItemUse(prevent_weapon_milliseconds);
 
                 //take costs
-                return_value = UseCosts();
+                if (!skip_checks_and_costs)
+                {
+                    return_value = UseCosts();
+                }
+
+                //return final result
                 return return_value;
             }
 
-            protected Return UseChecks()
+            protected RETURN UseChecks()
             {
-                return Return.SUCCESS;
+                return RETURN.FAIL_NOT_IMPLEMENTRD;
             }
 
-            protected virtual Return UseEffects()
+            protected RETURN UseEffects()
             {
-                return Return.SUCCESS;
+                return RETURN.FAIL_NOT_IMPLEMENTRD;
             }
 
-            protected virtual Return UseCosts()
+            protected RETURN UseCosts()
             {
-                return Return.SUCCESS;
+                return RETURN.FAIL_NOT_IMPLEMENTRD;
             }
 
             public int GetManaCost(int level = 1)
             {
-                int manaCost = (int)((cost_mana_base + (cost_mana_percent * Main.LocalPlayer.statManaMax2)) * Main.LocalPlayer.manaCost);
+                int manaCost = (int)((cost_mana_base + (cost_mana_percent * Main.LocalPlayer.statManaMax2)) * Main.LocalPlayer.manaCost); //apply cost_mana_reduction_cap
 
                 if (manaCost < 0) manaCost = 0;
                 if (manaCost > Main.LocalPlayer.statManaMax2) manaCost = Main.LocalPlayer.statManaMax2;
@@ -182,6 +229,12 @@ namespace ExperienceAndClasses
 
         }
 
+        //////    ////cleric actives
+        //////    //AbilityLookup.Add(ID.CLERIC_ACTIVE_HEAL, new CLERIC_ACTIVE_HEAL());
+        //////    //AbilityLookup.Add(ID.CLERIC_ACTIVE_SANCTUARY, new CLERIC_ACTIVE_SANCTUARY());
+        //////    //AbilityLookup.Add(ID.CLERIC_ACTIVE_DIVINE_INTERVENTION, new CLERIC_ACTIVE_DIVINE_INTERVENTION());
+        //////    //AbilityLookup.Add(ID.CLERIC_ACTIVE_PARAGON, new CLERIC_ACTIVE_PARAGON());
+        //////}
 
 
         //public static int CalculateManaCost(MyPlayer myPlayer, int abilityID, int level = 1)

@@ -18,7 +18,8 @@ namespace ExperienceAndClasses.Items
         public string desc = "Starter class." +
                          "\n\nClass advancement is available at level " + Recipes.ClassRecipes.TIER_LEVEL_REQUIREMENTS[1 + 1] + ".";
 
-        public int[] abilityIDs = Enumerable.Repeat(Abilities.ID_UNDEFINED, ExperienceAndClasses.MAXIMUM_NUMBER_OF_ABILITIES).ToArray();
+        public List<Abilities.ID> abilities = new List<Abilities.ID>();
+        public List<byte> abilities_level_required = new List<byte>();
 
         public override void ModifyTooltips(List<TooltipLine> tooltips)
         {
@@ -84,14 +85,12 @@ namespace ExperienceAndClasses.Items
 
             myPlayer.classTokensEquipped.Add(new Tuple<ModItem, string>(this, name));
 
-            //track player's current set of abilities
-            foreach (int i in abilityIDs)
+            //track player's current abilities
+            int level = myPlayer.GetLevel();
+            for (int i = 0; i < abilities.Count; i++)
             {
-                if (i != Abilities.ID_UNDEFINED)
-                {
-                    myPlayer.currentAbilityIDsPotential[myPlayer.currentAbilityPotentialsIndex] = i;
-                    myPlayer.currentAbilityPotentialsIndex++;
-                }
+                if (level >= abilities_level_required[i])
+                    myPlayer.currentAbilities[(int)abilities[i]] = true;
             }
         }
     }
@@ -464,8 +463,13 @@ namespace ExperienceAndClasses.Items
                        "\n\nCan produce an Ichor Aura that occasionally inflicts"+
                          "\nIchor on all nearby enemies for a moment."+
                        "\n\nClass advancement is available at level " + Recipes.ClassRecipes.TIER_LEVEL_REQUIREMENTS[tier+1] + ".";
-            abilityIDs[0] = Abilities.ID_CLERIC_ACTIVE_HEAL;
-            abilityIDs[1] = Abilities.ID_CLERIC_ACTIVE_SANCTUARY;
+
+            //abilities
+            abilities.Add(Abilities.ID.Cleric_Active_Heal);
+            abilities_level_required.Add(1);
+
+            abilities.Add(Abilities.ID.Cleric_Active_Sanctuary);
+            abilities_level_required.Add(15);
         }
         public override void AddRecipes()
         {
@@ -485,10 +489,19 @@ namespace ExperienceAndClasses.Items
                          "\nLife Aura (healing) and Damage Aura (harm). The Saint" +
                          "\nalso has several immunities, mana cost reduction, and" +
                          "\ndecent life and defense.";
-            abilityIDs[0] = Abilities.ID_CLERIC_ACTIVE_HEAL;
-            abilityIDs[1] = Abilities.ID_CLERIC_ACTIVE_SANCTUARY;
-            abilityIDs[2] = Abilities.ID_CLERIC_ACTIVE_DIVINE_INTERVENTION;
-            abilityIDs[3] = Abilities.ID_CLERIC_ACTIVE_PARAGON;
+
+            //abilities
+            abilities.Add(Abilities.ID.Cleric_Active_Heal);
+            abilities_level_required.Add(1);
+
+            abilities.Add(Abilities.ID.Cleric_Active_Sanctuary);
+            abilities_level_required.Add(15);
+
+            abilities.Add(Abilities.ID.Cleric_Active_Divine_Intervention);
+            abilities_level_required.Add(25);
+
+            abilities.Add(Abilities.ID.Cleric_Active_Paragon);
+            abilities_level_required.Add(50);
         }
         public override void AddRecipes()
         {

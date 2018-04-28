@@ -12,7 +12,7 @@ namespace ExperienceAndClasses.UI
         public static readonly Color COLOUR_TEXT_INNER = Color.White;
         public static readonly Color COLOUR_TEXT_OUTTER = Color.Black;
 
-        public static readonly int NUMBER_OF_BARS = 1 + ExperienceAndClasses.MAXIMUM_NUMBER_OF_ABILITIES;
+        public static readonly int NUMBER_OF_BARS = 1 + ExperienceAndClasses.NUMBER_OF_ABILITY_SLOTS;
         protected static readonly Color COLOUR_PANEL = new Color(73, 94, 171);
         protected static readonly Color COLOUR_BAR_BACKGROUND = Color.Gray;
         protected static readonly Color COLOUR_BAR_FOREGROUND_EXP = Color.GreenYellow;
@@ -142,10 +142,10 @@ namespace ExperienceAndClasses.UI
             if (localMyPlayer.UICDBars)
             {
                 int abilityID;
-                for (int i = 0; i < ExperienceAndClasses.MAXIMUM_NUMBER_OF_ABILITIES; i++)
+                for (int i = 0; i < ExperienceAndClasses.NUMBER_OF_ABILITY_SLOTS; i++)
                 {
                     abilityID = localMyPlayer.currentAbilityIDs[i];
-                    if (abilityID != Abilities.ID_UNDEFINED)
+                    if (abilityID != Abilities.ID.UNDEFINED)
                     {
                         //bar
                         bars[numberActiveBars].left = BAR_EXP_LEFT_INDENT;

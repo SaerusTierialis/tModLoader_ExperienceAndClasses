@@ -71,7 +71,7 @@ namespace ExperienceAndClasses.Items
         }
         public override bool UseItem(Player player)
         {
-            player.GetModPlayer<MyPlayer>(mod).AddExp(ExperienceAndClasses.EXP_ITEM_VALUE * orbValue);
+            ExperienceAndClasses.localMyPlayer.AddExp(ExperienceAndClasses.EXP_ITEM_VALUE * orbValue);
             return true;
         }
 
@@ -185,8 +185,7 @@ namespace ExperienceAndClasses.Items
 
         public override bool UseItem(Player player)
         {
-            MyPlayer myPlayer = player.GetModPlayer<MyPlayer>(mod);
-            myPlayer.AddExp(myPlayer.GetBossOrbXP());
+            ExperienceAndClasses.localMyPlayer.AddExp(ExperienceAndClasses.localMyPlayer.GetBossOrbXP());
             return true;
         }
 
@@ -204,9 +203,7 @@ namespace ExperienceAndClasses.Items
 
         public override void ModifyTooltips(List<TooltipLine> tooltips)
         {
-            MyPlayer myLocalPlayer = Main.LocalPlayer.GetModPlayer<MyPlayer>(mod);
-
-            TooltipLine line = new TooltipLine(mod, "desc", "Current XP Value: " + Main.LocalPlayer.GetModPlayer<MyPlayer>(mod).GetBossOrbXP());
+            TooltipLine line = new TooltipLine(mod, "desc", "Current XP Value: " + ExperienceAndClasses.localMyPlayer.GetBossOrbXP());
             line.overrideColor = Color.LimeGreen;
             tooltips.Add(line);
         }
@@ -248,8 +245,7 @@ namespace ExperienceAndClasses.Items
 
         public override bool UseItem(Player player)
         {
-            MyPlayer myPlayer = player.GetModPlayer<MyPlayer>(mod);
-            myPlayer.AddExp(myPlayer.GetMonsterOrbXP());
+            ExperienceAndClasses.localMyPlayer.AddExp(ExperienceAndClasses.localMyPlayer.GetMonsterOrbXP());
             return true;
         }
 
@@ -267,9 +263,7 @@ namespace ExperienceAndClasses.Items
 
         public override void ModifyTooltips(List<TooltipLine> tooltips)
         {
-            MyPlayer myLocalPlayer = Main.LocalPlayer.GetModPlayer<MyPlayer>(mod);
-
-            TooltipLine line = new TooltipLine(mod, "desc2", "Current XP Value: " + Main.LocalPlayer.GetModPlayer<MyPlayer>(mod).GetMonsterOrbXP());
+            TooltipLine line = new TooltipLine(mod, "desc2", "Current XP Value: " + ExperienceAndClasses.localMyPlayer.GetMonsterOrbXP());
             line.overrideColor = Color.LimeGreen;
             tooltips.Add(line);
         }

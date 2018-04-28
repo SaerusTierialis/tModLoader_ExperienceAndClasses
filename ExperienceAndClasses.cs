@@ -69,17 +69,15 @@ namespace ExperienceAndClasses
         //public static readonly Color MESSAGE_COLOUR_EXP = new Color(21, 111, 48);
 
         //active abilities
-        public static ModHotKey HOTKEY_ABILITY_1;
-        public static ModHotKey HOTKEY_ABILITY_2;
-        public static ModHotKey HOTKEY_ABILITY_3;
-        public static ModHotKey HOTKEY_ABILITY_4;
+        public static readonly int NUMBER_OF_ABILITY_SLOTS = 4;
+        private static string[] HOTKEY_DEFAULTS = { "Q", "E", "R", "F" };
+        public static ModHotKey[] HOTKEY_ABILITY = new ModHotKey[NUMBER_OF_ABILITY_SLOTS];
         public static ModHotKey HOTKEY_ALTERNATE_EFFECT;
-        public static readonly int MAXIMUM_NUMBER_OF_ABILITIES = 4;
 
         //exp requirements and cap
         public const int MAX_LEVEL = 3000;
         public const double EXP_ITEM_VALUE = 1;
-        public static readonly double[] EARLY_EXP_REQ = new double[] { 0, 0, 10, 25, 50, 75, 100, 125, 150, 200, 350 };//{0, 0, 100, 250, 500, 750, 1000, 1500, 2000, 2500, 3000};
+        public static readonly double[] EARLY_EXP_REQ = new double[] { 0, 0, 10, 25, 50, 75, 100, 125, 150, 200, 350 };
         public static readonly double[] EXP_REQ = new double[MAX_LEVEL + 1];
         public static readonly double[] EXP_REQ_TOTAL = new double[MAX_LEVEL + 1];
 
@@ -129,10 +127,11 @@ namespace ExperienceAndClasses
         //load
         public override void Load()
         {
-            HOTKEY_ABILITY_1 = RegisterHotKey("Ability 1", "Q");
-            HOTKEY_ABILITY_2 = RegisterHotKey("Ability 2", "E");
-            HOTKEY_ABILITY_3 = RegisterHotKey("Ability 3", "R");
-            HOTKEY_ABILITY_4 = RegisterHotKey("Ability 4", "F");
+            //setup hotkeys
+            for (int i=0; i<NUMBER_OF_ABILITY_SLOTS; i++)
+            {
+                HOTKEY_ABILITY[i] = RegisterHotKey("Ability " + (i + 1), HOTKEY_DEFAULTS[i]);
+            }
             HOTKEY_ALTERNATE_EFFECT = RegisterHotKey("Alternate Effect", "LeftShift");
 
             uiExp = new UIExp();
@@ -145,12 +144,9 @@ namespace ExperienceAndClasses
 
         public override void Unload()
         {
-            HOTKEY_ABILITY_1 = null;
-            HOTKEY_ABILITY_2 = null;
-            HOTKEY_ABILITY_3 = null;
-            HOTKEY_ABILITY_4 = null;
+            //remove hotkeys
+            HOTKEY_ABILITY.Initialize();
             HOTKEY_ALTERNATE_EFFECT = null;
-
         }
 
         /* ~~~~~~~~~~~~~~~~~~~~~ HANDLE PACKETS ~~~~~~~~~~~~~~~~~~~~~ */

@@ -1244,20 +1244,20 @@ namespace ExperienceAndClasses.Items
                 bonuses += "\nopener attacks grant "+(OPENER_ATTACK_IMMUNE_MSEC[intBonus] / 1000f) + " second immunity (must be off cooldown)";
             }
 
-            ////periodic party healing
-            //if (periodicPartyHeal_LEVEL != -1 && level >= periodicPartyHeal_LEVEL)
-            //{
-            //    float healAmount = (periodicPartyHeal * level); //- ((periodicPartyHeal_LEVEL-1)* periodicPartyHeal);
-            //    if (applyEffects)
-            //    {
-            //        //apply indicator
-            //        if (auraUpdate) AuraEffect(player, true, true, true, false, false, 0, 0, 0, 0, 0, mod.BuffType("Aura_Life"), AURA_UPDATE_BUFF_TICKS);
+            //periodic party healing
+            if (periodicPartyHeal_LEVEL != -1 && level >= periodicPartyHeal_LEVEL)
+            {
+                float healAmount = (periodicPartyHeal * level); //- ((periodicPartyHeal_LEVEL-1)* periodicPartyHeal);
+                if (applyEffects)
+                {
+                    //apply indicator
+                    if (auraUpdate) AuraEffect(player, true, true, true, false, false, 0, 0, 0, 0, 0, mod.BuffType("Aura_Life"), AURA_UPDATE_BUFF_TICKS);
 
-            //        //do heal
-            //        if (TimeReady(player.whoAmI, TIME_IND_AURA_LIFE, periodicPartyHeal_TIME_MSEC, true)) AuraEffect(player, true, true, true, false, false, healAmount, 0.5f);
-            //    }
-            //    bonuses += "\noccasionally heals allies for " + (int)healAmount + " life (half for self)";
-            //}
+                    //do heal
+                    if (TimeReady(player.whoAmI, TIME_IND_AURA_LIFE, periodicPartyHeal_TIME_MSEC, true)) AuraEffect(player, true, true, true, false, false, healAmount, 0.5f);
+                }
+                bonuses += "\noccasionally heals allies for " + (int)healAmount + " life (half for self)";
+            }
 
             //periodic ichor aura
             if (periodicIchorAura_LEVEL != -1 && level >= periodicIchorAura_LEVEL)

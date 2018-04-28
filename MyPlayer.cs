@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using Terraria.Localization;
 using Terraria.GameInput;
 using System.Linq;
+using System.Reflection;
 
 namespace ExperienceAndClasses
 {
@@ -43,16 +44,13 @@ namespace ExperienceAndClasses
         public int effectiveLevel = 0;
         public bool levelCapped = false;
 
-        //active abilities
-        public long[] abilityCooldowns = new long[Abilities.NUMBER_OF_IDs];
-        public int[] currentAbilityIDsPotential = Enumerable.Repeat(Abilities.ID_UNDEFINED, Abilities.NUMBER_OF_IDs).ToArray();
-        public int currentAbilityPotentialsIndex = 0;
-        public int[] currentAbilityIDs = Enumerable.Repeat(Abilities.ID_UNDEFINED, ExperienceAndClasses.MAXIMUM_NUMBER_OF_ABILITIES).ToArray();
-        public int currentAbilityIndex = 0;
-        public int latestAbilityFail = Abilities.RETURN_FAIL_UNDEFINED;
+        //abilities
+        public bool[] currentAbilities = new bool[(int)Abilities.ID.NUMBER_OF_IDs];
+        public Abilities.ID[] selectedActiveAbilities = new Abilities.ID[ExperienceAndClasses.NUMBER_OF_ABILITY_SLOTS];
+        public Abilities.RETURN latestAbilityFail = Abilities.RETURN.FAIL_NOT_IMPLEMENTRD;
         public Boolean showFailMessages = true;
         public float thresholdCDMsg = 3f;
-        public bool preventItemUse = false;
+        public bool itemUsePrevented = false;
         public DateTime timeAllowItemUse = DateTime.MinValue;
 
         //rogue
@@ -324,8 +322,7 @@ namespace ExperienceAndClasses
             classTokensEquipped = new List<Tuple<ModItem, string>>();
 
             //empty current ability list
-            currentAbilityIDsPotential = Enumerable.Repeat(Abilities.ID_UNDEFINED, Abilities.NUMBER_OF_IDs).ToArray();
-            currentAbilityPotentialsIndex = 0;
+            currentAbilities.Initialize();
 
             //default var bonuses
             bonusCritPct = 0;
@@ -363,20 +360,18 @@ namespace ExperienceAndClasses
             }
             effectiveLevel = (int)Math.Floor((double)effectiveLevel / numberClasses);
 
-            //limit abilities based on level requirements
-            currentAbilityIDs = Enumerable.Repeat(Abilities.ID_UNDEFINED, ExperienceAndClasses.MAXIMUM_NUMBER_OF_ABILITIES).ToArray();
-            int index = 0;
-            int id;
-            for (int i=0; i<currentAbilityPotentialsIndex; i++)
+            //for now, select first 4 actives
+            selectedActiveAbilities.Initialize();
+            int slot = 0;
+            for (int i=0; i<currentAbilities.Length; i++)
             {
-                id = currentAbilityIDsPotential[i];
-                if ((effectiveLevel >= Abilities.LEVEL_REQUIREMENT[id]) && (index < ExperienceAndClasses.MAXIMUM_NUMBER_OF_ABILITIES))
+                if (currentAbilities[i] && (Abilities.AbilityLookup[i].AbilityType == Abilities.ABILITY_TYPE.ACTIVE)) //have ability + is active
                 {
-                    currentAbilityIDs[index] = id;
-                    index++;
+                    selectedActiveAbilities[slot] = (Abilities.ID)i;
+                    if (slot++ >= ExperienceAndClasses.NUMBER_OF_ABILITY_SLOTS)
+                        break;
                 }
             }
-            currentAbilityIndex = index;
 
             base.PostUpdateEquips();
         }
@@ -411,9 +406,9 @@ namespace ExperienceAndClasses
             }
 
             //stop preventing item use
-            if (preventItemUse && (now.CompareTo(timeAllowItemUse) > 0))
+            if (itemUsePrevented && (now.CompareTo(timeAllowItemUse) > 0))
             {
-                preventItemUse = false;
+                itemUsePrevented = false;
             }
 
             //single player xp chunk update
@@ -601,7 +596,7 @@ namespace ExperienceAndClasses
         public override void ProcessTriggers(TriggersSet triggersSet) //CLIENT-SIDE ONLY
         {
             //prevent weapon use after 
-            if (triggersSet.MouseLeft && preventItemUse && ((player.HeldItem.damage > 0) || player.HeldItem.useStyle==1 || player.HeldItem.useStyle == 3 || player.HeldItem.useStyle == 5)) player.controlUseItem = false;
+            if (triggersSet.MouseLeft && itemUsePrevented && ((player.HeldItem.damage > 0) || player.HeldItem.useStyle==1 || player.HeldItem.useStyle == 3 || player.HeldItem.useStyle == 5)) player.controlUseItem = false;
 
             //track afk
             if (Main.netMode != 2 && (triggersSet.MouseLeft || triggersSet.MouseMiddle || triggersSet.MouseRight || triggersSet.Jump || triggersSet.Up || triggersSet.Down || triggersSet.Left || triggersSet.Right))
@@ -615,53 +610,87 @@ namespace ExperienceAndClasses
                 }
             }
 
-            if (ExperienceAndClasses.HOTKEY_ABILITY_1.JustPressed || ExperienceAndClasses.HOTKEY_ABILITY_2.JustPressed || ExperienceAndClasses.HOTKEY_ABILITY_3.JustPressed || ExperienceAndClasses.HOTKEY_ABILITY_4.JustPressed)
+            //reset which errors can display when an ability key is pressed
+            for (int i=0; i<ExperienceAndClasses.NUMBER_OF_ABILITY_SLOTS; i++)
             {
-                latestAbilityFail = Abilities.RETURN_FAIL_UNDEFINED;
-                showFailMessages = true;
+                if (ExperienceAndClasses.HOTKEY_ABILITY[i].JustPressed)
+                {
+                    latestAbilityFail = Abilities.RETURN.UNUSED;
+                    showFailMessages = true;
+                    break;
+                }
             }
 
             //which ability
-            int abilitySlot = 0;
-            if (ExperienceAndClasses.HOTKEY_ABILITY_4.Current)
+            int slot = -1;
+            for (int i=0; i<ExperienceAndClasses.NUMBER_OF_ABILITY_SLOTS; i++)
             {
-                abilitySlot = 4;
-            }
-            else if (ExperienceAndClasses.HOTKEY_ABILITY_3.Current)
-            {
-                abilitySlot = 3;
-            }
-            else if (ExperienceAndClasses.HOTKEY_ABILITY_2.Current)
-            {
-                abilitySlot = 2;
-            }
-            else if (ExperienceAndClasses.HOTKEY_ABILITY_1.Current)
-            {
-                abilitySlot = 1;
-            }
-
-            if (abilitySlot > 0)
-            {
-                int abilityID = currentAbilityIDs[abilitySlot - 1];
-                if (abilityID != Abilities.ID_UNDEFINED)
+                if (ExperienceAndClasses.HOTKEY_ABILITY[i].Current)
                 {
-                    int outcome = Abilities.DoAbility(this, abilityID, effectiveLevel, ExperienceAndClasses.HOTKEY_ALTERNATE_EFFECT.Current);
+                    slot = i;
+                    break;
+                }
+            }
 
-                    if (outcome == Abilities.RETURN_SUCCESS) showFailMessages = false;
+            //do ability, if any
+            if (slot >= 0)
+            {
+                Abilities.ID id = selectedActiveAbilities[slot];
+                if (id != Abilities.ID.UNDEFINED)
+                {
+                    Abilities.RETURN ret = Abilities.AbilityLookup[(int)id].Use((byte)effectiveLevel, ExperienceAndClasses.HOTKEY_ALTERNATE_EFFECT.Current);
 
-                    if (showFailMessages && (outcome != latestAbilityFail))
+                    if (ret == Abilities.RETURN.SUCCESS)
+                        showFailMessages = false;
+
+                    if (showFailMessages && (ret != latestAbilityFail))
                     {
-                        latestAbilityFail = outcome;
-                        Abilities.SendReturnMessage(latestAbilityFail, abilityID);
+                        latestAbilityFail = ret;
+                        SendReturnMessage(latestAbilityFail);
                     }
                 }
             }
         }
 
+        public static void SendReturnMessage(Abilities.RETURN ret)
+        {
+            string message = null;
+            switch (ret)
+            {
+                case (Abilities.RETURN.FAIL_COOLDOWN):
+                    message = "Not ready!";
+                    break;
+                case (Abilities.RETURN.FAIL_LINE_OF_SIGHT):
+                    message = "Requires line of sight!";
+                    break;
+                case (Abilities.RETURN.FAIL_MANA):
+                    message = "Not enough mana!";
+                    break;
+                case (Abilities.RETURN.FAIL_NOT_IMPLEMENTRD):
+                    message = "Not Implemented!";
+                    break;
+                case (Abilities.RETURN.FAIL_STATUS):
+                    message = "Cannot be used right now!";
+                    break;
+                case (Abilities.RETURN.FAIL_REQUIREMENTS):
+                    message = "Requirements not met!";
+                    break;
+                default:
+                    //no message
+                    break;
+            }
+            if (message != null)
+            {
+                Main.NewText(message, ExperienceAndClasses.MESSAGE_COLOUR_RED);
+            }
+        }
+
         public void PreventItemUse(double milliseconds)
         {
-            preventItemUse = true;
-            timeAllowItemUse = DateTime.Now.AddMilliseconds(milliseconds);
+            itemUsePrevented = true;
+            DateTime time = DateTime.Now.AddMilliseconds(milliseconds);
+            if(time.CompareTo(timeAllowItemUse) > 0)
+                timeAllowItemUse = time;
         }
 
     }
