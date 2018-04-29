@@ -141,10 +141,12 @@ namespace ExperienceAndClasses.UI
             //ability bars
             if (localMyPlayer.UICDBars)
             {
-                int abilityID;
+                float barPercent;
+                Abilities.ID abilityID;
+                Abilities.Ability ability;
                 for (int i = 0; i < ExperienceAndClasses.NUMBER_OF_ABILITY_SLOTS; i++)
                 {
-                    abilityID = localMyPlayer.currentAbilityIDs[i];
+                    abilityID = localMyPlayer.selectedActiveAbilities[i];
                     if (abilityID != Abilities.ID.UNDEFINED)
                     {
                         //bar
@@ -152,8 +154,10 @@ namespace ExperienceAndClasses.UI
                         bars[numberActiveBars].width = BAR_EXP_WIDTH_INDENT;
                         bars[numberActiveBars].Activate();
                         //set bar values and get text to diplay
-                        labelsBars[0, numberActiveBars] = Abilities.SHORTFORM[abilityID];
-                        labelsBars[1, numberActiveBars] = DisplayCooldown(abilityID, numberActiveBars);
+                        ability = Abilities.AbilityLookup[(int)abilityID];
+                        labelsBars[0, numberActiveBars] = ability.GetNameShort();
+                        labelsBars[1, numberActiveBars] = ability.CooldownUI((byte)localMyPlayer.effectiveLevel, out barPercent);
+                        bars[numberActiveBars].SetValue(barPercent, COLOUR_BAR_FOREGROUND_ABILITY);
                         numberActiveBars++;
                     }
                 }
@@ -281,40 +285,41 @@ namespace ExperienceAndClasses.UI
             }
         }
 
-        public static string DisplayCooldown(int abilityID, int barIndex)
-        {
-            float cooldownSec = 0;
-            float cooldownPct = 0f;
-            string cooldownText = null;
+        //////public static string DisplayCooldown(Abilities.ID abilityID, int barIndex)
+        //////{
+        //////    float cooldownSec = 0;
+        //////    float cooldownPct = 0f;
+        //////    string cooldownText = null;
 
-            //determine bar percent and text to overlay
-            long timeNow = DateTime.Now.Ticks;
-            long timeAllow = localMyPlayer.abilityCooldowns[abilityID];
-            switch (abilityID)
-            {
-                //any unique cooldown displays
+        //////    //determine bar percent and text to overlay
+        //////    DateTime timeNow = DateTime.Now;
+        //////    DateTime timeAllow = Abilities.AbilityLookup[(int)abilityID].CooldownTimeEnd;
+        //////    switch (abilityID)
+        //////    {
+        //////        //any unique cooldown displays
 
-                default:
-                    cooldownSec = (float)(timeAllow - timeNow) / TimeSpan.TicksPerSecond;
-                    if (cooldownSec < 0) cooldownSec = 0;
-                    cooldownPct = (Abilities.COOLDOWN_SECS[abilityID] - cooldownSec) / Abilities.COOLDOWN_SECS[abilityID];
-                    if (cooldownPct != 1f) cooldownText = Math.Round((double)cooldownSec, 1).ToString();
-                    break;
-            }
+        //////        default:
+        //////            cooldownSec = (float)(timeAllow - timeNow) / TimeSpan.TicksPerSecond;
+        //////            if (cooldownSec < 0) cooldownSec = 0;
+        //////            cooldownPct = (Abilities.COOLDOWN_SECS[abilityID] - cooldownSec) / Abilities.COOLDOWN_SECS[abilityID];
+        //////            if (cooldownPct != 1f) cooldownText = Math.Round((double)cooldownSec, 1).ToString();
+        //////            break;
+        //////    }
 
-            //set bar value
-            bars[barIndex].SetValue(cooldownPct, COLOUR_BAR_FOREGROUND_ABILITY);
+        //////    //set bar value
+        //////    bars[barIndex].SetValue(cooldownPct, COLOUR_BAR_FOREGROUND_ABILITY);
 
-            //display off cooldown message
-            if ((cooldownSec <= 0) && Abilities.ON_COOLDOWN[abilityID])
-            {
-                Abilities.ON_COOLDOWN[abilityID] = false;
-                if ((Abilities.COOLDOWN_SECS[abilityID] >= localMyPlayer.thresholdCDMsg) && (localMyPlayer.thresholdCDMsg >= 0f)) CombatText.NewText(localMyPlayer.player.getRect(), ExperienceAndClasses.MESSAGE_COLOUR_OFF_COOLDOWN, Abilities.NAME[abilityID] + " Ready!");
-            }
+        //////    //////////display off cooldown message
+        //////    ////////if ((cooldownSec <= 0) && Abilities.ON_COOLDOWN[abilityID])
+        //////    ////////{
+        //////    ////////    Abilities.ON_COOLDOWN[abilityID] = false;
+        //////    ////////    if ((Abilities.COOLDOWN_SECS[abilityID] >= localMyPlayer.thresholdCDMsg) && (localMyPlayer.thresholdCDMsg >= 0f))
+        //////    ////////        CombatText.NewText(localMyPlayer.player.getRect(), ExperienceAndClasses.MESSAGE_COLOUR_OFF_COOLDOWN, Abilities.NAME[abilityID] + " Ready!");
+        //////    ////////}
 
-            //return text for overlay
-            return cooldownText;
-        }
+        //////    //return text for overlay
+        //////    return cooldownText;
+        //////}
     }
 
     //some of this implementation is crap - redo if bored or reusing

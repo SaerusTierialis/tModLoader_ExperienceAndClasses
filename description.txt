@@ -5,6 +5,39 @@ A MAJOR overhaul is now underway. See the forums or discord for more details!
 
 CHANGELOG:
 
+===v1.3.3===
+
+Cleric/Saint rework delayed again, but here are some more fixes/qol changes.
+
+1.Ability System (still not in use):
+* abilities now interrupt attacking (400 milliseconds)
+* prevent use while dead
+* various optimizations (mostly timing and syncing)
+* renamed accept resurrection key to "Alternate Effects", will be used by a few abilities
+* removed keys for the main key + modifier key control mode, the simpler system seems to be the clear best choice
+* added generic visual upon using active ability, colour varies with class
+
+2. Changes:
+* Boss orb drop rate is significantly increased at low level
+* merge xp messages that occur together in singleplayer similar to multiplayer
+* reorganized the startup message and added more fields
+
+3. New Features:
+* added /expcd # to set threshold for showing cooldown messages (e.g., show if cooldown >5 seconds, set -1 to disable)
+* added /expuibarcd to toggle  on/off cooldown bars in ui
+* added /expuiinv to toggle always showing ui when viewing inventory (default to on)
+NOTE: in the not too distant future, I will add a settings UI to replace all of these commands
+
+4. Technical:
+* even more optimizations, everything should be running buttery smooth
+
+5. Bug Fixes:
+* midas chance capped at 100%
+* fixed display bug for dodge chance (due to a limitation, might show a bonus of 30% while still correctly applying a lower bonus such that dodge rate is not increased beyond 30% total)
+* afk mode will no longer trigger upon entering a world (fixed timing initial value)
+* fixed issue introduced by mana values exceeding 400
+* fixed all orbs giving no xp in multiplayer
+
 ===v1.3.2===
 
 1. Balance:

@@ -71,7 +71,7 @@ namespace ExperienceAndClasses.Items
         }
         public override bool UseItem(Player player)
         {
-            ExperienceAndClasses.localMyPlayer.AddExp(ExperienceAndClasses.EXP_ITEM_VALUE * orbValue);
+            ExperienceAndClasses.localMyPlayer.AddExp(ExperienceAndClasses.EXP_ITEM_VALUE * orbValue, true);
             return true;
         }
 
@@ -185,7 +185,7 @@ namespace ExperienceAndClasses.Items
 
         public override bool UseItem(Player player)
         {
-            ExperienceAndClasses.localMyPlayer.AddExp(ExperienceAndClasses.localMyPlayer.GetBossOrbXP());
+            ExperienceAndClasses.localMyPlayer.AddExp(ExperienceAndClasses.localMyPlayer.GetBossOrbXP(), true);
             return true;
         }
 
@@ -245,7 +245,7 @@ namespace ExperienceAndClasses.Items
 
         public override bool UseItem(Player player)
         {
-            ExperienceAndClasses.localMyPlayer.AddExp(ExperienceAndClasses.localMyPlayer.GetMonsterOrbXP());
+            ExperienceAndClasses.localMyPlayer.AddExp(ExperienceAndClasses.localMyPlayer.GetMonsterOrbXP(), true);
             return true;
         }
 

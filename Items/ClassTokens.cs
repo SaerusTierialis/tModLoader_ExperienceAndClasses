@@ -497,7 +497,7 @@ namespace ExperienceAndClasses.Items
             abilities.Add(Abilities.ID.Cleric_Active_Sanctuary);
             abilities_level_required.Add(15);
 
-            abilities.Add(Abilities.ID.Cleric_Active_Divine_Intervention);
+            abilities.Add(Abilities.ID.Cleric_Active_DivineIntervention);
             abilities_level_required.Add(25);
 
             abilities.Add(Abilities.ID.Cleric_Active_Paragon);

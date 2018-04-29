@@ -78,10 +78,20 @@ namespace ExperienceAndClasses
         /// Adds experience. For use in single-player or by server.
         /// </summary>
         /// <param name="xp"></param>
-        public void AddExp(double xp)
+        public void AddExp(double xp, bool force=false)
         {
             /*~~~~~~~~~~~~~~~~~~~~~~Single Player and Server Only~~~~~~~~~~~~~~~~~~~~~~*/
-            if (Main.netMode == 1) return;
+            if (Main.netMode == 1)
+            {
+                if (force)
+                {
+                    Methods.PacketSender.ClientTellAddExp(mod, xp);
+                }
+                else
+                {
+                    return;
+                }
+            }
 
             SetExp(GetExp() + xp);
         }
@@ -360,41 +370,11 @@ namespace ExperienceAndClasses
             }
             effectiveLevel = (int)Math.Floor((double)effectiveLevel / numberClasses);
 
-            //for now, select first 4 actives
-            selectedActiveAbilities.Initialize();
-            int slot = 0;
-            for (int i=0; i<currentAbilities.Length; i++)
-            {
-                if (currentAbilities[i] && (Abilities.AbilityLookup[i].AbilityType == Abilities.ABILITY_TYPE.ACTIVE)) //have ability + is active
-                {
-                    selectedActiveAbilities[slot] = (Abilities.ID)i;
-                    if (slot++ >= ExperienceAndClasses.NUMBER_OF_ABILITY_SLOTS)
-                        break;
-                }
-            }
-
             base.PostUpdateEquips();
         }
 
         public override void PostUpdate()
         {
-            ////things to do if this is you
-            //if (player.Equals(Main.LocalPlayer))
-            //{
-            //    //update UI if local single-player
-            //    //if(Main.netMode==0) (mod as ExperienceAndClasses).uiExp.Update();
-
-            //    //UI visibility
-            //    if (UIShow)
-            //    {
-            //        UI.UIExp.visible = true;
-            //    }
-            //    else
-            //    {
-            //        UI.UIExp.visible = false;
-            //    }
-            //}
-
             DateTime now = DateTime.Now;
 
             //check if afk
@@ -418,6 +398,37 @@ namespace ExperienceAndClasses
                 {
                     ExpMsg(0, true);
                     offlineXPTime = now;
+                }
+            }
+
+            //TEMPORARY: select first 4 actives
+            selectedActiveAbilities.Initialize();
+            int slot = 0;
+            for (int i = 0; i < currentAbilities.Length; i++)
+            {
+                if (currentAbilities[i] && (Abilities.AbilityLookup[i].IsTypeActive())) //have ability + is active
+                {
+                    selectedActiveAbilities[slot] = (Abilities.ID)i;
+                    if (slot++ >= ExperienceAndClasses.NUMBER_OF_ABILITY_SLOTS)
+                        break;
+                }
+            }
+
+            //check ability cooldowns
+            Abilities.Ability ability;
+            for (int i = 0; i < currentAbilities.Length; i++)
+            {
+                if (currentAbilities[i])
+                {
+                    ability = Abilities.AbilityLookup[i];
+                    if (ability.OnCooldown() && (ability.GetCooldownRemainingSeconds() <= 0))
+                    {
+                        ability.OnCooldown(true, false);
+                        if (ability.IsTypeActive() && (ability.GetCooldownSecs((byte)effectiveLevel) >= thresholdCDMsg))
+                        {
+                            OffCooldownMessage(ability.GetName());
+                        }
+                    }
                 }
             }
 
@@ -646,34 +657,34 @@ namespace ExperienceAndClasses
                     if (showFailMessages && (ret != latestAbilityFail))
                     {
                         latestAbilityFail = ret;
-                        SendReturnMessage(latestAbilityFail);
+                        SendReturnMessage(id, latestAbilityFail);
                     }
                 }
             }
         }
 
-        public static void SendReturnMessage(Abilities.RETURN ret)
+        public static void SendReturnMessage(Abilities.ID id, Abilities.RETURN ret)
         {
             string message = null;
             switch (ret)
             {
                 case (Abilities.RETURN.FAIL_COOLDOWN):
-                    message = "Not ready!";
+                    message = ": not ready!";
                     break;
                 case (Abilities.RETURN.FAIL_LINE_OF_SIGHT):
-                    message = "Requires line of sight!";
+                    message = ": requires line of sight!";
                     break;
                 case (Abilities.RETURN.FAIL_MANA):
-                    message = "Not enough mana!";
+                    message = ": not enough mana!";
                     break;
                 case (Abilities.RETURN.FAIL_NOT_IMPLEMENTRD):
-                    message = "Not Implemented!";
+                    message = ": not yet implemented!";
                     break;
                 case (Abilities.RETURN.FAIL_STATUS):
-                    message = "Cannot be used right now!";
+                    message = ": cannot be used right now!";
                     break;
                 case (Abilities.RETURN.FAIL_REQUIREMENTS):
-                    message = "Requirements not met!";
+                    message = ": requirements not met!";
                     break;
                 default:
                     //no message
@@ -681,16 +692,21 @@ namespace ExperienceAndClasses
             }
             if (message != null)
             {
-                Main.NewText(message, ExperienceAndClasses.MESSAGE_COLOUR_RED);
+                Main.NewText(Abilities.AbilityLookup[(int)id].GetName() + message, ExperienceAndClasses.MESSAGE_COLOUR_RED);
             }
         }
 
-        public void PreventItemUse(double milliseconds)
+        public void PreventItemUse(int milliseconds)
         {
             itemUsePrevented = true;
             DateTime time = DateTime.Now.AddMilliseconds(milliseconds);
             if(time.CompareTo(timeAllowItemUse) > 0)
                 timeAllowItemUse = time;
+        }
+
+        public void OffCooldownMessage(string abilityName)
+        {
+            CombatText.NewText(player.getRect(), ExperienceAndClasses.MESSAGE_COLOUR_OFF_COOLDOWN, abilityName + " Ready!");
         }
 
     }

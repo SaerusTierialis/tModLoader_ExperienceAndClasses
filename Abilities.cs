@@ -9,6 +9,10 @@ namespace ExperienceAndClasses
 {
     public class Abilities
     {
+        /* ~~~~~~~~~~~~ Cosntants ~~~~~~~~~~~~ */
+        protected const int ACTIVE_PREVENT_ATTACK_MILLISECONDS = 400;
+        protected static readonly Color COLOUR_SUPPORT = new Color(255, 255, 100); //new Color(239, 239, 239);
+
         /* ~~~~~~~~~~~~ Values ~~~~~~~~~~~~ */
         public enum RETURN : byte
         {
@@ -37,23 +41,28 @@ namespace ExperienceAndClasses
 
             Cleric_Active_Heal,
             Cleric_Active_Sanctuary,
-            Cleric_Active_Divine_Intervention,
+            Cleric_Active_DivineIntervention,
             Cleric_Active_Paragon,
 
-            NUMBER_OF_IDs //leave this last
+            //when adding here, make that that a class of the same name is added below
+
+            NUMBER_OF_IDs, //leave this last
         }
 
         /* ~~~~~~~~~~~~ List of Abilities ~~~~~~~~~~~~ */
         //contains the one and only instance of each ability
-        //not actually a "list" but an array
+        //not actually a "list" but an ID-indexed array
+        //auto-populates from ID
+        //will CRASH on mod startup if there is no corresponding class for an ID
+        //using this list is a pretty cumbersome design choice but it allowed for various efficiencies
 
         public static Ability[] AbilityLookup = new Ability[(int)ID.NUMBER_OF_IDs];
         public static void Initialize()
         {
             string[] IDs = Enum.GetNames(typeof(ID));
-            for (byte i = (byte)ID.UNDEFINED + 1; i < IDs.Length; i++)
+            for (byte i = 0; i < AbilityLookup.Length; i++)
             {
-                AbilityLookup[i] = (Ability)(Assembly.GetExecutingAssembly().CreateInstance(IDs[i]));
+                AbilityLookup[i] = (Ability)(Assembly.GetExecutingAssembly().CreateInstance(typeof(Abilities).FullName + "+" + IDs[i]));
             }
         }
 
@@ -62,7 +71,7 @@ namespace ExperienceAndClasses
 
         public class Cleric_Active_Heal : Ability
         {
-            static Cleric_Active_Heal()
+            public Cleric_Active_Heal()
             {
                 ability_type = ABILITY_TYPE.ACTIVE;
                 name = "Heal";
@@ -70,16 +79,17 @@ namespace ExperienceAndClasses
                 description = "";
                 cost_mana_percent = 0.35f;
                 cooldown_seconds = 3;
+                dust_colour = COLOUR_SUPPORT;
             }
-            protected new static RETURN UseEffects()
+            protected override RETURN UseEffects()
             {
-                return RETURN.FAIL_NOT_IMPLEMENTRD;
+                return RETURN.SUCCESS;
             }
         }
 
         public class Cleric_Active_Sanctuary : Ability
         {
-            static Cleric_Active_Sanctuary()
+            public Cleric_Active_Sanctuary()
             {
                 ability_type = ABILITY_TYPE.ACTIVE;
                 name = "Sanctuary";
@@ -87,12 +97,13 @@ namespace ExperienceAndClasses
                 description = "";
                 cost_mana_percent = 0.90f;
                 cooldown_seconds = 120;
+                dust_colour = COLOUR_SUPPORT;
             }
         }
 
         public class Cleric_Active_DivineIntervention : Ability
         {
-            static Cleric_Active_DivineIntervention()
+            public Cleric_Active_DivineIntervention()
             {
                 ability_type = ABILITY_TYPE.ACTIVE;
                 name = "Divine Intervention";
@@ -100,12 +111,13 @@ namespace ExperienceAndClasses
                 description = "";
                 cost_mana_percent = 0.50f;
                 cooldown_seconds = 20;
+                dust_colour = COLOUR_SUPPORT;
             }
         }
 
         public class Cleric_Active_Paragon : Ability
         {
-            static Cleric_Active_Paragon()
+            public Cleric_Active_Paragon()
             {
                 ability_type = ABILITY_TYPE.ACTIVE;
                 name = "Paragon";
@@ -113,46 +125,59 @@ namespace ExperienceAndClasses
                 description = "";
                 cost_mana_percent = 0.50f;
                 cooldown_seconds = 300;
+                dust_colour = COLOUR_SUPPORT;
             }
         }
 
+        public class UNDEFINED : Ability { }
+
         /* ~~~~~~~~~~~~ Ability Abstract ~~~~~~~~~~~~ */
         //singleton implementation
-        //all methods must NOT be static for easy access through lookup array
-        //fields should be static but it doesn't really matter
+        //nothing should be static in here
 
         public abstract class Ability
         {
             //type of ability
-            protected static ABILITY_TYPE ability_type = ABILITY_TYPE.NOT_IMPLEMENTED;
+            protected ABILITY_TYPE ability_type = ABILITY_TYPE.NOT_IMPLEMENTED;
 
             //toggle on for constant passives for efficiency
-            protected static bool skip_checks_and_costs = false;
+            protected bool skip_checks_and_costs = false;
 
             //descriptives
-            protected static string name = "undefined";
-            protected static string name_short = "undefined";
-            protected static string description = "undefined";
+            protected string name = "undefined";
+            protected string name_short = "undefined";
+            protected string description = "undefined";
 
             //coodlown tracking
-            protected static bool cooldown_active = false;
-            protected static DateTime cooldown_time_end = DateTime.MinValue;
+            protected bool cooldown_active = false;
+            protected DateTime cooldown_time_end = DateTime.MinValue;
 
             //costs
-            protected static int cost_mana_base = 0;
-            protected static float cost_mana_percent = 0f;
-            protected static float cost_mana_reduction_cap = 0.8f;
-            protected static double cooldown_seconds = 0;
-            protected static bool requires_sight_cursor = false;
+            protected int cost_mana_base = 0;
+            protected float cost_mana_percent = 0f;
+            protected float cost_mana_reduction_cap = 0.8f;
+            protected double cooldown_seconds = 0;
+            protected bool requires_sight_cursor = false;
 
             //on-use effects
-            protected static bool visual_do = false;
-            protected static Color visual_colour = default(Color);
-            protected static double prevent_weapon_milliseconds = 400;
+            protected Color dust_colour = default(Color);
+            protected bool active_prevents_attack = true;
 
-            //encapsulate whatever needs external access
-            public ABILITY_TYPE AbilityType { get => ability_type; }
-            public string Name { get => name; }
+            //encapsulate whatever needs external access (better formats wouldn't compile in tModLoader - exit code 1)
+            public string GetName()
+            {
+                return name;
+            }
+            public string GetNameShort()
+            {
+                return name_short;
+            }
+            public bool OnCooldown(bool changeValue=false, bool newValue=false)
+            {
+                if (changeValue)
+                    cooldown_active = newValue;
+                return cooldown_active;
+            }
 
             public RETURN Use(byte level=1, bool alternate=false)
             {
@@ -165,7 +190,7 @@ namespace ExperienceAndClasses
                 //pre-checks
                 if (!skip_checks_and_costs)
                 {
-                    return_value = UseChecks();
+                    return_value = UseChecks(level, alternate);
                     if (return_value != RETURN.SUCCESS) return return_value;
                 }
 
@@ -173,9 +198,13 @@ namespace ExperienceAndClasses
                 return_value = UseEffects();
                 if (return_value != RETURN.SUCCESS) return return_value;
 
-                //on-use effects
-                if (visual_do) DoVisual(Main.LocalPlayer);
-                if (prevent_weapon_milliseconds > 0) ExperienceAndClasses.localMyPlayer.PreventItemUse(prevent_weapon_milliseconds);
+                //active on-use effects
+                if (IsTypeActive())
+                {
+                    CastDust();
+                    if (active_prevents_attack)
+                        ExperienceAndClasses.localMyPlayer.PreventItemUse(ACTIVE_PREVENT_ATTACK_MILLISECONDS);
+                }
 
                 //take costs
                 if (!skip_checks_and_costs)
@@ -187,22 +216,42 @@ namespace ExperienceAndClasses
                 return return_value;
             }
 
-            protected RETURN UseChecks()
+            protected virtual RETURN UseChecks(byte level=1, bool alternate=false)
+            {
+                //check for invalid statuses
+                if (Main.LocalPlayer.frozen || Main.LocalPlayer.dead) return RETURN.FAIL_STATUS;
+
+                //check mana cost
+                if (Main.LocalPlayer.statMana < GetManaCost(level, alternate)) return RETURN.FAIL_MANA;
+
+                //check cooldown
+                if (cooldown_active) return RETURN.FAIL_COOLDOWN;
+
+                return RETURN.SUCCESS;
+            }
+
+            protected virtual RETURN UseEffects()
             {
                 return RETURN.FAIL_NOT_IMPLEMENTRD;
             }
 
-            protected RETURN UseEffects()
+            protected virtual RETURN UseCosts(byte level = 1, bool alternate = false)
             {
-                return RETURN.FAIL_NOT_IMPLEMENTRD;
+                Main.LocalPlayer.statMana -= GetManaCost(level, alternate);
+                if (Main.LocalPlayer.statMana < 0)
+                {
+                    Main.LocalPlayer.statMana = 0;
+                }
+                double cd = GetCooldownSecs(level);
+                if (cd > 0)
+                {
+                    cooldown_active = true;
+                    cooldown_time_end = DateTime.Now.AddSeconds(cd);
+                }
+                return RETURN.SUCCESS;
             }
 
-            protected RETURN UseCosts()
-            {
-                return RETURN.FAIL_NOT_IMPLEMENTRD;
-            }
-
-            public int GetManaCost(int level = 1)
+            public int GetManaCost(byte level = 1, bool alternate = false)
             {
                 int manaCost = (int)((cost_mana_base + (cost_mana_percent * Main.LocalPlayer.statManaMax2)) * Main.LocalPlayer.manaCost); //apply cost_mana_reduction_cap
 
@@ -212,19 +261,48 @@ namespace ExperienceAndClasses
                 return manaCost;
             }
 
-            public float GetCooldownSecs(int level = 1)
+            public virtual double GetCooldownSecs(byte level = 1)
             {
-                return 0f;
+                return cooldown_seconds;
             }
 
-            protected void DoVisual(Player player)
+            public float GetCooldownRemainingSeconds()
+            {
+                return (float)(cooldown_time_end.Subtract(DateTime.Now).TotalMilliseconds) / 1000;
+            }
+
+            protected void CastDust()
             {
                 //maybe use a projectile instead for easy syncing
                 for (int i = 0; i < 10; i++)
                 {
-                    int dust = Dust.NewDust(player.position, player.width, player.height, ExperienceAndClasses.mod.DustType("Dust_AbilityGeneric"), Main.rand.NextFloat(-5, +5), Main.rand.NextFloat(-5, +5), 150, ExperienceAndClasses.MESSAGE_COLOUR_YELLOW);
+                    int dust = Dust.NewDust(Main.LocalPlayer.position, Main.LocalPlayer.width, Main.LocalPlayer.height, ExperienceAndClasses.mod.DustType("Dust_AbilityGeneric"), Main.rand.NextFloat(-5, +5), Main.rand.NextFloat(-5, +5), 150, dust_colour);
                     Main.playerDrawDust.Add(dust);
                 }
+            }
+
+            public virtual string CooldownUI(byte level, out float percent)
+            {
+                //calculate cd time remaining
+                double timeRemain = GetCooldownRemainingSeconds();
+                if (timeRemain < 0)
+                    timeRemain = 0;
+
+                //if time, set string
+                string cooldownText = null;
+                if (timeRemain > 0)
+                    cooldownText = Math.Round(timeRemain, 1).ToString();
+
+                //also calculate percentage complete
+                double cd = GetCooldownSecs(level);
+                percent = (float)((cd - timeRemain) / cd);
+
+                return cooldownText;
+            }
+
+            public bool IsTypeActive()
+            {
+                return ability_type == ABILITY_TYPE.ACTIVE;
             }
 
         }
