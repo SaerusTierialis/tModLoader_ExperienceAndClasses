@@ -55,6 +55,7 @@
     </AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Abilities\AbilityProj.cs" />
     <Compile Include="Buffs\Auras.cs" />
     <Compile Include="Buffs\Buffs.cs" />
     <Compile Include="Buffs\Helpers.cs" />
@@ -64,7 +65,7 @@
     <Compile Include="Items\Helpers.cs" />
     <Compile Include="Items\Orbs.cs" />
     <Compile Include="ExperienceAndClasses.cs" />
-    <Compile Include="Abilities.cs" />
+    <Compile Include="Abilities\Abilities.cs" />
     <Compile Include="Methods\ChatCommands.cs" />
     <Compile Include="Methods\Experience.cs" />
     <Compile Include="Methods\PacketSender.cs" />
@@ -73,7 +74,6 @@
     <Compile Include="MyWorld.cs" />
     <Compile Include="NPCs\Helpers.cs" />
     <Compile Include="NPCs\MyGlobalNPC.cs" />
-    <Compile Include="Projectiles\MyGlobalProjectile.cs" />
     <Compile Include="Recipes\Helpers.cs" />
     <Compile Include="Recipes\RecipeTypes.cs" />
     <Compile Include="UI\MyUI.cs" />

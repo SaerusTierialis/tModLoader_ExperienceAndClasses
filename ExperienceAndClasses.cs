@@ -82,7 +82,7 @@ namespace ExperienceAndClasses
         public static readonly double[] EXP_REQ_TOTAL = new double[MAX_LEVEL + 1];
 
         //awarding experience and drops
-        public const float RANGE_EXP_AND_ASCENSION_ORB = 5000f;
+        public const float RANGE_EXP_AND_ASCENSION_ORB = 2500f;
         public const float PERCENT_CHANCE_BOSS_ORB_BASE = 5.0f;
         public const float PERCENT_CHANCE_BOSS_ORB_VARIABLE = 45.0f;
         public const float PERCENT_CHANCE_ASCENSION_ORB = 0.6f;
@@ -117,7 +117,6 @@ namespace ExperienceAndClasses
         public ExperienceAndClasses()
         {
             Methods.Experience.CalcExpReqs();
-            Abilities.Initialize();
             Properties = new ModProperties()
             {
                 Autoload = true,

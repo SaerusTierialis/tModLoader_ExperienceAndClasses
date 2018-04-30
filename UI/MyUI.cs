@@ -142,19 +142,19 @@ namespace ExperienceAndClasses.UI
             if (localMyPlayer.UICDBars)
             {
                 float barPercent;
-                Abilities.ID abilityID;
-                Abilities.Ability ability;
+                Abilities.AbilityMain.ID abilityID;
+                Abilities.AbilityMain.Ability ability;
                 for (int i = 0; i < ExperienceAndClasses.NUMBER_OF_ABILITY_SLOTS; i++)
                 {
                     abilityID = localMyPlayer.selectedActiveAbilities[i];
-                    if (abilityID != Abilities.ID.UNDEFINED)
+                    if (abilityID != Abilities.AbilityMain.ID.UNDEFINED)
                     {
                         //bar
                         bars[numberActiveBars].left = BAR_EXP_LEFT_INDENT;
                         bars[numberActiveBars].width = BAR_EXP_WIDTH_INDENT;
                         bars[numberActiveBars].Activate();
                         //set bar values and get text to diplay
-                        ability = Abilities.AbilityLookup[(int)abilityID];
+                        ability = Abilities.AbilityMain.AbilityLookup[(int)abilityID];
                         labelsBars[0, numberActiveBars] = ability.GetNameShort();
                         labelsBars[1, numberActiveBars] = ability.CooldownUI((byte)localMyPlayer.effectiveLevel, out barPercent);
                         bars[numberActiveBars].SetValue(barPercent, COLOUR_BAR_FOREGROUND_ABILITY);

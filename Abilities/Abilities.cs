@@ -5,13 +5,13 @@ using System.Reflection;
 using Terraria;
 using Terraria.ID;
 
-namespace ExperienceAndClasses
+namespace ExperienceAndClasses.Abilities
 {
-    public class Abilities
+    public class AbilityMain
     {
         /* ~~~~~~~~~~~~ Cosntants ~~~~~~~~~~~~ */
         protected const int ACTIVE_PREVENT_ATTACK_MILLISECONDS = 400;
-        protected static readonly Color COLOUR_SUPPORT = new Color(255, 255, 100); //new Color(239, 239, 239);
+    
 
         /* ~~~~~~~~~~~~ Values ~~~~~~~~~~~~ */
         public enum RETURN : byte
@@ -49,7 +49,15 @@ namespace ExperienceAndClasses
             NUMBER_OF_IDs, //leave this last
         }
 
-        /* ~~~~~~~~~~~~ List of Abilities ~~~~~~~~~~~~ */
+        public enum CLASS_TYPE : byte
+        {
+            UNUSED,
+            SUPPORT,
+
+            NUMBER_OF_CLASS_TYPES
+        }
+
+        /* ~~~~~~~~~~~~ List of Abilities (+ initialize class type colours) ~~~~~~~~~~~~ */
         //contains the one and only instance of each ability
         //not actually a "list" but an ID-indexed array
         //auto-populates from ID
@@ -57,12 +65,17 @@ namespace ExperienceAndClasses
         //using this list is a pretty cumbersome design choice but it allowed for various efficiencies
 
         public static Ability[] AbilityLookup = new Ability[(int)ID.NUMBER_OF_IDs];
-        public static void Initialize()
+        public static readonly Color[] COLOUR_CLASS_TYPE = new Color[(int)CLASS_TYPE.NUMBER_OF_CLASS_TYPES];
+        static AbilityMain()
         {
+            //class type colours
+            COLOUR_CLASS_TYPE[(int)CLASS_TYPE.SUPPORT] = new Color(255, 255, 100); //new Color(239, 239, 239);
+
+            //fill list of abilities
             string[] IDs = Enum.GetNames(typeof(ID));
             for (byte i = 0; i < AbilityLookup.Length; i++)
             {
-                AbilityLookup[i] = (Ability)(Assembly.GetExecutingAssembly().CreateInstance(typeof(Abilities).FullName + "+" + IDs[i]));
+                AbilityLookup[i] = (Ability)(Assembly.GetExecutingAssembly().CreateInstance(typeof(AbilityMain).FullName + "+" + IDs[i]));
             }
         }
 
@@ -79,10 +92,15 @@ namespace ExperienceAndClasses
                 description = "";
                 cost_mana_percent = 0.35f;
                 cooldown_seconds = 3;
-                dust_colour = COLOUR_SUPPORT;
+                class_type = CLASS_TYPE.SUPPORT;
+                requires_sight_cursor = true;
             }
             protected override RETURN UseEffects()
             {
+                float value = ExperienceAndClasses.localMyPlayer.effectiveLevel * ExperienceAndClasses.localMyPlayer.healRate;
+                Vector2 target = Main.MouseWorld;
+                Projectile.NewProjectile(Main.LocalPlayer.position, new Vector2(0f), ExperienceAndClasses.mod.ProjectileType< AbilityProj.HealProj.Initial>(), value, 0, Main.LocalPlayer.whoAmI, target.X, target.Y);
+
                 return RETURN.SUCCESS;
             }
         }
@@ -97,7 +115,7 @@ namespace ExperienceAndClasses
                 description = "";
                 cost_mana_percent = 0.90f;
                 cooldown_seconds = 120;
-                dust_colour = COLOUR_SUPPORT;
+                class_type = CLASS_TYPE.SUPPORT;
             }
         }
 
@@ -111,7 +129,7 @@ namespace ExperienceAndClasses
                 description = "";
                 cost_mana_percent = 0.50f;
                 cooldown_seconds = 20;
-                dust_colour = COLOUR_SUPPORT;
+                class_type = CLASS_TYPE.SUPPORT;
             }
         }
 
@@ -125,7 +143,7 @@ namespace ExperienceAndClasses
                 description = "";
                 cost_mana_percent = 0.50f;
                 cooldown_seconds = 300;
-                dust_colour = COLOUR_SUPPORT;
+                class_type = CLASS_TYPE.SUPPORT;
             }
         }
 
@@ -160,7 +178,7 @@ namespace ExperienceAndClasses
             protected bool requires_sight_cursor = false;
 
             //on-use effects
-            protected Color dust_colour = default(Color);
+            protected CLASS_TYPE class_type = CLASS_TYPE.UNUSED;
             protected bool active_prevents_attack = true;
 
             //encapsulate whatever needs external access (better formats wouldn't compile in tModLoader - exit code 1)
@@ -227,6 +245,16 @@ namespace ExperienceAndClasses
                 //check cooldown
                 if (cooldown_active) return RETURN.FAIL_COOLDOWN;
 
+                //line of sight
+                if (requires_sight_cursor)
+                {
+                    Vector2 target = Main.MouseWorld;
+                    if (!Collision.CanHit(Main.LocalPlayer.position, 0, 0, target, 0, 0))
+                    {
+                        return RETURN.FAIL_LINE_OF_SIGHT;
+                    }
+                }
+
                 return RETURN.SUCCESS;
             }
 
@@ -273,12 +301,8 @@ namespace ExperienceAndClasses
 
             protected void CastDust()
             {
-                //maybe use a projectile instead for easy syncing
-                for (int i = 0; i < 10; i++)
-                {
-                    int dust = Dust.NewDust(Main.LocalPlayer.position, Main.LocalPlayer.width, Main.LocalPlayer.height, ExperienceAndClasses.mod.DustType("Dust_AbilityGeneric"), Main.rand.NextFloat(-5, +5), Main.rand.NextFloat(-5, +5), 150, dust_colour);
-                    Main.playerDrawDust.Add(dust);
-                }
+                //create dust from projectile for easy multiplayer sync
+                Projectile.NewProjectile(Main.LocalPlayer.position.X, Main.LocalPlayer.position.Y, 0, 0, ExperienceAndClasses.mod.ProjectileType<AbilityProj.AbilityVisual>(), 0, 0, Main.LocalPlayer.whoAmI, (float)class_type);
             }
 
             public virtual string CooldownUI(byte level, out float percent)

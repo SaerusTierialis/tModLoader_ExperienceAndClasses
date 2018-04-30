@@ -561,9 +561,9 @@ namespace ExperienceAndClasses.Items
                     manaCost = 0.005f;
                     manaCost_CAP = 0.1f;
                     immune_Silence_LEVEL = 20;
-                    periodicIchorAura_DUR = 100f;
-                    periodicIchorAura_TIME_MSEC = 5000;
-                    periodicIchorAura_LEVEL = 10;
+                    //periodicIchorAura_DUR = 100f;
+                    //periodicIchorAura_TIME_MSEC = 5000;
+                    //periodicIchorAura_LEVEL = 10;
                     break;
                 case "Saint":
                     statLifeMax2 = 1f;
@@ -578,16 +578,16 @@ namespace ExperienceAndClasses.Items
                     immune_Confused_LEVEL = 30;
                     immune_Darkness_LEVEL = 10;
                     onHitRegen_LEVEL = 40;
-                    periodicPartyHeal = 1.5f;
-                    periodicPartyHeal_TIME_MSEC = 5000;
-                    periodicPartyHeal_LEVEL = 1;
-                    periodicDmgAura = 3f;
-                    periodicDmgAura_TIME_MSEC = 5000;
-                    periodicDmgAura_LEVEL = 20;
-                    periodicIchorAura_DUR = 200f;
-                    periodicIchorAura_TIME_MSEC = 5000;
-                    periodicIchorAura_LEVEL = 1;
-                    defenseAura1_LEVEL = 60;
+                    //periodicPartyHeal = 1.5f;
+                    //periodicPartyHeal_TIME_MSEC = 5000;
+                    //periodicPartyHeal_LEVEL = 1;
+                    //periodicDmgAura = 3f;
+                    //periodicDmgAura_TIME_MSEC = 5000;
+                    //periodicDmgAura_LEVEL = 20;
+                    //periodicIchorAura_DUR = 200f;
+                    //periodicIchorAura_TIME_MSEC = 5000;
+                    //periodicIchorAura_LEVEL = 1;
+                    //defenseAura1_LEVEL = 60;
                     break;
                 case "Hybrid":
                     statLifeMax2 = 0.75f;

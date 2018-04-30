@@ -18,7 +18,7 @@ namespace ExperienceAndClasses.Items
         public string desc = "Starter class." +
                          "\n\nClass advancement is available at level " + Recipes.ClassRecipes.TIER_LEVEL_REQUIREMENTS[1 + 1] + ".";
 
-        public List<Abilities.ID> abilities = new List<Abilities.ID>();
+        public List<Abilities.AbilityMain.ID> abilities = new List<Abilities.AbilityMain.ID>();
         public List<byte> abilities_level_required = new List<byte>();
 
         public override void ModifyTooltips(List<TooltipLine> tooltips)
@@ -465,10 +465,10 @@ namespace ExperienceAndClasses.Items
                        "\n\nClass advancement is available at level " + Recipes.ClassRecipes.TIER_LEVEL_REQUIREMENTS[tier+1] + ".";
 
             //abilities
-            abilities.Add(Abilities.ID.Cleric_Active_Heal);
+            abilities.Add(Abilities.AbilityMain.ID.Cleric_Active_Heal);
             abilities_level_required.Add(1);
 
-            abilities.Add(Abilities.ID.Cleric_Active_Sanctuary);
+            abilities.Add(Abilities.AbilityMain.ID.Cleric_Active_Sanctuary);
             abilities_level_required.Add(15);
         }
         public override void AddRecipes()
@@ -491,16 +491,16 @@ namespace ExperienceAndClasses.Items
                          "\ndecent life and defense.";
 
             //abilities
-            abilities.Add(Abilities.ID.Cleric_Active_Heal);
+            abilities.Add(Abilities.AbilityMain.ID.Cleric_Active_Heal);
             abilities_level_required.Add(1);
 
-            abilities.Add(Abilities.ID.Cleric_Active_Sanctuary);
+            abilities.Add(Abilities.AbilityMain.ID.Cleric_Active_Sanctuary);
             abilities_level_required.Add(15);
 
-            abilities.Add(Abilities.ID.Cleric_Active_DivineIntervention);
+            abilities.Add(Abilities.AbilityMain.ID.Cleric_Active_DivineIntervention);
             abilities_level_required.Add(25);
 
-            abilities.Add(Abilities.ID.Cleric_Active_Paragon);
+            abilities.Add(Abilities.AbilityMain.ID.Cleric_Active_Paragon);
             abilities_level_required.Add(50);
         }
         public override void AddRecipes()

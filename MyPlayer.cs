@@ -45,13 +45,16 @@ namespace ExperienceAndClasses
         public bool levelCapped = false;
 
         //abilities
-        public bool[] currentAbilities = new bool[(int)Abilities.ID.NUMBER_OF_IDs];
-        public Abilities.ID[] selectedActiveAbilities = new Abilities.ID[ExperienceAndClasses.NUMBER_OF_ABILITY_SLOTS];
-        public Abilities.RETURN latestAbilityFail = Abilities.RETURN.FAIL_NOT_IMPLEMENTRD;
+        public bool[] currentAbilities = new bool[(int)Abilities.AbilityMain.ID.NUMBER_OF_IDs];
+        public Abilities.AbilityMain.ID[] selectedActiveAbilities = new Abilities.AbilityMain.ID[ExperienceAndClasses.NUMBER_OF_ABILITY_SLOTS];
+        public Abilities.AbilityMain.RETURN latestAbilityFail = Abilities.AbilityMain.RETURN.FAIL_NOT_IMPLEMENTRD;
         public Boolean showFailMessages = true;
         public float thresholdCDMsg = 3f;
         public bool itemUsePrevented = false;
         public DateTime timeAllowItemUse = DateTime.MinValue;
+
+        //custom stats
+        public float healRate = 1f;
 
         //rogue
         public float percentMidas = 0;
@@ -406,21 +409,21 @@ namespace ExperienceAndClasses
             int slot = 0;
             for (int i = 0; i < currentAbilities.Length; i++)
             {
-                if (currentAbilities[i] && (Abilities.AbilityLookup[i].IsTypeActive())) //have ability + is active
+                if (currentAbilities[i] && (Abilities.AbilityMain.AbilityLookup[i].IsTypeActive())) //have ability + is active
                 {
-                    selectedActiveAbilities[slot] = (Abilities.ID)i;
+                    selectedActiveAbilities[slot] = (Abilities.AbilityMain.ID)i;
                     if (slot++ >= ExperienceAndClasses.NUMBER_OF_ABILITY_SLOTS)
                         break;
                 }
             }
 
             //check ability cooldowns
-            Abilities.Ability ability;
+            Abilities.AbilityMain.Ability ability;
             for (int i = 0; i < currentAbilities.Length; i++)
             {
                 if (currentAbilities[i])
                 {
-                    ability = Abilities.AbilityLookup[i];
+                    ability = Abilities.AbilityMain.AbilityLookup[i];
                     if (ability.OnCooldown() && (ability.GetCooldownRemainingSeconds() <= 0))
                     {
                         ability.OnCooldown(true, false);
@@ -626,7 +629,7 @@ namespace ExperienceAndClasses
             {
                 if (ExperienceAndClasses.HOTKEY_ABILITY[i].JustPressed)
                 {
-                    latestAbilityFail = Abilities.RETURN.UNUSED;
+                    latestAbilityFail = Abilities.AbilityMain.RETURN.UNUSED;
                     showFailMessages = true;
                     break;
                 }
@@ -646,12 +649,12 @@ namespace ExperienceAndClasses
             //do ability, if any
             if (slot >= 0)
             {
-                Abilities.ID id = selectedActiveAbilities[slot];
-                if (id != Abilities.ID.UNDEFINED)
+                Abilities.AbilityMain.ID id = selectedActiveAbilities[slot];
+                if (id != Abilities.AbilityMain.ID.UNDEFINED)
                 {
-                    Abilities.RETURN ret = Abilities.AbilityLookup[(int)id].Use((byte)effectiveLevel, ExperienceAndClasses.HOTKEY_ALTERNATE_EFFECT.Current);
+                    Abilities.AbilityMain.RETURN ret = Abilities.AbilityMain.AbilityLookup[(int)id].Use((byte)effectiveLevel, ExperienceAndClasses.HOTKEY_ALTERNATE_EFFECT.Current);
 
-                    if (ret == Abilities.RETURN.SUCCESS)
+                    if (ret == Abilities.AbilityMain.RETURN.SUCCESS)
                         showFailMessages = false;
 
                     if (showFailMessages && (ret != latestAbilityFail))
@@ -663,27 +666,27 @@ namespace ExperienceAndClasses
             }
         }
 
-        public static void SendReturnMessage(Abilities.ID id, Abilities.RETURN ret)
+        public static void SendReturnMessage(Abilities.AbilityMain.ID id, Abilities.AbilityMain.RETURN ret)
         {
             string message = null;
             switch (ret)
             {
-                case (Abilities.RETURN.FAIL_COOLDOWN):
+                case (Abilities.AbilityMain.RETURN.FAIL_COOLDOWN):
                     message = ": not ready!";
                     break;
-                case (Abilities.RETURN.FAIL_LINE_OF_SIGHT):
+                case (Abilities.AbilityMain.RETURN.FAIL_LINE_OF_SIGHT):
                     message = ": requires line of sight!";
                     break;
-                case (Abilities.RETURN.FAIL_MANA):
+                case (Abilities.AbilityMain.RETURN.FAIL_MANA):
                     message = ": not enough mana!";
                     break;
-                case (Abilities.RETURN.FAIL_NOT_IMPLEMENTRD):
+                case (Abilities.AbilityMain.RETURN.FAIL_NOT_IMPLEMENTRD):
                     message = ": not yet implemented!";
                     break;
-                case (Abilities.RETURN.FAIL_STATUS):
+                case (Abilities.AbilityMain.RETURN.FAIL_STATUS):
                     message = ": cannot be used right now!";
                     break;
-                case (Abilities.RETURN.FAIL_REQUIREMENTS):
+                case (Abilities.AbilityMain.RETURN.FAIL_REQUIREMENTS):
                     message = ": requirements not met!";
                     break;
                 default:
@@ -692,7 +695,7 @@ namespace ExperienceAndClasses
             }
             if (message != null)
             {
-                Main.NewText(Abilities.AbilityLookup[(int)id].GetName() + message, ExperienceAndClasses.MESSAGE_COLOUR_RED);
+                Main.NewText(Abilities.AbilityMain.AbilityLookup[(int)id].GetName() + message, ExperienceAndClasses.MESSAGE_COLOUR_RED);
             }
         }
 
