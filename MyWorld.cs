@@ -2,6 +2,7 @@
 using Terraria.ModLoader;
 using System;
 using Terraria.ModLoader.IO;
+using System.Collections;
 
 namespace ExperienceAndClasses
 {
@@ -24,6 +25,8 @@ namespace ExperienceAndClasses
         public static bool[] clientNeedsExpUpdate = new bool[256];
         public static int clientNeedsExpUpdate_counter = 0;
         public static int[] clientNeedsExpUpdate_indices = new int[256];
+
+        public static SortedList kill_counts = new SortedList(300);
 
         public override TagCompound Save()
         {

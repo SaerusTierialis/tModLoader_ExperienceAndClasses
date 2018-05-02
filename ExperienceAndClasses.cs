@@ -158,7 +158,7 @@ namespace ExperienceAndClasses
             Player player;
             MyPlayer myPlayer;
             bool newBool;
-            int newInt, pIndex;
+            int newInt, newInt2, pIndex;
             MyPlayer localMyPlayer = null;
             bool traceChar = false;
             if (Main.netMode!=2)
@@ -604,6 +604,7 @@ namespace ExperienceAndClasses
                     {
                         pIndex = reader.ReadInt32();
                         newExp = reader.ReadDouble();
+                        newInt2 = reader.ReadInt32(); //kill count
 
                         player = Main.player[pIndex];
                         if (player.active && (newExp >= 0))
@@ -612,6 +613,7 @@ namespace ExperienceAndClasses
                             double expChange = newExp - myPlayer.experience;
                             myPlayer.experience = newExp;
                             myPlayer.ExpMsg(expChange);
+                            myPlayer.kill_count = newInt2;
 
                             //if (Main.LocalPlayer.Equals(player))
                             //    uiExp.Update();

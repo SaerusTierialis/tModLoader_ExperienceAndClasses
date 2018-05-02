@@ -97,7 +97,7 @@ namespace ExperienceAndClasses.Abilities
             }
             protected override RETURN UseEffects()
             {
-                float value = ExperienceAndClasses.localMyPlayer.effectiveLevel * ExperienceAndClasses.localMyPlayer.healRate;
+                int value = (int)(ExperienceAndClasses.localMyPlayer.effectiveLevel * ExperienceAndClasses.localMyPlayer.healRate);
                 Vector2 target = Main.MouseWorld;
                 Projectile.NewProjectile(Main.LocalPlayer.position, new Vector2(0f), ExperienceAndClasses.mod.ProjectileType< AbilityProj.HealProj.Initial>(), value, 0, Main.LocalPlayer.whoAmI, target.X, target.Y);
 

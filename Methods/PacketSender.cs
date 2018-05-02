@@ -383,15 +383,18 @@ namespace ExperienceAndClasses.Methods
             for (int ind = 0; ind < MyWorld.clientNeedsExpUpdate_counter; ind++)
             {
                 player = Main.player[MyWorld.clientNeedsExpUpdate_indices[ind]];
-                packet.Write(player.whoAmI);
+                packet.Write(player.whoAmI); //who dis
                 if (player.active)
                 {
                     myPlayer = player.GetModPlayer<MyPlayer>(mod);
-                    packet.Write(myPlayer.GetExp());
+                    packet.Write(myPlayer.GetExp()); //xp
+                    int counter_index = MyWorld.kill_counts.IndexOfKey(myPlayer.kill_count_track_id);
+                    packet.Write((int)MyWorld.kill_counts.GetByIndex(counter_index)); //kill count (int32)
                 }
                 else
                 {
-                    packet.Write(-1);
+                    packet.Write(-1); //xp
+                    packet.Write(-1); //kill count
                 }
 
                 //reset

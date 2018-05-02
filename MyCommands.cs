@@ -4,7 +4,27 @@ using Terraria.ModLoader;
 
 namespace ExperienceAndClasses
 {
-    class Command_expuibarcd : CommandTemplate //allowAFK
+    class Command_expkillcount : CommandTemplate
+    {
+        public Command_expkillcount()
+        {
+            name = "expkillcount";
+            argstr = "";
+            desc = "toggle showing kill count of recently slain monsters";
+        }
+
+        public override void Action(CommandCaller caller, string input, string[] args)
+        {
+            ExperienceAndClasses.localMyPlayer.show_kill_count = !ExperienceAndClasses.localMyPlayer.show_kill_count;
+            if (ExperienceAndClasses.localMyPlayer.show_kill_count)
+                Main.NewText("Kill count enabled.", ExperienceAndClasses.MESSAGE_COLOUR_YELLOW);
+            else
+                Main.NewText("Kill count disabled.", ExperienceAndClasses.MESSAGE_COLOUR_YELLOW);
+        }
+    }
+
+
+    class Command_expuibarcd : CommandTemplate
     {
         public Command_expuibarcd()
         {
@@ -24,7 +44,7 @@ namespace ExperienceAndClasses
         }
     }
 
-    class Command_expcd : CommandTemplate //allowAFK
+    class Command_expcd : CommandTemplate
     {
         public Command_expcd()
         {

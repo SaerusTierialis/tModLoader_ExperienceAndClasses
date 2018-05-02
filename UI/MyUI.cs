@@ -169,8 +169,15 @@ namespace ExperienceAndClasses.UI
                 if (bars[i].active) bars[i].Deactivate();
             }
 
+            //kill count
+            int extra_rows = 0;
+            if (localMyPlayer.show_kill_count)
+            {
+                extra_rows++;
+            }
+
             //adjust panel size
-            panel.Height.Set(PANEL_HEIGHT_BASE + (numberActiveBars * PANEL_HEIGHT_PER_BAR), 0f);
+            panel.Height.Set(PANEL_HEIGHT_BASE + ((numberActiveBars + extra_rows) * PANEL_HEIGHT_PER_BAR), 0f);
         }
 
         public static void SetPosition(float left, float top)
@@ -281,6 +288,12 @@ namespace ExperienceAndClasses.UI
                         textSize = Main.fontMouseText.MeasureString(labelsBars[1, i]) * SCALE_SMALL;
                         Utils.DrawBorderStringFourWay(spriteBatch, Main.fontMouseText, labelsBars[1, i], panel.Left.Pixels + barCenter - (textSize.X / 2), panel.Top.Pixels + bars[i].top + TEXT_ABILITY_Y_DOWN, COLOUR_TEXT_INNER, COLOUR_TEXT_OUTTER, ORIGIN, SCALE_SMALL);
                     }
+                }
+
+                //kill counter
+                if (localMyPlayer.show_kill_count)
+                {
+                    Utils.DrawBorderStringFourWay(spriteBatch, Main.fontMouseText, "Kill Count: " + localMyPlayer.kill_count, panel.Left.Pixels + TEXT_LEVEL_X, panel.Top.Pixels + bars[numberActiveBars-1].top + PANEL_HEIGHT_PER_BAR, COLOUR_TEXT_INNER, COLOUR_TEXT_OUTTER, ORIGIN, SCALE_SMALL);
                 }
             }
         }

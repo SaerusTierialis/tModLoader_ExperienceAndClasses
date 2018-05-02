@@ -95,6 +95,22 @@ namespace ExperienceAndClasses.NPCs
                 bool droppedBossOrb = false;
                 bool droppedMonsterOrb = false;
 
+                /*~~~~~~~~~~~~~~~~~~~~~~ track kills ~~~~~~~~~~~~~~~~~~~~~~*/
+                int kill_count = 1;
+                int kill_index;
+                float chance_monster_orb_adjusted;
+                if (!MyWorld.kill_counts.ContainsKey(npc.netID))
+                {
+                    MyWorld.kill_counts.Add(npc.netID, kill_count); //keep default of 1
+                    kill_index = MyWorld.kill_counts.IndexOfKey(npc.netID);
+                }
+                else
+                {
+                    kill_index = MyWorld.kill_counts.IndexOfKey(npc.netID);
+                    kill_count = (int)MyWorld.kill_counts.GetByIndex(kill_index) + 1;
+                    MyWorld.kill_counts.SetByIndex(kill_index, kill_count);
+                }
+
                 /*~~~~~~~~~~~~~~~~~~~~~~ Process for each player ~~~~~~~~~~~~~~~~~~~~~~*/
                 for (int playerIndex = 0; playerIndex < 255; playerIndex++)
                 {
@@ -137,11 +153,22 @@ namespace ExperienceAndClasses.NPCs
                             //exp
                             myPlayer.AddExp(expGive);
 
+                            /*~~~~~~~~~~~~~~~~~~~~~~ set kill counter to show value for this npc type ~~~~~~~~~~~~~~~~~~~~~~*/
+
+                            myPlayer.kill_count_track_id = npc.netID;
+                            myPlayer.kill_count = kill_count;
+
                             /*~~~~~~~~~~~~~~~~~~~~~~ monster orb ~~~~~~~~~~~~~~~~~~~~~~*/
-                            if (Main.rand.Next(1000) < (int)(chanceMonster * 10))
+                            //adjusted chance = base change * ( (1 + (count/600)) ^ 10 )
+                            chance_monster_orb_adjusted = (float)(chanceMonster * Math.Pow(1f + ((float)(kill_count) / 600f), 10f));
+                            if (Main.rand.Next(1000) < (int)(chance_monster_orb_adjusted * 10))
                             {
                                 interactionsMonsterOrb[playerIndex] = true;
                                 droppedMonsterOrb = true;
+
+                                //reset kill count
+                                kill_count = 0;
+                                MyWorld.kill_counts.SetByIndex(kill_index, kill_count);
                             }
 
                             /*~~~~~~~~~~~~~~~~~~~~~~ boss orb ~~~~~~~~~~~~~~~~~~~~~~*/

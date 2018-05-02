@@ -16,6 +16,11 @@ namespace ExperienceAndClasses
     {
         public static double MAX_EXPERIENCE = Methods.Experience.GetExpReqForLevel(ExperienceAndClasses.MAX_LEVEL, true);
 
+        //kill count
+        public int kill_count_track_id = 0;
+        public int kill_count = 0;
+        public bool show_kill_count = false;
+
         //general
         public bool auth = false;
         public bool traceChar = false;
@@ -259,6 +264,7 @@ namespace ExperienceAndClasses
                 {"UI_inv_show", UIInventory},
                 {"traceChar", traceChar},
                 {"thresh_cd_message", thresholdCDMsg},
+                {"show_kill_count", show_kill_count},
             };
         }
 
@@ -284,6 +290,7 @@ namespace ExperienceAndClasses
             UITrans = Commons.TryGet<bool>(tag, "UI_trans", false);
             UICDBars = Commons.TryGet<bool>(tag, "UI_cdbars_show", true);
             UIInventory = Commons.TryGet<bool>(tag, "UI_inv_show", true);
+            show_kill_count = Commons.TryGet<bool>(tag, "show_kill_count", false);
 
             //trace
             traceChar = Commons.TryGet<bool>(tag, "traceChar", false);
