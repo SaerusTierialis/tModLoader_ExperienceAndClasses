@@ -84,6 +84,7 @@ namespace ExperienceAndClasses.Abilities
 
         public class Cleric_Active_Heal : Ability
         {
+            public static float range = 20;
             public Cleric_Active_Heal()
             {
                 ability_type = ABILITY_TYPE.ACTIVE;
@@ -99,7 +100,9 @@ namespace ExperienceAndClasses.Abilities
             {
                 int value = (int)(ExperienceAndClasses.localMyPlayer.effectiveLevel * ExperienceAndClasses.localMyPlayer.healRate);
                 Vector2 target = Main.MouseWorld;
-                Projectile.NewProjectile(Main.LocalPlayer.position, new Vector2(0f), ExperienceAndClasses.mod.ProjectileType< AbilityProj.HealProj.Initial>(), value, 0, Main.LocalPlayer.whoAmI, target.X, target.Y);
+                //Projectile.NewProjectile(Main.LocalPlayer.position, new Vector2(0f), ExperienceAndClasses.mod.ProjectileType< AbilityProj.HealProj.Initial>(), value, 0, Main.LocalPlayer.whoAmI, target.X, target.Y);
+                Projectile.NewProjectile(target, new Vector2(0f), ExperienceAndClasses.mod.ProjectileType<DustMakerProj>(), 0, 0, Main.LocalPlayer.whoAmI, (float)DustMakerProj.MODE.heal);
+
 
                 return RETURN.SUCCESS;
             }
@@ -302,7 +305,7 @@ namespace ExperienceAndClasses.Abilities
             protected void CastDust()
             {
                 //create dust from projectile for easy multiplayer sync
-                Projectile.NewProjectile(Main.LocalPlayer.position.X, Main.LocalPlayer.position.Y, 0, 0, ExperienceAndClasses.mod.ProjectileType<AbilityProj.AbilityVisual>(), 0, 0, Main.LocalPlayer.whoAmI, (float)class_type);
+                Projectile.NewProjectile(Main.LocalPlayer.position.X, Main.LocalPlayer.position.Y, 0, 0, ExperienceAndClasses.mod.ProjectileType<DustMakerProj>(), 0, 0, Main.LocalPlayer.whoAmI, (float)DustMakerProj.MODE.ability_cast, (float)class_type);
             }
 
             public virtual string CooldownUI(byte level, out float percent)

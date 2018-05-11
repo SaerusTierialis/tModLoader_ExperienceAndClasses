@@ -19,7 +19,6 @@ namespace ExperienceAndClasses.Dusts
         public override void OnSpawn(Dust dust)
         {
             dust.noGravity = true;
-            dust.scale = 2f;
         }
     }
 

@@ -8,77 +8,122 @@ using Terraria.ModLoader;
 
 namespace ExperienceAndClasses.Abilities
 {
+    public class DustMakerProj : ModProjectile
+    {
+        public enum MODE : byte
+        {
+            ability_cast,
+            heal,
+        }
+
+        public override void AI()
+        {
+            //setup
+            Player player = Main.player[projectile.owner];
+
+            //creates ability on-use dust effect, shows for all clients but dust scatter is unqiue for each client
+            switch ((MODE)projectile.ai[0])
+            {
+                case MODE.ability_cast:
+                    SpreadDust(player.position, ExperienceAndClasses.mod.DustType<Dusts.Dust_AbilityGeneric>(), 3, 5, 2, 150, AbilityMain.COLOUR_CLASS_TYPE[(int)projectile.ai[1]]);
+                    break;
+                case MODE.heal:
+                    SpreadDust(projectile.position, DustID.AncientLight, 5, AbilityMain.Cleric_Active_Heal.range, 3, 150, Color.Red, true);
+                    break;
+                default:
+                    break;
+            }
+
+            //done
+            projectile.Kill();
+        }
+
+        private static void SpreadDust(Vector2 position, int dust_type, int loop_count, float velocity, float scale = 1, int alpha = 255, Color colour = default(Color), bool remove_gravity = false)
+        {
+            //NOTE: Math.Cos and Math.Sin were crashing for some reason so a better implementation was not possible
+            if (loop_count < 3)
+            {
+                loop_count = 3;
+            }
+            float inc = 2f / (loop_count - 1);
+            int dust_index;
+            float velocity_use;
+            for (float x = -1; x <= +1; x += inc)
+            {
+                for (float y = -1; y <= +1; y += inc)
+                {
+                    if (x == -1 || x == 1 || y == -1 || y == 1)
+                    {
+                        velocity_use = velocity / (float)Math.Sqrt(Math.Pow(x,2) + Math.Pow(y, 2));
+
+                        dust_index = Dust.NewDust(position, 0, 0, dust_type, x * velocity_use, y * velocity_use, alpha, colour, scale);
+                        if (remove_gravity)
+                        {
+                            Main.dust[dust_index].noGravity = true;
+                            Main.dust[dust_index].velocity = new Vector2(x * velocity_use, y * velocity_use); //needs to be reset when setting gravity
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     public class AbilityProj
     {
-        public class AbilityVisual : ModProjectile
-        {
-            public override void AI()
-            {
-                //creates ability on-use dust effect, shows for all clients but dust scatter is unqiue for each client
-                Player player = Main.player[projectile.owner];
-                Color colour = AbilityMain.COLOUR_CLASS_TYPE[(int)projectile.ai[0]];
-                for (int i = 0; i < 10; i++)
-                {
-                    int dust = Dust.NewDust(player.position, player.width, player.height, ExperienceAndClasses.mod.DustType<Dusts.Dust_AbilityGeneric>(), Main.rand.NextFloat(-5, +5), Main.rand.NextFloat(-5, +5), 150, colour);
-                    Main.playerDrawDust.Add(dust);
-                }
-                projectile.Kill();
-            }
-        }
 
-        public class HealProj
-        {
+        //public class HealProj
+        //{
 
-            //add abstract class to reduce redundancy
+        //    //add abstract class to reduce redundancy
 
-            public class Initial : HomingProj
-            {
-                public override void SetDefaults()
-                {
-                    velocity_max = 30f;
-                    projectile.friendly = true;
-                    mode = MODES.POSITION;
-                    direct = true;
-                }
-                public override void AI()
-                {
-                    base.AI();
-                    Dust.NewDust(projectile.position, projectile.width, projectile.height, ExperienceAndClasses.mod.DustType<Dusts.Dust_AbilityGeneric>(), 0, 0, 50, Color.White, 0.25f);
-                    if (projectile.Distance(target) < 20)
-                    {
-                        if (Main.LocalPlayer.whoAmI == projectile.owner)
-                        {
-                            Projectile.NewProjectile(target, new Vector2(0f), ExperienceAndClasses.mod.ProjectileType<Heal>(), projectile.damage, 0, projectile.owner, 0);
-                        }
-                        projectile.Kill();
-                    }
-                }
-            }
+        //    public class Initial : HomingProj
+        //    {
+        //        public override void SetDefaults()
+        //        {
+        //            velocity_max = 30f;
+        //            projectile.friendly = true;
+        //            mode = MODES.POSITION;
+        //            direct = true;
+        //        }
+        //        public override void AI()
+        //        {
+        //            base.AI();
+        //            Dust.NewDust(projectile.position, projectile.width, projectile.height, ExperienceAndClasses.mod.DustType<Dusts.Dust_AbilityGeneric>(), 0, 0, 50, Color.White, 0.25f);
+        //            if (projectile.Distance(target) < 20)
+        //            {
+        //                if (Main.LocalPlayer.whoAmI == projectile.owner)
+        //                {
+        //                    Projectile.NewProjectile(target, new Vector2(0f), ExperienceAndClasses.mod.ProjectileType<Heal>(), projectile.damage, 0, projectile.owner, 0);
+        //                }
+        //                projectile.Kill();
+        //            }
+        //        }
+        //    }
 
-            //dual purpose heal/dmg
+        //    //dual purpose heal/dmg
 
-            protected class Heal : HomingProj
-            {
-                public override void SetDefaults()
-                {
-                    velocity_max = 30f;
-                    projectile.friendly = true;
-                    mode = MODES.PLAYER;
-                    direct = true;
-                }
-                public override void AI()
-                {
-                    base.AI();
-                    Dust.NewDust(projectile.position, projectile.width, projectile.height, ExperienceAndClasses.mod.DustType<Dusts.Dust_AbilityGeneric>(), 0, 0, 50, Color.White, 0.25f);
-                    if (projectile.Distance(target) < 20)
-                    {
-                        //do effect
+        //    protected class Heal : HomingProj
+        //    {
+        //        public override void SetDefaults()
+        //        {
+        //            velocity_max = 30f;
+        //            projectile.friendly = true;
+        //            mode = MODES.PLAYER;
+        //            direct = true;
+        //        }
+        //        public override void AI()
+        //        {
+        //            base.AI();
+        //            Dust.NewDust(projectile.position, projectile.width, projectile.height, ExperienceAndClasses.mod.DustType<Dusts.Dust_AbilityGeneric>(), 0, 0, 50, Color.White, 0.25f);
+        //            if (projectile.Distance(target) < 20)
+        //            {
+        //                //do effect
 
-                        projectile.Kill();
-                    }
-                }
-            }
-        }
+        //                projectile.Kill();
+        //            }
+        //        }
+        //    }
+        //}
 
 
 
