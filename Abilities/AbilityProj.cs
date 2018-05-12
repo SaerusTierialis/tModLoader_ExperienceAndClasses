@@ -25,10 +25,10 @@ namespace ExperienceAndClasses.Abilities
             switch ((MODE)projectile.ai[0])
             {
                 case MODE.ability_cast:
-                    SpreadDust(player.position, ExperienceAndClasses.mod.DustType<Dusts.Dust_AbilityGeneric>(), 3, 5, 2, 150, AbilityMain.COLOUR_CLASS_TYPE[(int)projectile.ai[1]]);
+                    SpreadDust(player.Center, ExperienceAndClasses.mod.DustType<Dusts.Dust_AbilityGeneric>(), 3, 5, 2, 150, AbilityMain.COLOUR_CLASS_TYPE[(int)projectile.ai[1]]);
                     break;
                 case MODE.heal:
-                    SpreadDust(projectile.position, DustID.AncientLight, 5, AbilityMain.Cleric_Active_Heal.range, 3, 150, Color.Red, true);
+                    SpreadDust(projectile.position, DustID.AncientLight, 10, AbilityMain.Cleric_Active_Heal.range, 3, 150, Color.Red, true, true);
                     break;
                 default:
                     break;
@@ -38,31 +38,64 @@ namespace ExperienceAndClasses.Abilities
             projectile.Kill();
         }
 
-        private static void SpreadDust(Vector2 position, int dust_type, int loop_count, float velocity, float scale = 1, int alpha = 255, Color colour = default(Color), bool remove_gravity = false)
+        private static void SpreadDust(Vector2 position, int dust_type, int loop_count, float velocity, float scale = 1, int alpha = 255, Color colour = default(Color), bool remove_gravity = false, bool remove_light = false)
         {
-            //NOTE: Math.Cos and Math.Sin were crashing for some reason so a better implementation was not possible
+            //Math.Cos and Math.Sin were crashing for some reason so a better implementation was not possible
+            //Should handle large values of loop_count fairly well
             if (loop_count < 3)
             {
                 loop_count = 3;
             }
             float inc = 2f / (loop_count - 1);
             int dust_index;
-            float velocity_use;
-            for (float x = -1; x <= +1; x += inc)
+            float velocity_adjust, velocity_x, velocity_y;
+            for (float step = -1; step <= +1; step += inc)
             {
-                for (float y = -1; y <= +1; y += inc)
+                for (int mode = 1; mode <= 4; mode++)
                 {
-                    if (x == -1 || x == 1 || y == -1 || y == 1)
+                    //4 directions
+                    switch (mode)
                     {
-                        velocity_use = velocity / (float)Math.Sqrt(Math.Pow(x,2) + Math.Pow(y, 2));
-
-                        dust_index = Dust.NewDust(position, 0, 0, dust_type, x * velocity_use, y * velocity_use, alpha, colour, scale);
-                        if (remove_gravity)
-                        {
-                            Main.dust[dust_index].noGravity = true;
-                            Main.dust[dust_index].velocity = new Vector2(x * velocity_use, y * velocity_use); //needs to be reset when setting gravity
-                        }
+                        case 1:
+                            velocity_x = step;
+                            velocity_y = -1;
+                            break;
+                        case 2:
+                            velocity_x = step;
+                            velocity_y = 1;
+                            break;
+                        case 3:
+                            velocity_x = 1;
+                            velocity_y = step;
+                            break;
+                        case 4:
+                            velocity_x = -1;
+                            velocity_y = step;
+                            break;
+                        default:
+                            velocity_x = 1;
+                            velocity_y = 1;
+                            break;
                     }
+
+                    //adjust for distance (so it is a circle instead of a square)
+                    velocity_adjust = velocity / (float)Math.Sqrt(Math.Pow(velocity_x, 2) + Math.Pow(velocity_y, 2));
+                    velocity_x *= velocity_adjust;
+                    velocity_y *= velocity_adjust;
+
+                    //do
+                    dust_index = Dust.NewDust(position, 0, 0, dust_type, velocity_x, velocity_y, alpha, colour, scale);
+                    if (remove_gravity)
+                    {
+                        Main.dust[dust_index].noGravity = true;
+                        Main.dust[dust_index].velocity = new Vector2(velocity_x, velocity_y); //needs to be reset when setting gravity
+                    }
+                    if (remove_light)
+                    {
+                        Main.dust[dust_index].noLight = true;
+                    }
+
+
                 }
             }
         }

@@ -84,7 +84,7 @@ namespace ExperienceAndClasses.Abilities
 
         public class Cleric_Active_Heal : Ability
         {
-            public static float range = 20;
+            public static float range = 100;
             public Cleric_Active_Heal()
             {
                 ability_type = ABILITY_TYPE.ACTIVE;
