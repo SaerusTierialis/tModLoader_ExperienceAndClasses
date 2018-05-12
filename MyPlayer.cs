@@ -342,7 +342,7 @@ namespace ExperienceAndClasses
             classTokensEquipped = new List<Tuple<ModItem, string>>();
 
             //empty current ability list
-            currentAbilities.Initialize();
+            currentAbilities = new bool[(int)Abilities.AbilityMain.ID.NUMBER_OF_IDs];
 
             //default var bonuses
             bonusCritPct = 0;
@@ -412,7 +412,7 @@ namespace ExperienceAndClasses
             }
 
             //TEMPORARY: select first 4 actives
-            selectedActiveAbilities.Initialize();
+            selectedActiveAbilities = new Abilities.AbilityMain.ID[ExperienceAndClasses.NUMBER_OF_ABILITY_SLOTS];
             int slot = 0;
             for (int i = 0; i < currentAbilities.Length; i++)
             {

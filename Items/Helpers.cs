@@ -894,10 +894,10 @@ namespace ExperienceAndClasses.Items
                 bonuses += "\n";
                 if (arrowDamage >= 0) bonuses += "+";
                 //else bonuses += "-";
-                bonuses += (doubleBonus * 100) + "% arrow damage";
+                bonuses += (doubleBonus * 100) + "% bow damage";
             }
-            if (arrowDamage > 0) desc += "\n+" + (arrowDamage * 100) + "% arrow damage";
-            if (arrowDamage < 0) desc += "\n-" + (arrowDamage * -100) + "% arrow damage (cannot reduce damage below zero)";
+            if (arrowDamage > 0) desc += "\n+" + (arrowDamage * 100) + "% bow damage";
+            if (arrowDamage < 0) desc += "\n-" + (arrowDamage * -100) + "% bow damage (cannot reduce damage below zero)";
 
             //ranged crit
             intBonus = (int)(rangedCrit * level);
@@ -1175,7 +1175,7 @@ namespace ExperienceAndClasses.Items
             if (archery_LEVEL != -1 && level >= archery_LEVEL)
             {
                 if (applyEffects) player.archery = true;
-                bonuses += "\narchery bonus (20% arrow speed/damage)";
+                bonuses += "\narchery bonus (20% arrow speed and bow damage)";
             }
 
             //scope

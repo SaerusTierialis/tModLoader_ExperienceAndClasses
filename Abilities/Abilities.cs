@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using Terraria;
-using Terraria.ID;
 
 namespace ExperienceAndClasses.Abilities
 {
@@ -11,7 +10,7 @@ namespace ExperienceAndClasses.Abilities
     {
         /* ~~~~~~~~~~~~ Cosntants ~~~~~~~~~~~~ */
         protected const int ACTIVE_PREVENT_ATTACK_MILLISECONDS = 400;
-    
+
 
         /* ~~~~~~~~~~~~ Values ~~~~~~~~~~~~ */
         public enum RETURN : byte
@@ -84,7 +83,10 @@ namespace ExperienceAndClasses.Abilities
 
         public class Cleric_Active_Heal : Ability
         {
-            public static float range = 100;
+            public static float range = 600;
+            public static float knockback = 5;
+            public static float secondary_targets_multiplier = 0.5f;
+
             public Cleric_Active_Heal()
             {
                 ability_type = ABILITY_TYPE.ACTIVE;
@@ -98,13 +100,94 @@ namespace ExperienceAndClasses.Abilities
             }
             protected override RETURN UseEffects()
             {
-                int value = (int)(ExperienceAndClasses.localMyPlayer.effectiveLevel * ExperienceAndClasses.localMyPlayer.healRate);
-                Vector2 target = Main.MouseWorld;
-                //Projectile.NewProjectile(Main.LocalPlayer.position, new Vector2(0f), ExperienceAndClasses.mod.ProjectileType< AbilityProj.HealProj.Initial>(), value, 0, Main.LocalPlayer.whoAmI, target.X, target.Y);
-                Projectile.NewProjectile(target, new Vector2(0f), ExperienceAndClasses.mod.ProjectileType<DustMakerProj>(), 0, 0, Main.LocalPlayer.whoAmI, (float)DustMakerProj.MODE.heal);
+                //grab this because it is used several times
+                MyPlayer self = ExperienceAndClasses.localMyPlayer;
 
+                //calculate heal others (10+((level/10)^1.7))
+                value_heal_other = (10 + Math.Pow(self.effectiveLevel / 10, 1.7)) * self.healRate;
+
+                //calculate heal self (6+((level/10)^1.4))
+                value_heal_self = (6 + Math.Pow(self.effectiveLevel / 10, 1.4)) * self.healRate;
+
+                //calculate heal damage (5+((level/10)^2))
+                value_damage = (5 + Math.Pow(self.effectiveLevel / 10, 2)) * self.healRate;
+
+                //location
+                location = Main.MouseWorld;
+
+                //visual (dust)
+                Projectile.NewProjectile(location, new Vector2(0f), ExperienceAndClasses.mod.ProjectileType<DustMakerProj>(), 0, 0, Main.LocalPlayer.whoAmI, (float)DustMakerProj.MODE.heal);
+
+                //look for players/npcs
+                Tuple<List<Tuple<bool, int, bool>>, int, int, bool, bool> target_info = FindTargets(self.player, location, range);
+                nearest_friendly_index = target_info.Item2;
+                nearest_hostile_index = target_info.Item3;
+                nearest_friendly_is_player = target_info.Item4;
+                nearest_hostile_is_player = target_info.Item5;
+
+                //do action
+                target_info.Item1.ForEach(HealAction);
 
                 return RETURN.SUCCESS;
+            }
+
+            private static int nearest_friendly_index;
+            private static int nearest_hostile_index;
+            private static bool nearest_friendly_is_player;
+            private static bool nearest_hostile_is_player;
+            private static Vector2 location;
+            private static double value_heal_self;
+            private static double value_heal_other;
+            private static double value_damage;
+            private static void HealAction(Tuple<bool, int, bool> target)
+            {
+                //parse input
+                bool is_player = target.Item1;
+                int index = target.Item2;
+                bool is_hostile = target.Item3;
+
+                //ai[0] = 1 if player, 0 if bpc
+                float player_val = 1;
+                if (!is_player)
+                    player_val = 0;
+
+
+                //get value of heal/damage
+                double value;
+                if (is_hostile)
+                {
+                    //damage
+                    value = -1 * value_damage;
+
+                    //adjust
+                    if ((index != nearest_hostile_index) || (is_player && !nearest_hostile_is_player))
+                    {
+                        value *= secondary_targets_multiplier;
+                    }
+                }
+                else
+                {
+                    //heal
+                    if (is_player && index == Main.LocalPlayer.whoAmI)
+                    {
+                        value = value_heal_self;
+                    }
+                    else
+                    {
+                        value = value_heal_other;
+                    }
+
+                    //adjust
+                    if ((index != nearest_friendly_index) || (is_player && !nearest_friendly_is_player))
+                    {
+                        value *= secondary_targets_multiplier;
+                    }
+                }
+
+                //round down to int (implicit)
+                int value_final = (int)value;
+                
+                Projectile.NewProjectile(location, new Vector2(0f), ExperienceAndClasses.mod.ProjectileType<AbilityProj.Proj_HealHurt>(), value_final, knockback, Main.LocalPlayer.whoAmI, player_val, index);
             }
         }
 
@@ -193,14 +276,14 @@ namespace ExperienceAndClasses.Abilities
             {
                 return name_short;
             }
-            public bool OnCooldown(bool changeValue=false, bool newValue=false)
+            public bool OnCooldown(bool changeValue = false, bool newValue = false)
             {
                 if (changeValue)
                     cooldown_active = newValue;
                 return cooldown_active;
             }
 
-            public RETURN Use(byte level=1, bool alternate=false)
+            public RETURN Use(byte level = 1, bool alternate = false)
             {
                 //not to be used by server, all abilities are client-side
                 if (Main.netMode == 2) return RETURN.FAIL_EXTERNAL_CALL;
@@ -237,7 +320,7 @@ namespace ExperienceAndClasses.Abilities
                 return return_value;
             }
 
-            protected virtual RETURN UseChecks(byte level=1, bool alternate=false)
+            protected virtual RETURN UseChecks(byte level = 1, bool alternate = false)
             {
                 //check for invalid statuses
                 if (Main.LocalPlayer.frozen || Main.LocalPlayer.dead) return RETURN.FAIL_STATUS;
@@ -662,5 +745,111 @@ namespace ExperienceAndClasses.Abilities
         //            break;
         //    }
         //}
+
+        /// <summary>
+        /// Return Tuple:
+        /// List = see below
+        /// int1 = nearest_friendly_index
+        /// int2 = nearest_hostile_index
+        /// bool1 = nearest_friendly_is_player
+        /// bool2 = nearest_hostile_is_player
+        /// 
+        /// List Tuples:
+        /// bool1 = is_player
+        /// int = index
+        /// bool2 = is_hostile
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="location"></param>
+        /// <param name="radius"></param>
+        /// <returns></returns>
+        private static Tuple<List<Tuple<bool, int, bool>>,int,int,bool,bool> FindTargets(Player source, Vector2 location, float radius)
+        {
+            List<Tuple<bool, int, bool>> targets = new List<Tuple<bool, int, bool>>();
+            int nearest_friendly_index = -1;
+            int nearest_hostile_index = -1;
+            float nearest_friendly_distance = radius;
+            float nearest_hostile_distance = radius;
+            bool nearest_friendly_is_player = false;
+            bool nearest_hostile_is_player = false;
+
+            Player player;
+            NPC npc;
+            float distance;
+
+            //search players
+            for (int player_index = 0; player_index <= Main.maxPlayers; player_index++)
+            {
+                player = Main.player[player_index];
+                if (player.active && !player.dead)
+                {
+                    distance = player.Distance(location);
+                    if (distance <= radius)
+                    {
+                        if (source.hostile && player.hostile && ((source.team == 0) || (source.team != player.team))) //both in pvp, self doesn't have a team or is on a different team
+                        {
+                            //damage
+                            targets.Add(new Tuple<bool, int, bool>(true, player_index, true));
+                            if (distance <= nearest_hostile_distance)
+                            {
+                                nearest_hostile_distance = distance;
+                                nearest_hostile_index = player.whoAmI;
+                                nearest_hostile_is_player = true;
+                            }
+                        }
+                        else
+                        {
+                            //heal
+                            targets.Add(new Tuple<bool, int, bool>(true, player_index, false));
+                            if (distance <= nearest_friendly_distance)
+                            {
+                                nearest_friendly_distance = distance;
+                                nearest_friendly_index = player.whoAmI;
+                                nearest_friendly_is_player = true;
+                            }
+                        }
+                    }
+                }
+            }
+
+            //search npcs
+            int num_npc_total = Main.npc.Length;
+            for (int npc_index = 0; npc_index < num_npc_total; npc_index++)
+            {
+                npc = Main.npc[npc_index];
+                if (npc.active)
+                {
+                    distance = npc.Distance(location);
+                    if (distance <= radius)
+                    {
+                        if (!npc.friendly)
+                        {
+                            //damage
+                            targets.Add(new Tuple<bool, int, bool>(false, npc_index, true));
+                            if (distance <= nearest_hostile_distance)
+                            {
+                                nearest_hostile_distance = distance;
+                                nearest_hostile_index = npc.whoAmI;
+                                nearest_hostile_is_player = false;
+                            }
+                        }
+                        else
+                        {
+                            //heal
+                            targets.Add(new Tuple<bool, int, bool>(false, npc_index, false));
+                            if (distance <= nearest_friendly_distance)
+                            {
+                                nearest_friendly_distance = distance;
+                                nearest_friendly_index = npc.whoAmI;
+                                nearest_friendly_is_player = false;
+                            }
+                        }
+                    }
+                }
+            }
+
+            //return described above
+            return new Tuple<List<Tuple<bool, int, bool>>, int, int, bool, bool>(targets, nearest_friendly_index, nearest_hostile_index, nearest_friendly_is_player, nearest_hostile_is_player);
+        }
     }
 }

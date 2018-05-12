@@ -144,7 +144,7 @@ namespace ExperienceAndClasses
         public override void Unload()
         {
             //remove hotkeys
-            HOTKEY_ABILITY.Initialize();
+            HOTKEY_ABILITY = new ModHotKey[NUMBER_OF_ABILITY_SLOTS];
             HOTKEY_ALTERNATE_EFFECT = null;
         }
 

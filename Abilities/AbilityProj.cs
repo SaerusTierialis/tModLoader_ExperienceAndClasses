@@ -8,7 +8,180 @@ using Terraria.ModLoader;
 
 namespace ExperienceAndClasses.Abilities
 {
-    public class DustMakerProj : ModProjectile
+    public class AbilityProj
+    {
+        public class Proj_HealHurt : ProjNoVisual
+        {
+            //heal/hurt a player/npc
+            //projectile.damage is the magnitude (+ for heal, - for hurt)
+            //projectile.ai[0] is the mode
+            //projectile.ai[1] is the target index
+            //uses projectile knockback
+
+            public override void AI()
+            {
+                bool is_player = projectile.ai[0] != 0;
+                int target = (int)projectile.ai[1];
+                int amount = projectile.damage;
+                int direction = 1;
+
+                Player owner = Main.player[projectile.owner];
+
+                if (owner.active && !owner.dead)
+                {
+                    if (is_player)
+                    {
+                        //player
+                        Player player = Main.player[target];
+                        if (player.active && !player.dead)
+                        {
+                            if (amount > 0)
+                            {
+                                int amount_valid = player.statLifeMax2 - player.statLife;
+                                if (amount > amount_valid)
+                                {
+                                    amount = amount_valid;
+                                }
+                                player.HealEffect(amount);
+                                player.statLife += amount;
+                            }
+                            else if (amount < 0)
+                            {
+                                amount *= -1;
+                                if (projectile.Center.X > player.Center.X)
+                                {
+                                    direction = -1;
+                                }
+                                player.Hurt(Terraria.DataStructures.PlayerDeathReason.ByPlayer(projectile.owner), amount, direction, true);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        //npc
+                        NPC npc = Main.npc[target];
+                        if (npc.active)
+                        {
+                            if (amount > 0)
+                            {
+                                int amount_valid = npc.lifeMax - npc.life;
+                                if (amount > amount_valid)
+                                {
+                                    amount = amount_valid;
+                                }
+                                npc.HealEffect(amount);
+                                npc.life += amount;
+                            }
+                            else if (amount < 0)
+                            {
+                                amount *= -1;
+                                if (projectile.Center.X > npc.Center.X)
+                                {
+                                    direction = -1;
+                                }
+                                owner.ApplyDamageToNPC(npc, amount, projectile.knockBack, direction, false);
+                            }
+                        }
+                    }
+                }
+
+                //done
+                projectile.Kill();
+            }
+
+        }
+
+        //////public abstract class HomingProj : ModProjectile
+        //////{
+        //////    public enum MODES : byte
+        //////    {
+        //////        POSITION,
+        //////        NPC,
+        //////        PLAYER,
+        //////    }
+
+        //////    public Vector2 target;
+        //////    public float velocity_adjust = 0.5f;
+        //////    public float velocity_max = 5f;
+        //////    public bool initialized = false;
+        //////    public bool direct = false;
+        //////    public int targetIndex = 0;
+        //////    public MODES mode = MODES.POSITION;
+
+        //////    public override void AI()
+        //////    {
+        //////        if (!initialized)
+        //////        {
+        //////            if (mode == MODES.POSITION)
+        //////            {
+        //////                target = new Vector2(projectile.ai[0], projectile.ai[1]);
+        //////            }
+        //////            else
+        //////            {
+        //////                targetIndex = (int)projectile.ai[0];
+        //////            }
+        //////            initialized = true;
+        //////        }
+        //////        else
+        //////        {
+        //////            if (mode == MODES.NPC)
+        //////            {
+        //////                NPC npc = Main.npc[targetIndex];
+        //////                if (npc.active)
+        //////                {
+        //////                    target = npc.position;
+        //////                }
+        //////                else
+        //////                {
+        //////                    projectile.Kill();
+        //////                    return;
+        //////                }
+        //////            }
+        //////            else if (mode == MODES.PLAYER)
+        //////            {
+        //////                Player player = Main.player[targetIndex];
+        //////                if (player.active)
+        //////                {
+        //////                    target = player.position;
+        //////                }
+        //////                else
+        //////                {
+        //////                    projectile.Kill();
+        //////                    return;
+        //////                }
+        //////            }
+
+        //////            HomeOnto(projectile, target, velocity_adjust, velocity_max, direct);
+        //////        }
+        //////    }
+        //////}
+
+        //////public static void HomeOnto(Projectile projectile, Vector2 target, float velocity_adjust, float velocity_max, bool direct)
+        //////{
+        //////    if (!direct)
+        //////    {
+        //////        int direction;
+
+        //////        direction = projectile.position.X < target.X ? 1 : -1;
+        //////        projectile.velocity.X += direction * velocity_adjust;
+        //////        if (projectile.velocity.X > velocity_max) projectile.velocity.X = velocity_max;
+        //////        if (projectile.velocity.X < -velocity_max) projectile.velocity.X = -velocity_max;
+
+        //////        direction = projectile.position.Y < target.Y ? 1 : -1;
+        //////        projectile.velocity.Y += direction * velocity_adjust;
+        //////        if (projectile.velocity.Y > velocity_max) projectile.velocity.Y = velocity_max;
+        //////        if (projectile.velocity.Y < -velocity_max) projectile.velocity.Y = -velocity_max;
+        //////    }
+        //////    else
+        //////    {
+        //////        Vector2 d = projectile.DirectionTo(target);
+        //////        projectile.velocity.X = d.X / (1 / velocity_max);
+        //////        projectile.velocity.Y = d.Y / (1 / velocity_max);
+        //////    }
+        //////}
+    }
+
+    public class DustMakerProj : ProjNoVisual
     {
         public enum MODE : byte
         {
@@ -28,7 +201,7 @@ namespace ExperienceAndClasses.Abilities
                     SpreadDust(player.Center, ExperienceAndClasses.mod.DustType<Dusts.Dust_AbilityGeneric>(), 3, 5, 2, 150, AbilityMain.COLOUR_CLASS_TYPE[(int)projectile.ai[1]]);
                     break;
                 case MODE.heal:
-                    SpreadDust(projectile.position, DustID.AncientLight, 10, AbilityMain.Cleric_Active_Heal.range, 3, 150, Color.Red, true, true);
+                    SpreadDust(projectile.position, DustID.AncientLight, 10, AbilityMain.Cleric_Active_Heal.range/6, 3, 150, Color.Red, true, true);
                     break;
                 default:
                     break;
@@ -42,6 +215,7 @@ namespace ExperienceAndClasses.Abilities
         {
             //Math.Cos and Math.Sin were crashing for some reason so a better implementation was not possible
             //Should handle large values of loop_count fairly well
+            //Total number of dusts is ((loop_count * 4) - 4), velocities form a circle
             if (loop_count < 3)
             {
                 loop_count = 3;
@@ -101,151 +275,13 @@ namespace ExperienceAndClasses.Abilities
         }
     }
 
-    public class AbilityProj
+    public abstract class ProjNoVisual : ModProjectile
     {
-
-        //public class HealProj
-        //{
-
-        //    //add abstract class to reduce redundancy
-
-        //    public class Initial : HomingProj
-        //    {
-        //        public override void SetDefaults()
-        //        {
-        //            velocity_max = 30f;
-        //            projectile.friendly = true;
-        //            mode = MODES.POSITION;
-        //            direct = true;
-        //        }
-        //        public override void AI()
-        //        {
-        //            base.AI();
-        //            Dust.NewDust(projectile.position, projectile.width, projectile.height, ExperienceAndClasses.mod.DustType<Dusts.Dust_AbilityGeneric>(), 0, 0, 50, Color.White, 0.25f);
-        //            if (projectile.Distance(target) < 20)
-        //            {
-        //                if (Main.LocalPlayer.whoAmI == projectile.owner)
-        //                {
-        //                    Projectile.NewProjectile(target, new Vector2(0f), ExperienceAndClasses.mod.ProjectileType<Heal>(), projectile.damage, 0, projectile.owner, 0);
-        //                }
-        //                projectile.Kill();
-        //            }
-        //        }
-        //    }
-
-        //    //dual purpose heal/dmg
-
-        //    protected class Heal : HomingProj
-        //    {
-        //        public override void SetDefaults()
-        //        {
-        //            velocity_max = 30f;
-        //            projectile.friendly = true;
-        //            mode = MODES.PLAYER;
-        //            direct = true;
-        //        }
-        //        public override void AI()
-        //        {
-        //            base.AI();
-        //            Dust.NewDust(projectile.position, projectile.width, projectile.height, ExperienceAndClasses.mod.DustType<Dusts.Dust_AbilityGeneric>(), 0, 0, 50, Color.White, 0.25f);
-        //            if (projectile.Distance(target) < 20)
-        //            {
-        //                //do effect
-
-        //                projectile.Kill();
-        //            }
-        //        }
-        //    }
-        //}
-
-
-
-        public abstract class HomingProj : ModProjectile
+        public override string Texture
         {
-            public enum MODES : byte
+            get
             {
-                POSITION,
-                NPC,
-                PLAYER,
-            }
-
-            public Vector2 target;
-            public float velocity_adjust = 0.5f;
-            public float velocity_max = 5f;
-            public bool initialized = false;
-            public bool direct = false;
-            public int targetIndex = 0;
-            public MODES mode = MODES.POSITION;
-
-            public override void AI()
-            {
-                if (!initialized)
-                {
-                    if (mode == MODES.POSITION)
-                    {
-                        target = new Vector2(projectile.ai[0], projectile.ai[1]);
-                    }
-                    else
-                    {
-                        targetIndex = (int)projectile.ai[0];
-                    }
-                    initialized = true;
-                }
-                else
-                {
-                    if (mode == MODES.NPC)
-                    {
-                        NPC npc = Main.npc[targetIndex];
-                        if (npc.active)
-                        {
-                            target = npc.position;
-                        }
-                        else
-                        {
-                            projectile.Kill();
-                            return;
-                        }
-                    }
-                    else if (mode == MODES.PLAYER)
-                    {
-                        Player player = Main.player[targetIndex];
-                        if (player.active)
-                        {
-                            target = player.position;
-                        }
-                        else
-                        {
-                            projectile.Kill();
-                            return;
-                        }
-                    }
-
-                    HomeOnto(projectile, target, velocity_adjust, velocity_max, direct);
-                }
-            }
-        }
-
-        public static void HomeOnto(Projectile projectile, Vector2 target, float velocity_adjust, float velocity_max, bool direct)
-        {
-            if (!direct)
-            {
-                int direction;
-
-                direction = projectile.position.X < target.X ? 1 : -1;
-                projectile.velocity.X += direction * velocity_adjust;
-                if (projectile.velocity.X > velocity_max) projectile.velocity.X = velocity_max;
-                if (projectile.velocity.X < -velocity_max) projectile.velocity.X = -velocity_max;
-
-                direction = projectile.position.Y < target.Y ? 1 : -1;
-                projectile.velocity.Y += direction * velocity_adjust;
-                if (projectile.velocity.Y > velocity_max) projectile.velocity.Y = velocity_max;
-                if (projectile.velocity.Y < -velocity_max) projectile.velocity.Y = -velocity_max;
-            }
-            else
-            {
-                Vector2 d = projectile.DirectionTo(target);
-                projectile.velocity.X = d.X / (1 / velocity_max);
-                projectile.velocity.Y = d.Y / (1 / velocity_max);
+                return mod.Name + "/Abilities/Placeholder";
             }
         }
     }
