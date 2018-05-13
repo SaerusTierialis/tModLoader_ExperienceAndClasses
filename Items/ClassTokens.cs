@@ -4,7 +4,7 @@ using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 using System.Collections.Generic;
-using System.Linq;
+using ExperienceAndClasses.Abilities;
 
 namespace ExperienceAndClasses.Items
 {
@@ -18,8 +18,7 @@ namespace ExperienceAndClasses.Items
         public string desc = "Starter class." +
                          "\n\nClass advancement is available at level " + Recipes.ClassRecipes.TIER_LEVEL_REQUIREMENTS[1 + 1] + ".";
 
-        public List<Abilities.AbilityMain.ID> abilities = new List<Abilities.AbilityMain.ID>();
-        public List<byte> abilities_level_required = new List<byte>();
+        public List<Tuple<AbilityMain.ID, byte>> abilities = new List<Tuple<AbilityMain.ID, byte>>();
 
         public override void ModifyTooltips(List<TooltipLine> tooltips)
         {
@@ -87,10 +86,12 @@ namespace ExperienceAndClasses.Items
 
             //track player's current abilities
             int level = myPlayer.GetLevel();
-            for (int i = 0; i < abilities.Count; i++)
+            foreach (Tuple<AbilityMain.ID, byte> ability in abilities)
             {
-                if (level >= abilities_level_required[i])
-                    myPlayer.currentAbilities[(int)abilities[i]] = true;
+                if (level >= ability.Item2)
+                {
+                    myPlayer.unlocked_abilities_next[(int)ability.Item1] = true;
+                }
             }
         }
     }
@@ -465,11 +466,10 @@ namespace ExperienceAndClasses.Items
                        "\n\nClass advancement is available at level " + Recipes.ClassRecipes.TIER_LEVEL_REQUIREMENTS[tier+1] + ".";
 
             //abilities
-            abilities.Add(Abilities.AbilityMain.ID.Cleric_Active_Heal);
-            abilities_level_required.Add(10);
-
-            abilities.Add(Abilities.AbilityMain.ID.Cleric_Active_Sanctuary);
-            abilities_level_required.Add(15);
+            abilities.Add(new Tuple<AbilityMain.ID, byte>(AbilityMain.ID.Cleric_Active_Heal, 10));
+            abilities.Add(new Tuple<AbilityMain.ID, byte>(AbilityMain.ID.Cleric_Passive_Cleanse, 12));
+            abilities.Add(new Tuple<AbilityMain.ID, byte>(AbilityMain.ID.Cleric_Upgrade_Heal_Smite, 14));
+            abilities.Add(new Tuple<AbilityMain.ID, byte>(AbilityMain.ID.Cleric_Active_Sanctuary, 17));
         }
         public override void AddRecipes()
         {
@@ -491,17 +491,12 @@ namespace ExperienceAndClasses.Items
                          "\ndecent life and defense.";
 
             //abilities
-            abilities.Add(Abilities.AbilityMain.ID.Cleric_Active_Heal);
-            abilities_level_required.Add(1);
-
-            abilities.Add(Abilities.AbilityMain.ID.Cleric_Active_Sanctuary);
-            abilities_level_required.Add(15);
-
-            abilities.Add(Abilities.AbilityMain.ID.Cleric_Active_DivineIntervention);
-            abilities_level_required.Add(25);
-
-            abilities.Add(Abilities.AbilityMain.ID.Cleric_Active_Paragon);
-            abilities_level_required.Add(50);
+            abilities.Add(new Tuple<AbilityMain.ID, byte>(AbilityMain.ID.Cleric_Active_Heal, 1));
+            abilities.Add(new Tuple<AbilityMain.ID, byte>(AbilityMain.ID.Cleric_Passive_Cleanse, 1));
+            abilities.Add(new Tuple<AbilityMain.ID, byte>(AbilityMain.ID.Cleric_Upgrade_Heal_Smite, 1));
+            abilities.Add(new Tuple<AbilityMain.ID, byte>(AbilityMain.ID.Cleric_Active_Sanctuary, 1));
+            abilities.Add(new Tuple<AbilityMain.ID, byte>(AbilityMain.ID.Cleric_Active_DivineIntervention, 25));
+            abilities.Add(new Tuple<AbilityMain.ID, byte>(AbilityMain.ID.Cleric_Active_Paragon, 70));
         }
         public override void AddRecipes()
         {

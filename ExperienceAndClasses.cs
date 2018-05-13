@@ -152,6 +152,19 @@ namespace ExperienceAndClasses
             BuffID.BetsysCurse,
             BuffID.Dazed,
         };
+        public static readonly string[] UNDEAD_NAMES = 
+        {
+            "skel",
+            "zomb",
+            "groom",
+            "bride",
+            "undead",
+            "viking",
+            "eyezor",
+            "bone",
+            "ghost",
+            "ghast",
+        };
 
         //start
         public ExperienceAndClasses()

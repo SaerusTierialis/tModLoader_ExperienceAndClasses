@@ -50,7 +50,8 @@ namespace ExperienceAndClasses
         public bool levelCapped = false;
 
         //abilities
-        public bool[] currentAbilities = new bool[(int)Abilities.AbilityMain.ID.NUMBER_OF_IDs];
+        public bool[] unlocked_abilities_next = new bool[(int)Abilities.AbilityMain.ID.NUMBER_OF_IDs];
+        public bool[] unlocked_abilities_current = new bool[(int)Abilities.AbilityMain.ID.NUMBER_OF_IDs];
         public Abilities.AbilityMain.ID[] selectedActiveAbilities = new Abilities.AbilityMain.ID[ExperienceAndClasses.NUMBER_OF_ABILITY_SLOTS];
         public Abilities.AbilityMain.RETURN latestAbilityFail = Abilities.AbilityMain.RETURN.FAIL_NOT_IMPLEMENTRD;
         public Boolean showFailMessages = true;
@@ -341,9 +342,6 @@ namespace ExperienceAndClasses
             //empty current class list
             classTokensEquipped = new List<Tuple<ModItem, string>>();
 
-            //empty current ability list
-            currentAbilities = new bool[(int)Abilities.AbilityMain.ID.NUMBER_OF_IDs];
-
             //default var bonuses
             bonusCritPct = 0;
             openerBonusPct = 0;
@@ -366,6 +364,10 @@ namespace ExperienceAndClasses
             {
                 Items.Helpers.ClassTokenEffects(mod, player, i.Item1, i.Item2, true, this);
             }
+
+            //set current abilities
+            unlocked_abilities_current = unlocked_abilities_next;
+            unlocked_abilities_next = new bool[(int)Abilities.AbilityMain.ID.NUMBER_OF_IDs];
 
             //calculate effective level for bonuses and abilities
             effectiveLevel = Methods.Experience.GetLevel(GetExp());
@@ -426,9 +428,9 @@ namespace ExperienceAndClasses
             //TEMPORARY: select first 4 actives
             selectedActiveAbilities = new Abilities.AbilityMain.ID[ExperienceAndClasses.NUMBER_OF_ABILITY_SLOTS];
             int slot = 0;
-            for (int i = 0; i < currentAbilities.Length; i++)
+            for (int i = 0; i < unlocked_abilities_current.Length; i++)
             {
-                if (currentAbilities[i] && (Abilities.AbilityMain.AbilityLookup[i].IsTypeActive())) //have ability + is active
+                if (unlocked_abilities_current[i] && (Abilities.AbilityMain.AbilityLookup[i].IsTypeActive())) //have ability + is active
                 {
                     selectedActiveAbilities[slot] = (Abilities.AbilityMain.ID)i;
                     if (slot++ >= ExperienceAndClasses.NUMBER_OF_ABILITY_SLOTS)
@@ -438,9 +440,9 @@ namespace ExperienceAndClasses
 
             //check ability cooldowns
             Abilities.AbilityMain.Ability ability;
-            for (int i = 0; i < currentAbilities.Length; i++)
+            for (int i = 0; i < unlocked_abilities_current.Length; i++)
             {
-                if (currentAbilities[i])
+                if (unlocked_abilities_current[i])
                 {
                     ability = Abilities.AbilityMain.AbilityLookup[i];
                     if (ability.OnCooldown() && (ability.GetCooldownRemainingSeconds() <= 0))

@@ -39,11 +39,14 @@ namespace ExperienceAndClasses.Abilities
         {
             UNDEFINED, //leave this first
 
+            Cleric_Passive_Cleanse,
+
             Cleric_Active_Heal,
+            Cleric_Upgrade_Heal_Smite,
+
             Cleric_Active_Sanctuary,
             Cleric_Active_DivineIntervention,
             Cleric_Active_Paragon,
-
 
             //when adding here, make that that a class of the same name is added below
 
@@ -83,11 +86,22 @@ namespace ExperienceAndClasses.Abilities
         /* ~~~~~~~~~~~~ Abilities (includes all active, upgrade, passive, proc, etc) ~~~~~~~~~~~~ */
         //singleton implementation
 
+        public class Cleric_Passive_Cleanse : Ability
+        {
+            public Cleric_Passive_Cleanse()
+            {
+                ability_type = ABILITY_TYPE.PASSIVE;
+                name = "Cleanse";
+                description = "";
+            }
+        }
+
         public class Cleric_Active_Heal : Ability
         {
             public static float range = 600;
             public static float knockback = 5;
             public static float secondary_targets_multiplier = 0.5f;
+            private static float undead_bonus_multiplier = 2f;
 
             public Cleric_Active_Heal()
             {
@@ -99,6 +113,7 @@ namespace ExperienceAndClasses.Abilities
                 cooldown_seconds = 3;
                 class_type = CLASS_TYPE.SUPPORT;
                 requires_sight_cursor = true;
+                upgrades = new ID[] {ID.Cleric_Upgrade_Heal_Smite};
             }
             protected override RETURN UseEffects()
             {
@@ -110,6 +125,9 @@ namespace ExperienceAndClasses.Abilities
 
                 //update values
                 UpdateHealingValues();
+
+                //update upgrades
+                upgrade_smite = ExperienceAndClasses.localMyPlayer.unlocked_abilities_current[(int)upgrades[0]];
 
                 //look for players/npcs
                 Tuple<List<Tuple<bool, int, bool>>, int, int, bool, bool> target_info = FindTargets(ExperienceAndClasses.localMyPlayer.player, location, range, true);
@@ -129,14 +147,14 @@ namespace ExperienceAndClasses.Abilities
                 //grab this because it is used several times
                 MyPlayer self = ExperienceAndClasses.localMyPlayer;
 
-                //calculate heal others (10+((level/10)^1.7))
-                value_heal_other = (10 + Math.Pow(self.effectiveLevel / 10, 1.7)) * self.healing_power;
+                //calculate heal others (20+((level/10)^1.7))
+                value_heal_other = (20 + Math.Pow(self.effectiveLevel / 10, 1.7)) * self.healing_power;
 
-                //calculate heal self (6+((level/10)^1.4))
-                value_heal_self = (6 + Math.Pow(self.effectiveLevel / 10, 1.4)) * self.healing_power;
+                //calculate heal self (15+((level/10)^1.4))
+                value_heal_self = (15 + Math.Pow(self.effectiveLevel / 10, 1.4)) * self.healing_power;
 
-                //calculate heal damage (5+((level/10)^2))
-                value_damage = (5 + Math.Pow(self.effectiveLevel / 10, 2)) * self.healing_power;
+                //calculate heal damage (15+((level/10)^2))
+                value_damage = (15 + Math.Pow(self.effectiveLevel / 10, 2)) * self.healing_power;
             }
 
             private static int nearest_friendly_index;
@@ -147,6 +165,7 @@ namespace ExperienceAndClasses.Abilities
             public static double value_heal_self;
             public static double value_heal_other;
             public static double value_damage;
+            private static bool upgrade_smite;
             private static void HealAction(Tuple<bool, int, bool> target)
             {
                 //parse input
@@ -162,8 +181,15 @@ namespace ExperienceAndClasses.Abilities
 
                 //get value of heal/damage
                 double value;
+                NPC npc;
                 if (is_hostile)
                 {
+                    //require smite else return
+                    if (!upgrade_smite)
+                    {
+                        return;
+                    }
+
                     //damage
                     value = -1 * value_damage;
 
@@ -171,6 +197,20 @@ namespace ExperienceAndClasses.Abilities
                     if ((index != nearest_hostile_index) || (is_player && !nearest_hostile_is_player))
                     {
                         value *= secondary_targets_multiplier;
+                    }
+
+                    //bonus damage to undead
+                    if (!is_player)
+                    {
+                        npc = Main.npc[index];
+                        foreach (string type in ExperienceAndClasses.UNDEAD_NAMES)
+                        {
+                            if (npc.TypeName.ToLower().Contains(type))
+                            {
+                                value *= undead_bonus_multiplier;
+                                break;
+                            }
+                        }
                     }
                 }
                 else
@@ -195,14 +235,18 @@ namespace ExperienceAndClasses.Abilities
                 //round down to int (implicit)
                 int value_final = (int)value;
                 
-                //if npc, do locally
-
-
-                //if player, create projecile to handle (projeciles auto-sync at creation)
-
-
-
+                //create projecile to handle (easy way to sync for multiplayer)
                 Projectile.NewProjectile(location, new Vector2(0f), ExperienceAndClasses.mod.ProjectileType<AbilityProj.Proj_HealHurt>(), value_final, knockback, Main.LocalPlayer.whoAmI, player_val, index);
+            }
+        }
+
+        public class Cleric_Upgrade_Heal_Smite : Ability
+        {
+            public Cleric_Upgrade_Heal_Smite()
+            {
+                ability_type = ABILITY_TYPE.UPGRADE;
+                name = "Heal - Smite";
+                description = "";
             }
         }
 
@@ -266,6 +310,9 @@ namespace ExperienceAndClasses.Abilities
             protected string name = "undefined";
             protected string name_short = "undefined";
             protected string description = "undefined";
+
+            //upgrades for actives
+            protected ID[] upgrades = new ID[0];
 
             //coodlown tracking
             protected bool cooldown_active = false;
