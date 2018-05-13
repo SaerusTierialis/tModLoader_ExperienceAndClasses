@@ -29,9 +29,10 @@ namespace ExperienceAndClasses.Abilities
         public enum ABILITY_TYPE : byte
         {
             NOT_IMPLEMENTED,
+            PASSIVE,
             ACTIVE,
             UPGRADE,
-            PASSIVE,
+            ALTERNATE,
         }
 
         public enum ID : ushort //order does not matter except where specified
@@ -111,7 +112,7 @@ namespace ExperienceAndClasses.Abilities
                 UpdateHealingValues();
 
                 //look for players/npcs
-                Tuple<List<Tuple<bool, int, bool>>, int, int, bool, bool> target_info = FindTargets(ExperienceAndClasses.localMyPlayer.player, location, range);
+                Tuple<List<Tuple<bool, int, bool>>, int, int, bool, bool> target_info = FindTargets(ExperienceAndClasses.localMyPlayer.player, location, range, true);
                 nearest_friendly_index = target_info.Item2;
                 nearest_hostile_index = target_info.Item3;
                 nearest_friendly_is_player = target_info.Item4;
@@ -777,7 +778,7 @@ namespace ExperienceAndClasses.Abilities
         /// <param name="location"></param>
         /// <param name="radius"></param>
         /// <returns></returns>
-        private static Tuple<List<Tuple<bool, int, bool>>,int,int,bool,bool> FindTargets(Player source, Vector2 location, float radius)
+        private static Tuple<List<Tuple<bool, int, bool>>,int,int,bool,bool> FindTargets(Player source, Vector2 location, float radius, bool require_line_of_sight)
         {
             List<Tuple<bool, int, bool>> targets = new List<Tuple<bool, int, bool>>();
             int nearest_friendly_index = -1;
@@ -798,8 +799,8 @@ namespace ExperienceAndClasses.Abilities
                 if (player.active && !player.dead)
                 {
                     distance = player.Distance(location);
-                    if (distance <= radius)
-                    {
+                    if ((distance <= radius) && Collision.CanHit(location, 0, 0, player.Center, 0, 0))
+                        {
                         if (source.hostile && player.hostile && ((source.team == 0) || (source.team != player.team)) && (source.whoAmI != player.whoAmI)) //both in pvp, self doesn't have a team or is on a different team
                         {
                             //hostile
@@ -834,7 +835,7 @@ namespace ExperienceAndClasses.Abilities
                 if (npc.active)
                 {
                     distance = npc.Distance(location);
-                    if (distance <= radius)
+                    if ((distance <= radius) && Collision.CanHit(location, 0, 0, npc.Center, 0, 0))
                     {
                         if (!npc.friendly)
                         {
