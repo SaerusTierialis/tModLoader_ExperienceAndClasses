@@ -466,7 +466,7 @@ namespace ExperienceAndClasses.Items
 
             //abilities
             abilities.Add(Abilities.AbilityMain.ID.Cleric_Active_Heal);
-            abilities_level_required.Add(1);
+            abilities_level_required.Add(10);
 
             abilities.Add(Abilities.AbilityMain.ID.Cleric_Active_Sanctuary);
             abilities_level_required.Add(15);

@@ -26,7 +26,11 @@ namespace ExperienceAndClasses.NPCs
                 double xp_mult = ExperienceAndClasses.worldExpModifier;
 
                 //chances for orbs
-                float chanceBossFixed = ExperienceAndClasses.PERCENT_CHANCE_BOSS_ORB_BASE;
+                float chanceBossFixed = ExperienceAndClasses.PERCENT_CHANCE_BOSS_ORB_FIXED;
+                if ((Main.netMode == 0) || (Main.ActivePlayersCount<=1))
+                {
+                    chanceBossFixed += ExperienceAndClasses.PERCENT_CHANCE_BOSS_ORB_FIXED_SINGLEPLAYER_BONUS;
+                }
                 float chanceBossVariable = ExperienceAndClasses.PERCENT_CHANCE_BOSS_ORB_VARIABLE;
                 float chanceMonster;
                 if (Main.expertMode)

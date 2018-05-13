@@ -49,7 +49,7 @@ namespace ExperienceAndClasses.Abilities
                         Player player = Main.player[target];
                         if (player.active && !player.dead)
                         {
-                            if (amount > 0)
+                            if ((amount > 0) && !(!Main.player[projectile.owner].hostile && player.hostile))//don't let non-pvp players heal pvp players
                             {
                                 int amount_valid = player.statLifeMax2 - player.statLife;
                                 if (amount > amount_valid)
@@ -108,7 +108,6 @@ namespace ExperienceAndClasses.Abilities
                     has_run = true;
                 }
             }
-
         }
 
         //////public abstract class HomingProj : ModProjectile

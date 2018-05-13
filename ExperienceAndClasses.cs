@@ -8,6 +8,7 @@ using System;
 using System.IO;
 using Terraria.Localization;
 using Microsoft.Xna.Framework;
+using Terraria.ID;
 
 //needed for compiling outside of Terraria
 public class Application
@@ -83,7 +84,8 @@ namespace ExperienceAndClasses
 
         //awarding experience and drops
         public const float RANGE_EXP_AND_ASCENSION_ORB = 2500f;
-        public const float PERCENT_CHANCE_BOSS_ORB_BASE = 5.0f;
+        public const float PERCENT_CHANCE_BOSS_ORB_FIXED = 5.0f;
+        public const float PERCENT_CHANCE_BOSS_ORB_FIXED_SINGLEPLAYER_BONUS = 5.0f;
         public const float PERCENT_CHANCE_BOSS_ORB_VARIABLE = 45.0f;
         public const float PERCENT_CHANCE_ASCENSION_ORB = 0.6f;
         public const float PERCENT_CHANCE_ASCENSION_ORB_EXPERT = 0.7f; 
@@ -109,9 +111,47 @@ namespace ExperienceAndClasses
         public static bool worldRequireAuth = true;
         public static bool worldTrace = false;
 
-        //shortcut
+        //shortcuts
         public static MyPlayer localMyPlayer;
         public static Mod mod;
+
+        //ability constants
+        public const float HEAL_POWER_PER_IMMUNITY = 0.1f;
+        public const float MAX_HEAL_POWER_IMMUNITY_BONUS = 1.0f;
+        public static readonly int[] DEBUFFS = {
+            BuffID.Bleeding,
+            BuffID.Poisoned,
+            BuffID.OnFire,
+            BuffID.Venom,
+            BuffID.Darkness,
+            BuffID.Blackout,
+            BuffID.Silenced,
+            BuffID.Cursed,
+            BuffID.Confused,
+            BuffID.Slow,
+            BuffID.Slimed,
+            BuffID.OgreSpit,
+            BuffID.Weak,
+            BuffID.BrokenArmor,
+            BuffID.WitheredArmor,
+            BuffID.WitheredWeapon,
+            BuffID.CursedInferno,
+            BuffID.Ichor,
+            BuffID.Chilled,
+            BuffID.Frozen,
+            BuffID.Webbed,
+            BuffID.Stoned,
+            BuffID.VortexDebuff,
+            BuffID.Obstructed,
+            BuffID.Electrified,
+            BuffID.Rabies,
+            BuffID.Burning,
+            BuffID.Frostburn,
+            BuffID.Oiled,
+            BuffID.ShadowFlame,
+            BuffID.BetsysCurse,
+            BuffID.Dazed,
+        };
 
         //start
         public ExperienceAndClasses()

@@ -100,26 +100,17 @@ namespace ExperienceAndClasses.Abilities
             }
             protected override RETURN UseEffects()
             {
-                //grab this because it is used several times
-                MyPlayer self = ExperienceAndClasses.localMyPlayer;
-
-                //calculate heal others (10+((level/10)^1.7))
-                value_heal_other = (10 + Math.Pow(self.effectiveLevel / 10, 1.7)) * self.healRate;
-
-                //calculate heal self (6+((level/10)^1.4))
-                value_heal_self = (6 + Math.Pow(self.effectiveLevel / 10, 1.4)) * self.healRate;
-
-                //calculate heal damage (5+((level/10)^2))
-                value_damage = (5 + Math.Pow(self.effectiveLevel / 10, 2)) * self.healRate;
-
                 //location
                 location = Main.MouseWorld;
 
                 //visual (dust)
                 Projectile.NewProjectile(location, new Vector2(0f), ExperienceAndClasses.mod.ProjectileType<DustMakerProj>(), 0, 0, Main.LocalPlayer.whoAmI, (float)DustMakerProj.MODE.heal);
 
+                //update values
+                UpdateHealingValues();
+
                 //look for players/npcs
-                Tuple<List<Tuple<bool, int, bool>>, int, int, bool, bool> target_info = FindTargets(self.player, location, range);
+                Tuple<List<Tuple<bool, int, bool>>, int, int, bool, bool> target_info = FindTargets(ExperienceAndClasses.localMyPlayer.player, location, range);
                 nearest_friendly_index = target_info.Item2;
                 nearest_hostile_index = target_info.Item3;
                 nearest_friendly_is_player = target_info.Item4;
@@ -131,14 +122,29 @@ namespace ExperienceAndClasses.Abilities
                 return RETURN.SUCCESS;
             }
 
+            public static void UpdateHealingValues()
+            {
+                //grab this because it is used several times
+                MyPlayer self = ExperienceAndClasses.localMyPlayer;
+
+                //calculate heal others (10+((level/10)^1.7))
+                value_heal_other = (10 + Math.Pow(self.effectiveLevel / 10, 1.7)) * self.healRate;
+
+                //calculate heal self (6+((level/10)^1.4))
+                value_heal_self = (6 + Math.Pow(self.effectiveLevel / 10, 1.4)) * self.healRate;
+
+                //calculate heal damage (5+((level/10)^2))
+                value_damage = (5 + Math.Pow(self.effectiveLevel / 10, 2)) * self.healRate;
+            }
+
             private static int nearest_friendly_index;
             private static int nearest_hostile_index;
             private static bool nearest_friendly_is_player;
             private static bool nearest_hostile_is_player;
             private static Vector2 location;
-            private static double value_heal_self;
-            private static double value_heal_other;
-            private static double value_damage;
+            public static double value_heal_self;
+            public static double value_heal_other;
+            public static double value_damage;
             private static void HealAction(Tuple<bool, int, bool> target)
             {
                 //parse input
@@ -795,7 +801,7 @@ namespace ExperienceAndClasses.Abilities
                     {
                         if (source.hostile && player.hostile && ((source.team == 0) || (source.team != player.team)) && (source.whoAmI != player.whoAmI)) //both in pvp, self doesn't have a team or is on a different team
                         {
-                            //damage
+                            //hostile
                             targets.Add(new Tuple<bool, int, bool>(true, player_index, true));
                             if (distance <= nearest_hostile_distance)
                             {
@@ -804,9 +810,9 @@ namespace ExperienceAndClasses.Abilities
                                 nearest_hostile_is_player = true;
                             }
                         }
-                        else if (!(!source.hostile && player.hostile))
+                        else
                         {
-                            //heal
+                            //friendly
                             targets.Add(new Tuple<bool, int, bool>(true, player_index, false));
                             if (distance <= nearest_friendly_distance)
                             {
@@ -831,7 +837,7 @@ namespace ExperienceAndClasses.Abilities
                     {
                         if (!npc.friendly)
                         {
-                            //damage
+                            //hostile
                             targets.Add(new Tuple<bool, int, bool>(false, npc_index, true));
                             if (distance <= nearest_hostile_distance)
                             {
@@ -842,7 +848,7 @@ namespace ExperienceAndClasses.Abilities
                         }
                         else
                         {
-                            //heal
+                            //friendly
                             targets.Add(new Tuple<bool, int, bool>(false, npc_index, false));
                             if (distance <= nearest_friendly_distance)
                             {

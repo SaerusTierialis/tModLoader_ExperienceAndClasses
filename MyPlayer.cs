@@ -380,6 +380,18 @@ namespace ExperienceAndClasses
             }
             effectiveLevel = (int)Math.Floor((double)effectiveLevel / numberClasses);
 
+            //update healing power
+            int count_immunities = 0;
+            foreach (int i in ExperienceAndClasses.DEBUFFS)
+            {
+                if (player.buffImmune[i])
+                    count_immunities++;
+            }
+            float heal_power_bonus = count_immunities * ExperienceAndClasses.HEAL_POWER_PER_IMMUNITY;
+            if (heal_power_bonus > ExperienceAndClasses.MAX_HEAL_POWER_IMMUNITY_BONUS)
+                heal_power_bonus = ExperienceAndClasses.MAX_HEAL_POWER_IMMUNITY_BONUS;
+            healRate = 1f + heal_power_bonus;
+
             base.PostUpdateEquips();
         }
 
