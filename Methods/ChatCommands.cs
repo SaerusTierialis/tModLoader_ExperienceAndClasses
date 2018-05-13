@@ -303,7 +303,7 @@ namespace ExperienceAndClasses.Methods
             }
             else
             {
-                Main.NewText("The expauth code is only visible in the console while hosting multiplayer or by using this command in singleplayer mode.", ExperienceAndClasses.MESSAGE_COLOUR_RED);
+                Main.NewText("The expauth code is only viewable in-game in singleplayer mode.", ExperienceAndClasses.MESSAGE_COLOUR_RED);
             }
         }
 

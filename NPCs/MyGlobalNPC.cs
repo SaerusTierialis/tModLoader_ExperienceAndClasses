@@ -14,8 +14,6 @@ namespace ExperienceAndClasses.NPCs
 
         public override void NPCLoot(NPC npc) //bool CheckDead(NPC npc)
         {
-            Console.WriteLine(npc.whoAmI);
-
             /*~~~~~~~~~~~~~~~~~~~~~~ Checks ~~~~~~~~~~~~~~~~~~~~~~*/
             //singleplayer and server-side only
             //no exp or loot for critters, statues, friendlies

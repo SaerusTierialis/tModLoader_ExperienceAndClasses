@@ -582,7 +582,7 @@ namespace ExperienceAndClasses
     {
         public Command_expmapAuthCode()
         {
-            name = "expmapAuthCode";
+            name = "expmapauthcode";
             argstr = "[new_auth_code]";
             desc = "display or change the map expauth code (code changes always requires expauth in multiplayer)";
         }

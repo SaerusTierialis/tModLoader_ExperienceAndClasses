@@ -18,17 +18,31 @@ namespace ExperienceAndClasses.Abilities
             //projectile.ai[1] is the target index
             //uses projectile knockback
 
+            private bool has_run = false;
+
+            public override void SetDefaults()
+            {
+                projectile.timeLeft = 100;
+                base.SetDefaults();
+            }
+
             public override void AI()
             {
-                bool is_player = projectile.ai[0] != 0;
-                int target = (int)projectile.ai[1];
-                int amount = projectile.damage;
-                int direction = 1;
-
-                Player owner = Main.player[projectile.owner];
-
-                if (owner.active && !owner.dead)
+                if (!has_run)
                 {
+                    bool is_player = projectile.ai[0] != 0;
+                    int target = (int)projectile.ai[1];
+                    int amount = projectile.damage;
+                    int direction = 1;
+
+                    bool server_or_single = (Main.netMode != 1);
+
+                    bool do_visual = false;
+                    if ((is_player && (target == Main.LocalPlayer.whoAmI)) || (!is_player && (projectile.owner == Main.LocalPlayer.whoAmI)))
+                    {
+                        do_visual = true;
+                    }
+
                     if (is_player)
                     {
                         //player
@@ -42,10 +56,13 @@ namespace ExperienceAndClasses.Abilities
                                 {
                                     amount = amount_valid;
                                 }
-                                player.HealEffect(amount);
+                                if (do_visual)
+                                {
+                                    player.HealEffect(amount);
+                                }
                                 player.statLife += amount;
                             }
-                            else if (amount < 0)
+                            else if ((amount < 0) && do_visual)
                             {
                                 amount *= -1;
                                 if (projectile.Center.X > player.Center.X)
@@ -69,24 +86,27 @@ namespace ExperienceAndClasses.Abilities
                                 {
                                     amount = amount_valid;
                                 }
-                                npc.HealEffect(amount);
+                                if (do_visual)
+                                {
+                                    npc.HealEffect(amount);
+                                }
                                 npc.life += amount;
                             }
-                            else if (amount < 0)
+                            else if ((amount < 0) && server_or_single)
                             {
                                 amount *= -1;
                                 if (projectile.Center.X > npc.Center.X)
                                 {
                                     direction = -1;
                                 }
-                                owner.ApplyDamageToNPC(npc, amount, projectile.knockBack, direction, false);
+                                Main.player[projectile.owner].ApplyDamageToNPC(npc, amount, projectile.knockBack, direction, false);
                             }
                         }
                     }
-                }
 
-                //done
-                projectile.Kill();
+                    //done
+                    has_run = true;
+                }
             }
 
         }

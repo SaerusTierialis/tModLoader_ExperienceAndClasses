@@ -187,6 +187,13 @@ namespace ExperienceAndClasses.Abilities
                 //round down to int (implicit)
                 int value_final = (int)value;
                 
+                //if npc, do locally
+
+
+                //if player, create projecile to handle (projeciles auto-sync at creation)
+
+
+
                 Projectile.NewProjectile(location, new Vector2(0f), ExperienceAndClasses.mod.ProjectileType<AbilityProj.Proj_HealHurt>(), value_final, knockback, Main.LocalPlayer.whoAmI, player_val, index);
             }
         }
@@ -786,7 +793,7 @@ namespace ExperienceAndClasses.Abilities
                     distance = player.Distance(location);
                     if (distance <= radius)
                     {
-                        if (source.hostile && player.hostile && ((source.team == 0) || (source.team != player.team))) //both in pvp, self doesn't have a team or is on a different team
+                        if (source.hostile && player.hostile && ((source.team == 0) || (source.team != player.team)) && (source.whoAmI != player.whoAmI)) //both in pvp, self doesn't have a team or is on a different team
                         {
                             //damage
                             targets.Add(new Tuple<bool, int, bool>(true, player_index, true));
@@ -797,7 +804,7 @@ namespace ExperienceAndClasses.Abilities
                                 nearest_hostile_is_player = true;
                             }
                         }
-                        else
+                        else if (!(!source.hostile && player.hostile))
                         {
                             //heal
                             targets.Add(new Tuple<bool, int, bool>(true, player_index, false));
