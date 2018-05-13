@@ -59,7 +59,7 @@ namespace ExperienceAndClasses
         public DateTime timeAllowItemUse = DateTime.MinValue;
 
         //custom stats
-        public float healRate = 1f;
+        public float healing_power = 1f;
 
         //rogue
         public float percentMidas = 0;
@@ -390,7 +390,7 @@ namespace ExperienceAndClasses
             float heal_power_bonus = count_immunities * ExperienceAndClasses.HEAL_POWER_PER_IMMUNITY;
             if (heal_power_bonus > ExperienceAndClasses.MAX_HEAL_POWER_IMMUNITY_BONUS)
                 heal_power_bonus = ExperienceAndClasses.MAX_HEAL_POWER_IMMUNITY_BONUS;
-            healRate = 1f + heal_power_bonus;
+            healing_power = 1f + heal_power_bonus;
 
             base.PostUpdateEquips();
         }

@@ -43,6 +43,7 @@ namespace ExperienceAndClasses.Abilities
             Cleric_Active_DivineIntervention,
             Cleric_Active_Paragon,
 
+
             //when adding here, make that that a class of the same name is added below
 
             NUMBER_OF_IDs, //leave this last
@@ -128,13 +129,13 @@ namespace ExperienceAndClasses.Abilities
                 MyPlayer self = ExperienceAndClasses.localMyPlayer;
 
                 //calculate heal others (10+((level/10)^1.7))
-                value_heal_other = (10 + Math.Pow(self.effectiveLevel / 10, 1.7)) * self.healRate;
+                value_heal_other = (10 + Math.Pow(self.effectiveLevel / 10, 1.7)) * self.healing_power;
 
                 //calculate heal self (6+((level/10)^1.4))
-                value_heal_self = (6 + Math.Pow(self.effectiveLevel / 10, 1.4)) * self.healRate;
+                value_heal_self = (6 + Math.Pow(self.effectiveLevel / 10, 1.4)) * self.healing_power;
 
                 //calculate heal damage (5+((level/10)^2))
-                value_damage = (5 + Math.Pow(self.effectiveLevel / 10, 2)) * self.healRate;
+                value_damage = (5 + Math.Pow(self.effectiveLevel / 10, 2)) * self.healing_power;
             }
 
             private static int nearest_friendly_index;
