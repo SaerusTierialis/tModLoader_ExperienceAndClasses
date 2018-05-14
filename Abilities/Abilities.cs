@@ -89,11 +89,33 @@ namespace ExperienceAndClasses.Abilities
 
         public class Cleric_Passive_Cleanse : Ability
         {
+            private const ushort seconds_delay = 10;
+            private const ushort seconds_duration = 120;
+
             public Cleric_Passive_Cleanse()
             {
                 ability_type = ABILITY_TYPE.PASSIVE;
                 name = "Cleanse";
                 description = "";
+                cooldown_seconds = 1;
+                ignore_status_requirements = true;
+            }
+
+            protected override RETURN UseEffects(byte level = 1, bool alternate = false)
+            {
+                Player self = Main.LocalPlayer;
+                DateTime now = DateTime.Now;
+                int index;
+                for (int i = 0; i < ExperienceAndClasses.NUMBER_OF_DEBUFFS; i++)
+                {
+                    index = ExperienceAndClasses.DEBUFFS[i];
+                    if (self.HasBuff(index))
+                    {
+                        MyPlayer.GrantDebuffImunity(i, now.AddSeconds(seconds_delay), seconds_duration);
+                    }
+                }
+
+                return RETURN.SUCCESS;
             }
         }
 
@@ -388,6 +410,7 @@ namespace ExperienceAndClasses.Abilities
             protected float cost_mana_alternative_multiplier = 1f;
             protected double cooldown_seconds = 0;
             protected bool requires_sight_cursor = false;
+            protected bool ignore_status_requirements = false;
 
             //on-use effects
             protected CLASS_TYPE class_type = CLASS_TYPE.UNUSED;
@@ -449,7 +472,8 @@ namespace ExperienceAndClasses.Abilities
             protected virtual RETURN UseChecks(byte level = 1, bool alternate = false)
             {
                 //check for invalid statuses
-                if (Main.LocalPlayer.frozen || Main.LocalPlayer.dead) return RETURN.FAIL_STATUS;
+                if (!ignore_status_requirements && (Main.LocalPlayer.frozen || Main.LocalPlayer.silence)) return RETURN.FAIL_STATUS;
+                if (Main.LocalPlayer.dead) return RETURN.FAIL_STATUS;
 
                 //check mana cost
                 if (Main.LocalPlayer.statMana < GetManaCost(level, alternate)) return RETURN.FAIL_MANA;
@@ -544,6 +568,11 @@ namespace ExperienceAndClasses.Abilities
             public bool IsTypeActive()
             {
                 return ability_type == ABILITY_TYPE.ACTIVE;
+            }
+
+            public bool IsTypePassive()
+            {
+                return ability_type == ABILITY_TYPE.PASSIVE;
             }
 
         }

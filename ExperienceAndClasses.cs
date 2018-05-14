@@ -9,6 +9,7 @@ using System.IO;
 using Terraria.Localization;
 using Microsoft.Xna.Framework;
 using Terraria.ID;
+using System.Reflection;
 
 //needed for compiling outside of Terraria
 public class Application
@@ -118,40 +119,46 @@ namespace ExperienceAndClasses
         //ability constants
         public const float HEAL_POWER_PER_IMMUNITY = 0.1f;
         public const float MAX_HEAL_POWER_IMMUNITY_BONUS = 1.0f;
-        public static readonly int[] DEBUFFS = {
-            BuffID.Bleeding,
-            BuffID.Poisoned,
-            BuffID.OnFire,
-            BuffID.Venom,
-            BuffID.Darkness,
-            BuffID.Blackout,
-            BuffID.Silenced,
-            BuffID.Cursed,
-            BuffID.Confused,
-            BuffID.Slow,
-            BuffID.Slimed,
-            BuffID.OgreSpit,
-            BuffID.Weak,
-            BuffID.BrokenArmor,
-            BuffID.WitheredArmor,
-            BuffID.WitheredWeapon,
-            BuffID.CursedInferno,
-            BuffID.Ichor,
-            BuffID.Chilled,
-            BuffID.Frozen,
-            BuffID.Webbed,
-            BuffID.Stoned,
-            BuffID.VortexDebuff,
-            BuffID.Obstructed,
-            BuffID.Electrified,
-            BuffID.Rabies,
-            BuffID.Burning,
-            BuffID.Frostburn,
-            BuffID.Oiled,
-            BuffID.ShadowFlame,
-            BuffID.BetsysCurse,
-            BuffID.Dazed,
+
+        //debuffs
+        public static readonly string[] DEBUFF_NAMES = {
+            "Bleeding",
+            "Poisoned",
+            "OnFire",
+            "Venom",
+            "Darkness",
+            "Blackout",
+            "Silenced",
+            "Cursed",
+            "Confused",
+            "Slow",
+            "Slimed",
+            "OgreSpit",
+            "Weak",
+            "BrokenArmor",
+            "WitheredArmor",
+            "WitheredWeapon",
+            "CursedInferno",
+            "Ichor",
+            "Chilled",
+            "Frozen",
+            "Webbed",
+            "Stoned",
+            "VortexDebuff",
+            "Obstructed",
+            "Electrified",
+            "Rabies",
+            "Burning",
+            "Frostburn",
+            "Oiled",
+            "ShadowFlame",
+            "BetsysCurse",
+            "Dazed",
         };
+        public static readonly int NUMBER_OF_DEBUFFS = DEBUFF_NAMES.Length;
+        public static int[] DEBUFFS = new int[NUMBER_OF_DEBUFFS];
+
+        //undead
         public static readonly string[] UNDEAD_NAMES = 
         {
             "skel",
@@ -174,6 +181,19 @@ namespace ExperienceAndClasses
             {
                 Autoload = true,
             };
+
+            //get debuff id from names
+            FieldInfo[] fields = typeof(BuffID).GetFields();
+            foreach (FieldInfo f in fields)
+            {
+                for (int i = 0; i<NUMBER_OF_DEBUFFS; i++)
+                {
+                    if (f.Name.Equals(DEBUFF_NAMES[i]))
+                    {
+                        DEBUFFS[i] = (int)f.GetValue(null);
+                    }
+                }
+            }
         }
 
         //load

@@ -61,6 +61,13 @@ namespace ExperienceAndClasses
         public Projectile[] sanctuaries = new Projectile[2];
         public bool ability_message_overhead = true;
 
+        //debuff immunity
+        public static bool[] debuff_immunity_active = new bool[ExperienceAndClasses.NUMBER_OF_DEBUFFS];
+        public static bool[] debuff_immunity_update = new bool[ExperienceAndClasses.NUMBER_OF_DEBUFFS];
+        public static DateTime[] debuff_immunity_time_start = new DateTime[ExperienceAndClasses.NUMBER_OF_DEBUFFS];
+        public static DateTime[] debuff_immunity_time_end = new DateTime[ExperienceAndClasses.NUMBER_OF_DEBUFFS];
+        public static Double[] debuff_immunity_duration_seconds = new double[ExperienceAndClasses.NUMBER_OF_DEBUFFS];
+
         //custom stats
         public float healing_power = 1f;
 
@@ -369,15 +376,11 @@ namespace ExperienceAndClasses
                 Items.Helpers.ClassTokenEffects(mod, player, i.Item1, i.Item2, true, this);
             }
 
-            //set current abilities
-            unlocked_abilities_current = unlocked_abilities_next;
-            unlocked_abilities_next = new bool[(int)Abilities.AbilityMain.ID.NUMBER_OF_IDs];
-
             //calculate effective level for bonuses and abilities
             effectiveLevel = Methods.Experience.GetLevel(GetExp());
             if ((ExperienceAndClasses.worldLevelCap > 0) && (effectiveLevel > ExperienceAndClasses.worldLevelCap))
             {
-                effectiveLevel = ExperienceAndClasses.worldLevelCap; 
+                effectiveLevel = ExperienceAndClasses.worldLevelCap;
                 levelCapped = true;
             }
             else
@@ -386,17 +389,95 @@ namespace ExperienceAndClasses
             }
             effectiveLevel = (int)Math.Floor((double)effectiveLevel / numberClasses);
 
-            //update healing power
-            int count_immunities = 0;
-            foreach (int i in ExperienceAndClasses.DEBUFFS)
+            //self only ability stuff
+            if ((player.whoAmI == Main.LocalPlayer.whoAmI) && (Main.netMode != 2))
             {
-                if (player.buffImmune[i])
-                    count_immunities++;
+                //set current abilities
+                unlocked_abilities_current = unlocked_abilities_next;
+                unlocked_abilities_next = new bool[(int)Abilities.AbilityMain.ID.NUMBER_OF_IDs];
+
+                //do any passives
+                int number_abilities = unlocked_abilities_current.Length;
+                Abilities.AbilityMain.Ability ability;
+                for (int i = 0; i < number_abilities; i++)
+                {
+                    if (unlocked_abilities_current[i])
+                    {
+                        ability = Abilities.AbilityMain.AbilityLookup[i];
+                        if (ability.IsTypePassive())
+                        {
+                            ability.Use((byte)effectiveLevel, false);
+                        }
+                    }
+                }
+
+                //update debuff immunities
+                DateTime now = DateTime.Now;
+                string message_gain = "";
+                string message_lose = "";
+                for (int i = 0; i<ExperienceAndClasses.NUMBER_OF_DEBUFFS; i++)
+                {
+                    //triggering new immuities
+                    if (debuff_immunity_update[i] && now.CompareTo(debuff_immunity_time_start[i])>0)
+                    {
+                        //start immunity
+                        debuff_immunity_update[i] = false;
+                        debuff_immunity_active[i] = true;
+                        debuff_immunity_time_end[i] = now.AddSeconds(debuff_immunity_duration_seconds[i]);
+                        debuff_immunity_duration_seconds[i] = 0;
+
+                        //message
+                        if (message_gain.Length > 0)
+                        {
+                            message_gain = ", " + message_gain;
+                        }
+                        message_gain += ExperienceAndClasses.DEBUFF_NAMES[i];
+                    }
+
+                    //handling current immunities
+                    if (debuff_immunity_active[i])
+                    {
+                        if (now.CompareTo(debuff_immunity_time_end[i])>0)
+                        {
+                            //end immunity
+                            debuff_immunity_active[i] = false;
+
+                            //message
+                            if (message_lose.Length > 0)
+                            {
+                                message_lose = ", " + message_lose;
+                            }
+                            message_lose += ExperienceAndClasses.DEBUFF_NAMES[i];
+                        }
+                        else
+                        {
+                            //grant immunity
+                            player.buffImmune[ExperienceAndClasses.DEBUFFS[i]] = true;
+                        }
+                    }
+                }
+                //messages
+                if (message_gain.Length > 0)
+                {
+                    Main.NewText("Gained Immunity: " + message_gain, ExperienceAndClasses.MESSAGE_COLOUR_GREEN);
+                }
+                if (message_lose.Length > 0)
+                {
+                    Main.NewText("Lost Immunity: " + message_gain, ExperienceAndClasses.MESSAGE_COLOUR_RED);
+                }
+
+                //update healing power
+                int count_immunities = 0;
+                foreach (int i in ExperienceAndClasses.DEBUFFS)
+                {
+                    if (player.buffImmune[i])
+                        count_immunities++;
+                }
+                float heal_power_bonus = count_immunities * ExperienceAndClasses.HEAL_POWER_PER_IMMUNITY;
+                if (heal_power_bonus > ExperienceAndClasses.MAX_HEAL_POWER_IMMUNITY_BONUS)
+                    heal_power_bonus = ExperienceAndClasses.MAX_HEAL_POWER_IMMUNITY_BONUS;
+                healing_power = 1f + heal_power_bonus;
             }
-            float heal_power_bonus = count_immunities * ExperienceAndClasses.HEAL_POWER_PER_IMMUNITY;
-            if (heal_power_bonus > ExperienceAndClasses.MAX_HEAL_POWER_IMMUNITY_BONUS)
-                heal_power_bonus = ExperienceAndClasses.MAX_HEAL_POWER_IMMUNITY_BONUS;
-            healing_power = 1f + heal_power_bonus;
 
             base.PostUpdateEquips();
         }
@@ -742,6 +823,24 @@ namespace ExperienceAndClasses
         public void OffCooldownMessage(string abilityName)
         {
             CombatText.NewText(player.getRect(), ExperienceAndClasses.MESSAGE_COLOUR_OFF_COOLDOWN, abilityName + " Ready!");
+        }
+
+        public static void GrantDebuffImunity(int index, DateTime time_start, int duration_seconds)
+        {
+            //trigger update
+            MyPlayer.debuff_immunity_update[index] = true;
+
+            //set start time unless there is already a sooner, upcoming start
+            if (DateTime.Now.CompareTo(MyPlayer.debuff_immunity_time_start[index]) > 0 || time_start.CompareTo(MyPlayer.debuff_immunity_time_start[index]) < 0)
+            {
+                MyPlayer.debuff_immunity_time_start[index] = time_start;
+            }
+
+            //set duration unless there is already a longer duration triggered
+            if (debuff_immunity_duration_seconds[index] < duration_seconds)
+            {
+                debuff_immunity_duration_seconds[index] = duration_seconds;
+            }
         }
 
     }

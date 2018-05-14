@@ -84,13 +84,16 @@ namespace ExperienceAndClasses.Items
 
             myPlayer.classTokensEquipped.Add(new Tuple<ModItem, string>(this, name));
 
-            //track player's current abilities
-            int level = myPlayer.GetLevel();
-            foreach (Tuple<AbilityMain.ID, byte> ability in abilities)
+            //track (own) player's current abilities
+            if (player.whoAmI == Main.LocalPlayer.whoAmI)
             {
-                if (level >= ability.Item2)
+                int level = myPlayer.GetLevel();
+                foreach (Tuple<AbilityMain.ID, byte> ability in abilities)
                 {
-                    myPlayer.unlocked_abilities_next[(int)ability.Item1] = true;
+                    if (level >= ability.Item2)
+                    {
+                        myPlayer.unlocked_abilities_next[(int)ability.Item1] = true;
+                    }
                 }
             }
         }
