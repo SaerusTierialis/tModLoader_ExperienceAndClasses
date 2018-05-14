@@ -10,6 +10,26 @@ namespace ExperienceAndClasses.Abilities
 {
     public class AbilityProj
     {
+        public class Sanctuary : ProjCycleFrames
+        {
+            public Sanctuary()
+            {
+                NUMBER_FRAMES = 4;
+                TICKS_PER_FRAME = 100;
+            }
+            public override void SetDefaults()
+            {
+                projectile.width = 96;
+                projectile.height = 96;
+                projectile.timeLeft = int.MaxValue; //move this
+            }
+            public override void OnHitPlayer(Player target, int damage, bool crit)
+            {
+                Main.NewText("test");
+                base.OnHitPlayer(target, damage, crit);
+            }
+        }
+
         public class Proj_HealHurt : ProjNoVisual
         {
             //heal/hurt a player/npc
@@ -294,7 +314,7 @@ namespace ExperienceAndClasses.Abilities
         }
     }
 
-    public abstract class ProjNoVisual : ModProjectile
+    public abstract class ProjNoVisual : SyncingProjectile
     {
         public override string Texture
         {
@@ -304,4 +324,86 @@ namespace ExperienceAndClasses.Abilities
             }
         }
     }
+
+    public abstract class ProjCycleFrames : SyncingProjectile
+    {
+        protected int NUMBER_FRAMES = 1;
+        protected int TICKS_PER_FRAME = 10;
+
+        public override void SetStaticDefaults()
+        {
+            Main.projFrames[projectile.type] = NUMBER_FRAMES;
+        }
+        public override void AI()
+        {
+            if (++projectile.frameCounter >= TICKS_PER_FRAME)
+            {
+                projectile.frameCounter = 0;
+                if (++projectile.frame >= NUMBER_FRAMES)
+                {
+                    projectile.frame = 0;
+                }
+            }
+            base.AI();
+        }
+    }
+
+    public abstract class SyncingProjectile : ModProjectile
+    {
+        //sync every N seconds and when a player joins/leaves (can be disabled with DO_SYNC == false)
+
+        private static ulong global_sync_counter = 0;
+        private static int global_player_count = 0;
+
+        protected bool DO_TIMED_SYNC = true;
+        protected ushort SYNC_EVERY_N_SECONDS = 120;
+        private DateTime next_sync = DateTime.MinValue;
+
+        private ulong sync_counter;
+
+        public SyncingProjectile()
+        {
+            sync_counter = global_sync_counter;
+        }
+
+        public override void AI()
+        {
+            base.AI();
+
+            if (projectile.owner == Main.LocalPlayer.whoAmI)
+            {
+                //trigger sync when # of players changes (static)
+                if (global_player_count != Main.ActivePlayersCount)
+                {
+                    global_player_count = Main.ActivePlayersCount;
+                    if (global_sync_counter == ulong.MaxValue)
+                    {
+                        global_sync_counter = 0;
+                    }
+                    else
+                    {
+                        global_sync_counter++;
+                    }
+                }
+
+                //instance sync
+                if (sync_counter != global_sync_counter)
+                {
+                    sync_counter = global_sync_counter;
+                    projectile.netUpdate = true;
+                }
+                else if (DO_TIMED_SYNC)
+                {
+                    DateTime now = DateTime.Now;
+                    if (next_sync.CompareTo(now) <= 0)
+                    {
+                        next_sync = now.AddSeconds(SYNC_EVERY_N_SECONDS);
+                        projectile.netUpdate = true;
+                    }
+                }
+            }
+        }
+
+    }
+
 }

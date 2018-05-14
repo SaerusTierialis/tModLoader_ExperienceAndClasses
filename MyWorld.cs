@@ -24,7 +24,7 @@ namespace ExperienceAndClasses
 
         public static bool[] clientNeedsExpUpdate = new bool[256];
         public static int clientNeedsExpUpdate_counter = 0;
-        public static int[] clientNeedsExpUpdate_indices = new int[256];
+        public static int[] clientNeedsExpUpdate_who = new int[256];
 
         public static SortedList kill_counts = new SortedList(300);
 
@@ -118,12 +118,12 @@ namespace ExperienceAndClasses
         public static void FlagAllForSyncExp()
         {
             clientNeedsExpUpdate_counter = 0;
-            for (int playerIndex = 0; playerIndex<255; playerIndex++)
+            for (int playerIndex = 0; playerIndex <= Main.maxPlayers; playerIndex++)
             {
                 if (Main.player[playerIndex].active)
                 {
                     clientNeedsExpUpdate[playerIndex] = true;
-                    clientNeedsExpUpdate_indices[clientNeedsExpUpdate_counter] = playerIndex;
+                    clientNeedsExpUpdate_who[clientNeedsExpUpdate_counter] = playerIndex;
                     clientNeedsExpUpdate_counter++;
                 }
             }

@@ -255,7 +255,7 @@ namespace ExperienceAndClasses
                     {
                         Methods.PacketSender.ServerSyncExp(mod, true);
                     }
-                    
+
                     if (worldTrace || traceChar) Methods.ChatCommands.Trace("TRACE:Recieved ClientTellExperience from player #" + player.whoAmI + ":" + player.name+" = "+ player.GetModPlayer<MyPlayer>(this).experience);
                     break;
 

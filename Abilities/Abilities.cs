@@ -40,13 +40,12 @@ namespace ExperienceAndClasses.Abilities
             UNDEFINED, //leave this first
 
             Cleric_Passive_Cleanse,
-
             Cleric_Active_Heal,
             Cleric_Upgrade_Heal_Smite,
-
             Cleric_Active_Sanctuary,
-            Cleric_Active_DivineIntervention,
-            Cleric_Active_Paragon,
+
+            Saint_Active_DivineIntervention,
+            Saint_Active_Paragon,
 
             //when adding here, make that that a class of the same name is added below
 
@@ -258,15 +257,21 @@ namespace ExperienceAndClasses.Abilities
                 name = "Sanctuary";
                 name_short = "Sanc";
                 description = "";
-                cost_mana_percent = 0.90f;
-                cooldown_seconds = 120;
+                cost_mana_percent = 0.1f; //0.90f;
+                cooldown_seconds = 2; //120;
                 class_type = CLASS_TYPE.SUPPORT;
+            }
+
+            protected override RETURN UseEffects()
+            {
+                Projectile.NewProjectile(Main.LocalPlayer.Center, new Vector2(0f), ExperienceAndClasses.mod.ProjectileType<AbilityProj.Sanctuary>(), 0, 0, Main.LocalPlayer.whoAmI, 0);
+                return RETURN.SUCCESS;
             }
         }
 
-        public class Cleric_Active_DivineIntervention : Ability
+        public class Saint_Active_DivineIntervention : Ability
         {
-            public Cleric_Active_DivineIntervention()
+            public Saint_Active_DivineIntervention()
             {
                 ability_type = ABILITY_TYPE.ACTIVE;
                 name = "Divine Intervention";
@@ -278,9 +283,9 @@ namespace ExperienceAndClasses.Abilities
             }
         }
 
-        public class Cleric_Active_Paragon : Ability
+        public class Saint_Active_Paragon : Ability
         {
-            public Cleric_Active_Paragon()
+            public Saint_Active_Paragon()
             {
                 ability_type = ABILITY_TYPE.ACTIVE;
                 name = "Paragon";
@@ -483,7 +488,7 @@ namespace ExperienceAndClasses.Abilities
         //////    //AbilityLookup.Add(ID.CLERIC_ACTIVE_HEAL, new CLERIC_ACTIVE_HEAL());
         //////    //AbilityLookup.Add(ID.CLERIC_ACTIVE_SANCTUARY, new CLERIC_ACTIVE_SANCTUARY());
         //////    //AbilityLookup.Add(ID.CLERIC_ACTIVE_DIVINE_INTERVENTION, new CLERIC_ACTIVE_DIVINE_INTERVENTION());
-        //////    //AbilityLookup.Add(ID.CLERIC_ACTIVE_PARAGON, new CLERIC_ACTIVE_PARAGON());
+        //////    //AbilityLookup.Add(ID.Saint_Active_Paragon, new Saint_Active_Paragon());
         //////}
 
 

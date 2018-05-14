@@ -382,14 +382,22 @@ namespace ExperienceAndClasses.Methods
             packet.Write(MyWorld.clientNeedsExpUpdate_counter); //number of clients updated
             for (int ind = 0; ind < MyWorld.clientNeedsExpUpdate_counter; ind++)
             {
-                player = Main.player[MyWorld.clientNeedsExpUpdate_indices[ind]];
+                player = Main.player[MyWorld.clientNeedsExpUpdate_who[ind]];
                 packet.Write(player.whoAmI); //who dis
                 if (player.active)
                 {
                     myPlayer = player.GetModPlayer<MyPlayer>(mod);
                     packet.Write(myPlayer.GetExp()); //xp
-                    int counter_index = MyWorld.kill_counts.IndexOfKey(myPlayer.kill_count_track_id);
-                    packet.Write((int)MyWorld.kill_counts.GetByIndex(counter_index)); //kill count (int32)
+
+                    int kill_id = myPlayer.kill_count_track_id;
+                    if (MyWorld.kill_counts.ContainsKey(kill_id))
+                    {
+                        packet.Write((int)MyWorld.kill_counts.GetByIndex(MyWorld.kill_counts.IndexOfKey(kill_id))); //kill count (int32)
+                    }
+                    else
+                    {
+                        packet.Write(0); //kill count
+                    }
                 }
                 else
                 {
@@ -398,7 +406,7 @@ namespace ExperienceAndClasses.Methods
                 }
 
                 //reset
-                MyWorld.clientNeedsExpUpdate_indices[ind] = 0;
+                MyWorld.clientNeedsExpUpdate_who[ind] = 0;
                 MyWorld.clientNeedsExpUpdate[player.whoAmI] = false;
             }
             packet.Send();

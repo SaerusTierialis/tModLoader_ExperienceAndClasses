@@ -73,7 +73,7 @@ namespace ExperienceAndClasses
         public DateTime timeLastAttack = DateTime.MinValue;
         public int openerImmuneTime_msec = 0;
         public DateTime openerImmuneEnd = DateTime.MinValue;
-        
+
         /// <summary>
         /// Returns experience total.
         /// </summary>
@@ -137,7 +137,7 @@ namespace ExperienceAndClasses
             if (Main.netMode == 2 && !MyWorld.clientNeedsExpUpdate[player.whoAmI])
             {
                 MyWorld.clientNeedsExpUpdate[player.whoAmI] = true;
-                MyWorld.clientNeedsExpUpdate_indices[MyWorld.clientNeedsExpUpdate_counter] = player.whoAmI;
+                MyWorld.clientNeedsExpUpdate_who[MyWorld.clientNeedsExpUpdate_counter] = player.whoAmI;
                 MyWorld.clientNeedsExpUpdate_counter++;
             }
             //if singleplayer, it's already done so display
@@ -309,7 +309,7 @@ namespace ExperienceAndClasses
 
         public override void OnEnterWorld(Player player)
         {
-            if (player.Equals(Main.LocalPlayer))
+            if (player.whoAmI == Main.LocalPlayer.whoAmI)
             {
                 //afk timing
                 afkTime = DateTime.Now;
