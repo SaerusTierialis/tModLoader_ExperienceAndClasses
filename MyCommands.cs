@@ -23,6 +23,24 @@ namespace ExperienceAndClasses
         }
     }
 
+    class Command_expabilityoverhead : CommandTemplate
+    {
+        public Command_expabilityoverhead()
+        {
+            name = "expabilityoverhead";
+            argstr = "";
+            desc = "toggle showing ability messages overhead";
+        }
+
+        public override void Action(CommandCaller caller, string input, string[] args)
+        {
+            ExperienceAndClasses.localMyPlayer.ability_message_overhead = !ExperienceAndClasses.localMyPlayer.ability_message_overhead;
+            if (ExperienceAndClasses.localMyPlayer.ability_message_overhead)
+                Main.NewText("Overhead messages enabled.", ExperienceAndClasses.MESSAGE_COLOUR_YELLOW);
+            else
+                Main.NewText("Overhead messages disabled.", ExperienceAndClasses.MESSAGE_COLOUR_YELLOW);
+        }
+    }
 
     class Command_expuibarcd : CommandTemplate
     {
@@ -578,9 +596,9 @@ namespace ExperienceAndClasses
         }
     }
 
-    class Command_expmapAuthCode : CommandTemplate
+    class Command_expmapauthcode : CommandTemplate
     {
-        public Command_expmapAuthCode()
+        public Command_expmapauthcode()
         {
             name = "expmapauthcode";
             argstr = "[new_auth_code]";

@@ -58,6 +58,8 @@ namespace ExperienceAndClasses
         public float thresholdCDMsg = 3f;
         public bool itemUsePrevented = false;
         public DateTime timeAllowItemUse = DateTime.MinValue;
+        public Projectile[] sanctuaries = new Projectile[2];
+        public bool ability_message_overhead = true;
 
         //custom stats
         public float healing_power = 1f;
@@ -266,6 +268,7 @@ namespace ExperienceAndClasses
                 {"traceChar", traceChar},
                 {"thresh_cd_message", thresholdCDMsg},
                 {"show_kill_count", show_kill_count},
+                {"ability_message_overhead", ability_message_overhead},
             };
         }
 
@@ -292,6 +295,7 @@ namespace ExperienceAndClasses
             UICDBars = Commons.TryGet<bool>(tag, "UI_cdbars_show", true);
             UIInventory = Commons.TryGet<bool>(tag, "UI_inv_show", true);
             show_kill_count = Commons.TryGet<bool>(tag, "show_kill_count", false);
+            ability_message_overhead = Commons.TryGet<bool>(tag, "ability_message_overhead", true);
 
             //trace
             traceChar = Commons.TryGet<bool>(tag, "traceChar", false);
@@ -693,22 +697,22 @@ namespace ExperienceAndClasses
             switch (ret)
             {
                 case (Abilities.AbilityMain.RETURN.FAIL_COOLDOWN):
-                    message = ": not ready!";
+                    message = "Not Ready!";
                     break;
                 case (Abilities.AbilityMain.RETURN.FAIL_LINE_OF_SIGHT):
-                    message = ": requires line of sight!";
+                    message = "Line of Sight!";
                     break;
                 case (Abilities.AbilityMain.RETURN.FAIL_MANA):
-                    message = ": not enough mana!";
+                    message = "Not Enough Mana!";
                     break;
                 case (Abilities.AbilityMain.RETURN.FAIL_NOT_IMPLEMENTRD):
-                    message = ": not yet implemented!";
+                    message = "Not Yet Implemented!";
                     break;
                 case (Abilities.AbilityMain.RETURN.FAIL_STATUS):
-                    message = ": cannot be used right now!";
+                    message = "Cannot Be Used Right Now!";
                     break;
                 case (Abilities.AbilityMain.RETURN.FAIL_REQUIREMENTS):
-                    message = ": requirements not met!";
+                    message = "Requirements Not Met!";
                     break;
                 default:
                     //no message
@@ -716,7 +720,14 @@ namespace ExperienceAndClasses
             }
             if (message != null)
             {
-                Main.NewText(Abilities.AbilityMain.AbilityLookup[(int)id].GetName() + message, ExperienceAndClasses.MESSAGE_COLOUR_RED);
+                if (ExperienceAndClasses.localMyPlayer.ability_message_overhead)
+                {
+                    CombatText.NewText(Main.LocalPlayer.getRect(), ExperienceAndClasses.MESSAGE_COLOUR_RED, message);
+                }
+                else
+                {
+                    Main.NewText(Abilities.AbilityMain.AbilityLookup[(int)id].GetName() + ": " + message, ExperienceAndClasses.MESSAGE_COLOUR_RED);
+                }
             }
         }
 

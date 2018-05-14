@@ -251,7 +251,7 @@ namespace ExperienceAndClasses.Methods
 
         public static void CommandDisplaySettings(Mod mod)
         {
-            string lvlcap, dmgred, threshCD;
+            string lvlcap, dmgred, threshCD, ability_overhead;
 
             if (ExperienceAndClasses.worldLevelCap > 0)
             {
@@ -281,6 +281,15 @@ namespace ExperienceAndClasses.Methods
                 threshCD = "disabled";
             }
 
+            if (myPlayer.ability_message_overhead)
+            {
+                ability_overhead = "enabled";
+            }
+            else
+            {
+                ability_overhead = "disabled";
+            }
+
             Main.NewTextMultiline("World - Require Authorization: " + ExperienceAndClasses.worldRequireAuth + "\nWorld - Experience Rate: " + (ExperienceAndClasses.worldExpModifier * 100) +
                         "%\nWorld - Ignore Class Caps: " + ExperienceAndClasses.worldIgnoreCaps + "\nWorld - Level Cap: " + lvlcap + "\nWorld - Class Damage Reduction: " +
                         dmgred + "\nWorld - Death Penalty: " + (ExperienceAndClasses.worldDeathPenalty * 100) + "%", false, ExperienceAndClasses.MESSAGE_COLOUR_YELLOW);
@@ -289,7 +298,8 @@ namespace ExperienceAndClasses.Methods
                 "\nCharacter - Cooldown Messages Threshold: " + threshCD, false, ExperienceAndClasses.MESSAGE_COLOUR_YELLOW);
 
             Main.NewTextMultiline("Character - UI Show: " + myPlayer.UIShow + "\nCharacter - UI Force Inventory: " + myPlayer.UIInventory + 
-                "\nCharacter - UI Exp Bar: " + myPlayer.UIExpBar + "\nCharacter - UI Cooldown Bars: " + myPlayer.UICDBars, false, ExperienceAndClasses.MESSAGE_COLOUR_YELLOW);
+                "\nCharacter - UI Exp Bar: " + myPlayer.UIExpBar + "\nCharacter - UI Cooldown Bars: " + myPlayer.UICDBars + 
+                "\nCharacter - UI Ability Messages Overhead: " + ability_overhead, false, ExperienceAndClasses.MESSAGE_COLOUR_YELLOW);
         }
 
         /// <summary>

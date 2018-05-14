@@ -5,6 +5,39 @@ A MAJOR overhaul is now underway. See the forums or discord for more details!
 
 CHANGELOG:
 
+===v1.3.4===
+
+1. Cleric/Saint Rework (ongoing):
+Goal: make the support playstyle more engaging/fun by introducing several active abilities to make up for the lack of support tools in vanilla
+Cleric will be further reworked in v1.4 along with the rest of the classes (different stats, later tier 3, tweaks and balancing of abilities, etc.)
+* removed the current auras from Cleric/Saint
+* some abilities are now partially implemented, see doc linked on forum post for more info (remaining features will be added throughout the week)
+Note: The cleric ability system is not representative of what other classes will receive. This is a support class with essentially no vanilla tools so it needs the most love. Most classes will have just two abilities (they will have similar upgrades that transform the skills as you progress).
+
+2. Ability System:
+* dust created on ability use now shows up for all clients in multiplayer
+* added line of sight to cursor as an available check for any ability
+* added /expabilityoverhead to toggle showing ability messages overhead or in the chat console (defaults to overhead)
+* optimized code for abilities that need to find all valid targets in an area
+* added checks to prevent non-pvp players from healing pvp players
+* added syncing for long duration projectiles when a player joins in multiplayer
+
+3. Balance:
+* xp and ascension orb range reduced to half of what it was (5000 reduced to 2500)
+* added an extra 5% flat chance to drop boss orbs in singleplayer (or when only one player is in a server)
+
+4. Ascension Drop Change:
+Drop rate will now increase based on how many of that specific monster have been farmed since the last time that that type of monster dropped an Ascension Orb. For example, a slime will have a higher chance to drop an Ascension Orb if many slimes have been slain since the last time a slime dropped an orb. Each type of monster is tracked separately and that monster's counter is reset when it drops an orb for anyone.
+An optional kill counter has been added to the experience ui. Toggle with /expkillcount (defaults to OFF). Shows the counter for the most recently killed monster type only.
+
+5. Other:
+* Sync checks are now less frequent to see if that reduces multiplayer lag when running several mods on low-spec systems (checking if a resync is needed was changed from 250ms to 500ms)
+* Archer's "arrow damage" renamed to "bow damage" (because it affects bows, not arrows)
+* fixed typo in expmapauthcode
+
+6. Bug Fixes:
+* prevent multiplayer console error on player join (harmless bug)
+
 ===v1.3.3===
 
 Cleric/Saint rework delayed again, but here are some more fixes/qol changes.

@@ -43,8 +43,10 @@ namespace ExperienceAndClasses.Abilities
             Cleric_Active_Heal,
             Cleric_Upgrade_Heal_Smite,
             Cleric_Active_Sanctuary,
+            Cleric_Alternate_Heal_Barrier,
 
             Saint_Active_DivineIntervention,
+            Saint_Upgrade_Sanctuary_Link,
             Saint_Active_Paragon,
 
             //when adding here, make that that a class of the same name is added below
@@ -98,9 +100,9 @@ namespace ExperienceAndClasses.Abilities
         public class Cleric_Active_Heal : Ability
         {
             public static float range = 600;
-            public static float knockback = 5;
-            public static float secondary_targets_multiplier = 0.5f;
-            private static float undead_bonus_multiplier = 2f;
+            private static float knockback = 5;
+            private static float secondary_targets_multiplier = 0.5f;
+            public static float undead_bonus_multiplier = 2f;
 
             public Cleric_Active_Heal()
             {
@@ -112,48 +114,65 @@ namespace ExperienceAndClasses.Abilities
                 cooldown_seconds = 3;
                 class_type = CLASS_TYPE.SUPPORT;
                 requires_sight_cursor = true;
+
                 upgrades = new ID[] {ID.Cleric_Upgrade_Heal_Smite};
+
+                alternative = ID.Cleric_Alternate_Heal_Barrier;
+                cost_mana_alternative_multiplier = Cleric_Alternate_Heal_Barrier.mana_multiplier;
             }
-            protected override RETURN UseEffects()
+            protected override RETURN UseEffects(byte level = 1, bool alternate = false)
             {
+                //update values
+                UpdateHealingValues(level);
+
                 //location
                 location = Main.MouseWorld;
 
-                //visual (dust)
-                Projectile.NewProjectile(location, new Vector2(0f), ExperienceAndClasses.mod.ProjectileType<DustMakerProj>(), 0, 0, Main.LocalPlayer.whoAmI, (float)DustMakerProj.MODE.heal);
+                if (!alternate || !ExperienceAndClasses.localMyPlayer.unlocked_abilities_current[(int)alternative]) //main effect (heal)
+                {
+                    //visual (dust)
+                    Projectile.NewProjectile(location, new Vector2(0f), ExperienceAndClasses.mod.ProjectileType<DustMakerProj>(), 0, 0, Main.LocalPlayer.whoAmI, (float)DustMakerProj.MODE.heal);
 
-                //update values
-                UpdateHealingValues();
+                    //update upgrades
+                    upgrade_smite = ExperienceAndClasses.localMyPlayer.unlocked_abilities_current[(int)upgrades[0]];
 
-                //update upgrades
-                upgrade_smite = ExperienceAndClasses.localMyPlayer.unlocked_abilities_current[(int)upgrades[0]];
+                    //look for players/npcs
+                    Tuple<List<Tuple<bool, int, bool>>, int, int, bool, bool> target_info = FindTargets(ExperienceAndClasses.localMyPlayer.player, location, range, true, true, true);
+                    nearest_friendly_index = target_info.Item2;
+                    nearest_hostile_index = target_info.Item3;
+                    nearest_friendly_is_player = target_info.Item4;
+                    nearest_hostile_is_player = target_info.Item5;
 
-                //look for players/npcs
-                Tuple<List<Tuple<bool, int, bool>>, int, int, bool, bool> target_info = FindTargets(ExperienceAndClasses.localMyPlayer.player, location, range, true);
-                nearest_friendly_index = target_info.Item2;
-                nearest_hostile_index = target_info.Item3;
-                nearest_friendly_is_player = target_info.Item4;
-                nearest_hostile_is_player = target_info.Item5;
-
-                //do action
-                target_info.Item1.ForEach(HealAction);
+                    //do action
+                    target_info.Item1.ForEach(HealAction);
+                }
+                else //alternative effect (barrier)
+                {
+                    Projectile.NewProjectile(location, new Vector2(0f), ExperienceAndClasses.mod.ProjectileType<AbilityProj.Cleric_Barrier>(), (int)(value_damage * Cleric_Alternate_Heal_Barrier.damage_multiplier), Cleric_Alternate_Heal_Barrier.knockback, Main.LocalPlayer.whoAmI);
+                }
 
                 return RETURN.SUCCESS;
             }
 
-            public static void UpdateHealingValues()
+            public static void UpdateHealingValues(byte level = 0)
             {
-                //grab this because it is used several times
+                //local player
                 MyPlayer self = ExperienceAndClasses.localMyPlayer;
 
+                //if not told which level to use, check
+                if (level == 0)
+                {
+                    level = (byte)self.effectiveLevel;
+                }
+
                 //calculate heal others (20+((level/10)^1.7))
-                value_heal_other = (20 + Math.Pow(self.effectiveLevel / 10, 1.7)) * self.healing_power;
+                value_heal_other = (20 + Math.Pow(level / 10, 1.7)) * self.healing_power;
 
                 //calculate heal self (15+((level/10)^1.4))
-                value_heal_self = (15 + Math.Pow(self.effectiveLevel / 10, 1.4)) * self.healing_power;
+                value_heal_self = (15 + Math.Pow(level / 10, 1.4)) * self.healing_power;
 
                 //calculate heal damage (15+((level/10)^2))
-                value_damage = (15 + Math.Pow(self.effectiveLevel / 10, 2)) * self.healing_power;
+                value_damage = (15 + Math.Pow(level / 10, 2)) * self.healing_power;
             }
 
             private static int nearest_friendly_index;
@@ -202,13 +221,9 @@ namespace ExperienceAndClasses.Abilities
                     if (!is_player)
                     {
                         npc = Main.npc[index];
-                        foreach (string type in ExperienceAndClasses.UNDEAD_NAMES)
+                        if (IsUndead(npc.TypeName))
                         {
-                            if (npc.TypeName.ToLower().Contains(type))
-                            {
-                                value *= undead_bonus_multiplier;
-                                break;
-                            }
+                            value *= undead_bonus_multiplier;
                         }
                     }
                 }
@@ -235,7 +250,7 @@ namespace ExperienceAndClasses.Abilities
                 int value_final = (int)value;
                 
                 //create projecile to handle (easy way to sync for multiplayer)
-                Projectile.NewProjectile(location, new Vector2(0f), ExperienceAndClasses.mod.ProjectileType<AbilityProj.Proj_HealHurt>(), value_final, knockback, Main.LocalPlayer.whoAmI, player_val, index);
+                Projectile.NewProjectile(location, new Vector2(0f), ExperienceAndClasses.mod.ProjectileType<AbilityProj.Misc_HealHurt>(), value_final, knockback, Main.LocalPlayer.whoAmI, player_val, index);
             }
         }
 
@@ -257,15 +272,47 @@ namespace ExperienceAndClasses.Abilities
                 name = "Sanctuary";
                 name_short = "Sanc";
                 description = "";
-                cost_mana_percent = 0.1f; //0.90f;
-                cooldown_seconds = 2; //120;
+                cost_mana_percent = 0.90f;
+                cooldown_seconds = 120;
                 class_type = CLASS_TYPE.SUPPORT;
+                upgrades = new ID[] { ID.Saint_Upgrade_Sanctuary_Link };
             }
 
-            protected override RETURN UseEffects()
+            protected override RETURN UseEffects(byte level = 1, bool alternate = false)
             {
-                Projectile.NewProjectile(Main.LocalPlayer.Center, new Vector2(0f), ExperienceAndClasses.mod.ProjectileType<AbilityProj.Sanctuary>(), 0, 0, Main.LocalPlayer.whoAmI, 0);
+                //which sanctuary to place
+                int sanc_index = 0;
+                if (alternate && ExperienceAndClasses.localMyPlayer.unlocked_abilities_current[(int)upgrades[0]])
+                {
+                    sanc_index = 1;
+                }
+
+                //destory prior sanc if exists
+                if (ExperienceAndClasses.localMyPlayer.sanctuaries[sanc_index] != null)
+                {
+                    ExperienceAndClasses.localMyPlayer.sanctuaries[sanc_index].Kill();
+                }
+
+                //create new
+                int index = Projectile.NewProjectile(Main.LocalPlayer.Center, new Vector2(0f), ExperienceAndClasses.mod.ProjectileType<AbilityProj.Cleric_Sanctuary>(), 0, 0, Main.LocalPlayer.whoAmI, sanc_index);
+                ExperienceAndClasses.localMyPlayer.sanctuaries[sanc_index] = Main.projectile[index];
+
+                //success
                 return RETURN.SUCCESS;
+            }
+        }
+
+        public class Cleric_Alternate_Heal_Barrier : Ability
+        {
+            public static float knockback = 10;
+            public static float damage_multiplier = 1f;
+            public static float mana_multiplier = 2f;
+
+            public Cleric_Alternate_Heal_Barrier()
+            {
+                ability_type = ABILITY_TYPE.ALTERNATE;
+                name = "Heal - Barrier";
+                description = "";
             }
         }
 
@@ -280,6 +327,16 @@ namespace ExperienceAndClasses.Abilities
                 cost_mana_percent = 0.50f;
                 cooldown_seconds = 20;
                 class_type = CLASS_TYPE.SUPPORT;
+            }
+        }
+
+        public class Saint_Upgrade_Sanctuary_Link : Ability
+        {
+            public Saint_Upgrade_Sanctuary_Link()
+            {
+                ability_type = ABILITY_TYPE.UPGRADE;
+                name = "Sanctuary - Link";
+                description = "";
             }
         }
 
@@ -316,8 +373,9 @@ namespace ExperienceAndClasses.Abilities
             protected string name_short = "undefined";
             protected string description = "undefined";
 
-            //upgrades for actives
+            //upgrades and alternative for actives
             protected ID[] upgrades = new ID[0];
+            protected ID alternative = new ID();
 
             //coodlown tracking
             protected bool cooldown_active = false;
@@ -327,6 +385,7 @@ namespace ExperienceAndClasses.Abilities
             protected int cost_mana_base = 0;
             protected float cost_mana_percent = 0f;
             protected float cost_mana_reduction_cap = 0.8f;
+            protected float cost_mana_alternative_multiplier = 1f;
             protected double cooldown_seconds = 0;
             protected bool requires_sight_cursor = false;
 
@@ -366,7 +425,7 @@ namespace ExperienceAndClasses.Abilities
                 }
 
                 //do effect (override UseEffects)
-                return_value = UseEffects();
+                return_value = UseEffects(level, alternate);
                 if (return_value != RETURN.SUCCESS) return return_value;
 
                 //active on-use effects
@@ -380,7 +439,7 @@ namespace ExperienceAndClasses.Abilities
                 //take costs
                 if (!skip_checks_and_costs)
                 {
-                    return_value = UseCosts();
+                    return_value = UseCosts(level, alternate);
                 }
 
                 //return final result
@@ -411,7 +470,7 @@ namespace ExperienceAndClasses.Abilities
                 return RETURN.SUCCESS;
             }
 
-            protected virtual RETURN UseEffects()
+            protected virtual RETURN UseEffects(byte level = 1, bool alternate = false)
             {
                 return RETURN.FAIL_NOT_IMPLEMENTRD;
             }
@@ -435,6 +494,11 @@ namespace ExperienceAndClasses.Abilities
             public int GetManaCost(byte level = 1, bool alternate = false)
             {
                 int manaCost = (int)((cost_mana_base + (cost_mana_percent * Main.LocalPlayer.statManaMax2)) * Main.LocalPlayer.manaCost); //apply cost_mana_reduction_cap
+
+                if (alternate)
+                {
+                    manaCost = (int)(manaCost * cost_mana_alternative_multiplier);
+                }
 
                 if (manaCost < 0) manaCost = 0;
                 if (manaCost > Main.LocalPlayer.statManaMax2) manaCost = Main.LocalPlayer.statManaMax2;
@@ -830,7 +894,7 @@ namespace ExperienceAndClasses.Abilities
         /// <param name="location"></param>
         /// <param name="radius"></param>
         /// <returns></returns>
-        private static Tuple<List<Tuple<bool, int, bool>>,int,int,bool,bool> FindTargets(Player source, Vector2 location, float radius, bool require_line_of_sight)
+        private static Tuple<List<Tuple<bool, int, bool>>, int, int, bool, bool> FindTargets(Player source, Vector2 location, float radius, bool require_line_of_sight = true, bool include_players = true, bool include_npc = true, bool include_friendly = true, bool include_hostile = true)
         {
             List<Tuple<bool, int, bool>> targets = new List<Tuple<bool, int, bool>>();
             int nearest_friendly_index = -1;
@@ -845,34 +909,37 @@ namespace ExperienceAndClasses.Abilities
             float distance;
 
             //search players
-            for (int player_index = 0; player_index <= Main.maxPlayers; player_index++)
+            if (include_players)
             {
-                player = Main.player[player_index];
-                if (player.active && !player.dead)
+                for (int player_index = 0; player_index <= Main.maxPlayers; player_index++)
                 {
-                    distance = player.Distance(location);
-                    if ((distance <= radius) && Collision.CanHit(location, 0, 0, player.Center, 0, 0))
+                    player = Main.player[player_index];
+                    if (player.active && !player.dead)
+                    {
+                        distance = player.Distance(location);
+                        if ((distance <= radius) && Collision.CanHit(location, 0, 0, player.Center, 0, 0))
                         {
-                        if (source.hostile && player.hostile && ((source.team == 0) || (source.team != player.team)) && (source.whoAmI != player.whoAmI)) //both in pvp, self doesn't have a team or is on a different team
-                        {
-                            //hostile
-                            targets.Add(new Tuple<bool, int, bool>(true, player_index, true));
-                            if (distance <= nearest_hostile_distance)
+                            if (include_hostile && source.hostile && player.hostile && ((source.team == 0) || (source.team != player.team)) && (source.whoAmI != player.whoAmI)) //both in pvp, self doesn't have a team or is on a different team
                             {
-                                nearest_hostile_distance = distance;
-                                nearest_hostile_index = player.whoAmI;
-                                nearest_hostile_is_player = true;
+                                //hostile
+                                targets.Add(new Tuple<bool, int, bool>(true, player_index, true));
+                                if (distance <= nearest_hostile_distance)
+                                {
+                                    nearest_hostile_distance = distance;
+                                    nearest_hostile_index = player.whoAmI;
+                                    nearest_hostile_is_player = true;
+                                }
                             }
-                        }
-                        else
-                        {
-                            //friendly
-                            targets.Add(new Tuple<bool, int, bool>(true, player_index, false));
-                            if (distance <= nearest_friendly_distance)
+                            else if (include_friendly)
                             {
-                                nearest_friendly_distance = distance;
-                                nearest_friendly_index = player.whoAmI;
-                                nearest_friendly_is_player = true;
+                                //friendly
+                                targets.Add(new Tuple<bool, int, bool>(true, player_index, false));
+                                if (distance <= nearest_friendly_distance)
+                                {
+                                    nearest_friendly_distance = distance;
+                                    nearest_friendly_index = player.whoAmI;
+                                    nearest_friendly_is_player = true;
+                                }
                             }
                         }
                     }
@@ -880,35 +947,38 @@ namespace ExperienceAndClasses.Abilities
             }
 
             //search npcs
-            int num_npc_total = Main.npc.Length;
-            for (int npc_index = 0; npc_index < num_npc_total; npc_index++)
+            if (include_npc)
             {
-                npc = Main.npc[npc_index];
-                if (npc.active)
+                int num_npc_total = Main.npc.Length;
+                for (int npc_index = 0; npc_index < num_npc_total; npc_index++)
                 {
-                    distance = npc.Distance(location);
-                    if ((distance <= radius) && Collision.CanHit(location, 0, 0, npc.Center, 0, 0))
+                    npc = Main.npc[npc_index];
+                    if (npc.active)
                     {
-                        if (!npc.friendly)
+                        distance = npc.Distance(location);
+                        if ((distance <= radius) && Collision.CanHit(location, 0, 0, npc.Center, 0, 0))
                         {
-                            //hostile
-                            targets.Add(new Tuple<bool, int, bool>(false, npc_index, true));
-                            if (distance <= nearest_hostile_distance)
+                            if (include_hostile && !npc.friendly)
                             {
-                                nearest_hostile_distance = distance;
-                                nearest_hostile_index = npc.whoAmI;
-                                nearest_hostile_is_player = false;
+                                //hostile
+                                targets.Add(new Tuple<bool, int, bool>(false, npc_index, true));
+                                if (distance <= nearest_hostile_distance)
+                                {
+                                    nearest_hostile_distance = distance;
+                                    nearest_hostile_index = npc.whoAmI;
+                                    nearest_hostile_is_player = false;
+                                }
                             }
-                        }
-                        else
-                        {
-                            //friendly
-                            targets.Add(new Tuple<bool, int, bool>(false, npc_index, false));
-                            if (distance <= nearest_friendly_distance)
+                            else if (include_friendly)
                             {
-                                nearest_friendly_distance = distance;
-                                nearest_friendly_index = npc.whoAmI;
-                                nearest_friendly_is_player = false;
+                                //friendly
+                                targets.Add(new Tuple<bool, int, bool>(false, npc_index, false));
+                                if (distance <= nearest_friendly_distance)
+                                {
+                                    nearest_friendly_distance = distance;
+                                    nearest_friendly_index = npc.whoAmI;
+                                    nearest_friendly_is_player = false;
+                                }
                             }
                         }
                     }
@@ -917,6 +987,19 @@ namespace ExperienceAndClasses.Abilities
 
             //return described above
             return new Tuple<List<Tuple<bool, int, bool>>, int, int, bool, bool>(targets, nearest_friendly_index, nearest_hostile_index, nearest_friendly_is_player, nearest_hostile_is_player);
+        }
+
+        public static bool IsUndead(string npc_name)
+        {
+            npc_name = npc_name.ToLower();
+            foreach (string type in ExperienceAndClasses.UNDEAD_NAMES)
+            {
+                if (npc_name.Contains(type))
+                {
+                    return true;
+                }
+            }
+            return false;
         }
     }
 }

@@ -10,27 +10,81 @@ namespace ExperienceAndClasses.Abilities
 {
     public class AbilityProj
     {
-        public class Sanctuary : ProjCycleFrames
+        public class Cleric_Sanctuary : SyncingProjectile
         {
-            public Sanctuary()
-            {
-                NUMBER_FRAMES = 4;
-                TICKS_PER_FRAME = 100;
-            }
+            private int sanc_index = -1;
+
             public override void SetDefaults()
             {
-                projectile.width = 96;
-                projectile.height = 96;
-                projectile.timeLeft = int.MaxValue; //move this
+                projectile.width = 151;
+                projectile.height = 151;
+                projectile.light = 1f;
+                projectile.alpha = 220;
             }
-            public override void OnHitPlayer(Player target, int damage, bool crit)
+            public override void AI()
             {
-                Main.NewText("test");
-                base.OnHitPlayer(target, damage, crit);
+                //unlimited duration
+                projectile.timeLeft = int.MaxValue;
+
+                //set index once
+                if (sanc_index == -1)
+                {
+                    sanc_index = (int)projectile.ai[0];
+                }
+
+                //remove any strays
+                if (!Main.player[projectile.owner].active || ((projectile.owner == Main.LocalPlayer.whoAmI) && !ExperienceAndClasses.localMyPlayer.sanctuaries[sanc_index].Equals(projectile)))
+                {
+                    projectile.Kill();
+                    return;
+                }
+
+                //everything else
+                base.AI();
             }
         }
 
-        public class Proj_HealHurt : ProjNoVisual
+        public class Cleric_Barrier : SyncingProjectile
+        {
+            public override void SetDefaults()
+            {
+                projectile.height = 127;
+                projectile.width = 12;
+                projectile.penetrate = 3; 
+                projectile.friendly = true;
+                projectile.alpha = 100;
+                projectile.light = 0.3f;
+                projectile.timeLeft = (int)TimeSpan.TicksPerSecond * 20;
+            }
+
+            public override void ModifyHitNPC(NPC target, ref int damage, ref float knockback, ref bool crit, ref int hitDirection)
+            {
+                //direction
+                RedirectToNPC(projectile, target);
+                hitDirection = projectile.direction;
+
+                //undead bonus
+                if (AbilityMain.IsUndead(target.TypeName))
+                {
+                    damage = (int)(damage * AbilityMain.Cleric_Active_Heal.undead_bonus_multiplier);
+                }
+            }
+
+            public override void ModifyHitPlayer(Player target, ref int damage, ref bool crit)
+            {
+                RedirectToPlayer(projectile, target);
+                base.ModifyHitPlayer(target, ref damage, ref crit);
+            }
+
+            public override void ModifyHitPvp(Player target, ref int damage, ref bool crit)
+            {
+                RedirectToPlayer(projectile, target);
+                base.ModifyHitPvp(target, ref damage, ref crit);
+            }
+
+        }
+
+        public class Misc_HealHurt : ProjNoVisual
         {
             //heal/hurt a player/npc
             //projectile.damage is the magnitude (+ for heal, - for hurt)
@@ -127,6 +181,24 @@ namespace ExperienceAndClasses.Abilities
                     //done
                     has_run = true;
                 }
+            }
+        }
+
+        private static void RedirectToPlayer(Projectile projectile, Player target)
+        {
+            projectile.direction = 1;
+            if (projectile.Center.X > target.Center.X)
+            {
+                projectile.direction = -1;
+            }
+        }
+
+        private static void RedirectToNPC(Projectile projectile, NPC target)
+        {
+            projectile.direction = 1;
+            if (projectile.Center.X > target.Center.X)
+            {
+                projectile.direction = -1;
             }
         }
 
