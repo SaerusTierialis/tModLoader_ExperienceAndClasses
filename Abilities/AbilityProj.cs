@@ -50,7 +50,7 @@ namespace ExperienceAndClasses.Abilities
             {
                 projectile.height = 127;
                 projectile.width = 12;
-                projectile.penetrate = 3; 
+                projectile.penetrate = 3;
                 projectile.friendly = true;
                 projectile.alpha = 100;
                 projectile.light = 0.3f;
