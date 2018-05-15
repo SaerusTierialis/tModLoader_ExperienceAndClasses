@@ -1089,8 +1089,6 @@ namespace ExperienceAndClasses.Abilities
                 }
 
                 npc_undead.Add(id, result);
-
-                Main.NewText(npc_name + " = " + result);
             }
             return (bool)npc_undead.GetByIndex(npc_undead.IndexOfKey(id));
         }
