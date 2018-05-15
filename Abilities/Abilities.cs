@@ -46,7 +46,9 @@ namespace ExperienceAndClasses.Abilities
             Cleric_Alternate_Heal_Barrier,
 
             Saint_Active_DivineIntervention,
+            Saint_Upgrade_Heal_Cure,
             Saint_Upgrade_Sanctuary_Link,
+            Saint_Upgrade_Heal_Purify,
             Saint_Active_Paragon,
 
             //when adding here, make that that a class of the same name is added below
@@ -89,8 +91,8 @@ namespace ExperienceAndClasses.Abilities
 
         public class Cleric_Passive_Cleanse : Ability
         {
-            private const ushort seconds_delay = 10;
-            private const ushort seconds_duration = 120;
+            private const double seconds_delay = 10;
+            private const double seconds_duration = 120;
 
             public Cleric_Passive_Cleanse()
             {
@@ -137,7 +139,7 @@ namespace ExperienceAndClasses.Abilities
                 class_type = CLASS_TYPE.SUPPORT;
                 requires_sight_cursor = true;
 
-                upgrades = new ID[] {ID.Cleric_Upgrade_Heal_Smite};
+                upgrades = new ID[] { ID.Cleric_Upgrade_Heal_Smite , ID.Saint_Upgrade_Heal_Cure , ID.Saint_Upgrade_Heal_Purify };
 
                 alternative = ID.Cleric_Alternate_Heal_Barrier;
                 cost_mana_alternative_multiplier = Cleric_Alternate_Heal_Barrier.mana_multiplier;
@@ -156,7 +158,7 @@ namespace ExperienceAndClasses.Abilities
                     Projectile.NewProjectile(location, new Vector2(0f), ExperienceAndClasses.mod.ProjectileType<DustMakerProj>(), 0, 0, Main.LocalPlayer.whoAmI, (float)DustMakerProj.MODE.heal);
 
                     //update upgrades
-                    upgrade_smite = ExperienceAndClasses.localMyPlayer.unlocked_abilities_current[(int)upgrades[0]];
+                    upgrade_smite = ExperienceAndClasses.localMyPlayer.unlocked_abilities_current[(int)ID.Cleric_Upgrade_Heal_Smite];
 
                     //look for players/npcs
                     Tuple<List<Tuple<bool, int, bool>>, int, int, bool, bool> target_info = FindTargets(ExperienceAndClasses.localMyPlayer.player, location, range, true, true, true);
@@ -218,6 +220,20 @@ namespace ExperienceAndClasses.Abilities
                 if (!is_player)
                     player_val = 0;
 
+                //immunities
+                bool has_cure = ExperienceAndClasses.localMyPlayer.unlocked_abilities_current[(int)ID.Saint_Upgrade_Heal_Cure];
+                bool has_purify = ExperienceAndClasses.localMyPlayer.unlocked_abilities_current[(int)ID.Saint_Upgrade_Heal_Purify];
+                List<int> immunities = new List<int>();
+                if (has_cure || has_purify)
+                {
+                    for (int i = 0; i < ExperienceAndClasses.NUMBER_OF_DEBUFFS; i++)
+                    {
+                        if (Main.LocalPlayer.buffImmune[ExperienceAndClasses.DEBUFFS[i]])
+                        {
+                            immunities.Add(i);
+                        }
+                    }
+                }
 
                 //get value of heal/damage
                 double value;
@@ -259,6 +275,19 @@ namespace ExperienceAndClasses.Abilities
                     else
                     {
                         value = value_heal_other;
+
+                        //cure and purify
+                        if (is_player && Main.player[index].active && !Main.player[index].dead)
+                        {
+                            if (has_purify)
+                            {
+                                Methods.PacketSender.ClientSendDebuffImmunity(index, immunities, Saint_Upgrade_Heal_Purify.immunity_duration_seconds);
+                            }
+                            else if (has_cure)
+                            {
+                                Methods.PacketSender.ClientSendDebuffImmunity(index, immunities, Saint_Upgrade_Heal_Cure.immunity_duration_seconds);
+                            }
+                        }
                     }
 
                     //adjust
@@ -304,7 +333,7 @@ namespace ExperienceAndClasses.Abilities
             {
                 //which sanctuary to place
                 int sanc_index = 0;
-                if (alternate && ExperienceAndClasses.localMyPlayer.unlocked_abilities_current[(int)upgrades[0]])
+                if (alternate && ExperienceAndClasses.localMyPlayer.unlocked_abilities_current[(int)ID.Saint_Upgrade_Sanctuary_Link])
                 {
                     sanc_index = 1;
                 }
@@ -352,12 +381,34 @@ namespace ExperienceAndClasses.Abilities
             }
         }
 
+        public class Saint_Upgrade_Heal_Cure : Ability
+        {
+            public static double immunity_duration_seconds = 0;
+            public Saint_Upgrade_Heal_Cure()
+            {
+                ability_type = ABILITY_TYPE.UPGRADE;
+                name = "Heal - Cure";
+                description = "";
+            }
+        }
+
         public class Saint_Upgrade_Sanctuary_Link : Ability
         {
             public Saint_Upgrade_Sanctuary_Link()
             {
                 ability_type = ABILITY_TYPE.UPGRADE;
                 name = "Sanctuary - Link";
+                description = "";
+            }
+        }
+
+        public class Saint_Upgrade_Heal_Purify : Ability
+        {
+            public static double immunity_duration_seconds = 120;
+            public Saint_Upgrade_Heal_Purify()
+            {
+                ability_type = ABILITY_TYPE.UPGRADE;
+                name = "Heal - Purify";
                 description = "";
             }
         }

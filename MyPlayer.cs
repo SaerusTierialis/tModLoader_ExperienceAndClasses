@@ -421,17 +421,29 @@ namespace ExperienceAndClasses
                     if (debuff_immunity_update[i] && now.CompareTo(debuff_immunity_time_start[i])>0)
                     {
                         //start immunity
-                        debuff_immunity_update[i] = false;
-                        debuff_immunity_active[i] = true;
-                        debuff_immunity_time_end[i] = now.AddSeconds(debuff_immunity_duration_seconds[i]);
-                        debuff_immunity_duration_seconds[i] = 0;
-
-                        //message
-                        if (message_gain.Length > 0)
+                        if (debuff_immunity_duration_seconds[i] <= 0)
                         {
-                            message_gain = ", " + message_gain;
+                            //one-time cure
+                            player.buffImmune[ExperienceAndClasses.DEBUFFS[i]] = true;
                         }
-                        message_gain += ExperienceAndClasses.DEBUFF_NAMES[i];
+                        else
+                        {
+                            //message
+                            if (!debuff_immunity_active[i] && !player.buffImmune[ExperienceAndClasses.DEBUFFS[i]])
+                            {
+                                if (message_gain.Length > 0)
+                                {
+                                    message_gain += ", ";
+                                }
+                                message_gain += ExperienceAndClasses.DEBUFF_NAMES[i];
+                            }
+
+                            //immunity with duration
+                            debuff_immunity_active[i] = true;
+                            debuff_immunity_time_end[i] = now.AddSeconds(debuff_immunity_duration_seconds[i]);
+                        }
+                        debuff_immunity_update[i] = false;
+                        debuff_immunity_duration_seconds[i] = 0;
                     }
 
                     //handling current immunities
@@ -443,11 +455,14 @@ namespace ExperienceAndClasses
                             debuff_immunity_active[i] = false;
 
                             //message
-                            if (message_lose.Length > 0)
+                            if (!player.buffImmune[ExperienceAndClasses.DEBUFFS[i]])
                             {
-                                message_lose = ", " + message_lose;
+                                if (message_lose.Length > 0)
+                                {
+                                    message_lose += ", ";
+                                }
+                                message_lose += ExperienceAndClasses.DEBUFF_NAMES[i];
                             }
-                            message_lose += ExperienceAndClasses.DEBUFF_NAMES[i];
                         }
                         else
                         {
@@ -463,7 +478,7 @@ namespace ExperienceAndClasses
                 }
                 if (message_lose.Length > 0)
                 {
-                    Main.NewText("Lost Immunity: " + message_gain, ExperienceAndClasses.MESSAGE_COLOUR_RED);
+                    Main.NewText("Lost Immunity: " + message_lose, ExperienceAndClasses.MESSAGE_COLOUR_RED);
                 }
 
                 //update healing power
@@ -825,7 +840,7 @@ namespace ExperienceAndClasses
             CombatText.NewText(player.getRect(), ExperienceAndClasses.MESSAGE_COLOUR_OFF_COOLDOWN, abilityName + " Ready!");
         }
 
-        public static void GrantDebuffImunity(int index, DateTime time_start, int duration_seconds)
+        public static void GrantDebuffImunity(int index, DateTime time_start, double duration_seconds)
         {
             //trigger update
             MyPlayer.debuff_immunity_update[index] = true;
@@ -837,7 +852,7 @@ namespace ExperienceAndClasses
             }
 
             //set duration unless there is already a longer duration triggered
-            if (debuff_immunity_duration_seconds[index] < duration_seconds)
+            if (!(debuff_immunity_duration_seconds[index] > duration_seconds))
             {
                 debuff_immunity_duration_seconds[index] = duration_seconds;
             }

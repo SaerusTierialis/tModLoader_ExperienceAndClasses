@@ -25,6 +25,8 @@ namespace ExperienceAndClasses
     {
         //Client packets are sent by clients to server
 
+        ClientSendDebuffImmunity,
+
         ClientTellAddExp,
         ClientTellAnnouncement,
         ClientTellExperience,
@@ -44,10 +46,9 @@ namespace ExperienceAndClasses
         ClientAFK,
         ClientUnAFK,
 
-        //ClientAbility,
-
         //Server packets are sent by server to clients
 
+        ServerDebuffImmunity,
         ServerNewPlayerSync,
         ServerForceExperience,
         ServerSyncExp,
@@ -242,6 +243,46 @@ namespace ExperienceAndClasses
             Mod mod = (this as Mod);
             switch (msgType)
             {
+                //Player telling server to give another player debuff immunities
+                case ExpModMessageType.ClientSendDebuffImmunity:
+                    if (Main.netMode != 2) break;
+
+                    //read
+                    player = Main.player[reader.ReadInt32()]; //sender
+                    newInt = reader.ReadInt32(); //target
+                    newDouble = reader.ReadDouble(); //duration
+                    newInt2 = reader.ReadInt32(); //number of debuffs
+                    List<int> immunities = new List<int>();
+                    for (int i=0; i< newInt2; i++)
+                    {
+                        immunities.Add(reader.ReadInt32());
+                    }
+
+                    //send to target
+                    if (Main.player[newInt].active)
+                    {
+                        Methods.PacketSender.ServerDebuffImmunity(player.whoAmI, newInt, immunities, newDouble);
+                    }
+
+                    if (worldTrace || traceChar) Methods.ChatCommands.Trace("TRACE:Recieved ClientSendDebuffImmunity from player #" + player.whoAmI + ":" + player.name + " for player #" + newInt + ":" + Main.player[newInt].name);
+                    break;
+
+                //Server giving a player debuff immunities
+                case ExpModMessageType.ServerDebuffImmunity:
+                    if (Main.netMode != 1) break;
+
+                    //read
+                    player = Main.player[reader.ReadInt32()]; //sender
+                    newDouble = reader.ReadDouble(); //duration
+                    newInt2 = reader.ReadInt32(); //number of debuffs
+                    for (int i = 0; i < newInt2; i++)
+                    {
+                        MyPlayer.GrantDebuffImunity(reader.ReadInt32(), DateTime.Now, newDouble);
+                    }
+
+                    if (worldTrace || traceChar) Methods.ChatCommands.Trace("TRACE:Recieved ServerDebuffImmunity from player #" + player.whoAmI + ":" + player.name);
+                    break;
+
                 //Server's request to new player (includes map settings)
                 case ExpModMessageType.ServerNewPlayerSync:
                     //set map settings

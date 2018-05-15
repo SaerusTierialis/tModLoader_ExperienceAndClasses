@@ -501,7 +501,9 @@ namespace ExperienceAndClasses.Items
             abilities.Add(new Tuple<AbilityMain.ID, byte>(AbilityMain.ID.Cleric_Active_Sanctuary, 1));
             abilities.Add(new Tuple<AbilityMain.ID, byte>(AbilityMain.ID.Cleric_Alternate_Heal_Barrier, 1));
             abilities.Add(new Tuple<AbilityMain.ID, byte>(AbilityMain.ID.Saint_Active_DivineIntervention, 25));
+            abilities.Add(new Tuple<AbilityMain.ID, byte>(AbilityMain.ID.Saint_Upgrade_Heal_Cure, 30));
             abilities.Add(new Tuple<AbilityMain.ID, byte>(AbilityMain.ID.Saint_Upgrade_Sanctuary_Link, 35));
+            abilities.Add(new Tuple<AbilityMain.ID, byte>(AbilityMain.ID.Saint_Upgrade_Heal_Purify, 60));
             abilities.Add(new Tuple<AbilityMain.ID, byte>(AbilityMain.ID.Saint_Active_Paragon, 70));
         }
         public override void AddRecipes()

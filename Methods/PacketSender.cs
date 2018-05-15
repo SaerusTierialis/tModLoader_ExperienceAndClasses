@@ -1,4 +1,5 @@
-﻿using Terraria;
+﻿using System.Collections.Generic;
+using Terraria;
 using Terraria.ModLoader;
 
 namespace ExperienceAndClasses.Methods
@@ -6,6 +7,32 @@ namespace ExperienceAndClasses.Methods
     public static class PacketSender
     {
         /* ~~~~~~~~~~~~~~~~~~~~~ Packet Senders - Client ~~~~~~~~~~~~~~~~~~~~~ */
+
+        /// <summary>
+        /// Player telling server to give another player debuff immunities
+        /// </summary>
+        /// <param name="player_index"></param>
+        /// <param name="immunity_indecies"></param>
+        /// <param name="duration_seconds"></param>
+        public static void ClientSendDebuffImmunity(int player_index, List<int> immunity_indecies, double duration_seconds)
+        {
+            if ((Main.netMode != 1) || (immunity_indecies.Count == 0))
+            {
+                return;
+            }
+
+            ModPacket packet = ExperienceAndClasses.mod.GetPacket();
+            packet.Write((byte)ExpModMessageType.ClientSendDebuffImmunity);
+            packet.Write(Main.LocalPlayer.whoAmI); //sender (int)
+            packet.Write(player_index); //target (int)
+            packet.Write(duration_seconds); //duration (double)
+            packet.Write(immunity_indecies.Count); //number of immunities (int)
+            foreach (int i in immunity_indecies)
+            {
+                packet.Write(i); //immunity indicies (int)
+            }
+            packet.Send();
+        }
 
         /// <summary>
         /// Player telling server to make an announcement.
@@ -292,6 +319,31 @@ namespace ExperienceAndClasses.Methods
         /* ~~~~~~~~~~~~~~~~~~~~~ Packet Senders - Server ~~~~~~~~~~~~~~~~~~~~~ */
 
         /// <summary>
+        /// Server giving a player debuff immunities
+        /// </summary>
+        /// <param name="player_index"></param>
+        /// <param name="immunity_indecies"></param>
+        /// <param name="duration_seconds"></param>
+        public static void ServerDebuffImmunity(int player_index_source, int player_index_target, List<int> immunity_indecies, double duration_seconds)
+        {
+            if ((Main.netMode != 2) || (immunity_indecies.Count == 0))
+            {
+                return;
+            }
+
+            ModPacket packet = ExperienceAndClasses.mod.GetPacket();
+            packet.Write((byte)ExpModMessageType.ServerDebuffImmunity);
+            packet.Write(player_index_source); //sender (int)
+            packet.Write(duration_seconds); //duration (double)
+            packet.Write(immunity_indecies.Count); //number of immunities (int)
+            foreach (int i in immunity_indecies)
+            {
+                packet.Write(i); //immunity indicies (int)
+            }
+            packet.Send(player_index_target);
+        }
+
+        /// <summary>
         /// Server's request to new player (includes map settings)
         /// </summary>
         /// <param name="mod"></param>
@@ -333,11 +385,6 @@ namespace ExperienceAndClasses.Methods
             packet.Write(player.whoAmI);
             packet.Write(myPlayer.GetExp());
             packet.Send(toWho, toIgnore);
-        }
-
-        public static void ServerForceExperienceAll(Mod mod, Player player, int toWho = -1, int toIgnore = -1)
-        {
-
         }
 
         /// <summary>
