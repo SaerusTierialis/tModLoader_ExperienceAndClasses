@@ -1078,7 +1078,7 @@ namespace ExperienceAndClasses.Abilities
             {
                 bool result = false;
 
-                string npc_name = npc.GivenOrTypeName.ToLower();
+                string npc_name = npc.TypeName.ToLower();
                 foreach (string type in ExperienceAndClasses.UNDEAD_NAMES)
                 {
                     if (npc_name.Contains(type))
