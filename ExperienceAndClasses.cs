@@ -172,6 +172,21 @@ namespace ExperienceAndClasses
             "bone",
             "ghost",
             "ghast",
+            "dark caster",
+            "skull",
+            "dungeon guardian",
+            "mumm",
+            "tim",
+            "ghoul",
+            "diabolist",
+            "floaty gross",
+            "necromancer",
+            "ragged caster",
+            "wraith",
+            "rune wizard",
+            "vampire miner",
+            "frankenstein",
+            "reaper",
         };
 
         //start
