@@ -187,6 +187,7 @@ namespace ExperienceAndClasses
             "vampire miner",
             "frankenstein",
             "reaper",
+            "undead",
         };
 
         //start

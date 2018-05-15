@@ -5,6 +5,22 @@ A MAJOR overhaul is now underway. See the forums or discord for more details!
 
 CHANGELOG:
 
+===v1.3.5===
+
+1. General:
+* Updated to tModLoader v0.10.1.4
+
+2. Cleric/Saint Abilities:
+* implemented Cleanse, Cure, and Purify
+Note: remaining abilities will be added throughout the week/weekend
+
+3. Ability System:
+* silence now prevents abilities
+
+4. Other:
+* added several more search terms to the undead list
+* undead checking is now optimized for npc that have been checked before (should prevent slight delay when using heal on a large group)
+
 ===v1.3.4===
 
 1. Cleric/Saint Rework (ongoing):
