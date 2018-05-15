@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using System;
+using System.Collections;
 using Terraria;
 using Terraria.Localization;
 using Terraria.ModLoader;
@@ -8,6 +9,8 @@ namespace ExperienceAndClasses.NPCs
 {
     public class MyGlobalNPC : GlobalNPC
     {
+        public static SortedList kill_counts = new SortedList(300);
+
         public const double EATER_13_MULT = 1.801792115;
         public const double EATER_14_MULT = 1.109713024;
         public const double EATER_15_MULT = 0.647725809;
@@ -103,16 +106,16 @@ namespace ExperienceAndClasses.NPCs
                 int kill_count = 1;
                 int kill_index;
                 float chance_monster_orb_adjusted;
-                if (!MyWorld.kill_counts.ContainsKey(npc.netID))
+                if (!kill_counts.ContainsKey(npc.netID))
                 {
-                    MyWorld.kill_counts.Add(npc.netID, kill_count); //keep default of 1
-                    kill_index = MyWorld.kill_counts.IndexOfKey(npc.netID);
+                    kill_counts.Add(npc.netID, kill_count); //keep default of 1
+                    kill_index = kill_counts.IndexOfKey(npc.netID);
                 }
                 else
                 {
-                    kill_index = MyWorld.kill_counts.IndexOfKey(npc.netID);
-                    kill_count = (int)MyWorld.kill_counts.GetByIndex(kill_index) + 1;
-                    MyWorld.kill_counts.SetByIndex(kill_index, kill_count);
+                    kill_index = kill_counts.IndexOfKey(npc.netID);
+                    kill_count = (int)kill_counts.GetByIndex(kill_index) + 1;
+                    kill_counts.SetByIndex(kill_index, kill_count);
                 }
 
                 /*~~~~~~~~~~~~~~~~~~~~~~ Process for each player ~~~~~~~~~~~~~~~~~~~~~~*/
@@ -172,7 +175,7 @@ namespace ExperienceAndClasses.NPCs
 
                                 //reset kill count
                                 kill_count = 0;
-                                MyWorld.kill_counts.SetByIndex(kill_index, kill_count);
+                                kill_counts.SetByIndex(kill_index, kill_count);
                             }
 
                             /*~~~~~~~~~~~~~~~~~~~~~~ boss orb ~~~~~~~~~~~~~~~~~~~~~~*/

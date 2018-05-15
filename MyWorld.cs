@@ -26,8 +26,6 @@ namespace ExperienceAndClasses
         public static int clientNeedsExpUpdate_counter = 0;
         public static int[] clientNeedsExpUpdate_who = new int[256];
 
-        public static SortedList kill_counts = new SortedList(300);
-
         public override TagCompound Save()
         {
             return new TagCompound {

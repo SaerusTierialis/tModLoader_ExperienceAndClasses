@@ -175,7 +175,7 @@ namespace ExperienceAndClasses
             "dark caster",
             "skull",
             "dungeon guardian",
-            "mumm",
+            "mummy",
             "tim",
             "ghoul",
             "diabolist",

@@ -437,9 +437,9 @@ namespace ExperienceAndClasses.Methods
                     packet.Write(myPlayer.GetExp()); //xp
 
                     int kill_id = myPlayer.kill_count_track_id;
-                    if (MyWorld.kill_counts.ContainsKey(kill_id))
+                    if (NPCs.MyGlobalNPC.kill_counts.ContainsKey(kill_id))
                     {
-                        packet.Write((int)MyWorld.kill_counts.GetByIndex(MyWorld.kill_counts.IndexOfKey(kill_id))); //kill count (int32)
+                        packet.Write((int)NPCs.MyGlobalNPC.kill_counts.GetByIndex(NPCs.MyGlobalNPC.kill_counts.IndexOfKey(kill_id))); //kill count (int32)
                     }
                     else
                     {

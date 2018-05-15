@@ -64,7 +64,7 @@ namespace ExperienceAndClasses.Abilities
                 hitDirection = projectile.direction;
 
                 //undead bonus
-                if (AbilityMain.IsUndead(target.TypeName))
+                if (AbilityMain.IsUndead(target))
                 {
                     damage = (int)(damage * AbilityMain.Cleric_Active_Heal.undead_bonus_multiplier);
                 }

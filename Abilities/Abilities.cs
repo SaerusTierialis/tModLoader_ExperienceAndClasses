@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 using Terraria;
@@ -259,7 +260,7 @@ namespace ExperienceAndClasses.Abilities
                     if (!is_player)
                     {
                         npc = Main.npc[index];
-                        if (IsUndead(npc.TypeName))
+                        if (IsUndead(npc))
                         {
                             value *= undead_bonus_multiplier;
                         }
@@ -1069,17 +1070,29 @@ namespace ExperienceAndClasses.Abilities
             return new Tuple<List<Tuple<bool, int, bool>>, int, int, bool, bool>(targets, nearest_friendly_index, nearest_hostile_index, nearest_friendly_is_player, nearest_hostile_is_player);
         }
 
-        public static bool IsUndead(string npc_name)
+        public static SortedList npc_undead = new SortedList(300);
+        public static bool IsUndead(NPC npc)
         {
-            npc_name = npc_name.ToLower();
-            foreach (string type in ExperienceAndClasses.UNDEAD_NAMES)
+            int id = npc.netID;
+            if (!npc_undead.ContainsKey(id))
             {
-                if (npc_name.Contains(type))
+                bool result = false;
+
+                string npc_name = npc.GivenOrTypeName.ToLower();
+                foreach (string type in ExperienceAndClasses.UNDEAD_NAMES)
                 {
-                    return true;
+                    if (npc_name.Contains(type))
+                    {
+                        result = true;
+                        break;
+                    }
                 }
+
+                npc_undead.Add(id, result);
+
+                Main.NewText(npc_name + " = " + result);
             }
-            return false;
+            return (bool)npc_undead.GetByIndex(npc_undead.IndexOfKey(id));
         }
     }
 }
