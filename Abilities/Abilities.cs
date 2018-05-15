@@ -318,6 +318,10 @@ namespace ExperienceAndClasses.Abilities
 
         public class Cleric_Active_Sanctuary : Ability
         {
+            private const double req_time_out_combat_seconds = 10;
+            private const double cooldown_new_seconds = 5;
+            public const double pulse_seconds = 1;
+
             public Cleric_Active_Sanctuary()
             {
                 ability_type = ABILITY_TYPE.ACTIVE;
@@ -344,13 +348,82 @@ namespace ExperienceAndClasses.Abilities
                 {
                     ExperienceAndClasses.localMyPlayer.sanctuaries[sanc_index].Kill();
                 }
+                else
+                {
+                    override_cooldown = cooldown_new_seconds;
+                }
 
                 //create new
-                int index = Projectile.NewProjectile(Main.LocalPlayer.Center, new Vector2(0f), ExperienceAndClasses.mod.ProjectileType<AbilityProj.Cleric_Sanctuary>(), 0, 0, Main.LocalPlayer.whoAmI, sanc_index);
-                ExperienceAndClasses.localMyPlayer.sanctuaries[sanc_index] = Main.projectile[index];
+                Projectile.NewProjectile(Main.LocalPlayer.Center, new Vector2(0f), ExperienceAndClasses.mod.ProjectileType<AbilityProj.Cleric_Sanctuary>(), 0, 0, Main.LocalPlayer.whoAmI, sanc_index);
 
                 //success
                 return RETURN.SUCCESS;
+            }
+
+            public static void Pulse(Projectile projectile)
+            {
+                //get heal value
+                Cleric_Active_Heal.UpdateHealingValues((byte)ExperienceAndClasses.localMyPlayer.effectiveLevel);
+                int heal = (int)Cleric_Active_Heal.value_heal_other;
+
+                //heal valid players
+                Tuple<List<Tuple<bool, int, bool>>, int, int, bool, bool> target_info = FindTargets(Main.LocalPlayer, projectile.Center, projectile.width / 2, false, true, true, true, false);
+                List<Tuple<bool, int, bool>> targets = target_info.Item1;
+                DateTime now = DateTime.Now;
+                foreach (Tuple<bool, int, bool> t in targets)
+                {
+                    if (t.Item1)
+                    {
+                        //player
+                        if (DateTime.Now.Subtract(Main.player[t.Item2].GetModPlayer<MyPlayer>(ExperienceAndClasses.mod).time_last_combat).TotalSeconds >= req_time_out_combat_seconds)
+                        {
+                            Projectile.NewProjectile(projectile.Center, new Vector2(0f), ExperienceAndClasses.mod.ProjectileType<AbilityProj.Misc_HealHurt>(), heal, 0, Main.LocalPlayer.whoAmI, 1, t.Item2);
+                        }
+                    }
+                    else 
+                    {
+                        //npc
+                        Projectile.NewProjectile(projectile.Center, new Vector2(0f), ExperienceAndClasses.mod.ProjectileType<AbilityProj.Misc_HealHurt>(), heal, 0, Main.LocalPlayer.whoAmI, 0, t.Item2);
+                    }
+                }
+            }
+
+            public static void TryWarp()
+            {
+                MyPlayer myPlayer;
+                int sanc2;
+                DateTime now = DateTime.Now;
+                for (int player = 0; player < Main.maxPlayers; player++)
+                {
+                    if (Main.player[player].active)
+                    {
+                        myPlayer = Main.player[player].GetModPlayer<MyPlayer>(ExperienceAndClasses.mod);
+                        for (int sanc = 0; sanc <= 1; sanc++)
+                        {
+                            if ((myPlayer.sanctuaries[sanc] != null) && myPlayer.sanctuaries[sanc].active)
+                            {
+                                if (myPlayer.sanctuaries[sanc].Hitbox.Intersects(Main.LocalPlayer.Hitbox))
+                                {
+                                    sanc2 = 1 - sanc;
+                                    if ((myPlayer.sanctuaries[sanc2] != null) && myPlayer.sanctuaries[sanc2].active)
+                                    {
+                                        if (now.Subtract(ExperienceAndClasses.localMyPlayer.time_last_combat).TotalSeconds >= req_time_out_combat_seconds)
+                                        {
+                                            //teleport to sanc2
+                                            Main.LocalPlayer.UnityTeleport(new Vector2(myPlayer.sanctuaries[sanc2].Center.X - Main.LocalPlayer.width / 2,
+                                            myPlayer.sanctuaries[sanc2].Center.Y - Main.LocalPlayer.height / 2));
+                                        }
+                                        else
+                                        {
+                                            Main.NewText("Cannot warp during combat!", ExperienceAndClasses.MESSAGE_COLOUR_RED);
+                                        }
+                                        return;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
 
@@ -463,6 +536,7 @@ namespace ExperienceAndClasses.Abilities
             protected double cooldown_seconds = 0;
             protected bool requires_sight_cursor = false;
             protected bool ignore_status_requirements = false;
+            protected double override_cooldown = -1;
 
             //on-use effects
             protected CLASS_TYPE class_type = CLASS_TYPE.UNUSED;
@@ -516,6 +590,7 @@ namespace ExperienceAndClasses.Abilities
                 {
                     return_value = UseCosts(level, alternate);
                 }
+                override_cooldown = -1;
 
                 //return final result
                 return return_value;
@@ -559,7 +634,12 @@ namespace ExperienceAndClasses.Abilities
                     Main.LocalPlayer.statMana = 0;
                 }
                 double cd = GetCooldownSecs(level);
-                if (cd > 0)
+                if (override_cooldown > 0)
+                {
+                    cooldown_active = true;
+                    cooldown_time_end = DateTime.Now.AddSeconds(override_cooldown);
+                }
+                else if (cd > 0)
                 {
                     cooldown_active = true;
                     cooldown_time_end = DateTime.Now.AddSeconds(cd);
@@ -1000,15 +1080,18 @@ namespace ExperienceAndClasses.Abilities
                         distance = player.Distance(location);
                         if ((distance <= radius) && Collision.CanHit(location, 0, 0, player.Center, 0, 0))
                         {
-                            if (include_hostile && source.hostile && player.hostile && ((source.team == 0) || (source.team != player.team)) && (source.whoAmI != player.whoAmI)) //both in pvp, self doesn't have a team or is on a different team
+                            if (source.hostile && player.hostile && ((source.team == 0) || (source.team != player.team)) && (source.whoAmI != player.whoAmI)) //both in pvp, self doesn't have a team or is on a different team
                             {
-                                //hostile
-                                targets.Add(new Tuple<bool, int, bool>(true, player_index, true));
-                                if (distance <= nearest_hostile_distance)
+                                if (include_hostile)
                                 {
-                                    nearest_hostile_distance = distance;
-                                    nearest_hostile_index = player.whoAmI;
-                                    nearest_hostile_is_player = true;
+                                    //hostile
+                                    targets.Add(new Tuple<bool, int, bool>(true, player_index, true));
+                                    if (distance <= nearest_hostile_distance)
+                                    {
+                                        nearest_hostile_distance = distance;
+                                        nearest_hostile_index = player.whoAmI;
+                                        nearest_hostile_is_player = true;
+                                    }
                                 }
                             }
                             else if (include_friendly)
@@ -1039,15 +1122,18 @@ namespace ExperienceAndClasses.Abilities
                         distance = npc.Distance(location);
                         if ((distance <= radius) && Collision.CanHit(location, 0, 0, npc.Center, 0, 0))
                         {
-                            if (include_hostile && !npc.friendly)
+                            if (!npc.friendly)
                             {
-                                //hostile
-                                targets.Add(new Tuple<bool, int, bool>(false, npc_index, true));
-                                if (distance <= nearest_hostile_distance)
+                                if (include_hostile)
                                 {
-                                    nearest_hostile_distance = distance;
-                                    nearest_hostile_index = npc.whoAmI;
-                                    nearest_hostile_is_player = false;
+                                    //hostile
+                                    targets.Add(new Tuple<bool, int, bool>(false, npc_index, true));
+                                    if (distance <= nearest_hostile_distance)
+                                    {
+                                        nearest_hostile_distance = distance;
+                                        nearest_hostile_index = npc.whoAmI;
+                                        nearest_hostile_is_player = false;
+                                    }
                                 }
                             }
                             else if (include_friendly)

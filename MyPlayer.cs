@@ -60,6 +60,7 @@ namespace ExperienceAndClasses
         public DateTime timeAllowItemUse = DateTime.MinValue;
         public Projectile[] sanctuaries = new Projectile[2];
         public bool ability_message_overhead = true;
+        public DateTime time_last_combat = DateTime.MinValue;
 
         //debuff immunity
         public static bool[] debuff_immunity_active = new bool[ExperienceAndClasses.NUMBER_OF_DEBUFFS];
@@ -320,8 +321,11 @@ namespace ExperienceAndClasses
 
         public override void OnEnterWorld(Player player)
         {
-            if (player.whoAmI == Main.LocalPlayer.whoAmI)
+            if (Main.LocalPlayer.Equals(player))
             {
+                //reset own sanctuaries if left and rejoined
+                sanctuaries = new Projectile[2];
+
                 //afk timing
                 afkTime = DateTime.Now;
 
@@ -516,14 +520,6 @@ namespace ExperienceAndClasses
         {
             DateTime now = DateTime.Now;
 
-            //check if afk
-            if (!afk && allowAFK && (Main.netMode != 2) && (now.AddSeconds(-ExperienceAndClasses.AFK_TIME_TICKS_SEC).CompareTo(afkTime) > 0))
-            {
-                if (Main.netMode == 0) Main.NewText("You are now AFK. You will not recieve death penalties to experience but you cannot gain experience either.", ExperienceAndClasses.MESSAGE_COLOUR_RED);
-                afk = true;
-                Methods.PacketSender.ClientAFK(mod);
-            }
-
             //stop preventing item use
             if (itemUsePrevented && (now.CompareTo(timeAllowItemUse) > 0))
             {
@@ -540,38 +536,56 @@ namespace ExperienceAndClasses
                 }
             }
 
-            //TEMPORARY: select first 4 actives
-            selectedActiveAbilities = new Abilities.AbilityMain.ID[ExperienceAndClasses.NUMBER_OF_ABILITY_SLOTS];
-            int slot = 0;
-            for (int i = 0; i < unlocked_abilities_current.Length; i++)
+            //self stuff
+            if (Main.LocalPlayer.Equals(player))
             {
-                if (unlocked_abilities_current[i] && (Abilities.AbilityMain.AbilityLookup[i].IsTypeActive())) //have ability + is active
+                //check if afk
+                if (!afk && allowAFK && (Main.netMode != 2) && (now.AddSeconds(-ExperienceAndClasses.AFK_TIME_TICKS_SEC).CompareTo(afkTime) > 0))
                 {
-                    selectedActiveAbilities[slot] = (Abilities.AbilityMain.ID)i;
-                    if (slot++ >= ExperienceAndClasses.NUMBER_OF_ABILITY_SLOTS)
-                        break;
+                    if (Main.netMode == 0) Main.NewText("You are now AFK. You will not recieve death penalties to experience but you cannot gain experience either.", ExperienceAndClasses.MESSAGE_COLOUR_RED);
+                    afk = true;
+                    Methods.PacketSender.ClientAFK(mod);
                 }
-            }
 
-            //check ability cooldowns
-            Abilities.AbilityMain.Ability ability;
-            for (int i = 0; i < unlocked_abilities_current.Length; i++)
-            {
-                if (unlocked_abilities_current[i])
+                //TEMPORARY: select first 4 actives
+                selectedActiveAbilities = new Abilities.AbilityMain.ID[ExperienceAndClasses.NUMBER_OF_ABILITY_SLOTS];
+                int slot = 0;
+                for (int i = 0; i < unlocked_abilities_current.Length; i++)
                 {
-                    ability = Abilities.AbilityMain.AbilityLookup[i];
-                    if (ability.OnCooldown() && (ability.GetCooldownRemainingSeconds() <= 0))
+                    if (unlocked_abilities_current[i] && (Abilities.AbilityMain.AbilityLookup[i].IsTypeActive())) //have ability + is active
                     {
-                        ability.OnCooldown(true, false);
-                        if (ability.IsTypeActive() && (ability.GetCooldownSecs((byte)effectiveLevel) >= thresholdCDMsg))
+                        selectedActiveAbilities[slot] = (Abilities.AbilityMain.ID)i;
+                        if (slot++ >= ExperienceAndClasses.NUMBER_OF_ABILITY_SLOTS)
+                            break;
+                    }
+                }
+
+                //check ability cooldowns
+                Abilities.AbilityMain.Ability ability;
+                for (int i = 0; i < unlocked_abilities_current.Length; i++)
+                {
+                    if (unlocked_abilities_current[i])
+                    {
+                        ability = Abilities.AbilityMain.AbilityLookup[i];
+                        if (ability.OnCooldown() && (ability.GetCooldownRemainingSeconds() <= 0))
                         {
-                            OffCooldownMessage(ability.GetName());
+                            ability.OnCooldown(true, false);
+                            if (ability.IsTypeActive() && (ability.GetCooldownSecs((byte)effectiveLevel) >= thresholdCDMsg))
+                            {
+                                OffCooldownMessage(ability.GetName());
+                            }
                         }
                     }
                 }
             }
 
             base.PostUpdate();
+        }
+
+        public override void OnRespawn(Player player)
+        {
+            time_last_combat = DateTime.MinValue;
+            base.OnRespawn(player);
         }
 
         public override void Kill(double damage, int hitDirection, bool pvp, PlayerDeathReason damageSource)
@@ -617,9 +631,6 @@ namespace ExperienceAndClasses
 
         public override void ModifyHitNPC(Item item, NPC target, ref int damage, ref float knockback, ref bool crit)
         {
-            //resolve afk desync if any
-            afk = false;
-
             //on-hit midas
             if (Main.rand.Next(100) < (percentMidas * 100)) target.AddBuff(Terraria.ID.BuffID.Midas, 300);
 
@@ -658,19 +669,8 @@ namespace ExperienceAndClasses
             base.ModifyHitNPC(item, target, ref damage, ref knockback, ref crit);
         }
 
-        public override bool Shoot(Item item, ref Vector2 position, ref float speedX, ref float speedY, ref int type, ref int damage, ref float knockBack)
-        {
-            //resolve afk desync if any
-            afk = false;
-
-            return base.Shoot(item, ref position, ref speedX, ref speedY, ref type, ref damage, ref knockBack);
-        }
-
         public override void ModifyHitNPCWithProj(Projectile proj, NPC target, ref int damage, ref float knockback, ref bool crit, ref int hitDirection)
         {
-            //resolve afk desync if any
-            afk = false;
-
             //on-hit midas
             if (Main.rand.Next(100) < (percentMidas * 100)) target.AddBuff(Terraria.ID.BuffID.Midas, 300);
 
@@ -743,6 +743,34 @@ namespace ExperienceAndClasses
             return base.PreHurt(pvp, quiet, ref damage, ref hitDirection, ref crit, ref customDamage, ref playSound, ref genGore, ref damageSource);
         }
 
+        public override void OnHitAnything(float x, float y, Entity victim)
+        {
+            if (Main.LocalPlayer.Equals(player))
+            {
+                //afk
+                afkTime = DateTime.Now;
+                if (afk)
+                {
+                    if (Main.netMode == 0) Main.NewText("You are no longer AFK.", ExperienceAndClasses.MESSAGE_COLOUR_RED);
+                    afk = false;
+                    Methods.PacketSender.ClientUnAFK(mod);
+                }
+            }
+
+            //combat time
+            time_last_combat = DateTime.Now;
+
+            base.OnHitAnything(x, y, victim);
+        }
+
+        public override void Hurt(bool pvp, bool quiet, double damage, int hitDirection, bool crit)
+        {
+            //combat time
+            time_last_combat = DateTime.Now;
+
+            base.Hurt(pvp, quiet, damage, hitDirection, crit);
+        }
+
         public override void ProcessTriggers(TriggersSet triggersSet) //CLIENT-SIDE ONLY
         {
             //prevent weapon use after 
@@ -799,6 +827,10 @@ namespace ExperienceAndClasses
                         SendReturnMessage(id, latestAbilityFail);
                     }
                 }
+            }
+            else if (ExperienceAndClasses.HOTKEY_ALTERNATE_EFFECT.JustPressed)
+            {
+                Abilities.AbilityMain.Cleric_Active_Sanctuary.TryWarp();
             }
         }
 

@@ -13,6 +13,8 @@ namespace ExperienceAndClasses.Abilities
         public class Cleric_Sanctuary : SyncingProjectile
         {
             private int sanc_index = -1;
+            private DateTime time_next_pulse = DateTime.MinValue;
+            private bool local_owner = false;
 
             public override void SetDefaults()
             {
@@ -23,14 +25,19 @@ namespace ExperienceAndClasses.Abilities
             }
             public override void AI()
             {
-                //unlimited duration
-                projectile.timeLeft = int.MaxValue;
-
-                //set index once
+                //attach to owner
                 if (sanc_index == -1)
                 {
                     sanc_index = (int)projectile.ai[0];
+                    Main.player[projectile.owner].GetModPlayer<MyPlayer>(mod).sanctuaries[sanc_index] = projectile;
+                    if (Main.LocalPlayer.Equals(Main.player[projectile.owner]))
+                    {
+                        local_owner = true;
+                    }
                 }
+
+                //unlimited duration
+                projectile.timeLeft = int.MaxValue;
 
                 //remove any strays
                 if (!Main.player[projectile.owner].active || ((projectile.owner == Main.LocalPlayer.whoAmI) && !ExperienceAndClasses.localMyPlayer.sanctuaries[sanc_index].Equals(projectile)))
@@ -39,8 +46,31 @@ namespace ExperienceAndClasses.Abilities
                     return;
                 }
 
+                //effects
+                if (local_owner)
+                {
+                    DateTime now = DateTime.Now;
+                    if (now.Subtract(time_next_pulse).TotalSeconds >= AbilityMain.Cleric_Active_Sanctuary.pulse_seconds)
+                    {
+                        //timing
+                        time_next_pulse = now;
+
+                        //effects
+                        AbilityMain.Cleric_Active_Sanctuary.Pulse(projectile);
+                    }
+                }
+
                 //everything else
                 base.AI();
+            }
+            public override void Kill(int timeLeft)
+            {
+                MyPlayer myPlayer = Main.player[projectile.owner].GetModPlayer<MyPlayer>(mod);
+                if (myPlayer.sanctuaries[sanc_index].Equals(projectile))
+                {
+                    myPlayer.sanctuaries[sanc_index] = null;
+                }
+                base.Kill(timeLeft);
             }
         }
 
@@ -100,6 +130,19 @@ namespace ExperienceAndClasses.Abilities
                 base.SetDefaults();
             }
 
+            public override bool? CanHitNPC(NPC target)
+            {
+                return false;
+            }
+            public override bool CanHitPlayer(Player target)
+            {
+                return false;
+            }
+            public override bool CanHitPvp(Player target)
+            {
+                return false;
+            }
+
             public override void AI()
             {
                 if (!has_run)
@@ -136,14 +179,19 @@ namespace ExperienceAndClasses.Abilities
                                 }
                                 player.statLife += amount;
                             }
-                            else if ((amount < 0) && do_visual)
+                            else if (amount < 0)
                             {
-                                amount *= -1;
-                                if (projectile.Center.X > player.Center.X)
+                                if (do_visual)
                                 {
-                                    direction = -1;
+                                    amount *= -1;
+                                    if (projectile.Center.X > player.Center.X)
+                                    {
+                                        direction = -1;
+                                    }
+                                    player.Hurt(Terraria.DataStructures.PlayerDeathReason.ByPlayer(projectile.owner), amount, direction, true);
                                 }
-                                player.Hurt(Terraria.DataStructures.PlayerDeathReason.ByPlayer(projectile.owner), amount, direction, true);
+                                player.GetModPlayer<MyPlayer>(mod).time_last_combat = DateTime.Now;
+                                Main.player[projectile.owner].GetModPlayer<MyPlayer>(mod).time_last_combat = DateTime.Now;
                             }
                         }
                     }
@@ -166,14 +214,18 @@ namespace ExperienceAndClasses.Abilities
                                 }
                                 npc.life += amount;
                             }
-                            else if ((amount < 0) && server_or_single)
+                            else if (amount < 0)
                             {
-                                amount *= -1;
-                                if (projectile.Center.X > npc.Center.X)
+                                if (server_or_single)
                                 {
-                                    direction = -1;
+                                    amount *= -1;
+                                    if (projectile.Center.X > npc.Center.X)
+                                    {
+                                        direction = -1;
+                                    }
+                                    Main.player[projectile.owner].ApplyDamageToNPC(npc, amount, projectile.knockBack, direction, false);
                                 }
-                                Main.player[projectile.owner].ApplyDamageToNPC(npc, amount, projectile.knockBack, direction, false);
+                                Main.player[projectile.owner].GetModPlayer<MyPlayer>(mod).time_last_combat = DateTime.Now;
                             }
                         }
                     }

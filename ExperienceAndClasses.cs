@@ -188,6 +188,7 @@ namespace ExperienceAndClasses
             "frankenstein",
             "reaper",
             "undead",
+            "headless",
         };
 
         //start
