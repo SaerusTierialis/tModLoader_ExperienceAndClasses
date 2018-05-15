@@ -415,6 +415,7 @@ namespace ExperienceAndClasses
                 DateTime now = DateTime.Now;
                 string message_gain = "";
                 string message_lose = "";
+                string message_cured = "";
                 for (int i = 0; i<ExperienceAndClasses.NUMBER_OF_DEBUFFS; i++)
                 {
                     //triggering new immuities
@@ -423,6 +424,16 @@ namespace ExperienceAndClasses
                         //start immunity
                         if (debuff_immunity_duration_seconds[i] <= 0)
                         {
+                            //message
+                            if (Main.LocalPlayer.HasBuff(ExperienceAndClasses.DEBUFFS[i]))
+                            {
+                                if (message_cured.Length > 0)
+                                {
+                                    message_cured += ", ";
+                                }
+                                message_cured += ExperienceAndClasses.DEBUFF_NAMES[i];
+                            }
+
                             //one-time cure
                             player.buffImmune[ExperienceAndClasses.DEBUFFS[i]] = true;
                         }
@@ -479,6 +490,10 @@ namespace ExperienceAndClasses
                 if (message_lose.Length > 0)
                 {
                     Main.NewText("Lost Immunity: " + message_lose, ExperienceAndClasses.MESSAGE_COLOUR_RED);
+                }
+                if (message_cured.Length > 0)
+                {
+                    Main.NewText("Cured: " + message_cured, ExperienceAndClasses.MESSAGE_COLOUR_GREEN);
                 }
 
                 //update healing power
