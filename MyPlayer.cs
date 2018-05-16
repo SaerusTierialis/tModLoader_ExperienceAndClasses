@@ -50,20 +50,26 @@ namespace ExperienceAndClasses
         public bool levelCapped = false;
 
         //abilities
-        public bool[] unlocked_abilities_next = new bool[(int)Abilities.AbilityMain.ID.NUMBER_OF_IDs];
-        public bool[] unlocked_abilities_current = new bool[(int)Abilities.AbilityMain.ID.NUMBER_OF_IDs];
-        public Abilities.AbilityMain.ID[] selectedActiveAbilities = new Abilities.AbilityMain.ID[ExperienceAndClasses.NUMBER_OF_ABILITY_SLOTS];
+        public bool[] unlocked_abilities_next;
+        public bool[] unlocked_abilities_current;
+        public Abilities.AbilityMain.ID[] selectedActiveAbilities;
         public Abilities.AbilityMain.RETURN latestAbilityFail = Abilities.AbilityMain.RETURN.FAIL_NOT_IMPLEMENTRD;
         public Boolean showFailMessages = true;
         public float thresholdCDMsg = 3f;
         public bool itemUsePrevented = false;
         public DateTime timeAllowItemUse = DateTime.MinValue;
-        public Projectile[] sanctuaries = new Projectile[2];
-        public Abilities.AbilityProj.Cleric_SanctuaryBuff sanctuary_buff = null;
-        public DateTime sanctuary_buff_end = DateTime.MinValue;
+        public Projectile[] sanctuaries;
         public bool ability_message_overhead = true;
-        public DateTime time_last_combat = DateTime.MinValue;
+        public DateTime time_last_hit_taken = DateTime.MinValue;
         public DateTime time_last_sanc_effect = DateTime.MinValue;
+
+        //status system
+        public bool[] status_active;
+        public bool[] status_new;
+        public DateTime[] status_end_time;
+        public float[] status_magnitude;
+        public Projectile[] status_visuals;
+        public int[] status_visuals_projectile_ids;
 
         //debuff immunity
         public static bool[] debuff_immunity_active = new bool[ExperienceAndClasses.NUMBER_OF_DEBUFFS];
@@ -91,6 +97,30 @@ namespace ExperienceAndClasses
         private string last_world_name;
         private IList<float> sanctuaries_centers;
         private bool recreated_sancs = false;
+
+        public override void Initialize()
+        {
+            //initialize instanced arrays here to prevent bug
+
+            //abilities
+            unlocked_abilities_next = new bool[(int)Abilities.AbilityMain.ID.NUMBER_OF_IDs];
+            unlocked_abilities_current = new bool[(int)Abilities.AbilityMain.ID.NUMBER_OF_IDs];
+            selectedActiveAbilities = new Abilities.AbilityMain.ID[ExperienceAndClasses.NUMBER_OF_ABILITY_SLOTS];
+            sanctuaries = new Projectile[2];
+
+            //status system
+            status_active = new bool[(int)ExperienceAndClasses.STATUSES.COUNT];
+            status_new = new bool[(int)ExperienceAndClasses.STATUSES.COUNT];
+            status_end_time = new DateTime[(int)ExperienceAndClasses.STATUSES.COUNT];
+            status_magnitude = new float[(int)ExperienceAndClasses.STATUSES.COUNT];
+            status_visuals = new Projectile[(int)ExperienceAndClasses.STATUSES.COUNT];
+            status_visuals_projectile_ids = new int[(int)ExperienceAndClasses.STATUSES.COUNT];
+
+            //define status visuals
+            status_visuals_projectile_ids[(int)ExperienceAndClasses.STATUSES.SANCTUARY] = mod.ProjectileType<Abilities.AbilityProj.Status_Cleric_Sanctuary>();
+            status_visuals_projectile_ids[(int)ExperienceAndClasses.STATUSES.PARAGON] = mod.ProjectileType<Abilities.AbilityProj.Status_Cleric_Paragon>();
+            status_visuals_projectile_ids[(int)ExperienceAndClasses.STATUSES.PARAGON_RENEW] = mod.ProjectileType<Abilities.AbilityProj.Status_Cleric_Paragon_Renew>();
+        }
 
         /// <summary>
         /// Returns experience total.
@@ -395,6 +425,8 @@ namespace ExperienceAndClasses
 
         public override void PostUpdateEquips()
         {
+            DateTime now = DateTime.Now;
+
             //number of classes
             numberClasses = classTokensEquipped.Count;
             if (numberClasses < 1) numberClasses = 1;
@@ -441,7 +473,6 @@ namespace ExperienceAndClasses
                 }
 
                 //update debuff immunities
-                DateTime now = DateTime.Now;
                 string message_gain = "";
                 string message_lose = "";
                 string message_cured = "";
@@ -538,7 +569,78 @@ namespace ExperienceAndClasses
                 healing_power = 1f + heal_power_bonus;
             }
 
+            //status system
+            bool do_sync = false;
+            bool draw_visual = false;
+            if (ExperienceAndClasses.sync_local_status && (player.whoAmI == Main.LocalPlayer.whoAmI))
+            {
+                do_sync = true;
+                ExperienceAndClasses.sync_local_status = false;
+            }
+            for (int i = 0; i < (byte)ExperienceAndClasses.STATUSES.COUNT; i++)
+            {
+                if (status_active[i])
+                {
+                    if (now.Subtract(status_end_time[i]).Ticks > 0)
+                    {
+                        //status ending
+                        EndStatus(i);
+                    }
+                    else
+                    {
+                        //anything that happens at the start of status
+                        if (status_new[i])
+                        {
+                            status_new[i] = false;
+                            //visual, if any
+                            if (player.whoAmI == Main.LocalPlayer.whoAmI)
+                            {
+                                //default to true if any
+                                draw_visual = (status_visuals_projectile_ids[i] > 0);
+
+                                //special cases
+                                if ((i == (int)ExperienceAndClasses.STATUSES.SANCTUARY) && (status_magnitude[i] <= 0))
+                                {
+                                    draw_visual = false;
+                                }
+
+                                //draw
+                                if (draw_visual)
+                                {
+                                    Projectile.NewProjectile(player.Center, new Vector2(0f), status_visuals_projectile_ids[i], 0, 0, player.whoAmI);
+                                }
+                            }
+                        }
+
+                        //status effect
+                        switch ((ExperienceAndClasses.STATUSES)i)
+                        {
+                            case (ExperienceAndClasses.STATUSES.IMMUNITY):
+                                player.immune = true;
+                                break;
+                            case (ExperienceAndClasses.STATUSES.SANCTUARY):
+                                Lighting.AddLight(player.Top, Abilities.AbilityMain.Cleric_Active_Sanctuary.BUFF_LIGHT_COLOUR);
+                                break;
+                            default:
+                                //do nothing
+                                break;
+                        }
+
+                        //sync
+                        if (do_sync)
+                        {
+                            Projectile.NewProjectile(player.Center, new Vector2(0.1f), mod.ProjectileType<Abilities.AbilityProj.Misc_PlayerStatus>(), player.whoAmI, status_magnitude[i], player.whoAmI, i, (float)status_end_time[i].Subtract(now).TotalSeconds);
+                        }
+                    }
+                }
+            }
+
             base.PostUpdateEquips();
+        }
+
+        public override void ModifyDrawInfo(ref PlayerDrawInfo drawInfo)
+        {
+            base.ModifyDrawInfo(ref drawInfo);
         }
 
         public override void PostUpdate()
@@ -635,7 +737,7 @@ namespace ExperienceAndClasses
 
         public override void OnRespawn(Player player)
         {
-            time_last_combat = DateTime.MinValue;
+            time_last_hit_taken = DateTime.MinValue;
             base.OnRespawn(player);
         }
 
@@ -675,6 +777,24 @@ namespace ExperienceAndClasses
                 //{
                 //    (mod as ExperienceAndClasses).uiExp.Update();
                 //}
+            }
+
+            //remove all status
+            for (byte i = 0; i < (byte)ExperienceAndClasses.STATUSES.COUNT; i++)
+            {
+                if (status_active[i])
+                {
+                    //status ending
+                    status_active[i] = false;
+                    status_new[i] = false;
+                    status_end_time[i] = DateTime.MinValue;
+                    status_magnitude[i] = 0;
+                    if (player.whoAmI == Main.LocalPlayer.whoAmI)
+                    {
+                        //local, sync effect ending
+                        Projectile.NewProjectile(player.Center, new Vector2(0.1f), ExperienceAndClasses.mod.ProjectileType<Abilities.AbilityProj.Misc_PlayerStatus>(), player.whoAmI, 0, player.whoAmI, i, -1);
+                    }
+                }
             }
 
             base.Kill(damage, hitDirection, pvp, damageSource);
@@ -793,23 +913,19 @@ namespace ExperienceAndClasses
 
             return base.PreHurt(pvp, quiet, ref damage, ref hitDirection, ref crit, ref customDamage, ref playSound, ref genGore, ref damageSource);
         }
-
+        
         public override void OnHitAnything(float x, float y, Entity victim)
         {
-            if (Main.LocalPlayer.Equals(player))
+            //always local only
+            
+            //afk
+            afkTime = DateTime.Now;
+            if (afk)
             {
-                //afk
-                afkTime = DateTime.Now;
-                if (afk)
-                {
-                    if (Main.netMode == 0) Main.NewText("You are no longer AFK.", ExperienceAndClasses.MESSAGE_COLOUR_RED);
-                    afk = false;
-                    Methods.PacketSender.ClientUnAFK(mod);
-                }
+                if (Main.netMode == 0) Main.NewText("You are no longer AFK.", ExperienceAndClasses.MESSAGE_COLOUR_RED);
+                afk = false;
+                Methods.PacketSender.ClientUnAFK(mod);
             }
-
-            //combat time
-            time_last_combat = DateTime.Now;
 
             base.OnHitAnything(x, y, victim);
         }
@@ -817,15 +933,24 @@ namespace ExperienceAndClasses
         public override void Hurt(bool pvp, bool quiet, double damage, int hitDirection, bool crit)
         {
             //combat time
-            time_last_combat = DateTime.Now;
+            time_last_hit_taken = DateTime.Now;
 
             base.Hurt(pvp, quiet, damage, hitDirection, crit);
 
             //sanctuary buff heal
-            if (!player.dead && sanctuary_buff != null && sanctuary_buff.heal>0)
+            if (!player.dead && status_active[(int)ExperienceAndClasses.STATUSES.SANCTUARY] && status_magnitude[(int)ExperienceAndClasses.STATUSES.SANCTUARY] > 0)
             {
-                Projectile.NewProjectile(player.Center, new Vector2(0f), ExperienceAndClasses.mod.ProjectileType<Abilities.AbilityProj.Misc_HealHurt>(), sanctuary_buff.heal, 0, Main.LocalPlayer.whoAmI, 1, Main.LocalPlayer.whoAmI);
-                Projectile.NewProjectile(player.Center, new Vector2(0f), ExperienceAndClasses.mod.ProjectileType<Abilities.AbilityProj.Cleric_SanctuaryBuff>(), 0, 0, player.whoAmI, 0, 0);
+                //heal
+                Projectile.NewProjectile(player.Center, new Vector2(0f), ExperienceAndClasses.mod.ProjectileType<Abilities.AbilityProj.Misc_HealHurt>(), (int)status_magnitude[(int)ExperienceAndClasses.STATUSES.SANCTUARY], 0, Main.LocalPlayer.whoAmI, 1, Main.LocalPlayer.whoAmI);
+                //remove heal from status
+                Projectile.NewProjectile(player.Center, new Vector2(0.1f), ExperienceAndClasses.mod.ProjectileType<Abilities.AbilityProj.Misc_PlayerStatus>(), player.whoAmI, 0, player.whoAmI, (float)ExperienceAndClasses.STATUSES.SANCTUARY, (float)status_end_time[(int)ExperienceAndClasses.STATUSES.SANCTUARY].Subtract(DateTime.Now).TotalSeconds);
+                //failsafe
+                status_magnitude[(int)ExperienceAndClasses.STATUSES.SANCTUARY] = 0;
+                //remove visual
+                if (status_visuals[(int)ExperienceAndClasses.STATUSES.SANCTUARY] != null)
+                {
+                    status_visuals[(int)ExperienceAndClasses.STATUSES.SANCTUARY].Kill();
+                }
             }
         }
 
@@ -960,6 +1085,31 @@ namespace ExperienceAndClasses
             if (!(debuff_immunity_duration_seconds[index] > duration_seconds))
             {
                 debuff_immunity_duration_seconds[index] = duration_seconds;
+            }
+        }
+
+        public bool HasImmunityItem()
+        {
+            foreach (Item i in player.armor)
+            {
+                if (i.Name.Length > 0 && (i.Name.Equals("Cross Necklace") || i.Name.Equals("Star Veil")))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public void EndStatus(int index)
+        {
+            //status ending
+            status_active[index] = false;
+            status_end_time[index] = DateTime.MinValue;
+            status_magnitude[index] = 0;
+            if (player.whoAmI == Main.LocalPlayer.whoAmI)
+            {
+                //local, sync effect ending
+                Projectile.NewProjectile(player.Center, new Vector2(0.1f), mod.ProjectileType<Abilities.AbilityProj.Misc_PlayerStatus>(), player.whoAmI, 0, player.whoAmI, index, -1);
             }
         }
 

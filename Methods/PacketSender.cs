@@ -426,6 +426,7 @@ namespace ExperienceAndClasses.Methods
 
             ModPacket packet = mod.GetPacket();
             packet.Write((byte)ExpModMessageType.ServerSyncExp);
+            packet.Write(full);
             packet.Write(MyWorld.clientNeedsExpUpdate_counter); //number of clients updated
             for (int ind = 0; ind < MyWorld.clientNeedsExpUpdate_counter; ind++)
             {

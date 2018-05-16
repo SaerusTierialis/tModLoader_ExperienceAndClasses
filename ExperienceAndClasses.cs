@@ -117,9 +117,21 @@ namespace ExperienceAndClasses
         public static MyPlayer localMyPlayer;
         public static Mod mod;
 
+        //syncing
+        public static bool sync_local_proj = false;
+        public static bool sync_local_status = false;
+
         //ability constants
         public const float HEAL_POWER_PER_IMMUNITY = 0.1f;
         public const float MAX_HEAL_POWER_IMMUNITY_BONUS = 1.0f;
+        public enum STATUSES : byte
+        {
+            SANCTUARY,
+            IMMUNITY,
+            PARAGON,
+            PARAGON_RENEW,
+            COUNT,
+        }
 
         //debuffs
         public static readonly string[] DEBUFF_NAMES = {
@@ -729,8 +741,15 @@ namespace ExperienceAndClasses
                 case ExpModMessageType.ServerSyncExp:
                     if (Main.netMode != 1) break;
 
+                    //trigger client sync when recieving full exp sync
+                    newBool = reader.ReadBoolean(); //full sync
+                    if (newBool)
+                    {
+                        TriggerLocalSyncs();
+                    }
+
                     //read and set exp
-                    newInt = reader.ReadInt32();
+                    newInt = reader.ReadInt32(); //number players
                     for (int ind = 0; ind < newInt; ind++)
                     {
                         pIndex = reader.ReadInt32();
@@ -823,6 +842,27 @@ namespace ExperienceAndClasses
                     InterfaceScaleType.UI)
                 );
             }
+        }
+
+        /* ~~~~~~~~~~~~~~~~~~~~~ MISC ~~~~~~~~~~~~~~~~~~~~~ */
+
+        //public static int CountActivePlayers()
+        //{
+        //    int count = 0;
+        //    for (int i=0; i<Main.maxPlayers; i++)
+        //    {
+        //        if (Main.player[i].active)
+        //        {
+        //            count++;
+        //        }
+        //    }
+        //    return count;
+        //}
+
+        public static void TriggerLocalSyncs()
+        {
+            sync_local_status = true;
+            sync_local_proj = true;
         }
     }
 }

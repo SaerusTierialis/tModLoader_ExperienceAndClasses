@@ -22,8 +22,6 @@ namespace ExperienceAndClasses.Dusts
         }
     }
 
-
-
     /* TEMPLATES */
     public abstract class Dusts : ModDust
     {

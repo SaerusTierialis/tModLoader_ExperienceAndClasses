@@ -26,6 +26,8 @@ namespace ExperienceAndClasses
         public static int clientNeedsExpUpdate_counter = 0;
         public static int[] clientNeedsExpUpdate_who = new int[256];
 
+        public static int active_player_count = 0;
+
         public override TagCompound Save()
         {
             return new TagCompound {
@@ -55,11 +57,12 @@ namespace ExperienceAndClasses
             if (ExperienceAndClasses.worldAuthCode == -1) ExperienceAndClasses.worldAuthCode = Main.rand.Next(1000) + ((Main.rand.Next(8) + 1) * 1000) + ((Main.rand.Next(8) + 1) * 10000) + ((Main.rand.Next(8) + 1) * 100000);
         }
 
+        public static int testvar = 0;
         public override void PostUpdate()
         {
             if (Main.netMode == 2) // server only
             {
-                if (!expmapAuthCodeWritten && Main.ActivePlayersCount > 0)
+                if (!expmapAuthCodeWritten && active_player_count > 0)
                 {
                     Console.WriteLine("Experience&Classes expauth code: " + ExperienceAndClasses.worldAuthCode);
                     expmapAuthCodeWritten = true;
@@ -99,6 +102,7 @@ namespace ExperienceAndClasses
         {
             MyPlayer myPlayer;
             //DateTime target_time = DateTime.Now.AddMilliseconds(-TIME_BETWEEN_REQUEST_MSEC);
+            active_player_count = 0;
             for (int i = 0; i <= 255; i++)
             {
                 if (Main.player[i].active)
@@ -109,6 +113,7 @@ namespace ExperienceAndClasses
                         //Server's request to new player (includes map settings)
                         Methods.PacketSender.ServerNewPlayerSync(mod, i);
                     }
+                    active_player_count++;
                 }
             }
         }

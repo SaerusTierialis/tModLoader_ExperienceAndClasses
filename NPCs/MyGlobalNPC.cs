@@ -30,7 +30,7 @@ namespace ExperienceAndClasses.NPCs
 
                 //chances for orbs
                 float chanceBossFixed = ExperienceAndClasses.PERCENT_CHANCE_BOSS_ORB_FIXED;
-                if ((Main.netMode == 0) || (Main.ActivePlayersCount<=1))
+                if ((Main.netMode == 0) || ((Main.netMode == 2) && (MyWorld.active_player_count<=1)))
                 {
                     chanceBossFixed += ExperienceAndClasses.PERCENT_CHANCE_BOSS_ORB_FIXED_SINGLEPLAYER_BONUS;
                 }
