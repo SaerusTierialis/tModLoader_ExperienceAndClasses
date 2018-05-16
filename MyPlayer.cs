@@ -59,8 +59,11 @@ namespace ExperienceAndClasses
         public bool itemUsePrevented = false;
         public DateTime timeAllowItemUse = DateTime.MinValue;
         public Projectile[] sanctuaries = new Projectile[2];
+        public Abilities.AbilityProj.Cleric_SanctuaryBuff sanctuary_buff = null;
+        public DateTime sanctuary_buff_end = DateTime.MinValue;
         public bool ability_message_overhead = true;
         public DateTime time_last_combat = DateTime.MinValue;
+        public DateTime time_last_sanc_effect = DateTime.MinValue;
 
         //debuff immunity
         public static bool[] debuff_immunity_active = new bool[ExperienceAndClasses.NUMBER_OF_DEBUFFS];
@@ -83,6 +86,11 @@ namespace ExperienceAndClasses
         public DateTime timeLastAttack = DateTime.MinValue;
         public int openerImmuneTime_msec = 0;
         public DateTime openerImmuneEnd = DateTime.MinValue;
+
+        //save and load specific
+        private string last_world_name;
+        private IList<float> sanctuaries_centers;
+        private bool recreated_sancs = false;
 
         /// <summary>
         /// Returns experience total.
@@ -262,6 +270,17 @@ namespace ExperienceAndClasses
             UILeft = UI.UIExp.GetLeft();
             UITop = UI.UIExp.GetTop();
 
+            IList<float> sanctuaries_centers = new List<float>();
+            for (int i = 0; i < sanctuaries.Length; i++)
+            {
+                if (sanctuaries[i] != null)
+                {
+                    sanctuaries_centers.Add(i);
+                    sanctuaries_centers.Add(sanctuaries[i].Center.X);
+                    sanctuaries_centers.Add(sanctuaries[i].Center.Y);
+                }
+            }
+
             return new TagCompound {
                 {"experience", experience},
                 {"display_exp", displayExp},
@@ -277,6 +296,8 @@ namespace ExperienceAndClasses
                 {"thresh_cd_message", thresholdCDMsg},
                 {"show_kill_count", show_kill_count},
                 {"ability_message_overhead", ability_message_overhead},
+                {"last_world_name", Main.worldName},
+                {"sanctuaries_centers", sanctuaries_centers},
             };
         }
 
@@ -307,6 +328,10 @@ namespace ExperienceAndClasses
 
             //trace
             traceChar = Commons.TryGet<bool>(tag, "traceChar", false);
+
+            //sanctuaries
+            last_world_name = Commons.TryGet<string>(tag, "last_world_name", "");
+            sanctuaries_centers = Commons.TryGetList<float>(tag, "sanctuaries_centers");
         }
 
         public override void SetupStartInventory(IList<Item> items)
@@ -577,6 +602,32 @@ namespace ExperienceAndClasses
                         }
                     }
                 }
+
+                if (!recreated_sancs)
+                {
+                    //do once
+                    recreated_sancs = true;
+
+                    //recreate sanctuaries
+                    if (last_world_name.Equals(Main.worldName))
+                    {
+                        int counter = 0;
+                        int sanc_index;
+                        int proj_index;
+                        float x, y;
+                        while (counter < sanctuaries_centers.Count)
+                        {
+                            sanc_index = (int)sanctuaries_centers[counter++];
+                            x = (int)sanctuaries_centers[counter++];
+                            y = (int)sanctuaries_centers[counter++];
+
+                            proj_index = Projectile.NewProjectile(new Vector2(x, y), new Vector2(0f), ExperienceAndClasses.mod.ProjectileType<Abilities.AbilityProj.Cleric_Sanctuary>(), 0, 0, Main.LocalPlayer.whoAmI, sanc_index);
+                            sanctuaries[sanc_index] = Main.projectile[proj_index];
+
+                            Main.NewText("Recreated sanctuary #" + (sanc_index + 1) + "!", ExperienceAndClasses.MESSAGE_COLOUR_OFF_COOLDOWN);
+                        }
+                    }
+                }
             }
 
             base.PostUpdate();
@@ -769,6 +820,13 @@ namespace ExperienceAndClasses
             time_last_combat = DateTime.Now;
 
             base.Hurt(pvp, quiet, damage, hitDirection, crit);
+
+            //sanctuary buff heal
+            if (!player.dead && sanctuary_buff != null && sanctuary_buff.heal>0)
+            {
+                Projectile.NewProjectile(player.Center, new Vector2(0f), ExperienceAndClasses.mod.ProjectileType<Abilities.AbilityProj.Misc_HealHurt>(), sanctuary_buff.heal, 0, Main.LocalPlayer.whoAmI, 1, Main.LocalPlayer.whoAmI);
+                Projectile.NewProjectile(player.Center, new Vector2(0f), ExperienceAndClasses.mod.ProjectileType<Abilities.AbilityProj.Cleric_SanctuaryBuff>(), 0, 0, player.whoAmI, 0, 0);
+            }
         }
 
         public override void ProcessTriggers(TriggersSet triggersSet) //CLIENT-SIDE ONLY

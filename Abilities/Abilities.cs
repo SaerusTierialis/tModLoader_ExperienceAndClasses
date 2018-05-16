@@ -45,6 +45,7 @@ namespace ExperienceAndClasses.Abilities
             Cleric_Upgrade_Heal_Smite,
             Cleric_Active_Sanctuary,
             Cleric_Alternate_Heal_Barrier,
+            Cleric_Upgrade_Sanctuary_Blessing,
 
             Saint_Active_DivineIntervention,
             Saint_Upgrade_Heal_Cure,
@@ -319,8 +320,9 @@ namespace ExperienceAndClasses.Abilities
         public class Cleric_Active_Sanctuary : Ability
         {
             private const double req_time_out_combat_seconds = 10;
-            private const double cooldown_new_seconds = 5;
             public const double pulse_seconds = 1;
+            public const float light_effect = 1f;
+            public const double buff_duration_seconds = 120;
 
             public Cleric_Active_Sanctuary()
             {
@@ -331,7 +333,7 @@ namespace ExperienceAndClasses.Abilities
                 cost_mana_percent = 0.90f;
                 cooldown_seconds = 120;
                 class_type = CLASS_TYPE.SUPPORT;
-                upgrades = new ID[] { ID.Saint_Upgrade_Sanctuary_Link };
+                upgrades = new ID[] { ID.Cleric_Upgrade_Sanctuary_Blessing , ID.Saint_Upgrade_Sanctuary_Link };
             }
 
             protected override RETURN UseEffects(byte level = 1, bool alternate = false)
@@ -343,21 +345,26 @@ namespace ExperienceAndClasses.Abilities
                     sanc_index = 1;
                 }
 
-                //destory prior sanc if exists
-                if (ExperienceAndClasses.localMyPlayer.sanctuaries[sanc_index] != null)
-                {
-                    ExperienceAndClasses.localMyPlayer.sanctuaries[sanc_index].Kill();
-                }
-                else
-                {
-                    override_cooldown = cooldown_new_seconds;
-                }
-
-                //create new
+                //create
                 Projectile.NewProjectile(Main.LocalPlayer.Center, new Vector2(0f), ExperienceAndClasses.mod.ProjectileType<AbilityProj.Cleric_Sanctuary>(), 0, 0, Main.LocalPlayer.whoAmI, sanc_index);
 
                 //success
                 return RETURN.SUCCESS;
+            }
+
+            protected override RETURN UseChecks(byte level = 1, bool alternate = false)
+            {
+                //allow use on cooldown if NOT replacing
+                int sanc_index = 0;
+                if (alternate && ExperienceAndClasses.localMyPlayer.unlocked_abilities_current[(int)ID.Saint_Upgrade_Sanctuary_Link])
+                {
+                    sanc_index = 1;
+                }
+                if (ExperienceAndClasses.localMyPlayer.sanctuaries[sanc_index] == null)
+                {
+                    cooldown_active = false;
+                }
+                return base.UseChecks(level, alternate);
             }
 
             public static void Pulse(Projectile projectile)
@@ -370,14 +377,35 @@ namespace ExperienceAndClasses.Abilities
                 Tuple<List<Tuple<bool, int, bool>>, int, int, bool, bool> target_info = FindTargets(Main.LocalPlayer, projectile.Center, projectile.width / 2, false, true, true, true, false);
                 List<Tuple<bool, int, bool>> targets = target_info.Item1;
                 DateTime now = DateTime.Now;
+                MyPlayer myPlayer;
+                int heal_buff;
                 foreach (Tuple<bool, int, bool> t in targets)
                 {
                     if (t.Item1)
                     {
                         //player
-                        if (DateTime.Now.Subtract(Main.player[t.Item2].GetModPlayer<MyPlayer>(ExperienceAndClasses.mod).time_last_combat).TotalSeconds >= req_time_out_combat_seconds)
+                        myPlayer = Main.player[t.Item2].GetModPlayer<MyPlayer>(ExperienceAndClasses.mod);
+                        if ((DateTime.Now.Subtract(myPlayer.time_last_combat).TotalSeconds >= req_time_out_combat_seconds) && 
+                            (DateTime.Now.Subtract(myPlayer.time_last_sanc_effect).TotalSeconds >= pulse_seconds))
                         {
+                            //heal
+                            myPlayer.time_last_sanc_effect = now;
                             Projectile.NewProjectile(projectile.Center, new Vector2(0f), ExperienceAndClasses.mod.ProjectileType<AbilityProj.Misc_HealHurt>(), heal, 0, Main.LocalPlayer.whoAmI, 1, t.Item2);
+
+                            //buff
+                            if ((myPlayer.sanctuary_buff != null) && myPlayer.sanctuary_buff.heal > heal)
+                            {
+                                heal_buff = myPlayer.sanctuary_buff.heal;
+                            }
+                            else if (ExperienceAndClasses.localMyPlayer.unlocked_abilities_current[(int)ID.Cleric_Upgrade_Sanctuary_Blessing])
+                            {
+                                heal_buff = heal;
+                            }
+                            else
+                            {
+                                heal_buff = 0;
+                            }
+                            Projectile.NewProjectile(myPlayer.player.Center, new Vector2(0f), ExperienceAndClasses.mod.ProjectileType<AbilityProj.Cleric_SanctuaryBuff>(), 0, 0, myPlayer.player.whoAmI, heal_buff, 1);
                         }
                     }
                     else 
@@ -437,6 +465,16 @@ namespace ExperienceAndClasses.Abilities
             {
                 ability_type = ABILITY_TYPE.ALTERNATE;
                 name = "Heal - Barrier";
+                description = "";
+            }
+        }
+
+        public class Cleric_Upgrade_Sanctuary_Blessing : Ability
+        {
+            public Cleric_Upgrade_Sanctuary_Blessing()
+            {
+                ability_type = ABILITY_TYPE.UPGRADE;
+                name = "Sanctuary - Blessing";
                 description = "";
             }
         }
@@ -708,335 +746,6 @@ namespace ExperienceAndClasses.Abilities
             }
 
         }
-
-        //////    ////cleric actives
-        //////    //AbilityLookup.Add(ID.CLERIC_ACTIVE_HEAL, new CLERIC_ACTIVE_HEAL());
-        //////    //AbilityLookup.Add(ID.CLERIC_ACTIVE_SANCTUARY, new CLERIC_ACTIVE_SANCTUARY());
-        //////    //AbilityLookup.Add(ID.CLERIC_ACTIVE_DIVINE_INTERVENTION, new CLERIC_ACTIVE_DIVINE_INTERVENTION());
-        //////    //AbilityLookup.Add(ID.Saint_Active_Paragon, new Saint_Active_Paragon());
-        //////}
-
-
-        //public static int CalculateManaCost(MyPlayer myPlayer, int abilityID, int level = 1)
-        //{
-        //    //base cost
-        //    Player player = myPlayer.player;
-        //    int manaCost = (int)((MANA_COST[abilityID] + (player.statManaMax2 * MANA_COST_PERCENT[abilityID])) * player.manaCost);
-
-        //    //any ability-specific adjustments go here
-
-        //    //limits
-        //    if (manaCost < 0) manaCost = 0;
-        //    if (manaCost > player.statManaMax2) manaCost = player.statManaMax2;
-
-        //    //return
-        //    return manaCost;
-        //}
-
-        //public static float CalculateCooldownSecs(MyPlayer myPlayer, int abilityID, int level = 1)
-        //{
-        //    //base cost
-        //    float cooldownSecs = COOLDOWN_SECS[abilityID];
-
-        //    //any ability-specific adjustments go here
-
-        //    //return
-        //    return cooldownSecs;
-        //}
-
-        ///// <summary>
-        ///// This is called ONLY by the client using the ability
-        ///// </summary>
-        ///// <param name="myPlayer"></param>
-        ///// <param name="abilityID"></param>
-        ///// <param name="level"></param>
-        ///// <returns></returns>
-        //public static int DoAbility(MyPlayer myPlayer, int abilityID, int level, bool alternateEffect)
-        //{
-        //    //check if ID is potentially valid
-        //    if ((abilityID >= NUMBER_OF_IDs) || (abilityID < 0))
-        //        return RETURN_FAIL_UNDEFINED;
-
-        //    /* ~~~~~~~~~~~~ Setup ~~~~~~~~~~~~ */
-        //    Player player = myPlayer.player;
-        //    long timeNow = DateTime.Now.Ticks;
-        //    long timeAllow = myPlayer.abilityCooldowns[abilityID];
-        //    int manaCost = CalculateManaCost(myPlayer, abilityID, level);
-        //    float cooldownSecs = CalculateCooldownSecs(myPlayer, abilityID, level);
-        //    double attackDelay = ATTACK_DELAY[abilityID];
-
-        //    Vector2 myPosition = player.position;
-
-        //    /* ~~~~~~~~~~~~ Generic Checks ~~~~~~~~~~~~ */
-
-        //    //don't allow server calls or calls from other clients
-        //    if (Main.netMode == 2 || !Main.LocalPlayer.Equals(player)) return RETURN_FAIL_EXTERNAL;
-
-        //    //check for invalid statuses
-        //    if (player.frozen || player.dead) return RETURN_FAIL_STATUS;
-
-        //    //check mana cost
-        //    if (player.statMana < manaCost) return RETURN_FAIL_MANA;
-
-        //    //check cooldown
-        //    if (timeNow < timeAllow) return RETURN_FAIL_COOLDOWN;
-
-        //    /* ~~~~~~~~~~~~ Ability-Specific Checks ~~~~~~~~~~~~ */
-
-
-
-        //    /* ~~~~~~~~~~~~ Ability-Specific Effects ~~~~~~~~~~~~ */
-        //    //keep in mind that all clients will execute this!
-        //    switch (abilityID)
-        //    {
-        //        //case ID_CLERIC_ACTIVE_HEAL:
-        //        //    // RadiusEffect(myPosition, true, true, true, false, false, 1000f, level * 2, 0.5f);
-        //        //    // RadiusEffect(myPosition, false, false, false, true, true, 1000f, 0, 0, 0, 0, 10f);
-        //        //    //Projectile.NewProjectile(player.position.X, player.position.Y, 0, 0, ProjectileID.LostSoulFriendly, level * 2, 0, player.whoAmI);
-        //        //    break;
-
-        //        //case ID_CLERIC_ACTIVE_SANCTUARY:
-        //        //    break;
-
-        //        //case ID_CLERIC_ACTIVE_DIVINE_INTERVENTION:
-        //        //    break;
-
-        //        //case ID_CLERIC_ACTIVE_RESSURECTION:
-        //        //    break;
-
-
-
-
-        //        default:
-        //            //undefined ability
-
-        //            //return RETURN_FAIL_UNDEFINED;
-        //            Main.NewText(NAME[abilityID] + " Placeholder", ExperienceAndClasses.MESSAGE_COLOUR_RED);
-        //            CombatText.NewText(player.getRect(), ExperienceAndClasses.MESSAGE_COLOUR_RED, NAME[abilityID] + " Placeholder");
-        //            break;
-        //    }
-
-        //    /* ~~~~~~~~~~~~ Costs ~~~~~~~~~~~~ */
-        //    player.statMana -= manaCost;
-        //    if (player.statMana < 0)
-        //    {
-        //        player.statMana = 0;
-        //    }
-        //    if (cooldownSecs > 0) ON_COOLDOWN[abilityID] = true;
-        //    myPlayer.abilityCooldowns[abilityID] = timeNow + (long)(cooldownSecs * TimeSpan.TicksPerSecond);
-
-        //    /* ~~~~~~~~~~~~ Animation ~~~~~~~~~~~~ */
-        //    if (attackDelay > 0)
-        //        myPlayer.PreventItemUse(attackDelay);
-
-        //    /* ~~~~~~~~~~~~ Success ~~~~~~~~~~~~ */
-        //    return RETURN_SUCCESS;
-        //}
-
-        ///// <summary>
-        ///// Applies effect in radius self. Can apply buffs, healing, or damage.
-        ///// </summary>
-        //public static void RadiusEffect(Vector2 center, bool affectSelf, bool affectPlayerFriendly, bool affectNPCFriendly, bool affectPlayerHostile, bool affectNPCHostile, float radius = 1000f,
-        //    float healAmount = 0, float selfHealMultiplier = 1f, float manaAmount = 0, float selfManaMultiplier = 1f, float damageAmount = 0, int buffID = -1, int buffDurationTicks = 0, bool requireLineOfSight = false)
-        //{
-        //    //return if there is nothing to do
-        //    if (healAmount == 0 && damageAmount == 0 && buffID == -1) return;
-        //    if (!affectPlayerFriendly && !affectPlayerHostile && !affectNPCFriendly && !affectNPCHostile) return;
-
-        //    //cast
-        //    int heal = (int)healAmount;
-        //    int healSelf = (int)(healAmount * selfHealMultiplier);
-        //    int damage = (int)damageAmount;
-        //    int mana = (int)manaAmount;
-        //    int manaSelf = (int)(manaAmount * selfManaMultiplier);
-
-        //    //inits
-        //    Player sourcePlayer = Main.LocalPlayer;
-        //    int selfIndex = sourcePlayer.whoAmI;
-        //    int amount, lifeCurrent = 0, lifeMax = 0, manaCurrent = 0, manaMax = 0;
-        //    Player player = null;
-        //    NPC npc = null;
-        //    bool forPlayer = true; //if false, then for npc
-
-        //    //action to apply affects
-        //    var apply = new Action(() => {
-        //        //buff
-        //        if (buffID >= 0 && buffDurationTicks > 0)
-        //        {
-        //            if (forPlayer && Main.LocalPlayer.Equals(player))
-        //                player.AddBuff(buffID, buffDurationTicks);
-        //            else if (Main.LocalPlayer.Equals(player))
-        //                npc.AddBuff(buffID, buffDurationTicks);
-        //        }
-
-        //        //heal
-        //        if (heal > 0)
-        //        {
-        //            if (forPlayer && player.Equals(sourcePlayer))
-        //                amount = healSelf;
-        //            else
-        //                amount = heal;
-
-        //            if (forPlayer)
-        //            {
-        //                lifeCurrent = player.statLife;
-        //                lifeMax = player.statLifeMax2;
-        //            }
-        //            else
-        //            {
-        //                lifeCurrent = npc.life;
-        //                lifeMax = npc.lifeMax;
-        //            }
-
-
-        //            if ((lifeMax - lifeCurrent) < amount) amount = lifeMax - lifeCurrent;
-
-        //            if (amount > 0)
-        //            {
-        //                if (forPlayer)
-        //                {
-        //                    player.statLife += amount;
-        //                    player.HealEffect(amount);
-        //                    if ((Main.netMode == 1) && (player.whoAmI != selfIndex))
-        //                    {
-        //                        NetMessage.SendData(MessageID.HealEffect, -1, selfIndex, null, player.whoAmI, (float)amount, 0.0f, 0.0f);
-        //                    }
-        //                }
-        //                else
-        //                {
-        //                    npc.HealEffect(amount);
-        //                    npc.life += amount;
-        //                }
-        //            }
-        //        }
-
-        //        //mana
-        //        if (mana > 0 && forPlayer)
-        //        {
-        //            if (player.Equals(sourcePlayer))
-        //                amount = manaSelf;
-        //            else
-        //                amount = mana;
-
-        //            manaCurrent = player.statMana;
-        //            manaMax = player.statManaMax2;
-
-        //            if ((manaMax - manaCurrent) < amount) amount = manaMax - manaCurrent;
-
-        //            if (amount > 0 && Main.LocalPlayer.Equals(player))
-        //            {
-        //                player.ManaEffect(amount);
-        //                player.statMana += amount;
-        //            }
-        //        }
-
-        //        //damage
-        //        if (damage > 0)
-        //        {
-        //            //TO DO: needs to send net message if npc is killed
-        //            if (forPlayer)
-        //                player.Hurt(Terraria.DataStructures.PlayerDeathReason.ByPlayer(sourcePlayer.whoAmI), damage, 0, true);
-        //            else
-        //            {
-        //                if (Main.netMode == 1)
-        //                {
-        //                    NetMessage.SendData(MessageID.StrikeNPC, -1, -1, null, npc.whoAmI, damage, 0f, 0);
-        //                }
-        //                else
-        //                {
-        //                    sourcePlayer.ApplyDamageToNPC(npc, damage, 0, 0, false); //multiplayer sync would be automatic, but npc death does not sync
-        //                }
-        //            }
-        //        }
-        //    });
-
-        //    //cycle players
-        //    forPlayer = true;
-        //    if (affectSelf || affectPlayerFriendly || affectPlayerHostile)
-        //    {
-
-        //        //optimize self-only
-        //        int indexMin, indexMax;
-        //        if (affectSelf && !affectPlayerFriendly && !affectPlayerHostile)
-        //        {
-        //            indexMin = indexMax = sourcePlayer.whoAmI;
-        //        }
-        //        else
-        //        {
-        //            indexMin = 0;
-        //            indexMax = 255;
-        //        }
-
-        //        //loop
-        //        bool friendlyTeam = false;
-        //        bool bothHostile = false;
-        //        bool isSelf = false;
-        //        for (int playerIndex = indexMin; playerIndex <= indexMax; playerIndex++)
-        //        {
-        //            player = Main.player[playerIndex];
-
-        //            if (requireLineOfSight && !Collision.CanHit(sourcePlayer.position, 0, 0, player.position, player.width, player.height))
-        //                continue;
-
-        //            if (sourcePlayer.team != 0 && player.team == sourcePlayer.team)
-        //                friendlyTeam = true;
-        //            else
-        //                friendlyTeam = false;
-
-        //            if (sourcePlayer.hostile && player.hostile)
-        //                bothHostile = true;
-        //            else
-        //                bothHostile = false;
-
-        //            isSelf = player.Equals(sourcePlayer);
-
-        //            if (player.active && player.Distance(center) < radius && ((!isSelf && affectPlayerHostile && bothHostile && !friendlyTeam) || (!isSelf && affectPlayerFriendly && (!bothHostile || friendlyTeam)) || (isSelf && affectSelf)))
-        //            {
-        //                apply();
-        //            }
-        //        }
-        //    }
-
-        //    //cycle npc
-        //    forPlayer = false;
-        //    NPC[] npcs = Main.npc;
-        //    if (affectNPCFriendly || affectNPCHostile)
-        //    {
-        //        for (int npc_index = 0; npc_index < npcs.Length; npc_index++)
-        //        {
-        //            npc = npcs[npc_index];
-
-        //            if (requireLineOfSight && !Collision.CanHit(sourcePlayer.position, 0, 0, npc.position, npc.width, npc.height))
-        //                continue;
-
-        //            if (npc.active && npc.Distance(center) < radius && npc.lifeMax > 5 && ((npc.friendly && affectNPCFriendly) || (!npc.friendly && affectNPCHostile)))
-        //            {
-        //                apply();
-        //            }
-        //        }
-        //    }
-        //}
-
-        //public static void SendReturnMessage(int returnValue, int abilityID)
-        //{
-        //    string abilityName = NAME[abilityID];
-        //    switch (returnValue)
-        //    {
-        //        case Abilities.RETURN_FAIL_MANA:
-        //            Main.NewText(abilityName + ": " + Abilities.MESSAGE_FAIL_MANA, ExperienceAndClasses.MESSAGE_COLOUR_RED, true);
-        //            break;
-        //        case Abilities.RETURN_FAIL_COOLDOWN:
-        //            Main.NewText(abilityName + ": " + Abilities.MESSAGE_FAIL_COOLDOWN, ExperienceAndClasses.MESSAGE_COLOUR_RED, true);
-        //            break;
-        //        case Abilities.RETURN_FAIL_STATUS:
-        //        case Abilities.RETURN_FAIL_REQUIREMENTS:
-        //            Main.NewText(abilityName + ": " + Abilities.MESSAGE_FAIL_GENERIC, ExperienceAndClasses.MESSAGE_COLOUR_RED, true);
-        //            break;
-        //        default:
-        //            //no message
-        //            break;
-        //    }
-        //}
 
         /// <summary>
         /// Return Tuple:

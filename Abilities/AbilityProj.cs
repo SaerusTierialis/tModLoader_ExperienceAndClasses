@@ -29,11 +29,18 @@ namespace ExperienceAndClasses.Abilities
                 if (sanc_index == -1)
                 {
                     sanc_index = (int)projectile.ai[0];
-                    Main.player[projectile.owner].GetModPlayer<MyPlayer>(mod).sanctuaries[sanc_index] = projectile;
-                    if (Main.LocalPlayer.Equals(Main.player[projectile.owner]))
+
+                    if (Main.LocalPlayer.Equals(Main.player[projectile.owner])) //local
                     {
                         local_owner = true;
+
+                        if (ExperienceAndClasses.localMyPlayer.sanctuaries[sanc_index] != null && !ExperienceAndClasses.localMyPlayer.sanctuaries[sanc_index].Equals(projectile))
+                        {
+                            ExperienceAndClasses.localMyPlayer.sanctuaries[sanc_index].Kill();
+                        }
                     }
+
+                    Main.player[projectile.owner].GetModPlayer<MyPlayer>(mod).sanctuaries[sanc_index] = projectile;
                 }
 
                 //unlimited duration
@@ -49,14 +56,23 @@ namespace ExperienceAndClasses.Abilities
                 //effects
                 if (local_owner)
                 {
-                    DateTime now = DateTime.Now;
-                    if (now.Subtract(time_next_pulse).TotalSeconds >= AbilityMain.Cleric_Active_Sanctuary.pulse_seconds)
+                    //kill if no longer have requirements
+                    if (!ExperienceAndClasses.localMyPlayer.unlocked_abilities_current[(int)AbilityMain.ID.Cleric_Active_Sanctuary] ||
+                        ((sanc_index > 0) && !ExperienceAndClasses.localMyPlayer.unlocked_abilities_current[(int)AbilityMain.ID.Saint_Upgrade_Sanctuary_Link]))
                     {
-                        //timing
-                        time_next_pulse = now;
+                        projectile.Kill();
+                    }
+                    else
+                    {
+                        DateTime now = DateTime.Now;
+                        if (now.Subtract(time_next_pulse).TotalSeconds >= AbilityMain.Cleric_Active_Sanctuary.pulse_seconds)
+                        {
+                            //timing
+                            time_next_pulse = now;
 
-                        //effects
-                        AbilityMain.Cleric_Active_Sanctuary.Pulse(projectile);
+                            //effects
+                            AbilityMain.Cleric_Active_Sanctuary.Pulse(projectile);
+                        }
                     }
                 }
 
@@ -69,6 +85,75 @@ namespace ExperienceAndClasses.Abilities
                 if (myPlayer.sanctuaries[sanc_index].Equals(projectile))
                 {
                     myPlayer.sanctuaries[sanc_index] = null;
+                }
+                base.Kill(timeLeft);
+            }
+        }
+
+        public class Cleric_SanctuaryBuff : SyncingProjectile
+        {
+            public int heal = -1;
+            public int draw_counter = 0;
+
+            public override void SetDefaults()
+            {
+                projectile.light = AbilityMain.Cleric_Active_Sanctuary.light_effect;
+                projectile.width = 42;
+                projectile.height = 70;
+                projectile.alpha = 200;
+                projectile.tileCollide = false;
+                projectile.friendly = false;
+                projectile.hostile = false;
+                base.SetDefaults();
+            }
+
+            public override void AI()
+            {
+                if (heal == -1)
+                {
+                    heal = (int)projectile.ai[0];
+
+                    if (Main.LocalPlayer.Equals(Main.player[projectile.owner])) //local
+                    {
+                        if (ExperienceAndClasses.localMyPlayer.sanctuary_buff != null && !ExperienceAndClasses.localMyPlayer.sanctuary_buff.Equals(projectile))
+                        {
+                            ExperienceAndClasses.localMyPlayer.sanctuary_buff.projectile.Kill();
+                        }
+                        ExperienceAndClasses.localMyPlayer.sanctuary_buff = this;
+
+                        if (projectile.ai[1] == 1)
+                        {
+                            ExperienceAndClasses.localMyPlayer.sanctuary_buff_end = DateTime.Now.AddSeconds(AbilityMain.Cleric_Active_Sanctuary.buff_duration_seconds);
+                        }
+                    }
+                }
+
+                //timimg
+                projectile.timeLeft = int.MaxValue;
+                if (Main.LocalPlayer.whoAmI == projectile.owner)
+                {
+                    if (DateTime.Now.Subtract(ExperienceAndClasses.localMyPlayer.sanctuary_buff_end).Ticks >= 0)
+                    {
+                        projectile.Kill();
+                    }
+                }
+
+                Vector2 new_pos = Main.player[projectile.owner].Center;
+                new_pos.X -= projectile.width / 2;
+                new_pos.Y -= (projectile.height - Main.LocalPlayer.height / 2);
+                projectile.position = new_pos;
+
+                base.AI();
+            }
+
+            public override void Kill(int timeLeft)
+            {
+                Main.NewText("KILL " + projectile.timeLeft + " " + timeLeft);
+
+                MyPlayer myPlayer = Main.player[projectile.owner].GetModPlayer<MyPlayer>(mod);
+                if (myPlayer.sanctuary_buff.Equals(projectile))
+                {
+                    myPlayer.sanctuary_buff = null;
                 }
                 base.Kill(timeLeft);
             }
