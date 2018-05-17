@@ -5,6 +5,26 @@ A MAJOR overhaul is now underway. See the forums or discord for more details!
 
 CHANGELOG:
 
+===v1.3.6===
+
+1. Cleric/Saint Abilities (complete!)
+* Sanctuary completely implemented
+* Divine Intervention completely implemented
+* Paragon/Renew completely implemented
+
+2. Status System:
+* added a custom status system so that effects will not need to take buff slots (Cleric/Saint effects are statuses; during reworks, all current mod buffs will become statuses)
+* statuses do not show in the buff bar, but most will have visual effects
+* I am open to suggestions on how best to display duration info if at all (currently not shown)
+* added /expstatusmsg to toggle showing status gain/lose messages (defaults to on)
+
+3. Misc:
+* Headless Horseman is now counted as undead
+* Optimizations for heavily populated servers and very low-spec systems
+
+4. Bug Fixes:
+* Fixed a bug that could prevent certain mod ability projectiles from spawning
+
 ===v1.3.5===
 
 1. General:

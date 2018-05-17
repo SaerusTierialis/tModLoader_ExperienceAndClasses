@@ -4,6 +4,25 @@ using Terraria.ModLoader;
 
 namespace ExperienceAndClasses
 {
+    class Command_expstatusmsg : CommandTemplate
+    {
+        public Command_expstatusmsg()
+        {
+            name = "expstatusmsg";
+            argstr = "";
+            desc = "toggle showing status messages";
+        }
+
+        public override void Action(CommandCaller caller, string input, string[] args)
+        {
+            ExperienceAndClasses.localMyPlayer.show_status_messages = !ExperienceAndClasses.localMyPlayer.show_status_messages;
+            if (ExperienceAndClasses.localMyPlayer.show_status_messages)
+                Main.NewText("Status messages enabled.", ExperienceAndClasses.MESSAGE_COLOUR_YELLOW);
+            else
+                Main.NewText("Status messages disabled.", ExperienceAndClasses.MESSAGE_COLOUR_YELLOW);
+        }
+    }
+
     class Command_expkillcount : CommandTemplate
     {
         public Command_expkillcount()

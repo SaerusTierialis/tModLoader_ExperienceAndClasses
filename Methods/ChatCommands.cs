@@ -251,7 +251,7 @@ namespace ExperienceAndClasses.Methods
 
         public static void CommandDisplaySettings(Mod mod)
         {
-            string lvlcap, dmgred, threshCD, ability_overhead;
+            string lvlcap, dmgred, threshCD, ability_overhead, show_status_messages;
 
             if (ExperienceAndClasses.worldLevelCap > 0)
             {
@@ -290,6 +290,15 @@ namespace ExperienceAndClasses.Methods
                 ability_overhead = "disabled";
             }
 
+            if (myPlayer.show_status_messages)
+            {
+                show_status_messages = "enabled";
+            }
+            else
+            {
+                show_status_messages = "disabled";
+            }
+
             Main.NewTextMultiline("World - Require Authorization: " + ExperienceAndClasses.worldRequireAuth + "\nWorld - Experience Rate: " + (ExperienceAndClasses.worldExpModifier * 100) +
                         "%\nWorld - Ignore Class Caps: " + ExperienceAndClasses.worldIgnoreCaps + "\nWorld - Level Cap: " + lvlcap + "\nWorld - Class Damage Reduction: " +
                         dmgred + "\nWorld - Death Penalty: " + (ExperienceAndClasses.worldDeathPenalty * 100) + "%", false, ExperienceAndClasses.MESSAGE_COLOUR_YELLOW);
@@ -299,7 +308,7 @@ namespace ExperienceAndClasses.Methods
 
             Main.NewTextMultiline("Character - UI Show: " + myPlayer.UIShow + "\nCharacter - UI Force Inventory: " + myPlayer.UIInventory + 
                 "\nCharacter - UI Exp Bar: " + myPlayer.UIExpBar + "\nCharacter - UI Cooldown Bars: " + myPlayer.UICDBars + 
-                "\nCharacter - UI Ability Messages Overhead: " + ability_overhead, false, ExperienceAndClasses.MESSAGE_COLOUR_YELLOW);
+                "\nCharacter - UI Ability Messages Overhead: " + ability_overhead + "\nCharacter - UI Status Messages: " + show_status_messages, false, ExperienceAndClasses.MESSAGE_COLOUR_YELLOW);
         }
 
         /// <summary>

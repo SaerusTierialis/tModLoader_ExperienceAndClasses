@@ -1,7 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
 using System;
-using System.Collections.Generic;
-using System.Reflection;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -18,6 +16,7 @@ namespace ExperienceAndClasses.Abilities
 
             public override void SetDefaults()
             {
+                base.SetDefaults();
                 projectile.width = 151;
                 projectile.height = 151;
                 projectile.light = 1f;
@@ -34,7 +33,7 @@ namespace ExperienceAndClasses.Abilities
                     {
                         local_owner = true;
 
-                        if (ExperienceAndClasses.localMyPlayer.sanctuaries[sanc_index] != null && !ExperienceAndClasses.localMyPlayer.sanctuaries[sanc_index].Equals(projectile))
+                        if ((ExperienceAndClasses.localMyPlayer.sanctuaries[sanc_index] != null) && !ExperienceAndClasses.localMyPlayer.sanctuaries[sanc_index].Equals(projectile))
                         {
                             ExperienceAndClasses.localMyPlayer.sanctuaries[sanc_index].Kill();
                         }
@@ -75,7 +74,7 @@ namespace ExperienceAndClasses.Abilities
                         }
                     }
                 }
-
+                
                 //everything else
                 base.AI();
             }
@@ -90,15 +89,16 @@ namespace ExperienceAndClasses.Abilities
             }
         }
 
-        public class Status_Cleric_Sanctuary : ProjStatusVisual
+        public class Status_Cleric_Blessing : ProjStatusVisual
         {
-            public Status_Cleric_Sanctuary()
+            public Status_Cleric_Blessing()
             {
-                status_index = (int)ExperienceAndClasses.STATUSES.SANCTUARY;
+                status_index = (int)ExperienceAndClasses.STATUSES.Blessing;
                 position_type = ProjStatusVisual.POSITION.BOTTOM;
             }
             public override void SetDefaults()
             {
+                base.SetDefaults();
                 projectile.width = 40;
                 projectile.height = 60;
                 projectile.alpha = 200;
@@ -109,11 +109,12 @@ namespace ExperienceAndClasses.Abilities
         {
             public Status_Cleric_Paragon()
             {
-                status_index = (int)ExperienceAndClasses.STATUSES.PARAGON;
+                status_index = (int)ExperienceAndClasses.STATUSES.Paragon;
                 position_type = ProjStatusVisual.POSITION.ABOVE;
             }
             public override void SetDefaults()
             {
+                base.SetDefaults();
                 projectile.width = 20;
                 projectile.height = 8;
                 projectile.alpha = 100;
@@ -124,104 +125,23 @@ namespace ExperienceAndClasses.Abilities
         {
             public Status_Cleric_Paragon_Renew()
             {
-                status_index = (int)ExperienceAndClasses.STATUSES.PARAGON_RENEW;
+                status_index = (int)ExperienceAndClasses.STATUSES.Renew;
                 position_type = ProjStatusVisual.POSITION.ABOVE;
             }
             public override void SetDefaults()
             {
+                base.SetDefaults();
                 projectile.width = 20;
                 projectile.height = 8;
                 projectile.alpha = 100;
             }
         }
 
-        //public class Cleric_SanctuaryBuff : SyncingProjectile
-        //{
-        //    public int heal = -1;
-
-        //    public override void SetDefaults()
-        //    {
-        //        projectile.light = AbilityMain.Cleric_Active_Sanctuary.light_effect;
-        //        projectile.width = 40;
-        //        projectile.height = 60;
-        //        projectile.alpha = 200;
-        //        projectile.tileCollide = false;
-        //        projectile.friendly = false;
-        //        projectile.hostile = false;
-        //        projectile.hide = true;
-        //        base.SetDefaults();
-        //    }
-
-        //    public override void AI()
-        //    {
-        //        //init
-        //        if (heal == -1)
-        //        {
-        //            heal = projectile.damage;
-        //            projectile.owner = (int)projectile.ai[0];
-
-        //            if (heal > 0)
-        //            {
-        //                projectile.hide = false;
-        //            }
-
-        //            MyPlayer myPlayer = Main.player[projectile.owner].GetModPlayer<MyPlayer>(mod);
-        //            if (myPlayer.sanctuary_buff != null && !myPlayer.sanctuary_buff.Equals(projectile))
-        //            {
-        //                myPlayer.sanctuary_buff.projectile.Kill();
-        //            }
-        //            myPlayer.sanctuary_buff = this;
-
-        //            if (Main.LocalPlayer.Equals(Main.player[projectile.owner])) //local
-        //            {
-        //                if (projectile.ai[1] == 1)
-        //                {
-        //                    myPlayer.sanctuary_buff_end = DateTime.Now.AddSeconds(AbilityMain.Cleric_Active_Sanctuary.buff_duration_seconds);
-        //                }
-        //            }
-        //        }
-
-        //        //clear stray + remove on death
-        //        if (!Main.player[projectile.owner].active || Main.player[projectile.owner].dead)
-        //        {
-        //            projectile.Kill();
-        //        }
-
-        //        //timimg
-        //        projectile.timeLeft = int.MaxValue;
-        //        if (Main.LocalPlayer.whoAmI == projectile.owner)
-        //        {
-        //            if (DateTime.Now.Subtract(ExperienceAndClasses.localMyPlayer.sanctuary_buff_end).Ticks >= 0)
-        //            {
-        //                projectile.Kill();
-        //            }
-        //        }
-
-        //        //follow player
-        //        Vector2 new_pos = Main.player[projectile.owner].Center;
-        //        new_pos.X -= projectile.width / 2;
-        //        new_pos.Y -= (projectile.height - Main.LocalPlayer.height / 2);
-        //        projectile.position = new_pos;
-
-        //        base.AI();
-        //    }
-
-        //    public override void Kill(int timeLeft)
-        //    {
-        //        MyPlayer myPlayer = Main.player[projectile.owner].GetModPlayer<MyPlayer>(mod);
-        //        if ((myPlayer.sanctuary_buff != null) && myPlayer.sanctuary_buff.Equals(projectile))
-        //        {
-        //            myPlayer.sanctuary_buff = null;
-        //        }
-
-        //        base.Kill(timeLeft);
-        //    }
-        //}
-
         public class Cleric_Barrier : SyncingProjectile
         {
             public override void SetDefaults()
             {
+                base.SetDefaults();
                 projectile.height = 127;
                 projectile.width = 12;
                 projectile.penetrate = 3;
@@ -270,9 +190,8 @@ namespace ExperienceAndClasses.Abilities
 
             public override void SetDefaults()
             {
+                base.SetDefaults();
                 projectile.timeLeft = 100;
-                projectile.friendly = false;
-                projectile.hostile = false;
             }
 
             public override bool? CanHitNPC(NPC target)
@@ -296,6 +215,8 @@ namespace ExperienceAndClasses.Abilities
                     int target = (int)projectile.ai[1];
                     int amount = projectile.damage;
                     int direction = 1;
+
+                    bool sanctuary_heal = projectile.ai[0] == 2;
 
                     bool server_or_single = (Main.netMode != 1);
 
@@ -323,6 +244,10 @@ namespace ExperienceAndClasses.Abilities
                                     player.HealEffect(amount);
                                 }
                                 player.statLife += amount;
+                                if (sanctuary_heal)
+                                {
+                                    player.GetModPlayer<MyPlayer>(mod).time_last_sanc_effect = DateTime.Now;
+                                }
                             }
                             else if (amount < 0)
                             {
@@ -395,9 +320,8 @@ namespace ExperienceAndClasses.Abilities
 
             public override void SetDefaults()
             {
+                base.SetDefaults();
                 projectile.timeLeft = 100;
-                projectile.friendly = false;
-                projectile.hostile = false;
             }
 
             public override bool? CanHitNPC(NPC target)
@@ -429,7 +353,8 @@ namespace ExperienceAndClasses.Abilities
 
                         if (duration_seconds > 0) //add status
                         {
-                            DateTime time_end = DateTime.Now.AddSeconds(duration_seconds);
+                            DateTime now = DateTime.Now;
+                            DateTime time_end = now.AddSeconds(duration_seconds);
                             if (force_mode || time_end.Subtract(myPlayer.status_end_time[status]).Ticks > 0)
                             {
                                 myPlayer.status_end_time[status] = time_end;
@@ -438,6 +363,13 @@ namespace ExperienceAndClasses.Abilities
                             {
                                 myPlayer.status_magnitude[status] = magnitude;
                             }
+
+                            if (myPlayer.show_status_messages && !myPlayer.status_active[status] && (myPlayer.player.whoAmI == Main.LocalPlayer.whoAmI))
+                            {
+                                //Main.NewText("Gained Effect: " + (ExperienceAndClasses.STATUSES)status + " (MAG: " + myPlayer.status_magnitude[status] + ", DUR: " + myPlayer.status_end_time[status].Subtract(now).TotalSeconds + ")", ExperienceAndClasses.MESSAGE_COLOUR_GREEN);
+                                Main.NewText("Gained Status: " + (ExperienceAndClasses.STATUSES)status, ExperienceAndClasses.MESSAGE_COLOUR_GREEN);
+                            }
+
                             myPlayer.status_active[status] = true;
                             myPlayer.status_new[status] = true;
                         }
@@ -446,6 +378,11 @@ namespace ExperienceAndClasses.Abilities
                             myPlayer.status_active[status] = false;
                             myPlayer.status_end_time[status] = DateTime.MinValue;
                             myPlayer.status_magnitude[status] = 0;
+
+                            if (myPlayer.show_status_messages && (myPlayer.player.whoAmI == Main.LocalPlayer.whoAmI))
+                            {
+                                Main.NewText("Lost Status: " + (ExperienceAndClasses.STATUSES)status, ExperienceAndClasses.MESSAGE_COLOUR_RED);
+                            }
                         }
                     }
                     
@@ -590,13 +527,6 @@ namespace ExperienceAndClasses.Abilities
         protected MyPlayer owner_myPlayer;
         protected POSITION position_type = POSITION.CENTER;
 
-        public override void SetDefaults()
-        {
-            projectile.tileCollide = false;
-            projectile.friendly = false;
-            projectile.hostile = false;
-        }
-
         public override bool? CanHitNPC(NPC target)
         {
             return false;
@@ -712,6 +642,14 @@ namespace ExperienceAndClasses.Abilities
         private DateTime next_sync = DateTime.MinValue;
 
         private ulong sync_counter;
+
+        public override void SetDefaults()
+        {
+            //default all mod projectiles to not hit anything
+            projectile.friendly = false;
+            projectile.hostile = false;
+            projectile.tileCollide = false;
+        }
 
         public SyncingProjectile()
         {

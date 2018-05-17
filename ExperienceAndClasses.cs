@@ -126,10 +126,11 @@ namespace ExperienceAndClasses
         public const float MAX_HEAL_POWER_IMMUNITY_BONUS = 1.0f;
         public enum STATUSES : byte
         {
-            SANCTUARY,
-            IMMUNITY,
-            PARAGON,
-            PARAGON_RENEW,
+            HolyLight,
+            Blessing,
+            DivineIntervention,
+            Paragon,
+            Renew,
             COUNT,
         }
 

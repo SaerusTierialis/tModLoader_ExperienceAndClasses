@@ -44,6 +44,11 @@ namespace ExperienceAndClasses
         public bool UICDBars = true;
         public bool UIInventory = true;
 
+        public Boolean showFailMessages = true;
+        public bool ability_message_overhead = true;
+        public float thresholdCDMsg = 3f;
+        public bool show_status_messages = true;
+
         public List<Tuple<ModItem, string>> classTokensEquipped;
         public int numberClasses = 1;
         public int effectiveLevel = 0;
@@ -54,12 +59,9 @@ namespace ExperienceAndClasses
         public bool[] unlocked_abilities_current;
         public Abilities.AbilityMain.ID[] selectedActiveAbilities;
         public Abilities.AbilityMain.RETURN latestAbilityFail = Abilities.AbilityMain.RETURN.FAIL_NOT_IMPLEMENTRD;
-        public Boolean showFailMessages = true;
-        public float thresholdCDMsg = 3f;
         public bool itemUsePrevented = false;
         public DateTime timeAllowItemUse = DateTime.MinValue;
         public Projectile[] sanctuaries;
-        public bool ability_message_overhead = true;
         public DateTime time_last_hit_taken = DateTime.MinValue;
         public DateTime time_last_sanc_effect = DateTime.MinValue;
 
@@ -117,9 +119,9 @@ namespace ExperienceAndClasses
             status_visuals_projectile_ids = new int[(int)ExperienceAndClasses.STATUSES.COUNT];
 
             //define status visuals
-            status_visuals_projectile_ids[(int)ExperienceAndClasses.STATUSES.SANCTUARY] = mod.ProjectileType<Abilities.AbilityProj.Status_Cleric_Sanctuary>();
-            status_visuals_projectile_ids[(int)ExperienceAndClasses.STATUSES.PARAGON] = mod.ProjectileType<Abilities.AbilityProj.Status_Cleric_Paragon>();
-            status_visuals_projectile_ids[(int)ExperienceAndClasses.STATUSES.PARAGON_RENEW] = mod.ProjectileType<Abilities.AbilityProj.Status_Cleric_Paragon_Renew>();
+            status_visuals_projectile_ids[(int)ExperienceAndClasses.STATUSES.Blessing] = mod.ProjectileType<Abilities.AbilityProj.Status_Cleric_Blessing>();
+            status_visuals_projectile_ids[(int)ExperienceAndClasses.STATUSES.Paragon] = mod.ProjectileType<Abilities.AbilityProj.Status_Cleric_Paragon>();
+            status_visuals_projectile_ids[(int)ExperienceAndClasses.STATUSES.Renew] = mod.ProjectileType<Abilities.AbilityProj.Status_Cleric_Paragon_Renew>();
         }
 
         /// <summary>
@@ -328,6 +330,7 @@ namespace ExperienceAndClasses
                 {"ability_message_overhead", ability_message_overhead},
                 {"last_world_name", Main.worldName},
                 {"sanctuaries_centers", sanctuaries_centers},
+                {"show_status_messages", show_status_messages},
             };
         }
 
@@ -355,6 +358,7 @@ namespace ExperienceAndClasses
             UIInventory = Commons.TryGet<bool>(tag, "UI_inv_show", true);
             show_kill_count = Commons.TryGet<bool>(tag, "show_kill_count", false);
             ability_message_overhead = Commons.TryGet<bool>(tag, "ability_message_overhead", true);
+            show_status_messages = Commons.TryGet<bool>(tag, "show_status_messages", true);
 
             //trace
             traceChar = Commons.TryGet<bool>(tag, "traceChar", false);
@@ -589,7 +593,7 @@ namespace ExperienceAndClasses
                         //any end of duration events
                         switch ((ExperienceAndClasses.STATUSES)i)
                         {
-                            case (ExperienceAndClasses.STATUSES.PARAGON_RENEW):
+                            case (ExperienceAndClasses.STATUSES.Renew):
                                 //paragon timeout refreshes half of cooldown
                                 Abilities.AbilityMain.Ability ability = Abilities.AbilityMain.AbilityLookup[(int)Abilities.AbilityMain.ID.Saint_Active_Paragon];
                                 ability.AdjustCooldown(ability.GetCooldownSecs((byte)effectiveLevel) * -0.5);
@@ -613,12 +617,6 @@ namespace ExperienceAndClasses
                                 //special cases
                                 switch ((ExperienceAndClasses.STATUSES)i)
                                 {
-                                    case (ExperienceAndClasses.STATUSES.SANCTUARY):
-                                        if (status_magnitude[i] <= 0)
-                                        {
-                                            draw_visual = false;
-                                        }
-                                        break;
                                     default:
                                         break;
                                 }
@@ -634,10 +632,10 @@ namespace ExperienceAndClasses
                         //status effect
                         switch ((ExperienceAndClasses.STATUSES)i)
                         {
-                            case (ExperienceAndClasses.STATUSES.IMMUNITY):
+                            case (ExperienceAndClasses.STATUSES.DivineIntervention):
                                 player.immune = true;
                                 break;
-                            case (ExperienceAndClasses.STATUSES.SANCTUARY):
+                            case (ExperienceAndClasses.STATUSES.HolyLight):
                                 Lighting.AddLight(player.Top, Abilities.AbilityMain.Cleric_Active_Sanctuary.BUFF_LIGHT_COLOUR);
                                 break;
                             default:
@@ -803,16 +801,7 @@ namespace ExperienceAndClasses
             {
                 if (status_active[i])
                 {
-                    //status ending
-                    status_active[i] = false;
-                    status_new[i] = false;
-                    status_end_time[i] = DateTime.MinValue;
-                    status_magnitude[i] = 0;
-                    if (player.whoAmI == Main.LocalPlayer.whoAmI)
-                    {
-                        //local, sync effect ending
-                        Projectile.NewProjectile(player.Center, new Vector2(0.1f), ExperienceAndClasses.mod.ProjectileType<Abilities.AbilityProj.Misc_PlayerStatus>(), player.whoAmI, 0, player.whoAmI, i, -1);
-                    }
+                    EndStatus(i);
                 }
             }
 
@@ -957,19 +946,12 @@ namespace ExperienceAndClasses
             base.Hurt(pvp, quiet, damage, hitDirection, crit);
 
             //sanctuary buff heal
-            if (!player.dead && status_active[(int)ExperienceAndClasses.STATUSES.SANCTUARY] && status_magnitude[(int)ExperienceAndClasses.STATUSES.SANCTUARY] > 0)
+            if (!player.dead && status_active[(int)ExperienceAndClasses.STATUSES.Blessing])
             {
                 //heal
-                Projectile.NewProjectile(player.Center, new Vector2(0f), ExperienceAndClasses.mod.ProjectileType<Abilities.AbilityProj.Misc_HealHurt>(), (int)status_magnitude[(int)ExperienceAndClasses.STATUSES.SANCTUARY], 0, Main.LocalPlayer.whoAmI, 1, Main.LocalPlayer.whoAmI);
-                //remove heal from status
-                Projectile.NewProjectile(player.Center, new Vector2(0.1f), ExperienceAndClasses.mod.ProjectileType<Abilities.AbilityProj.Misc_PlayerStatus>(), player.whoAmI, 0, player.whoAmI, (float)ExperienceAndClasses.STATUSES.SANCTUARY, (float)status_end_time[(int)ExperienceAndClasses.STATUSES.SANCTUARY].Subtract(DateTime.Now).TotalSeconds);
-                //failsafe
-                status_magnitude[(int)ExperienceAndClasses.STATUSES.SANCTUARY] = 0;
-                //remove visual
-                if (status_visuals[(int)ExperienceAndClasses.STATUSES.SANCTUARY] != null)
-                {
-                    status_visuals[(int)ExperienceAndClasses.STATUSES.SANCTUARY].Kill();
-                }
+                Projectile.NewProjectile(player.Center, new Vector2(0f), ExperienceAndClasses.mod.ProjectileType<Abilities.AbilityProj.Misc_HealHurt>(), (int)status_magnitude[(int)ExperienceAndClasses.STATUSES.Blessing], 0, Main.LocalPlayer.whoAmI, 1, Main.LocalPlayer.whoAmI);
+                //remove
+                EndStatus((int)ExperienceAndClasses.STATUSES.Blessing);
             }
         }
 
@@ -1123,6 +1105,7 @@ namespace ExperienceAndClasses
         {
             //status ending
             status_active[index] = false;
+            status_new[index] = false;
             status_end_time[index] = DateTime.MinValue;
             status_magnitude[index] = 0;
             if (player.whoAmI == Main.LocalPlayer.whoAmI)

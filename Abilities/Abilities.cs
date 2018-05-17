@@ -44,6 +44,7 @@ namespace ExperienceAndClasses.Abilities
             Cleric_Active_Heal,
             Cleric_Upgrade_Heal_Smite,
             Cleric_Active_Sanctuary,
+            Cleric_Upgrade_Sanctuary_HolyLight,
             Cleric_Alternate_Heal_Barrier,
             Cleric_Upgrade_Sanctuary_Blessing,
 
@@ -334,7 +335,7 @@ namespace ExperienceAndClasses.Abilities
                     {
                         value *= SECONDARY_TARGETS_MULTIPLIER;
                     }
-                    else if (ExperienceAndClasses.localMyPlayer.status_active[(int)ExperienceAndClasses.STATUSES.PARAGON_RENEW]) //renew
+                    else if (ExperienceAndClasses.localMyPlayer.status_active[(int)ExperienceAndClasses.STATUSES.Renew]) //renew
                     {
                         if (is_player && (index == nearest_friendly_index) && nearest_friendly_is_player)
                         {
@@ -342,7 +343,7 @@ namespace ExperienceAndClasses.Abilities
                             if (value < max_heal)
                             {
                                 value = 9999;
-                                ExperienceAndClasses.localMyPlayer.EndStatus((int)ExperienceAndClasses.STATUSES.PARAGON_RENEW);
+                                ExperienceAndClasses.localMyPlayer.EndStatus((int)ExperienceAndClasses.STATUSES.Renew);
                                 Projectile.NewProjectile(Main.player[index].Center, new Vector2(0f), ExperienceAndClasses.mod.ProjectileType<DustMakerProj>(), 0, 0, Main.LocalPlayer.whoAmI, (float)DustMakerProj.MODE.HEAL_RENEW);
                                 healed_something = 2;
                             }
@@ -361,9 +362,9 @@ namespace ExperienceAndClasses.Abilities
             {
                 double cd = base.GetCooldownSecs(level);
 
-                if (ExperienceAndClasses.localMyPlayer.status_active[(int)ExperienceAndClasses.STATUSES.PARAGON])
+                if (ExperienceAndClasses.localMyPlayer.status_active[(int)ExperienceAndClasses.STATUSES.Paragon])
                 {
-                    cd *= ExperienceAndClasses.localMyPlayer.status_magnitude[(int)ExperienceAndClasses.STATUSES.PARAGON];
+                    cd *= ExperienceAndClasses.localMyPlayer.status_magnitude[(int)ExperienceAndClasses.STATUSES.Paragon];
                 }
 
                 return cd;
@@ -373,9 +374,9 @@ namespace ExperienceAndClasses.Abilities
             {
                 int cost = base.GetManaCost(level, alternate);
 
-                if (ExperienceAndClasses.localMyPlayer.status_active[(int)ExperienceAndClasses.STATUSES.PARAGON])
+                if (ExperienceAndClasses.localMyPlayer.status_active[(int)ExperienceAndClasses.STATUSES.Paragon])
                 {
-                    cost = (int)(cost * ExperienceAndClasses.localMyPlayer.status_magnitude[(int)ExperienceAndClasses.STATUSES.PARAGON]);
+                    cost = (int)(cost * ExperienceAndClasses.localMyPlayer.status_magnitude[(int)ExperienceAndClasses.STATUSES.Paragon]);
                 }
 
                 return cost;
@@ -408,7 +409,7 @@ namespace ExperienceAndClasses.Abilities
                 cost_mana_percent = 0.90f;
                 cooldown_seconds = 120;
                 class_type = CLASS_TYPE.SUPPORT;
-                upgrades = new ID[] { ID.Cleric_Upgrade_Sanctuary_Blessing , ID.Saint_Upgrade_Sanctuary_Link };
+                upgrades = new ID[] { ID.Cleric_Upgrade_Sanctuary_HolyLight , ID.Cleric_Upgrade_Sanctuary_Blessing , ID.Saint_Upgrade_Sanctuary_Link };
             }
 
             protected override RETURN UseEffects(byte level = 1, bool alternate = false)
@@ -453,30 +454,29 @@ namespace ExperienceAndClasses.Abilities
                 List<Tuple<bool, int, bool>> targets = target_info.Item1;
                 DateTime now = DateTime.Now;
                 MyPlayer myPlayer;
-                int heal_buff;
                 foreach (Tuple<bool, int, bool> t in targets)
                 {
                     if (t.Item1)
                     {
                         //player
                         myPlayer = Main.player[t.Item2].GetModPlayer<MyPlayer>(ExperienceAndClasses.mod);
-                        if ((DateTime.Now.Subtract(myPlayer.time_last_hit_taken).TotalSeconds >= REQ_TIME_NO_HIT_TAKEN) && 
-                            (DateTime.Now.Subtract(myPlayer.time_last_sanc_effect).TotalSeconds >= PULSE_SECONDS))
+                        if (DateTime.Now.Subtract(myPlayer.time_last_hit_taken).TotalSeconds >= REQ_TIME_NO_HIT_TAKEN)
                         {
                             //heal
-                            myPlayer.time_last_sanc_effect = now;
-                            Projectile.NewProjectile(projectile.Center, new Vector2(0f), ExperienceAndClasses.mod.ProjectileType<AbilityProj.Misc_HealHurt>(), heal, 0, Main.LocalPlayer.whoAmI, 1, t.Item2);
+                            if (DateTime.Now.Subtract(myPlayer.time_last_sanc_effect).TotalSeconds >= PULSE_SECONDS)
+                            {
+                                Projectile.NewProjectile(projectile.Center, new Vector2(0f), ExperienceAndClasses.mod.ProjectileType<AbilityProj.Misc_HealHurt>(), heal, 0, Main.LocalPlayer.whoAmI, 2, t.Item2);
+                            }
 
                             //buff
+                            if (ExperienceAndClasses.localMyPlayer.unlocked_abilities_current[(int)ID.Cleric_Upgrade_Sanctuary_HolyLight])
+                            {
+                                Projectile.NewProjectile(myPlayer.player.Center, new Vector2(0f), ExperienceAndClasses.mod.ProjectileType<AbilityProj.Misc_PlayerStatus>(), myPlayer.player.whoAmI, 0, Main.LocalPlayer.whoAmI, (float)ExperienceAndClasses.STATUSES.HolyLight, BUFF_DURATION_SECONDS);
+                            }
                             if (ExperienceAndClasses.localMyPlayer.unlocked_abilities_current[(int)ID.Cleric_Upgrade_Sanctuary_Blessing])
                             {
-                                heal_buff = heal;
+                                Projectile.NewProjectile(myPlayer.player.Center, new Vector2(0f), ExperienceAndClasses.mod.ProjectileType<AbilityProj.Misc_PlayerStatus>(), myPlayer.player.whoAmI, heal, Main.LocalPlayer.whoAmI, (float)ExperienceAndClasses.STATUSES.Blessing, BUFF_DURATION_SECONDS);
                             }
-                            else
-                            {
-                                heal_buff = 0;
-                            }
-                            Projectile.NewProjectile(myPlayer.player.Center, new Vector2(0f), ExperienceAndClasses.mod.ProjectileType<AbilityProj.Misc_PlayerStatus>(), myPlayer.player.whoAmI, heal_buff, Main.LocalPlayer.whoAmI, (float)ExperienceAndClasses.STATUSES.SANCTUARY, BUFF_DURATION_SECONDS);
                         }
                     }
                     else 
@@ -523,6 +523,16 @@ namespace ExperienceAndClasses.Abilities
                         }
                     }
                 }
+            }
+        }
+
+        public class Cleric_Upgrade_Sanctuary_HolyLight : Ability
+        {
+            public Cleric_Upgrade_Sanctuary_HolyLight()
+            {
+                ability_type = ABILITY_TYPE.UPGRADE;
+                name = "Sanctuary - Holy Light";
+                description = "";
             }
         }
 
@@ -604,7 +614,7 @@ namespace ExperienceAndClasses.Abilities
                         }
 
                         //apply
-                        Projectile.NewProjectile(location, new Vector2(0f), ExperienceAndClasses.mod.ProjectileType<AbilityProj.Misc_PlayerStatus>(), t.Item2, 0, Main.LocalPlayer.whoAmI, (float)ExperienceAndClasses.STATUSES.IMMUNITY, duration_use);
+                        Projectile.NewProjectile(location, new Vector2(0f), ExperienceAndClasses.mod.ProjectileType<AbilityProj.Misc_PlayerStatus>(), t.Item2, 0, Main.LocalPlayer.whoAmI, (float)ExperienceAndClasses.STATUSES.DivineIntervention, duration_use);
                     }
                 }
 
@@ -677,12 +687,12 @@ namespace ExperienceAndClasses.Abilities
                 if (alternate && ExperienceAndClasses.localMyPlayer.unlocked_abilities_current[(int)alternative])
                 {
                     //renew
-                    Projectile.NewProjectile(Main.LocalPlayer.Center, new Vector2(0f), ExperienceAndClasses.mod.ProjectileType<AbilityProj.Misc_PlayerStatus>(), Main.LocalPlayer.whoAmI, 0, Main.LocalPlayer.whoAmI, (float)ExperienceAndClasses.STATUSES.PARAGON_RENEW, DURATION_SECONDS);
+                    Projectile.NewProjectile(Main.LocalPlayer.Center, new Vector2(0f), ExperienceAndClasses.mod.ProjectileType<AbilityProj.Misc_PlayerStatus>(), Main.LocalPlayer.whoAmI, 0, Main.LocalPlayer.whoAmI, (float)ExperienceAndClasses.STATUSES.Renew, DURATION_SECONDS);
                 }
                 else
                 {
                     //paragon
-                    Projectile.NewProjectile(Main.LocalPlayer.Center, new Vector2(0f), ExperienceAndClasses.mod.ProjectileType<AbilityProj.Misc_PlayerStatus>(), Main.LocalPlayer.whoAmI, HEAL_COOLDOWN_AND_COST_MULTIPLIER, Main.LocalPlayer.whoAmI, (float)ExperienceAndClasses.STATUSES.PARAGON, DURATION_SECONDS);
+                    Projectile.NewProjectile(Main.LocalPlayer.Center, new Vector2(0f), ExperienceAndClasses.mod.ProjectileType<AbilityProj.Misc_PlayerStatus>(), Main.LocalPlayer.whoAmI, HEAL_COOLDOWN_AND_COST_MULTIPLIER, Main.LocalPlayer.whoAmI, (float)ExperienceAndClasses.STATUSES.Paragon, DURATION_SECONDS);
                 }
                 //refresh heal's cooldown
                 AbilityLookup[(int)ID.Cleric_Active_Heal].RefreshCooldown();
