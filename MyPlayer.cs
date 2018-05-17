@@ -585,6 +585,18 @@ namespace ExperienceAndClasses
                     {
                         //status ending
                         EndStatus(i);
+
+                        //any end of duration events
+                        switch ((ExperienceAndClasses.STATUSES)i)
+                        {
+                            case (ExperienceAndClasses.STATUSES.PARAGON_RENEW):
+                                //paragon timeout refreshes half of cooldown
+                                Abilities.AbilityMain.Ability ability = Abilities.AbilityMain.AbilityLookup[(int)Abilities.AbilityMain.ID.Saint_Active_Paragon];
+                                ability.AdjustCooldown(ability.GetCooldownSecs((byte)effectiveLevel) * -0.5);
+                                break;
+                            default:
+                                break;
+                        }
                     }
                     else
                     {
@@ -599,9 +611,16 @@ namespace ExperienceAndClasses
                                 draw_visual = (status_visuals_projectile_ids[i] > 0);
 
                                 //special cases
-                                if ((i == (int)ExperienceAndClasses.STATUSES.SANCTUARY) && (status_magnitude[i] <= 0))
+                                switch ((ExperienceAndClasses.STATUSES)i)
                                 {
-                                    draw_visual = false;
+                                    case (ExperienceAndClasses.STATUSES.SANCTUARY):
+                                        if (status_magnitude[i] <= 0)
+                                        {
+                                            draw_visual = false;
+                                        }
+                                        break;
+                                    default:
+                                        break;
                                 }
 
                                 //draw

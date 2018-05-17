@@ -128,10 +128,12 @@ namespace ExperienceAndClasses.Abilities
 
         public class Cleric_Active_Heal : Ability
         {
-            public static float range = 600;
-            private static float knockback = 5;
-            private static float secondary_targets_multiplier = 0.5f;
-            public static float undead_bonus_multiplier = 2f;
+            public const float RANGE = 600;
+            private const float KNOCKBACK = 5;
+            private const float SECONDARY_TARGETS_MULTIPLIER = 0.5f;
+            public const float UNDEAD_BONUS_MULTIPLIER = 2f;
+            private const double PARAGON_COOLDOWN_REDUCTION_SECONDS = -3;
+            private const double PARAGON_RENEW_COOLDOWN_REDUCTION_SECONDS = PARAGON_COOLDOWN_REDUCTION_SECONDS*3;
 
             public Cleric_Active_Heal()
             {
@@ -160,20 +162,36 @@ namespace ExperienceAndClasses.Abilities
                 if (!alternate || !ExperienceAndClasses.localMyPlayer.unlocked_abilities_current[(int)alternative]) //main effect (heal)
                 {
                     //visual (dust)
-                    Projectile.NewProjectile(location, new Vector2(0f), ExperienceAndClasses.mod.ProjectileType<DustMakerProj>(), 0, 0, Main.LocalPlayer.whoAmI, (float)DustMakerProj.MODE.heal);
+                    Projectile.NewProjectile(location, new Vector2(0f), ExperienceAndClasses.mod.ProjectileType<DustMakerProj>(), 0, 0, Main.LocalPlayer.whoAmI, (float)DustMakerProj.MODE.HEAL);
 
                     //update upgrades
                     upgrade_smite = ExperienceAndClasses.localMyPlayer.unlocked_abilities_current[(int)ID.Cleric_Upgrade_Heal_Smite];
 
                     //look for players/npcs
-                    Tuple<List<Tuple<bool, int, bool>>, int, int, bool, bool> target_info = FindTargets(ExperienceAndClasses.localMyPlayer.player, location, range, true, true, true);
+                    Tuple<List<Tuple<bool, int, bool>>, int, int, bool, bool> target_info = FindTargets(ExperienceAndClasses.localMyPlayer.player, location, RANGE, true, true, true);
                     nearest_friendly_index = target_info.Item2;
                     nearest_hostile_index = target_info.Item3;
                     nearest_friendly_is_player = target_info.Item4;
                     nearest_hostile_is_player = target_info.Item5;
 
+                    //default to not having healed something 
+                    healed_something = 0;
+
                     //do action
                     target_info.Item1.ForEach(HealAction);
+
+                    //adjust paragon cooldown
+                    if (ExperienceAndClasses.localMyPlayer.unlocked_abilities_current[(int)ID.Saint_Active_Paragon])
+                    {
+                        if (healed_something == 1)
+                        {
+                            AbilityLookup[(int)ID.Saint_Active_Paragon].AdjustCooldown(PARAGON_COOLDOWN_REDUCTION_SECONDS);
+                        }
+                        else if (healed_something == 2)
+                        {
+                            AbilityLookup[(int)ID.Saint_Active_Paragon].AdjustCooldown(PARAGON_RENEW_COOLDOWN_REDUCTION_SECONDS);
+                        }
+                    }
                 }
                 else //alternative effect (barrier)
                 {
@@ -212,6 +230,7 @@ namespace ExperienceAndClasses.Abilities
             public static double value_heal_other;
             public static double value_damage;
             private static bool upgrade_smite;
+            private static int healed_something;
             private static void HealAction(Tuple<bool, int, bool> target)
             {
                 //parse input
@@ -256,7 +275,7 @@ namespace ExperienceAndClasses.Abilities
                     //adjust
                     if ((index != nearest_hostile_index) || (is_player && !nearest_hostile_is_player))
                     {
-                        value *= secondary_targets_multiplier;
+                        value *= SECONDARY_TARGETS_MULTIPLIER;
                     }
 
                     //bonus damage to undead
@@ -265,7 +284,7 @@ namespace ExperienceAndClasses.Abilities
                         npc = Main.npc[index];
                         if (IsUndead(npc))
                         {
-                            value *= undead_bonus_multiplier;
+                            value *= UNDEAD_BONUS_MULTIPLIER;
                         }
                     }
                 }
@@ -294,10 +313,40 @@ namespace ExperienceAndClasses.Abilities
                         }
                     }
 
+                    //check if valid heal
+                    if (is_player)
+                    {
+                        if (Main.player[index].statLife < Main.player[index].statLifeMax2)
+                        {
+                            healed_something = 1;
+                        }
+                    }
+                    else
+                    {
+                        if (Main.npc[index].life < Main.npc[index].lifeMax)
+                        {
+                            healed_something = 1;
+                        }
+                    }
+
                     //adjust
                     if ((index != nearest_friendly_index) || (is_player && !nearest_friendly_is_player))
                     {
-                        value *= secondary_targets_multiplier;
+                        value *= SECONDARY_TARGETS_MULTIPLIER;
+                    }
+                    else if (ExperienceAndClasses.localMyPlayer.status_active[(int)ExperienceAndClasses.STATUSES.PARAGON_RENEW]) //renew
+                    {
+                        if (is_player && (index == nearest_friendly_index) && nearest_friendly_is_player)
+                        {
+                            int max_heal = Main.player[index].statLifeMax2 - Main.player[index].statLife;
+                            if (value < max_heal)
+                            {
+                                value = 9999;
+                                ExperienceAndClasses.localMyPlayer.EndStatus((int)ExperienceAndClasses.STATUSES.PARAGON_RENEW);
+                                Projectile.NewProjectile(Main.player[index].Center, new Vector2(0f), ExperienceAndClasses.mod.ProjectileType<DustMakerProj>(), 0, 0, Main.LocalPlayer.whoAmI, (float)DustMakerProj.MODE.HEAL_RENEW);
+                                healed_something = 2;
+                            }
+                        }
                     }
                 }
 
@@ -305,7 +354,7 @@ namespace ExperienceAndClasses.Abilities
                 int value_final = (int)value;
                 
                 //create projecile to handle (easy way to sync for multiplayer)
-                Projectile.NewProjectile(Main.LocalPlayer.Center, new Vector2(0f), ExperienceAndClasses.mod.ProjectileType<AbilityProj.Misc_HealHurt>(), value_final, knockback, Main.LocalPlayer.whoAmI, player_val, index);
+                Projectile.NewProjectile(Main.LocalPlayer.Center, new Vector2(0f), ExperienceAndClasses.mod.ProjectileType<AbilityProj.Misc_HealHurt>(), value_final, KNOCKBACK, Main.LocalPlayer.whoAmI, player_val, index);
             }
 
             public override double GetCooldownSecs(byte level = 1)
@@ -535,7 +584,7 @@ namespace ExperienceAndClasses.Abilities
                 }
 
                 //visual (dust)
-                Projectile.NewProjectile(location, new Vector2(0f), ExperienceAndClasses.mod.ProjectileType<DustMakerProj>(), 0, 0, Main.LocalPlayer.whoAmI, (float)DustMakerProj.MODE.divine_intervention, range);
+                Projectile.NewProjectile(location, new Vector2(0f), ExperienceAndClasses.mod.ProjectileType<DustMakerProj>(), 0, 0, Main.LocalPlayer.whoAmI, (float)DustMakerProj.MODE.DIVINE_INTERVENTION, range);
 
                 //look for players/npcs
                 Tuple<List<Tuple<bool, int, bool>>, int, int, bool, bool> target_info = FindTargets(ExperienceAndClasses.localMyPlayer.player, location, range, true, true, false, true, false);
@@ -619,7 +668,7 @@ namespace ExperienceAndClasses.Abilities
                 name_short = "Para";
                 description = "";
                 cost_mana_percent = 0.50f;
-                cooldown_seconds = 3; // 300;
+                cooldown_seconds = 300;
                 class_type = CLASS_TYPE.SUPPORT;
                 alternative = ID.Saint_Alternate_Paragon_Renew;
             }
@@ -688,7 +737,7 @@ namespace ExperienceAndClasses.Abilities
 
             //coodlown tracking
             protected bool cooldown_active = false;
-            protected DateTime cooldown_time_end = DateTime.MinValue;
+            protected DateTime cooldown_time_end = DateTime.Now;
 
             //costs
             protected int cost_mana_base = 0;
@@ -840,7 +889,7 @@ namespace ExperienceAndClasses.Abilities
             protected void CastDust()
             {
                 //create dust from projectile for easy multiplayer sync
-                Projectile.NewProjectile(Main.LocalPlayer.position.X, Main.LocalPlayer.position.Y, 0, 0, ExperienceAndClasses.mod.ProjectileType<DustMakerProj>(), 0, 0, Main.LocalPlayer.whoAmI, (float)DustMakerProj.MODE.ability_cast, (float)class_type);
+                Projectile.NewProjectile(Main.LocalPlayer.position.X, Main.LocalPlayer.position.Y, 0, 0, ExperienceAndClasses.mod.ProjectileType<DustMakerProj>(), 0, 0, Main.LocalPlayer.whoAmI, (float)DustMakerProj.MODE.ABILITY_CAST, (float)class_type);
             }
 
             public virtual string CooldownUI(byte level, out float percent)
@@ -874,8 +923,13 @@ namespace ExperienceAndClasses.Abilities
 
             public void RefreshCooldown()
             {
-                cooldown_time_end = DateTime.MinValue;
+                cooldown_time_end = DateTime.Now;
                 cooldown_active = false;
+            }
+
+            public void AdjustCooldown(double seconds)
+            {
+                cooldown_time_end = cooldown_time_end.AddSeconds(seconds);
             }
 
         }

@@ -240,7 +240,7 @@ namespace ExperienceAndClasses.Abilities
                 //undead bonus
                 if (AbilityMain.IsUndead(target))
                 {
-                    damage = (int)(damage * AbilityMain.Cleric_Active_Heal.undead_bonus_multiplier);
+                    damage = (int)(damage * AbilityMain.Cleric_Active_Heal.UNDEAD_BONUS_MULTIPLIER);
                 }
             }
 
@@ -479,9 +479,10 @@ namespace ExperienceAndClasses.Abilities
     {
         public enum MODE : byte
         {
-            ability_cast,
-            heal,
-            divine_intervention,
+            ABILITY_CAST,
+            HEAL,
+            HEAL_RENEW,
+            DIVINE_INTERVENTION,
         }
 
         public override void AI()
@@ -492,13 +493,16 @@ namespace ExperienceAndClasses.Abilities
             //creates ability on-use dust effect, shows for all clients but dust scatter is unqiue for each client
             switch ((MODE)projectile.ai[0])
             {
-                case MODE.ability_cast:
+                case MODE.ABILITY_CAST:
                     SpreadDust(player.Center, ExperienceAndClasses.mod.DustType<Dusts.Dust_AbilityGeneric>(), 3, 5, 2, 150, AbilityMain.COLOUR_CLASS_TYPE[(int)projectile.ai[1]]);
                     break;
-                case MODE.heal:
-                    SpreadDust(projectile.position, DustID.AncientLight, 10, AbilityMain.Cleric_Active_Heal.range / 6, 3, 150, Color.Red, true, true);
+                case MODE.HEAL:
+                    SpreadDust(projectile.position, DustID.AncientLight, 10, AbilityMain.Cleric_Active_Heal.RANGE / 6, 3, 150, Color.Red, true, true);
                     break;
-                case MODE.divine_intervention:
+                case MODE.HEAL_RENEW:
+                    SpreadDust(projectile.position, DustID.AncientLight, 3, 10, 2, 150, Color.White, true, true);
+                    break;
+                case MODE.DIVINE_INTERVENTION:
                     SpreadDust(projectile.position, DustID.AncientLight, 10, projectile.ai[1] / 6, 3, 150, Color.Yellow, true, true);
                     break;
                 default:
