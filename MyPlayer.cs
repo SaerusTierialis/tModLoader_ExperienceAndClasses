@@ -364,7 +364,7 @@ namespace ExperienceAndClasses
             traceChar = Commons.TryGet<bool>(tag, "traceChar", false);
 
             //sanctuaries
-            last_world_name = Commons.TryGet<string>(tag, "last_world_name", "");
+            last_world_name = Commons.TryGet<string>(tag, "last_world_name", "xx");//default must have length to prevent bug
             sanctuaries_centers = Commons.TryGetList<float>(tag, "sanctuaries_centers");
         }
 
@@ -722,13 +722,13 @@ namespace ExperienceAndClasses
                     }
                 }
 
-                if (!recreated_sancs)
+                if (!recreated_sancs && (Main.worldName != null))
                 {
                     //do once
                     recreated_sancs = true;
 
                     //recreate sanctuaries
-                    if (last_world_name.Equals(Main.worldName))
+                    if ((last_world_name != null) && last_world_name.Equals(Main.worldName))
                     {
                         int counter = 0;
                         int sanc_index;
