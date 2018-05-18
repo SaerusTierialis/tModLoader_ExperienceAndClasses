@@ -1,7 +1,6 @@
 using Terraria.ModLoader;
 using ExperienceAndClasses.UI;
 using Terraria.UI;
-using Terraria.DataStructures;
 using Terraria;
 using System.Collections.Generic;
 using System;

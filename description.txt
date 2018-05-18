@@ -8,7 +8,7 @@ CHANGELOG:
 ===v1.3.7===
 
 1. Bug Fix
-* Fixed a bug that could prevent new characters from joining worlds
+* Fixed a bug that could prevent new and pre-mod characters from joining worlds
 
 ===v1.3.6===
 
