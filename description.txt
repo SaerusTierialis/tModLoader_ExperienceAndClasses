@@ -5,6 +5,10 @@ A MAJOR overhaul is now underway. See the forums or discord for more details!
 
 CHANGELOG:
 
+===v1.3.8===
+
+Git Integration! You can now access downgrade through the Mod Browser.
+
 ===v1.3.7===
 
 1. Bug Fix
