@@ -177,338 +177,386 @@ The xp value boss orbs now scale with level up to five times the current value (
 * cooldowns continue while paused in singleplayer
 
 ===v1.2.8===
--Updated for tModLoader v0.10.1.3
+
+* tModLoader v0.10.1.3
 
 ===v1.2.7===
--Updated for tModLoader v0.10.1
+
+* tModLoader v0.10.1
 
 ===v1.2.6===
--Updated for tModLoader v0.10.0.2
+
+* tModLoader v0.10.0.2
 
 ===v1.2.5===
--fixed a crafting bug that affected recipe groups used by tokens
+
+* fixed a crafting bug that affected recipe groups used by tokens
 
 ===v1.2.4===
--fixed crafting bug that was affecting other mods (introduced in v1.2.3)
+
+* fixed crafting bug that was affecting other mods (introduced in v1.2.3)
 
 ===v1.2.3===
--token descriptions will show the "Current Bonuses" only if that class is equipped (any duplicate token in your inventory will still show this text)
--fixed bug that allowed summoner to be crafted with 1 orb instead of 2 (also affected MM and SB, implemented in a way to keep it from happening with anything ever again)
--fixed a potential exp calculation glitch
+
+* token descriptions will show the "Current Bonuses" only if that class is equipped (any duplicate token in your inventory will still show this text)
+* fixed bug that allowed summoner to be crafted with 1 orb instead of 2 (also affected MM and SB, implemented in a way to keep it from happening with anything ever again)
+* fixed a potential exp calculation glitch
 
 ===v1.2.2===
--updated for tModLoader v0.10.0.1
--token descriptions currently always display as if they were equipped (does not affect actual stats)
--crawltipede (and similar) exp glitch should be fixed
+
+* tModLoader v0.10.0.1
+* token descriptions currently always display as if they were equipped (does not affect actual stats)
+* crawltipede (and similar) exp glitch should be fixed
 
 ===v1.2.1===
--updated for tModLoader v0.9.2.3 (for v1.3.5, v2)
+
+* tModLoader v0.9.2.3 (for v1.3.5, v2)
 
 ===v1.2.0===
--updated for tModLoader v0.9.2.1
+
+* tModLoader v0.9.2.1
 
 ===v1.1.9===
--more code cleanup and optimizations
--Ninja on-hit petal bonus changed to level 30 (from 40)
--added command /expauthcode to display the map's auth code (must be used in single player mode)
--added command /expauthcode # to change the map's auth code (must be used in single player mode)
--fixed a display issue in the "you have earned/lost x experience" messages
+
+* more code cleanup and optimizations
+* Ninja on* hit petal bonus changed to level 30 (from 40)
+* added command /expauthcode to display the map's auth code (must be used in single player mode)
+* added command /expauthcode # to change the map's auth code (must be used in single player mode)
+* fixed a display issue in the "you have earned/lost x experience" messages
 
 ===v1.1.8===
--fixed saint recipe
+
+* fixed saint recipe
 
 ===v1.1.7===
--update tooltip to state that the invincibility after opener attack is only triggered when the opener was ready (i.e., not from "free" openers on full-life targets while cooldown is not done)
--fix health reset bug with "Stats Config" when opener attack phase stops an attack
--improve yo-yo attack speed check
--reallow tokens to be equipped in slots added by mods (e.g., cheat sheet), the related issues have been resolved
--reduce saint light
+
+* update tooltip to state that the invincibility after opener attack is only triggered when the opener was ready (i.e., not from "free" openers on full-life targets while cooldown is not done)
+* fix health reset bug with "Stats Config" when opener attack phase stops an attack
+* improve yo-yo attack speed check
+* reallow tokens to be equipped in slots added by mods (e.g., cheat sheet), the related issues have been resolved
+* reduce saint light
 
 ===v1.1.6===
--class tokens can now only be equipped in the vanilla accessory slots (prevents many bugs and exploits when using other mods) 
--update token description when unequipped 
--hide the ClassToken template 
--auras now work as you'd expect in pvp (don't buff or heal enemies, do harm them) 
--defense aura now applies to friendly NPC 
--life aura now shows healing on friendly NPC 
--if there are multiple defense auras in a region, you can now see a buff indicator for each tier (but still only get the highest-tier buff) 
--code cleanup and optimizations (done enough, more in next version)
--auras now all use a general method (future auras will be easier/faster to implement and less likely to contain bugs) 
--Experience Orbs can now stack to 9,999,999 even if you have MaxStacks installed 
--Berserker damage reduced to 0.25%/level (from 0.75%/level) 
--Warrior damage reduced to 1%/level (from 1.25%/level) 
--fix reload bug
--fix aura buffs break when reloading mods 
--add option for you all to toggle the trace for debugging (/exptrace and /expmaptrace) 
--remove scope from tier III range classes 
--multiclass assassin bug (sometimes opener doesn't work depending on token order and positions) 
--add dodge chance to Rogue, Assassin, and Ninja 
--add brief invulnerability after opener attack (excluding "free" opener attacks against full-life targets) 
--make opener easier to use with projectile melee weapons (i.e., opener can trigger from melee hit shortly after the projectile hits)
--opener attack dust effect now becomes noticeable more quickly 
--add light to saint 
--changes to prevent other potential reload issues
--fixed a potential multiclass bug with bonus melee crit damage
--percent midas now stacks when multiclassing
+
+* class tokens can now only be equipped in the vanilla accessory slots (prevents many bugs and exploits when using other mods) 
+* update token description when unequipped 
+* hide the ClassToken template 
+* auras now work as you'd expect in pvp (don't buff or heal enemies, do harm them) 
+* defense aura now applies to friendly NPC 
+* life aura now shows healing on friendly NPC 
+* if there are multiple defense auras in a region, you can now see a buff indicator for each tier (but still only get the highest-tier buff) 
+* code cleanup and optimizations (done enough, more in next version)
+* auras now all use a general method (future auras will be easier/faster to implement and less likely to contain bugs) 
+* Experience Orbs can now stack to 9,999,999 even if you have MaxStacks installed 
+* Berserker damage reduced to 0.25%/level (from 0.75%/level) 
+* Warrior damage reduced to 1%/level (from 1.25%/level) 
+* fix reload bug
+* fix aura buffs break when reloading mods 
+* add option for you all to toggle the trace for debugging (/exptrace and /expmaptrace) 
+* remove scope from tier III range classes 
+* multiclass assassin bug (sometimes opener doesn't work depending on token order and positions) 
+* add dodge chance to Rogue, Assassin, and Ninja 
+* add brief invulnerability after opener attack (excluding "free" opener attacks against full-life targets) 
+* make opener easier to use with projectile melee weapons (i.e., opener can trigger from melee hit shortly after the projectile hits)
+* opener attack dust effect now becomes noticeable more quickly 
+* add light to saint 
+* changes to prevent other potential reload issues
+* fixed a potential multiclass bug with bonus melee crit damage
+* percent midas now stacks when multiclassing
 
 ===v1.1.5===
--Mac/Linux could not run version v1.1.4, this issue has been resolved
--reworded Ascension/Boss Orb message to state that the orb has dropped
+
+* Mac/Linux could not run version v1.1.4, this issue has been resolved
+* reworded Ascension/Boss Orb message to state that the orb has dropped
 
 ===v1.1.4===
--add /expnoauth to toggle the need for auth on a map (must be used in single player mode and then load the map in multiplayer)
--all command should now state "Invalid command or parameter." when bad parameters are given
--disable /expcraft and /expuse (you can convert existing orbs into higher-value orbs for quick consumption) these are causing more trouble than they are worth
--implement direct crafting of all Experience Orbs at workbench using earned experience as a replacement for /expcraft, this is done at any Campfire (to prevent confusion with other Experience Orb recipes)
--have Ascension and Boss orbs craft into Exp Orb 100s instead of 1s (adjust exchange at each tier to 100/200, 300/600, 500/1000, 1000/2000)
--fixed an exploitable crafting bug
--current settings are now displayed upon entering a map
--write auth to console every 2min (from 1min)
+
+* add /expnoauth to toggle the need for auth on a map (must be used in single player mode and then load the map in multiplayer)
+* all command should now state "Invalid command or parameter." when bad parameters are given
+* disable /expcraft and /expuse (you can convert existing orbs into higher-value orbs for quick consumption) these are causing more trouble than they are worth
+* implement direct crafting of all Experience Orbs at workbench using earned experience as a replacement for /expcraft, this is done at any Campfire (to prevent confusion with other Experience Orb recipes)
+* have Ascension and Boss orbs craft into Exp Orb 100s instead of 1s (adjust exchange at each tier to 100/200, 300/600, 500/1000, 1000/2000)
+* fixed an exploitable crafting bug
+* current settings are now displayed upon entering a map
+* write auth to console every 2min (from 1min)
 
 ===v1.1.3===
--expauth codes are now shorter
--multiplayer exprate and expclasscaps are now saved to maps (i.e., you do not have to set these each time you put up the map)
--disable "A healed B for x" message in Life Aura
--added a workaround for an issue with /expcraft large values
--fix Hybrid II Midas Debuff rate (from 5% to 0.5%)
+
+* expauth codes are now shorter
+* multiplayer exprate and expclasscaps are now saved to maps (i.e., you do not have to set these each time you put up the map)
+* disable "A healed B for x" message in Life Aura
+* added a workaround for an issue with /expcraft large values
+* fix Hybrid II Midas Debuff rate (from 5% to 0.5%)
 
 ===v1.1.2===
--multiclassing is now possible by equipping multiple tokens, but effective level is divided (e.g., a level 50 with two classes is level 25 in each)
--fixed a bug that could prompt the "You have gained/lost x experience." message each time ANYONE gains experience in multiplayer
--Ascension Orb recipe: heart crystal + mana crystal + 20 gold/platinum bars
--can now gain experience and view experience bar without a token equipped
--can now craft Experience Orbs into x100, x1000, x10000, x100000, and x1000000 for faster command-free consumption (not consumed by /expuse)
--manual consumption of Experience Orbs is a faster animation
--fixed a possible crash from invalid command arguments
--new personal setting /explvlcap # to limit gaining experience past the specified level (will move to config file if that is implemented later), works in multiplayer (not global, set to -1 to disable, disabled by default)
--new personal setting /expdmgred # to limit bonus damage stats (0-100, 0% reduction is normal, 50% reduction is half, 100% reduction is no bonus damage), works in multiplayer (not global); affects damage, attack speed, and critical rate (set to -1 or 0 to disable, disabled by default)
--reorganized packet sender functions (performance improvement + less likely to introduce bugs)
+
+* multiclassing is now possible by equipping multiple tokens, but effective level is divided (e.g., a level 50 with two classes is level 25 in each)
+* fixed a bug that could prompt the "You have gained/lost x experience." message each time ANYONE gains experience in multiplayer
+* Ascension Orb recipe: heart crystal + mana crystal + 20 gold/platinum bars
+* can now gain experience and view experience bar without a token equipped
+* can now craft Experience Orbs into x100, x1000, x10000, x100000, and x1000000 for faster command-free consumption (not consumed by /expuse)
+* manual consumption of Experience Orbs is a faster animation
+* fixed a possible crash from invalid command arguments
+* new personal setting /explvlcap # to limit gaining experience past the specified level (will move to config file if that is implemented later), works in multiplayer (not global, set to -1 to disable, disabled by default)
+* new personal setting /expdmgred # to limit bonus damage stats (0-100, 0% reduction is normal, 50% reduction is half, 100% reduction is no bonus damage), works in multiplayer (not global); affects damage, attack speed, and critical rate (set to -1 or 0 to disable, disabled by default)
+* reorganized packet sender functions (performance improvement + less likely to introduce bugs)
 
 ===v1.1.1===
--no actual changes, just updated the description
+
+* no actual changes, just updated the description
 
 ===v1.1.0===
--class tokens can no longer gain a prefix when crafted although the text above your head may include one (you can still add/change prefix)
--Ascension Orb drop rate increased to 1/150 (from 1/200)
--Ascension Orb and Boss Orb rate of exchange for experience now varies with current class Tier (125/250, 250/500, 500/1000, and then 1000/2000 at level 50+ of Tier III)
--individual exprate is no longer applied in multiplayer (uses global rate instead)
--individual ignore class caps is no longer applied in multiplayer (uses global bool instead)
--fixed a bug that could allow Saint to have level 2 and level 3 Defense Aura
--fixed a bug where Cleric Ichor Aura debuff lasted slightly too long
--Saint Life Aura now heals friendly NPCs too
--added announcements for finding Ascension Orb, Boss Orb, levelup, leveldown, craft Tier II, craft Tier III
--when a player acquires the mod by joining a server that uses it, the experience bar visibility bug should no longer occur and the player will be given a Novice Token to start (if they have room)
--tiers in class token names changed to roman numerals
--timing converted from ticks to milliseconds, no longer affected by pausing time with HERO's mod
--assassin operner attack can trigger every 2000milliseconds (and on any hits aginst full-life targets)
--periodic effects trigger every 5000milliseconds
--Ichor Aura duration adjusted to fit new trigger interval
--Saint Ichor Aura duration is now nearly twice Cleric
--several optimizations with auras
--all timing now uses real time instead of in-game ticks (more reliable, doesn't stop when pausing with HERO's mod)
--new command /expbarreset will reset the position, visibility, and transparency of experience bar
--Ascension Orb now also drop from monsters that give 1 experience (e.g., early slimes)
--multiplayer now has a auth feature, the code will display in the console, players can enter /expauth <code> to gain auth, enter /auth to check your status
--functions that adjust experience, rates, or class caps now require auth in multiplayer
--when a server is brought online, exprate defaults to 100%, ignore class caps defaults to FALSE, and authentications are reset
--many optimizations and organizations (too many to list)
--server now handles the experience in multiplayer (so many internal changes)
--to prevent potential experience reset bugs, the server cannot change an experience value until the player's initial sync is complete. the initial sync should occur within 500 msec of connection and repeats until successful. if, somehow, the sync is not possible then a server-wide warning messages will be sent out each time the server tries and fails to alter your experience value. if this ever happens, relogging will probably fix whatever is happening (please also report it to me)
--memory usage should be around 0.5mb highers
+
+* class tokens can no longer gain a prefix when crafted although the text above your head may include one (you can still add/change prefix)
+* Ascension Orb drop rate increased to 1/150 (from 1/200)
+* Ascension Orb and Boss Orb rate of exchange for experience now varies with current class Tier (125/250, 250/500, 500/1000, and then 1000/2000 at level 50+ of Tier III)
+* individual exprate is no longer applied in multiplayer (uses global rate instead)
+* individual ignore class caps is no longer applied in multiplayer (uses global bool instead)
+* fixed a bug that could allow Saint to have level 2 and level 3 Defense Aura
+* fixed a bug where Cleric Ichor Aura debuff lasted slightly too long
+* Saint Life Aura now heals friendly NPCs too
+* added announcements for finding Ascension Orb, Boss Orb, levelup, leveldown, craft Tier II, craft Tier III
+* when a player acquires the mod by joining a server that uses it, the experience bar visibility bug should no longer occur and the player will be given a Novice Token to start (if they have room)
+* tiers in class token names changed to roman numerals
+* timing converted from ticks to milliseconds, no longer affected by pausing time with HERO's mod
+* assassin operner attack can trigger every 2000milliseconds (and on any hits aginst full-life targets)
+* periodic effects trigger every 5000milliseconds
+* Ichor Aura duration adjusted to fit new trigger interval
+* Saint Ichor Aura duration is now nearly twice Cleric
+* several optimizations with auras
+* all timing now uses real time instead of in* game ticks (more reliable, doesn't stop when pausing with HERO's mod)
+* new command /expbarreset will reset the position, visibility, and transparency of experience bar
+* Ascension Orb now also drop from monsters that give 1 experience (e.g., early slimes)
+* multiplayer now has a auth feature, the code will display in the console, players can enter /expauth <code> to gain auth, enter /auth to check your status
+* functions that adjust experience, rates, or class caps now require auth in multiplayer
+* when a server is brought online, exprate defaults to 100%, ignore class caps defaults to FALSE, and authentications are reset
+* many optimizations and organizations (too many to list)
+* server now handles the experience in multiplayer (so many internal changes)
+* to prevent potential experience reset bugs, the server cannot change an experience value until the player's initial sync is complete. the initial sync should occur within 500 msec of connection and repeats until successful. if, somehow, the sync is not possible then a server-wide warning messages will be sent out each time the server tries and fails to alter your experience value. if this ever happens, relogging will probably fix whatever is happening (please also report it to me)
+* memory usage should be around 0.5mb highers
 
 ===v1.0.4===
--new command /expbartrans toggles UI transparency
--improved the check for whether a character has found an Ascension Orb before (no longer counts picking one up that has been dropped by a player)
+
+* new command /expbartrans toggles UI transparency
+* improved the check for whether a character has found an Ascension Orb before (no longer counts picking one up that has been dropped by a player)
 
 ===v1.0.3===
--Backtracking a little bit from v1.0.2 (sorry!)
--"Monster Orb" renamed "Ascension Orb"
--Boss Orb exp/gold value restored to twice that of Ascension Orbs, can craft into 2 Ascension Orbs
--Tier II advancement uses 1 Ascension Orb
--Tier III advancement uses 5 Boss Orb and 50 Ascension Orb
+
+* Backtracking a little bit from v1.0.2 (sorry!)
+* "Monster Orb" renamed "Ascension Orb"
+* Boss Orb exp/gold value restored to twice that of Ascension Orbs, can craft into 2 Ascension Orbs
+* Tier II advancement uses 1 Ascension Orb
+* Tier III advancement uses 5 Boss Orb and 50 Ascension Orb
 
 ===v1.0.2===
--Monster Orb drop rate decreased
--Monster Orb experience exchange and value increased
--Monster Orb drop rate is increased for each character until they find their first Orb (to help with Tier II progression)
--Boss Orb experience exchange and value decreased to match Monster Orb
--Tier II class advancement now accepts one Monster or Boss Orb
--Tier III class advancement now accepts any combination of 50 Monster/Boss Orbs
--Summoner class advancements now accept any combination of Monster/Boss Orbs
--Saint class advancement items changed to 1 Heart Lantern, 1 Star in a Bottle, and 10 Campfire
--class advancement iron/lead bar requirements cut in half (except for Squire's 10 bar requirement)
+
+* Monster Orb drop rate decreased
+* Monster Orb experience exchange and value increased
+* Monster Orb drop rate is increased for each character until they find their first Orb (to help with Tier II progression)
+* Boss Orb experience exchange and value decreased to match Monster Orb
+* Tier II class advancement now accepts one Monster or Boss Orb
+* Tier III class advancement now accepts any combination of 50 Monster/Boss Orbs
+* Summoner class advancements now accept any combination of Monster/Boss Orbs
+* Saint class advancement items changed to 1 Heart Lantern, 1 Star in a Bottle, and 10 Campfire
+* class advancement iron/lead bar requirements cut in half (except for Squire's 10 bar requirement)
 
 ===v1.0.1===
--experience share range reduced to 5,000 (from 20,000)
+
+* experience share range reduced to 5,000 (from 20,000)
 
 ===v1.0.0===
--/expbar command now displays a message indicating current state
--improve class descriptions in tooltips
--add a simple collection component to class advancement
--"Experience" item renamed to "Experience Orb"
--new item "Boss Orb" drops from all bosses by 25% chance, one drop chance per player in multiplayer (multiple can drop), used in Tier III class advancement recipes, excess can be exchanged for experience orbs at any worktable or simply sold
--new item "Monster Orb" drops from all non-bosses with base experience >1 at a 1% chance, one drop chance per nearby player in multiplayer (multiple can drop), used in Tier II and III class advancement recipes, excess can be exchanged for experience orbs at any worktable or simply sold
--rarity (item name colour) of tokens now matches tier
--Hybrid II now has a 0.5% chance per level to inflict Midas Debuff
--drastically reduced mod file size
--transition from "Work in Progress" to "Release"
+
+* /expbar command now displays a message indicating current state
+* improve class descriptions in tooltips
+* add a simple collection component to class advancement
+* "Experience" item renamed to "Experience Orb"
+* new item "Boss Orb" drops from all bosses by 25% chance, one drop chance per player in multiplayer (multiple can drop), used in Tier III class advancement recipes, excess can be exchanged for experience orbs at any worktable or simply sold
+* new item "Monster Orb" drops from all non-bosses with base experience >1 at a 1% chance, one drop chance per nearby player in multiplayer (multiple can drop), used in Tier II and III class advancement recipes, excess can be exchanged for experience orbs at any worktable or simply sold
+* rarity (item name colour) of tokens now matches tier
+* Hybrid II now has a 0.5% chance per level to inflict Midas Debuff
+* drastically reduced mod file size
+* transition from "Work in Progress" to "Release"
 
 ===v0.5.4===
--new characters start with Novice Token in inventory
--fixed issue with expbar not appearing for some new users (type /expbar if it's still not showing)
+
+* new characters start with Novice Token in inventory
+* fixed issue with expbar not appearing for some new users (type /expbar if it's still not showing)
 
 ===v0.5.3===
--PREVENT EXP GAIN WHEN NO TOKEN IS EQUIPPED - this makes the Novice token relevant
--hide the experience UI when a class token is not worn
--Rogue/Assassin/Ninja inflict Midas Debuff by chance on hit
--Fix new Assassin buffs persist after token is removed
--reduce total experience required for levels 1-10 from 1500 to 1085
--save UI visibility with character to prevent visibility reset during updates
--fixed a bug that could prevent /explist from accurately displaying "No Class"
--if no player is within distance 5,000 of dying npc, no experience is awarded unless it was a boss (experience share distance is still 20,000)
--removed a trace that was still active in /explist
--center experience requirement in UI (nearly centered)
+
+* PREVENT EXP GAIN WHEN NO TOKEN IS EQUIPPED *  this makes the Novice token relevant
+* hide the experience UI when a class token is not worn
+* Rogue/Assassin/Ninja inflict Midas Debuff by chance on hit
+* Fix new Assassin buffs persist after token is removed
+* reduce total experience required for levels 1-10 from 1500 to 1085
+* save UI visibility with character to prevent visibility reset during updates
+* fixed a bug that could prevent /explist from accurately displaying "No Class"
+* if no player is within distance 5,000 of dying npc, no experience is awarded unless it was a boss (experience share distance is still 20,000)
+* removed a trace that was still active in /explist
+* center experience requirement in UI (nearly centered)
 
 ===v0.5.2===
--all classes now have a minimum of 0.5 life growth
--removed Novice’s mana growth stat
--removed Assassin/Ninja/HybridII “can see treasure” because it can be obtrusive
--Assassin Opener Attack: now correctly disabled by ranged and magic in addition to melee, can now be performed with yo-yo but deals only half of bonus damage, still cannot be performed with melee projectiles (boomerang, magic sword projectiles, etc), hugely increased damage to make the playstyle more viable
+
+* all classes now have a minimum of 0.5 life growth
+* removed NoviceÂ’s mana growth stat
+* removed Assassin/Ninja/HybridII Â“can see treasureÂ” because it can be obtrusive
+* Assassin Opener Attack: now correctly disabled by ranged and magic in addition to melee, can now be performed with yo-yo but deals only half of bonus damage, still cannot be performed with melee projectiles (boomerang, magic sword projectiles, etc), hugely increased damage to make the playstyle more viable
 
 ===v0.5.1===
--fixed an issue when level is set to the max possible value (3000)
+
+* fixed an issue when level is set to the max possible value (3000)
 
 ===v0.5.0 (experience curve overhaul)===
--fixed a bug that could cause periodic mana or life regen to trigger while token was in inventory
--fixed a bug that could prevent heal aura from healing
--fixed a visual bug where health/mana restore effects could appear twice
--fixed a bug where monsters with invincible segments (e.g., crawltipedes) gave absurd experience
--added methods to allow auras to grant actual buffs
--reduced Saint heal aura radius to match the size of other auras
--Warriors now deal more damage
--Assassin is no longer an attack speed class, focus is on criticals
--Assassin now deals 10/20/30% bonus melee critical damage
--new Berserker class (branches from Squire) to fill attack speed niche
--minor buffs to melee Rogues
--Summoner can now have 2 bonus minions in first class
--added a defense aura to Sage to make it a more appealing choice
--a few other smaller class adjustments (see post)
--adjusted the experience curve to increase the realistically attainable max level from ~28 to ~95 (old level -> new level: 5->10, 15->25, 25->65, 28->95)
--scaled all bonuses and level requirements to fit the new experience curve and targeted legit "max" level
--optimized experience calculations
--increased technical max level (for non-legit playthroughs) to 3000 to offset the decrease in bonus ratios
--decreased experience requirements for levels 1-10 and raised level for first class change to level 10
--raised level for second class change to level 25
--implemented “Opener Attacks” for Assassin (bonus damage against full-health targets or if no attack has hit recently, gains triple benefit from critical damage)
--renamed "At Level X Bonuses" to "Unlocked Bonuses".
--renamed "Per Level Bonuses" to "Scaling Bonuses".
--experience requirements that are 10+ digits no longer show on UI (affects non-legit levels only)
--coloured class icons to indicate tier
--adjusted class tree descriptors to reflect changes, added tier colours, and added Berserker
--new figure of experience curve added to main post
--balanced advanced minion classes (Minion Master has damage penalty per bonus minion, Soul Binder’s bonus damage reduced and no longer receives any bonus minions). **MM has survivability through sheer number of minions and also has slightly higher overall damage in early/mid levels. SB has survivability through health/defense and has slightly better overall damage in very high levels**
--Hybrid can now advance to any Tier 3 class making it the perfect choice for anyone who is undecided as well as anyone who simply enjoys a more-flexible playstyle
--class tokens now state that total mana cannot exceed 400
--overall mana bonuses have been reduced due to how much of an effect this was having on mana regeneration
--added basic defense aura to Saint at level 60 (only Sage will offer second and third tier defense aura)
+
+* fixed a bug that could cause periodic mana or life regen to trigger while token was in inventory
+* fixed a bug that could prevent heal aura from healing
+* fixed a visual bug where health/mana restore effects could appear twice
+* fixed a bug where monsters with invincible segments (e.g., crawltipedes) gave absurd experience
+* added methods to allow auras to grant actual buffs
+* reduced Saint heal aura radius to match the size of other auras
+* Warriors now deal more damage
+* Assassin is no longer an attack speed class, focus is on criticals
+* Assassin now deals 10/20/30% bonus melee critical damage
+* new Berserker class (branches from Squire) to fill attack speed niche
+* minor buffs to melee Rogues
+* Summoner can now have 2 bonus minions in first class
+* added a defense aura to Sage to make it a more appealing choice
+* a few other smaller class adjustments (see post)
+* adjusted the experience curve to increase the realistically attainable max level from ~28 to ~95 (old level -> new level: 5->10, 15->25, 25->65, 28->95)
+* scaled all bonuses and level requirements to fit the new experience curve and targeted legit "max" level
+* optimized experience calculations
+* increased technical max level (for non-legit playthroughs) to 3000 to offset the decrease in bonus ratios
+* decreased experience requirements for levels 1-10 and raised level for first class change to level 10
+* raised level for second class change to level 25
+* implemented Â“Opener AttacksÂ” for Assassin (bonus damage against full-health targets or if no attack has hit recently, gains triple benefit from critical damage)
+* renamed "At Level X Bonuses" to "Unlocked Bonuses".
+* renamed "Per Level Bonuses" to "Scaling Bonuses".
+* experience requirements that are 10+ digits no longer show on UI (affects non-legit levels only)
+* coloured class icons to indicate tier
+* adjusted class tree descriptors to reflect changes, added tier colours, and added Berserker
+* new figure of experience curve added to main post
+* balanced advanced minion classes (Minion Master has damage penalty per bonus minion, Soul BinderÂ’s bonus damage reduced and no longer receives any bonus minions). **MM has survivability through sheer number of minions and also has slightly higher overall damage in early/mid levels. SB has survivability through health/defense and has slightly better overall damage in very high levels**
+* Hybrid can now advance to any Tier 3 class making it the perfect choice for anyone who is undecided as well as anyone who simply enjoys a more-flexible playstyle
+* class tokens now state that total mana cannot exceed 400
+* overall mana bonuses have been reduced due to how much of an effect this was having on mana regeneration
+* added basic defense aura to Saint at level 60 (only Sage will offer second and third tier defense aura)
 
 ===v0.4.1===
--fixed multuplayer experience reset bug
+
+* fixed multuplayer experience reset bug
 
 ===v0.4.0===
--updated all class token sprites using http://game-icons.net/
--store UI position in character data to prevent UI reset during updates
+
+* updated all class token sprites using http://game-icons.net/
+* store UI position in character data to prevent UI reset during updates
 
 ===v0.3.4===
--remove global limit on attack speed
--add limit of +70% attack speed for yoyos so they don't break (this affects all channeled melee weapons, but I think that's just yoyos)
--limit experience to level 500 (legit playthroughs are unlikely to exceed level 25-50)
--fixed potential crash when invalid parameters are given with commands
+
+* remove global limit on attack speed
+* add limit of +70% attack speed for yoyos so they don't break (this affects all channeled melee weapons, but I think that's just yoyos)
+* limit experience to level 500 (legit playthroughs are unlikely to exceed level 25-50)
+* fixed potential crash when invalid parameters are given with commands
 
 ===v0.3.3===
--Saint damage aura no longer hits critters
--Saint immunity to darkness moved to level 3
--Saint gained mana cost reduction
--Saint lost periodic life regen (healing aura still affects the Saint)
+
+* Saint damage aura no longer hits critters
+* Saint immunity to darkness moved to level 3
+* Saint gained mana cost reduction
+* Saint lost periodic life regen (healing aura still affects the Saint)
 
 ===v0.3.2===
--added /expclasscaps to toggle on/off the caps on class bonuses
--added the caps on minions to token descriptions
--added experience_modifier and ignore_caps to sync packets for multiplayer
--fixed attack speed cap listed twice
+
+* added /expclasscaps to toggle on/off the caps on class bonuses
+* added the caps on minions to token descriptions
+* added experience_modifier and ignore_caps to sync packets for multiplayer
+* fixed attack speed cap listed twice
 
 ===v0.3.1===
--increased Mystic magic crit to 0.5%/level (from 0.05%/level)
+
+* increased Mystic magic crit to 0.5%/level (from 0.05%/level)
 
 ===v0.3.0 (balance pass one)===
--expmsg is now disabled by default (unless previously enabled)
--several automations that make balancing much easier/faster
--several new caps on bonuses (e.g., jump speed bonus can no longer take you to the moon)
--second class change now requires level 15 (previously 10)
--class advancement no longer uses item experience, the experience will be directly deducted, recipes are visible only when you have enough experience
--new class: Gunner (ranged users can now choose archery, non-archery, or a mix)
--balance overhaul
+
+* expmsg is now disabled by default (unless previously enabled)
+* several automations that make balancing much easier/faster
+* several new caps on bonuses (e.g., jump speed bonus can no longer take you to the moon)
+* second class change now requires level 15 (previously 10)
+* class advancement no longer uses item experience, the experience will be directly deducted, recipes are visible only when you have enough experience
+* new class: Gunner (ranged users can now choose archery, non-archery, or a mix)
+* balance overhaul
 
 ===v0.2.2===
--fixed Archer tooltip2 states reduced arrow damage (arrow damage was correct, issue was with tooltip)
--fixed periodic life/mana regen wasn't working (despite the visuals appearing)
--experience cannot be reduced below zero by commands
--added /explvladd, /explvlsub, /explvlset
--there shouldn't be any more decimal values in experience
--UI now shows at most 99.99% (even when exp rounds to 100%)
--exp requirements adjusted (after level 10, each level requires 50% more than the prior level)
--setting exprate to zero now eliminates all experience gain from monster kills
--added command /expmsg to enabled/disable the "You have earned x experience." messages
+
+* fixed Archer tooltip2 states reduced arrow damage (arrow damage was correct, issue was with tooltip)
+* fixed periodic life/mana regen wasn't working (despite the visuals appearing)
+* experience cannot be reduced below zero by commands
+* added /explvladd, /explvlsub, /explvlset
+* there shouldn't be any more decimal values in experience
+* UI now shows at most 99.99% (even when exp rounds to 100%)
+* exp requirements adjusted (after level 10, each level requires 50% more than the prior level)
+* setting exprate to zero now eliminates all experience gain from monster kills
+* added command /expmsg to enabled/disable the "You have earned x experience." messages
 
 ===v0.2.1===
--fixed minions despawning every second
--only one class token can be worn at a time
+
+* fixed minions despawning every second
+* only one class token can be worn at a time
 
 ===v0.2===
--added commands "/expadd #", "/expsub #", and "/expset #"
--added "/exprate #" to change rate of exp gain
--added "/expuse #" to consume experience items in bulk
--added "/expcraft #" to create experience items from your earned experience
--experience items are now consumable
--introduced non-item experience system (tied to character file)
--old experience items can be converted to the new system with /expuse
--fixed multiplayer UI bug
--more code cleanup
--adjusted experience requirements (again)
--optimizations (potatoes, rejoice!)
--experience is now stored as a double (from int) in case anyone wants 1.79E+308 experience
--solved multiplayer issue, removed workaround
--even more optimizations
+
+* added commands "/expadd #", "/expsub #", and "/expset #"
+* added "/exprate #" to change rate of exp gain
+* added "/expuse #" to consume experience items in bulk
+* added "/expcraft #" to create experience items from your earned experience
+* experience items are now consumable
+* introduced non-item experience system (tied to character file)
+* old experience items can be converted to the new system with /expuse
+* fixed multiplayer UI bug
+* more code cleanup
+* adjusted experience requirements (again)
+* optimizations (potatoes, rejoice!)
+* experience is now stored as a double (from int) in case anyone wants 1.79E+308 experience
+* solved multiplayer issue, removed workaround
+* even more optimizations
 
 ===v0.1.8===
--can now count multiple stacks of experience
--attack speed breaks yoyos around 85-90%, capped attack speed at +70%
--exp requirements past level 10 increase MUCH faster
--code cleanup
+
+* can now count multiple stacks of experience
+* attack speed breaks yoyos around 85-90%, capped attack speed at +70%
+* exp requirements past level 10 increase MUCH faster
+* code cleanup
 
 ===v0.1.7===
--NPC spawned from statue do not award experience
--fixed Eye of Cthulhu phase two kill experience (experience had been calculated using current stats rather than base stats - phase two eye has negative defense apparently, which resulted in 1 experience)
+
+* NPC spawned from statue do not award experience
+* fixed Eye of Cthulhu phase two kill experience (experience had been calculated using current stats rather than base stats - phase two eye has negative defense apparently, which resulted in 1 experience)
 
 ===v0.1.6===
--chat commands work again
+
+* chat commands work again
 
 ===v0.1.5===
--updated for tModLoader 0.9.1
--both chat commands disabled while I sort out how to make them compatible with 0.9.1
+
+* tModLoader 0.9.1
+* both chat commands disabled while I sort out how to make them compatible with 0.9.1
 
 ===v0.1.4===
--dead players now only receive experience from bosses
+
+* dead players now only receive experience from bosses
 
 ===v0.1.3===
--fixed rounding issue in experience formula
+
+* fixed rounding issue in experience formula
 
 ===v0.1.2===
--critters (and any NPCs with 5 or less health) no longer give experience
+
+* critters (and any NPCs with 5 or less health) no longer give experience
 
 ===v0.1.1===
--removed distance check for boss monsters to ensure that respawning players receive their the boss experience in multiplayer
--if the player is dead, place Experience directly in inventory (i.e., don't drop it on the ground by the body)
+
+* removed distance check for boss monsters to ensure that respawning players receive their the boss experience in multiplayer
+* if the player is dead, place Experience directly in inventory (i.e., don't drop it on the ground by the body)
 
 ===v0.1===
--first upload
+
+* first upload
