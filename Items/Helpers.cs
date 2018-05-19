@@ -792,13 +792,13 @@ namespace ExperienceAndClasses.Items
             if (floatBonus > 0)
             {
                 if (floatBonus > moveSpeed_CAP && !ignoreCaps) floatBonus = moveSpeed_CAP;
-                if (applyEffects) player.moveSpeed += floatBonus;
-                bonuses += "\n+" + floatBonus + " move speed";
+                if (applyEffects) player.moveSpeed += (floatBonus / 100f);
+                bonuses += "\n+" + floatBonus + "% movement speed";
             }
             if (moveSpeed > 0)
             {
-                desc += "\n+" + moveSpeed + " move speed";
-                if (!ignoreCaps) desc += " (max " + moveSpeed_CAP + ")";
+                desc += "\n+" + moveSpeed + "% movement speed";
+                if (!ignoreCaps) desc += " (max " + moveSpeed_CAP + "%)";
             }
 
             //melee damage
