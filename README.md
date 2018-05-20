@@ -9,13 +9,21 @@
 Wiki (not yet)
 
 # Revamp Summary:
-1. [Cleric/Saint Abilities](https://github.com/SaerusTierialis/tModLoader_ExperienceAndClasses/milestone/3)
-1. [New Stats System](https://github.com/SaerusTierialis/tModLoader_ExperienceAndClasses/milestone/1)
-1. not yet documented
+- [x] [Cleric/Saint Abilities](https://github.com/SaerusTierialis/tModLoader_ExperienceAndClasses/milestone/3)
+- [ ] [New Stats System](https://github.com/SaerusTierialis/tModLoader_ExperienceAndClasses/milestone/1)
+- [ ] New Statuses System
+- [ ] New Class/XP System
+- [ ] Class/Ability Selection UI
+- [ ] Ranged-Class Abilities
+- [ ] Melee-Class Abilities
+- [ ] Magic-Class Abilities
+- [ ] Minion-Class Abilities
+- [ ] Theif-Class Abilities
+- [ ] Hybrid-Class Abilities
+- [ ] Settings UI
+- [ ] [General Improvements](https://github.com/SaerusTierialis/tModLoader_ExperienceAndClasses/milestone/2)
 
-And also [Cleanup](https://github.com/SaerusTierialis/tModLoader_ExperienceAndClasses/milestone/2)
-
-# Repo Organization:
+# Branch Organization:
 | Branch | Contents |
 | ------ | ----------- |
 | master | lastest release (protected) |
