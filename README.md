@@ -1,5 +1,7 @@
 # Links
 
+[Discord](https://discord.gg/KXf9zen)
+
 [Forum Post](https://forums.terraria.org/index.php?threads/experience-and-classes.53048/)
 
 [Changelog](../master/description.txt)
