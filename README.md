@@ -28,4 +28,4 @@ Wiki (not yet)
 | ------ | ----------- |
 | master | lastest release (protected) |
 | development | workspace for next release |
-| feature-*x* | workspace for specific, large feature *x* (merged into development upon completion) |
+| feature-*X* | workspace for specific, large feature *X* (merge into development upon completion) |
