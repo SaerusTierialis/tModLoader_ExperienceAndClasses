@@ -2,4 +2,4 @@
 
 [Changelog](./description.txt)
 
-[Wiki (not yet)]()
+Wiki (not yet)
