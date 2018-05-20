@@ -11,7 +11,7 @@ Wiki (not yet)
 # Revamp Summary:
 - [x] [Cleric/Saint Abilities](https://github.com/SaerusTierialis/tModLoader_ExperienceAndClasses/milestone/3)
 - [ ] [New Stats System](https://github.com/SaerusTierialis/tModLoader_ExperienceAndClasses/milestone/1)
-- [ ] New Statuses System
+- [ ] [New Statuses System](https://github.com/SaerusTierialis/tModLoader_ExperienceAndClasses/milestone/4)
 - [ ] New Class/XP System
 - [ ] Class/Ability Selection UI
 - [ ] Ranged-Class Abilities
