@@ -2,16 +2,16 @@
 
 [Forum Post](https://forums.terraria.org/index.php?threads/experience-and-classes.53048/)
 
-[Changelog](master/description.txt)
+[Changelog](../master/description.txt)
 
-[Revamp Overall Progress](https://github.com/SaerusTierialis/tModLoader_ExperienceAndClasses/projects/1)
+[Revamp Overall Progress](../../projects/1)
 
 Wiki (not yet)
 
 # Revamp Summary:
-- [x] [Cleric/Saint Abilities](https://github.com/SaerusTierialis/tModLoader_ExperienceAndClasses/milestone/3)
-- [ ] [New Stats System](https://github.com/SaerusTierialis/tModLoader_ExperienceAndClasses/milestone/1)
-- [ ] [New Statuses System](https://github.com/SaerusTierialis/tModLoader_ExperienceAndClasses/milestone/4)
+- [x] [Cleric/Saint Abilities](../../milestone/3) ([v1.3.8](../../releases/tag/v1.3.8))
+- [ ] [New Stats System](../../milestone/1)
+- [ ] [New Statuses System](../../milestone/4)
 - [ ] New Class/XP System
 - [ ] Class/Ability Selection UI
 - [ ] Ranged-Class Abilities
@@ -21,7 +21,7 @@ Wiki (not yet)
 - [ ] Theif-Class Abilities
 - [ ] Hybrid-Class Abilities
 - [ ] Settings UI
-- [ ] [General Improvements](https://github.com/SaerusTierialis/tModLoader_ExperienceAndClasses/milestone/2)
+- [ ] [General Improvements](../../milestone/2)
 
 # Branch Organization:
 | Branch | Contents |
