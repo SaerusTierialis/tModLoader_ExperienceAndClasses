@@ -1,4 +1,4 @@
-### [Hub Page](https://saerustierialis.github.io/tModLoader_ExperienceAndClasses/)
+### [Homepage](https://saerustierialis.github.io/tModLoader_ExperienceAndClasses/)
 
 ### Branch Organization:
 | Branch | Contents |
