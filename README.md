@@ -4,7 +4,7 @@
 
 [Changelog](master/description.txt)
 
-[Revamp Progress](https://github.com/SaerusTierialis/tModLoader_ExperienceAndClasses/projects/1)
+[Revamp Overall Progress](https://github.com/SaerusTierialis/tModLoader_ExperienceAndClasses/projects/1)
 
 Wiki (not yet)
 
