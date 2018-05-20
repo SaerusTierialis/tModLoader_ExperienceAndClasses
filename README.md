@@ -9,10 +9,15 @@
 Wiki (not yet)
 
 # Revamp Summary:
+1. [Cleric/Saint Abilities](https://github.com/SaerusTierialis/tModLoader_ExperienceAndClasses/milestone/3)
 1. [New Stats System](https://github.com/SaerusTierialis/tModLoader_ExperienceAndClasses/milestone/1)
 1. not yet documented
 
+And also [Cleanup](https://github.com/SaerusTierialis/tModLoader_ExperienceAndClasses/milestone/2)
+
 # Repo Organization:
-* master:       lastest release (protected)
-* development:  workspace for next release
-* feature-x:    workspace for a specific, large feature (merged into development upon completion)
+| Branch | Contents |
+| ------ | ----------- |
+| master | lastest release (protected) |
+| development | workspace for next release |
+| feature-*x* | workspace for specific, large feature *x* (merged into development upon completion) |
