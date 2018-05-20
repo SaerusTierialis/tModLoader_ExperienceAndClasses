@@ -1,7 +1,6 @@
-## Experience and Classes
-[Webpage Link](https://saerustierialis.github.io/tModLoader_ExperienceAndClasses/)
+### [Hub Page](https://saerustierialis.github.io/tModLoader_ExperienceAndClasses/)
 
-## Branch Organization:
+### Branch Organization:
 | Branch | Contents |
 | ------ | ----------- |
 | master | lastest release (protected) |
