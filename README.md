@@ -1,5 +1,7 @@
-[Forum Post](https://forums.terraria.org/index.php?threads/experience-and-classes.53048/)
-
-[Changelog](./description.txt)
-
-Wiki (not yet)
+### Branch Organization:
+| Branch | Contents |
+| ------ | ----------- |
+| master | lastest release (protected) |
+| development | workspace for next release |
+| feature-*X* | workspace for specific, large feature *X* (merge into development upon completion) |
+| gh-pages | webpage (documentation) |
