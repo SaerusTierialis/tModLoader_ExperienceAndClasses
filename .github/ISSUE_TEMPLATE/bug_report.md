@@ -7,10 +7,20 @@ about: Create a report to help us improve
 Please replace the x with your response in all relevant fields.
 
 **Version Info:**
-Mod Version:        x
-tModLoader Version: x
-Operating System:   x
-Other Mods:         x
+Mod Version:
+x
+
+tModLoader Version:
+x
+
+Operating System:
+x
+
+Other Mods:
+x
+
+Singleplayer, Multiplayer, or Both?
+x
 
 **Describe the bug**
 x
