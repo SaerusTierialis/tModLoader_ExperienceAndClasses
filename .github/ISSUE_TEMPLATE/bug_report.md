@@ -22,17 +22,17 @@ x
 Singleplayer, Multiplayer, or Both?
 x
 
-**Describe the bug**
+**Describe the bug:**
 x
 
-**How to reproduce**
+**How to reproduce:**
 x
 
-**Screenshots (if needed)**
+**Screenshots (if needed):**
 x
 
-**Additional context**
+**Additional context:**
 x
 
-**Forum or Discord username (if you would like to be notified)**
+**Forum or Discord username (if you would like to be notified):**
 x
