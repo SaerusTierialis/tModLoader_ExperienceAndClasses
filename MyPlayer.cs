@@ -1115,5 +1115,10 @@ namespace ExperienceAndClasses
             }
         }
 
+        public double ModifyHealing(double base_heal)
+        {
+            return (base_heal * healing_power);
+        }
+
     }
 }
