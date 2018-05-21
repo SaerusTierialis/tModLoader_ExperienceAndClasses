@@ -12,7 +12,7 @@ about: Suggest a new ability (passive, active, upgrade, or alternate)
 - [ ] Alternate
 
 **Base Ability (if applicable):**
-(type #Ability and select)
+(type # and start typing the name of the ability, select the one with "Ability: name")
 x
 
 **Class(es):**
