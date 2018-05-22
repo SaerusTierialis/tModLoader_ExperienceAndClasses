@@ -5,7 +5,7 @@ about: Suggest a new ability (passive, active, upgrade, or alternate)
 ---
 
 **Ability Type:**
-(place an "x" in one box)
+(place an "x" in one box like this [x])
 - [ ] Passive
 - [ ] Active
 - [ ] Upgrade
