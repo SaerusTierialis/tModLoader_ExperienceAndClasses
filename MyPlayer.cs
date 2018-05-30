@@ -81,7 +81,7 @@ namespace ExperienceAndClasses
         public static Double[] debuff_immunity_duration_seconds = new double[ExperienceAndClasses.NUMBER_OF_DEBUFFS];
 
         //custom stats
-        public float healing_power = 1f;
+        private float healing_power = 1f;
 
         //rogue
         public float percentMidas = 0;
@@ -1115,7 +1115,7 @@ namespace ExperienceAndClasses
             }
         }
 
-        public double ModifyHealing(double base_heal)
+        public double ModifyHealingOutput(double base_heal)
         {
             return (base_heal * healing_power);
         }
