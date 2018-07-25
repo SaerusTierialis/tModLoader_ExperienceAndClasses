@@ -214,13 +214,13 @@ namespace ExperienceAndClasses.Abilities
                 }
 
                 //calculate heal others (20+((level/10)^1.7))
-                value_heal_other = (20 + Math.Pow(level / 10, 1.7)) * self.healing_power;
+                value_heal_other = self.ModifyHealingOutput(20 + Math.Pow(level / 10, 1.7));
 
                 //calculate heal self (15+((level/10)^1.4))
-                value_heal_self = (15 + Math.Pow(level / 10, 1.4)) * self.healing_power;
+                value_heal_self = self.ModifyHealingOutput(15 + Math.Pow(level / 10, 1.4));
 
                 //calculate heal damage (15+((level/10)^2))
-                value_damage = (15 + Math.Pow(level / 10, 2)) * self.healing_power;
+                value_damage = self.ModifyHealingOutput(15 + Math.Pow(level / 10, 2));
             }
 
             private static int nearest_friendly_index;

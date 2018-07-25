@@ -1,9 +1,14 @@
-This mod introduces an RPG-style class and leveling system where all monsters provide experience based on their health, defense, and damage stats. Your current level and progression is presented in a movable UI box. As you level, you unlock various bonuses and progress through three tiers of classes with several choices along the way.
+﻿This mod introduces an RPG-style class and leveling system where all monsters provide experience based on their health, defense, and damage stats. Your current level and progression is presented in a movable UI box. As you level, you unlock various bonuses and progress through three tiers of classes with several choices along the way.
 
 A MAJOR overhaul is now underway. See the forums or discord for more details!
 
 
 CHANGELOG:
+
+===v1.3.9===
+
+Disabled Ninja petal procs.
+Built on latest tModLaoder 0.10.1.5
 
 ===v1.3.8===
 
