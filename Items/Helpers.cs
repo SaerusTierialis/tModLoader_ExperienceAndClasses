@@ -484,7 +484,7 @@ namespace ExperienceAndClasses.Items
                     noFallDmg_LEVEL = 15;
                     immune_Confused_LEVEL = 20;
                     immune_Darkness_LEVEL = 20;
-                    //onHitPetal_LEVEL = 30;
+                    //onHitPetal_LEVEL = 30; //not very good at low level, decreases damage at high level due to pierce limits
                     thrownCost33_LEVEL = 10;
                     thrownCost50_LEVEL = 35;
                     break;
