@@ -188,7 +188,10 @@ namespace ExperienceAndClasses.Items
 
         public override bool UseItem(Player player)
         {
-            ExperienceAndClasses.localMyPlayer.AddExp(ExperienceAndClasses.localMyPlayer.GetBossOrbXP(), true);
+            if (player.whoAmI == Main.LocalPlayer.whoAmI)
+            {
+                ExperienceAndClasses.localMyPlayer.AddExp(ExperienceAndClasses.localMyPlayer.GetBossOrbXP(), true);
+            }
             return true;
         }
 
@@ -248,7 +251,10 @@ namespace ExperienceAndClasses.Items
 
         public override bool UseItem(Player player)
         {
-            ExperienceAndClasses.localMyPlayer.AddExp(ExperienceAndClasses.localMyPlayer.GetMonsterOrbXP(), true);
+            if (player.whoAmI == Main.LocalPlayer.whoAmI)
+            {
+                ExperienceAndClasses.localMyPlayer.AddExp(ExperienceAndClasses.localMyPlayer.GetMonsterOrbXP(), true);
+            }
             return true;
         }
 
