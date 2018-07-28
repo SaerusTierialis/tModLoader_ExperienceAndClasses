@@ -5,6 +5,10 @@ A MAJOR overhaul is now underway. See the forums or discord for more details!
 
 CHANGELOG:
 
+===v1.3.11===
+
+Applied orb xp fix to ascension and boss orbs
+
 ===v1.3.10===
 
 Fixed multiplayer orb xp bug (no longer grants xp to all players)
