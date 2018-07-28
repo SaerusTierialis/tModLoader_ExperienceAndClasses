@@ -71,7 +71,10 @@ namespace ExperienceAndClasses.Items
         }
         public override bool UseItem(Player player)
         {
-            ExperienceAndClasses.localMyPlayer.AddExp(ExperienceAndClasses.EXP_ITEM_VALUE * orbValue, true);
+            if (player.whoAmI == Main.LocalPlayer.whoAmI)
+            {
+                ExperienceAndClasses.localMyPlayer.AddExp(ExperienceAndClasses.EXP_ITEM_VALUE * orbValue, true);
+            }
             return true;
         }
 
