@@ -816,7 +816,7 @@ namespace ExperienceAndClasses
             //Assassin special attack
             DateTime now = DateTime.Now;
             bool ready = timeLastAttack.AddMilliseconds(openerTime_msec).CompareTo(now) <= 0;
-            if (openerBonusPct>0 && item.melee && (ready || target.life==target.lifeMax))
+            if ((openerBonusPct>0 && item.melee) && ready) //(ready || target.life==target.lifeMax))
             {
                 //if ready, add phase
                 if (ready)

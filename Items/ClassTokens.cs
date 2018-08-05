@@ -421,14 +421,14 @@ namespace ExperienceAndClasses.Items
             name = "Assassin";
             tier = 3;
             desc = "Melee critical and agility class."+
-                       "\n\nHas the unique ability to make Opener Attacks, which rewards a"+
-                         "\n\"poking\" playstyle."+
-                       "\n\nOpener Attack: Occurs when making a melee attack against a target"+
-                         "\nwith full life or when you have not landed a hit recently. A buff"+
-                         "\nand visual will indicate when it has been long enough. Yo-yo gain"+
-                         "\nonly half of the damage multiplier. Does not trigger on projectile"+
-                         "\nmelee attacks such as boomerang or magic sword projectiles. Bonus"+
-                         "\ncritical damage is tripled on Opener Attacks.";
+                       "\n\nHas the unique ability to Assassinate, which rewards a"+
+                         "\n\"hit and run\" playstyle."+
+                       "\n\nAssassinate: Occurs when making a melee attack against a target" +
+                         "\nwhen you have not landed a hit recently. A buff and visual will"+
+                         "\nindicate when it is ready. Yo-yos gain only half of the damage" +
+                         "\nmultiplier. Does not trigger on projectile melee attacks such" +
+                         "\nas boomerang, some flails and spears, or magic sword projectiles."+
+                         "\nBonus critical damage is tripled on Assassinate.";
         }
         public override void AddRecipes()
         {
