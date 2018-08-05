@@ -11,7 +11,7 @@ namespace ExperienceAndClasses.Buffs
         {
             //Main.buffName[Type] = "Opener Attack";
             //Main.buffTip[Type] = "Bonus damage on the next melee attack\nBonus is half for yo-yo";
-            DisplayName.SetDefault("Opener Attack");
+            DisplayName.SetDefault("Assassinate");
             Description.SetDefault("Bonus damage on the next melee attack\nBonus is half for yo-yo");
             Main.buffNoTimeDisplay[Type] = true;
             Main.buffNoSave[Type] = true;

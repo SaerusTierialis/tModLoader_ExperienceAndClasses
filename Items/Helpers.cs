@@ -1189,17 +1189,17 @@ namespace ExperienceAndClasses.Items
             if (meleeCritDmg30Pct_LEVEL != -1 && level >= meleeCritDmg30Pct_LEVEL)
             {
                 if (applyEffects && myPlayer.bonusCritPct < 0.3) myPlayer.bonusCritPct = 0.3;
-                bonuses += "\n30% bonus melee critical damage (90% on Opener Attacks)";
+                bonuses += "\n30% bonus melee critical damage (90% on Assassinate)";
             }
             else if (meleeCritDmg20Pct_LEVEL != -1 && level >= meleeCritDmg20Pct_LEVEL)
             {
                 if (applyEffects && myPlayer.bonusCritPct < 0.2) myPlayer.bonusCritPct = 0.2;
-                bonuses += "\n20% bonus melee critical damage (60% on Opener Attacks)";
+                bonuses += "\n20% bonus melee critical damage (60% on Assassinate)";
             }
             else if (meleeCritDmg10Pct_LEVEL != -1 && level >= meleeCritDmg10Pct_LEVEL)
             {
                 if (applyEffects && myPlayer.bonusCritPct < 0.1) myPlayer.bonusCritPct = 0.1;
-                bonuses += "\n10% bonus melee critical damage (30% on Opener Attacks)";
+                bonuses += "\n10% bonus melee critical damage (30% on Assassinate)";
             }
 
             //Assassin attack (bonus damage if target has full health or no attack has been made recently)
@@ -1217,7 +1217,7 @@ namespace ExperienceAndClasses.Items
                         player.AddBuff(mod.BuffType("Buff_OpenerAttack"), 50);
                     }
                 }
-                bonuses += "\nopener attacks deal " + (floatBonus * 100) + "% damage";
+                bonuses += "\nAssassinate deals " + (floatBonus * 100) + "% damage";
             }
 
             //opener attack iframe
@@ -1241,7 +1241,7 @@ namespace ExperienceAndClasses.Items
             if (intBonus > -1)
             {
                 if (applyEffects && myPlayer.openerImmuneTime_msec < OPENER_ATTACK_IMMUNE_MSEC[intBonus]) myPlayer.openerImmuneTime_msec = OPENER_ATTACK_IMMUNE_MSEC[intBonus];
-                bonuses += "\nopener attacks grant "+(OPENER_ATTACK_IMMUNE_MSEC[intBonus] / 1000f) + " second immunity (must be off cooldown)";
+                bonuses += "\nAssassinate grants "+(OPENER_ATTACK_IMMUNE_MSEC[intBonus] / 1000f) + " second immunity (must be off cooldown)";
             }
 
             //periodic party healing
@@ -1390,12 +1390,12 @@ namespace ExperienceAndClasses.Items
                 if (meleeCritDmg20Pct_LEVEL == lvl) desc += "\nLevel " + lvl + ": 20% bonus melee critical damage (non-stacking)";
                 if (meleeCritDmg30Pct_LEVEL == lvl) desc += "\nLevel " + lvl + ": 30% bonus melee critical damage (non-stacking)";
 
-                if (assassinAttack_LEVEL == lvl) desc += "\nLevel " + lvl + ": opener attacks deal " + (assassinAttack_FLAT * 100) + "%+(" + (assassinAttack * 100) + "*level)% damage";
+                if (assassinAttack_LEVEL == lvl) desc += "\nLevel " + lvl + ": Assassinate deals " + (assassinAttack_FLAT * 100) + "%+(" + (assassinAttack * 100) + "*level)% damage";
 
-                if (assassinAttackPhase0_LEVEL==lvl) desc += "\nLevel " + lvl + ": opener attacks grant " + (OPENER_ATTACK_IMMUNE_MSEC[0] / 1000f) + " second immunity (must be off cooldown)";
-                if (assassinAttackPhase1_LEVEL == lvl) desc += "\nLevel " + lvl + ": opener attacks grant " + (OPENER_ATTACK_IMMUNE_MSEC[1] / 1000f) + " second immunity (must be off cooldown)";
-                if (assassinAttackPhase2_LEVEL == lvl) desc += "\nLevel " + lvl + ": opener attacks grant " + (OPENER_ATTACK_IMMUNE_MSEC[2] / 1000f) + " second immunity (must be off cooldown)";
-                if (assassinAttackPhase3_LEVEL == lvl) desc += "\nLevel " + lvl + ": opener attacks grant " + (OPENER_ATTACK_IMMUNE_MSEC[3] / 1000f) + " second immunity (must be off cooldown)";
+                if (assassinAttackPhase0_LEVEL==lvl) desc += "\nLevel " + lvl + ": Assassinate grants " + (OPENER_ATTACK_IMMUNE_MSEC[0] / 1000f) + " second immunity (must be off cooldown)";
+                if (assassinAttackPhase1_LEVEL == lvl) desc += "\nLevel " + lvl + ": Assassinate grants " + (OPENER_ATTACK_IMMUNE_MSEC[1] / 1000f) + " second immunity (must be off cooldown)";
+                if (assassinAttackPhase2_LEVEL == lvl) desc += "\nLevel " + lvl + ": Assassinate grants " + (OPENER_ATTACK_IMMUNE_MSEC[2] / 1000f) + " second immunity (must be off cooldown)";
+                if (assassinAttackPhase3_LEVEL == lvl) desc += "\nLevel " + lvl + ": Assassinate grants " + (OPENER_ATTACK_IMMUNE_MSEC[3] / 1000f) + " second immunity (must be off cooldown)";
 
                 if (periodicPartyHeal_LEVEL == lvl) desc += "\nLevel " + lvl + ": occasionally heals allies (half for self)";
                 if (periodicIchorAura_LEVEL == lvl) desc += "\nLevel " + lvl + ": occasionally inflicts ichor on nearby enemies";
