@@ -464,8 +464,7 @@ namespace ExperienceAndClasses.Items
             name = "Cleric";
             tier = 2;
             desc = "Basic support class."+
-                       "\n\nCan produce an Ichor Aura that occasionally inflicts"+
-                         "\nIchor on all nearby enemies for a moment."+
+                       "\n\nSee website for ability descriptions (temporary)."+
                        "\n\nClass advancement is available at level " + Recipes.ClassRecipes.TIER_LEVEL_REQUIREMENTS[tier+1] + ".";
 
             //abilities
@@ -491,10 +490,7 @@ namespace ExperienceAndClasses.Items
             name = "Saint";
             tier = 3;
             desc = "Advanced support class." +
-                       "\n\nCan produce a longer-lasting Ichor Aura as well as a" +
-                         "\nLife Aura (healing) and Damage Aura (harm). The Saint" +
-                         "\nalso has several immunities, mana cost reduction, and" +
-                         "\ndecent life and defense.";
+                       "\n\nSee website for ability descriptions (temporary).";
 
             //abilities
             abilities.Add(new Tuple<AbilityMain.ID, byte>(AbilityMain.ID.Cleric_Active_Heal, 1));
