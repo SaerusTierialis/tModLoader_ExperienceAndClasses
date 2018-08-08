@@ -5,6 +5,10 @@ A MAJOR overhaul is now underway. See the forums or discord for more details!
 
 CHANGELOG:
 
+===v1.3.13===
+
+Revised Cleric/Saint descriptions. The auras were removed a while ago. Several new ACTIVE abilities have been added in their place. See the website for more details.
+
 ===v1.3.12===
 
 Removed free Opener Attack on full-health targets.
