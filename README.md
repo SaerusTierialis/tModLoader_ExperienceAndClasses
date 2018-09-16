@@ -4,6 +4,7 @@
 | master | lastest release (protected) |
 | dev | workspace for next release |
 
+
 ### Acknowledgement for sprite use
 Sprites adapted from: game-icons.net (used with modifications)
 
