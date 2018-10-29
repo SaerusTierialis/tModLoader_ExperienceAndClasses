@@ -4,12 +4,9 @@ about: Suggest a new ability (passive, active, upgrade, or alternate)
 
 ---
 
-**Ability Type:**
-(place an "x" in one box like this [x])
-- [ ] Passive
-- [ ] Active
-- [ ] Upgrade
-- [ ] Alternate
+**Type:**
+(passive, active, upgrade, or alternate)
+x
 
 **Base Ability (if applicable):**
 (type # and start typing the name of the ability, select the one with "Ability: name")
