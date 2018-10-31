@@ -55,28 +55,8 @@
     </AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Abilities\AbilityProj.cs" />
-    <Compile Include="Buffs\Auras.cs" />
-    <Compile Include="Buffs\Buffs.cs" />
-    <Compile Include="Buffs\Helpers.cs" />
-    <Compile Include="Commons.cs" />
-    <Compile Include="Dusts\Dusts.cs" />
-    <Compile Include="Items\ClassTokens.cs" />
-    <Compile Include="Items\Helpers.cs" />
-    <Compile Include="Items\Orbs.cs" />
     <Compile Include="ExperienceAndClasses.cs" />
-    <Compile Include="Abilities\Abilities.cs" />
-    <Compile Include="Methods\ChatCommands.cs" />
-    <Compile Include="Methods\Experience.cs" />
-    <Compile Include="Methods\PacketSender.cs" />
-    <Compile Include="MyCommands.cs" />
-    <Compile Include="MyPlayer.cs" />
-    <Compile Include="MyWorld.cs" />
-    <Compile Include="NPCs\Helpers.cs" />
-    <Compile Include="NPCs\MyGlobalNPC.cs" />
-    <Compile Include="Recipes\Helpers.cs" />
-    <Compile Include="Recipes\RecipeTypes.cs" />
-    <Compile Include="UI\MyUI.cs" />
+    <Compile Include="MPlayer.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Microsoft.Xna.Framework, Version=4.0.0.0, Culture=neutral, PublicKeyToken=842cf8be1de50553, processorArchitecture=x86">
@@ -94,10 +74,6 @@
     <Reference Include="Microsoft.Xna.Framework.Xact, Version=4.0.0.0, Culture=neutral, PublicKeyToken=842cf8be1de50553, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>C:\Windows\Microsoft.NET\assembly\GAC_32\Microsoft.Xna.Framework.Xact\v4.0_4.0.0.0__842cf8be1de50553\Microsoft.Xna.Framework.Xact.dll</HintPath>
-    </Reference>
-    <Reference Include="ReLogic, Version=1.0.0.0, Culture=neutral, processorArchitecture=x86">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Terraria\ReLogic.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="Terraria, Version=1.3.5.1, Culture=neutral, processorArchitecture=x86">

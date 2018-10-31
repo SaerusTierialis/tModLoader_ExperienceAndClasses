@@ -1,5 +1,5 @@
 author = Saerus
-version = 1.3.13
+version = 2.0.0
 displayName = ExperienceAndClasses
 buildIgnore = *.csproj, *.user, obj\*, bin\*, .vs\*, *.xlsx, *.m, *.pptx, *.docx, *.tmp, *.zip, *.psd, *.sln, *.gitattributes, *.gitignore, Properties\*, Service References\*
 homepage = https://saerustierialis.github.io/tModLoader_Homepage/
