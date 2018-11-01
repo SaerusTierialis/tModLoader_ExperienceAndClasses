@@ -81,7 +81,7 @@ namespace ExperienceAndClasses {
 
         public override void ProcessTriggers(TriggersSet triggersSet) {
             if (ExperienceAndClasses.HOTKEY_UI.JustPressed) {
-                ExperienceAndClasses.user_interface_state_main.visible = !ExperienceAndClasses.user_interface_state_main.visible;
+                ExperienceAndClasses.user_interface_state_main.Visible = !ExperienceAndClasses.user_interface_state_main.Visible;
             }
         }
 
@@ -171,7 +171,7 @@ namespace ExperienceAndClasses {
             return new TagCompound {
                 {"ui_main_left", ExperienceAndClasses.user_interface_state_main.GetLeft() },
                 {"ui_main_top", ExperienceAndClasses.user_interface_state_main.GetTop() },
-                {"ui_main_auto", ExperienceAndClasses.user_interface_state_main.GetAuto() },
+                {"ui_main_auto", ExperienceAndClasses.user_interface_state_main.Auto },
                 {"ui_main_pinned", ExperienceAndClasses.user_interface_state_main.GetPinned() },
             };
         }

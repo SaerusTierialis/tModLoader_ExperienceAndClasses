@@ -6,7 +6,43 @@ using Terraria.UI;
 
 namespace ExperienceAndClasses.UI {
 
-    // Copied from ExampleMod github
+    class ClassButton : UIImageButton {
+        private const float TEXT_SCALE = 0.7f;
+        private const float TEXT_OFFSET = 5f;
+
+        private Systems.Classes.ID class_id;
+        UIText text;
+
+        public ClassButton(Texture2D texture, Systems.Classes.ID class_id) : base(texture) {
+            this.class_id = class_id;
+            OnClick += new MouseEvent(ClickPrimary);
+            OnRightClick += new MouseEvent(ClickSubclass);
+
+            text = new UIText("", TEXT_SCALE);
+            Append(text);
+
+            UpdateText();
+        }
+
+        private void ClickPrimary(UIMouseEvent evt, UIElement listeningElement) {
+            Main.NewText("Primary: " + class_id);
+        }
+
+        private void ClickSubclass(UIMouseEvent evt, UIElement listeningElement) {
+            Main.NewText("Subclass: " + class_id);
+        }
+
+        public void UpdateText() {
+            string message = "Lv." + (1 + Main.rand.Next(255));
+            text.SetText(message, TEXT_SCALE, false);
+            float message_size = Main.fontMouseText.MeasureString(message).X * TEXT_SCALE;
+            text.Left.Set(UIMain.CLASS_BUTTON_SIZE/2 - message_size/2, 0f);
+            text.Top.Set(UIMain.CLASS_BUTTON_SIZE + TEXT_OFFSET, 0F);
+        }
+    }
+
+
+    // Copied from ExampleMod on GitHub
     // Added locking of drag panel
 
     // This DragableUIPanel class inherits from UIPanel. 
@@ -33,6 +69,7 @@ namespace ExperienceAndClasses.UI {
             if (!pinned) {
                 offset = new Vector2(evt.MousePosition.X - Left.Pixels, evt.MousePosition.Y - Top.Pixels);
                 dragging = true;
+                stop_pin = false;
             }
             else {
                 dragging = false;
@@ -84,6 +121,8 @@ namespace ExperienceAndClasses.UI {
             }
         }
     }
+
+    // Copied from ExampleMod on GitHub
 
     // This UIHoverImageButton class inherits from UIImageButton. 
     // Inheriting is a great tool for UI design. 

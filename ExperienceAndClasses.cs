@@ -30,7 +30,7 @@ namespace ExperienceAndClasses
             SYNC_TEST,
         };
 
-        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Variables (set once per game then treated as constanst/readonly) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Treated like readonly ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         public static MPlayer LOCAL_MPLAYER;
         public static Mod MOD;
@@ -75,14 +75,14 @@ namespace ExperienceAndClasses
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ UI ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         public override void UpdateUI(GameTime gameTime) {
-            if (user_interface_state_main.GetAuto()) {
+            if (user_interface_state_main.Auto) {
                 if (inventory_state != Main.playerInventory) {
                     inventory_state = Main.playerInventory;
-                    user_interface_state_main.visible = inventory_state;
+                    user_interface_state_main.Visible = inventory_state;
                 }
             }
 
-            if (user_interface_main != null && user_interface_state_main.visible)
+            if (user_interface_main != null && user_interface_state_main.Visible)
                 user_interface_main.Update(gameTime);
         }
 
@@ -91,7 +91,7 @@ namespace ExperienceAndClasses
             if (MouseTextIndex != -1) {
                 layers.Insert(MouseTextIndex, new LegacyGameInterfaceLayer("EAC_UIMain",
                     delegate {
-                        if (user_interface_state_main.visible) {
+                        if (user_interface_state_main.Visible) {
                             user_interface_state_main.Draw(Main.spriteBatch);
                         }
                         return true;
