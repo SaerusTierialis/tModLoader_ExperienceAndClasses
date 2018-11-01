@@ -7,8 +7,10 @@ using System.Text;
 using System.Threading.Tasks;
 using Terraria;
 using Terraria.DataStructures;
+using Terraria.GameInput;
 using Terraria.Localization;
 using Terraria.ModLoader;
+using Terraria.ModLoader.IO;
 
 namespace ExperienceAndClasses {
     class MPlayer : ModPlayer {
@@ -19,11 +21,12 @@ namespace ExperienceAndClasses {
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Static Vars ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-        private static DateTime time_next_full_sync = DateTime.MinValue;
+        private static DateTime time_next_full_sync = DateTime.MaxValue;
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Instance Vars (non-syncing) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         public bool is_local_player = false;
+        private TagCompound load_tag;
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Instance Vars (syncing) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -50,8 +53,17 @@ namespace ExperienceAndClasses {
         public override void OnEnterWorld(Player player) {
             // is this the local player?
             if (player.whoAmI == Main.LocalPlayer.whoAmI) {
+                //this is the current local player
                 is_local_player = true;
                 ExperienceAndClasses.LOCAL_MPLAYER = this;
+
+                //start timer for next full sync
+                time_next_full_sync = DateTime.Now.AddTicks(TICKS_PER_FULL_SYNC);
+
+                //apply saved ui settings
+                ExperienceAndClasses.user_interface_state_main.SetPosition(Commons.TryGet<float>(load_tag, "ui_main_left", 100f), Commons.TryGet<float>(load_tag, "ui_main_top", 100f));
+                ExperienceAndClasses.user_interface_state_main.SetAuto(Commons.TryGet<bool>(load_tag, "ui_main_auto", true));
+                ExperienceAndClasses.user_interface_state_main.SetPinned(Commons.TryGet<bool>(load_tag, "ui_main_pinned", false));
             }
         }
 
@@ -62,7 +74,15 @@ namespace ExperienceAndClasses {
                 sync_test = player.statLife;
             }
 
-            Main.NewText(player.name + " " + sync_test); //working
+            //Main.NewText(player.name + " " + sync_test); //working
+        }
+
+        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Hotkeys ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+        public override void ProcessTriggers(TriggersSet triggersSet) {
+            if (ExperienceAndClasses.HOTKEY_UI.JustPressed) {
+                ExperienceAndClasses.user_interface_state_main.visible = !ExperienceAndClasses.user_interface_state_main.visible;
+            }
         }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Syncing ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
@@ -144,9 +164,24 @@ namespace ExperienceAndClasses {
             layers.Add(MiscEffects);
         }
 
+
+        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Save/Load ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+        public override TagCompound Save() {
+            return new TagCompound {
+                {"ui_main_left", ExperienceAndClasses.user_interface_state_main.GetLeft() },
+                {"ui_main_top", ExperienceAndClasses.user_interface_state_main.GetTop() },
+                {"ui_main_auto", ExperienceAndClasses.user_interface_state_main.GetAuto() },
+                {"ui_main_pinned", ExperienceAndClasses.user_interface_state_main.GetPinned() },
+            };
+        }
+
+        public override void Load(TagCompound tag) {
+            //ui settings must be stored and applied later when entering game
+            load_tag = tag;
+
+            
+        }
+
     }
-
-    /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Save/Load ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-
-
 }

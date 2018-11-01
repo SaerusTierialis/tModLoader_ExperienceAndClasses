@@ -30,10 +30,19 @@ namespace ExperienceAndClasses
             SYNC_TEST,
         };
 
-        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Variables ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Variables (set once per game then treated as constanst/readonly) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         public static MPlayer LOCAL_MPLAYER;
-        public static Mod mod;
+        public static Mod MOD;
+
+        public static ModHotKey HOTKEY_UI;
+
+        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Variables ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+        private static UserInterface user_interface_main;
+        public static UI.UIMain user_interface_state_main;
+
+        public static bool inventory_state = false;
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Constructor ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -46,7 +55,50 @@ namespace ExperienceAndClasses
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Load/Unload ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         public override void Load() {
-            mod = this;
+            MOD = this;
+
+            //hotkeys
+            HOTKEY_UI = RegisterHotKey("Show Class Interface", "P");
+
+            //main ui
+            user_interface_state_main = new UI.UIMain();
+            user_interface_state_main.Activate();
+            user_interface_main = new UserInterface();
+            user_interface_main.SetState(user_interface_state_main);
+        }
+
+        public override void Unload() {
+            //hotkeys
+            HOTKEY_UI = null;
+        }
+
+        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ UI ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+        public override void UpdateUI(GameTime gameTime) {
+            if (user_interface_state_main.GetAuto()) {
+                if (inventory_state != Main.playerInventory) {
+                    inventory_state = Main.playerInventory;
+                    user_interface_state_main.visible = inventory_state;
+                }
+            }
+
+            if (user_interface_main != null && user_interface_state_main.visible)
+                user_interface_main.Update(gameTime);
+        }
+
+        public override void ModifyInterfaceLayers(List<GameInterfaceLayer> layers) {
+            int MouseTextIndex = layers.FindIndex(layer => layer.Name.Equals("Vanilla: Mouse Text"));
+            if (MouseTextIndex != -1) {
+                layers.Insert(MouseTextIndex, new LegacyGameInterfaceLayer("EAC_UIMain",
+                    delegate {
+                        if (user_interface_state_main.visible) {
+                            user_interface_state_main.Draw(Main.spriteBatch);
+                        }
+                        return true;
+                    },
+                    InterfaceScaleType.UI)
+                );
+            }
         }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Packets ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
@@ -70,7 +122,7 @@ namespace ExperienceAndClasses
 
                     //relay
                     if (IS_SERVER) {
-                        ModPacket packet = mod.GetPacket();
+                        ModPacket packet = MOD.GetPacket();
                         packet.Write((byte)ExperienceAndClasses.MessageType.SYNC_TEST);
                         packet.Write((byte)player_ind);
                         packet.Write(int1);
