@@ -157,8 +157,6 @@ namespace ExperienceAndClasses {
         }
 
         public bool LocalSetClass(byte id, bool is_primary) {
-            Main.NewText(Class_Primary.ID + " " + Class_Secondary.ID + " " + id + " " + is_primary);
-
             //local MPlayer only
             if (!is_local_player) {
                 Main.NewText("ERROR: Tried to set non-local player with SetClass! (please report)", Shared.COLOUR_ERROR);
@@ -371,7 +369,7 @@ namespace ExperienceAndClasses {
             return new TagCompound {
                 {"ui_main_left", ExperienceAndClasses.user_interface_state_main.GetLeft() },
                 {"ui_main_top", ExperienceAndClasses.user_interface_state_main.GetTop() },
-                {"ui_main_auto", ExperienceAndClasses.user_interface_state_main.Auto },
+                {"ui_main_auto", ExperienceAndClasses.user_interface_state_main.GetAuto() },
                 {"ui_main_pinned", ExperienceAndClasses.user_interface_state_main.GetPinned() },
             };
             //TODO: current classes

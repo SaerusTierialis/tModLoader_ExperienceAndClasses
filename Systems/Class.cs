@@ -57,6 +57,7 @@ namespace ExperienceAndClasses.Systems {
             byte tier, id_byte;
             Texture2D texture;
             ID id_prereq;
+            bool gives_attributes;
 
             for (Systems.Classes.ID id = 0; id < Systems.Classes.ID.NUMBER_OF_IDs; id++) {
                 id_byte = (byte)id;
@@ -67,11 +68,13 @@ namespace ExperienceAndClasses.Systems {
                 tier = 0;
                 id_prereq = ID.New;
                 texture = ModLoader.GetTexture("ExperienceAndClasses/Textures/Tokens/ClassToken_Novice");
+                gives_attributes = true;
 
                 //specifics
                 switch (id) {
                     case ID.None:
                         name = "None";
+                        gives_attributes = false;
                         break;
 
                     case ID.Novice:
@@ -270,10 +273,14 @@ namespace ExperienceAndClasses.Systems {
                         class_locations[2, 6] = id_byte;
                         id_prereq = ID.Hybrid;
                         break;
+
+                    default:
+                        gives_attributes = false;
+                        break;
                 }
 
                 //add
-                CLASS_LOOKUP[id_byte] = new Class(id_byte, name, desc, tier, texture, (byte)id_prereq);
+                CLASS_LOOKUP[id_byte] = new Class(id_byte, name, desc, tier, texture, (byte)id_prereq, gives_attributes);
             }
         }
     }
@@ -285,14 +292,16 @@ namespace ExperienceAndClasses.Systems {
         public byte Tier { get; private set; }
         public Texture2D Texture { get; private set; }
         public byte ID_Prereq { get; private set; }
+        public bool Gives_Attributes { get; private set; }
 
-        public Class(byte id, string name, string description, byte tier, Texture2D texture, byte id_prereq) {
+        public Class(byte id, string name, string description, byte tier, Texture2D texture, byte id_prereq, bool gives_attributes) {
             ID = id;
             Name = name;
             Description = description;
             Tier = tier;
             Texture = texture;
             ID_Prereq = id_prereq;
+            Gives_Attributes = gives_attributes;
         }
     }
 }

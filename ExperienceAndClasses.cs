@@ -75,7 +75,7 @@ namespace ExperienceAndClasses
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ UI ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         public override void UpdateUI(GameTime gameTime) {
-            if (user_interface_state_main.Auto) {
+            if (user_interface_state_main.GetAuto()) {
                 if (inventory_state != Main.playerInventory) {
                     inventory_state = Main.playerInventory;
                     user_interface_state_main.Visible = inventory_state;

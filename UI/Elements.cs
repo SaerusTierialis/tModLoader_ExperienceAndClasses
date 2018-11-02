@@ -12,6 +12,7 @@ namespace ExperienceAndClasses.UI {
         private const float TEXT_OFFSET = 5f;
         private const float VISIBILITY_SELECTED = 1f;
         private const float VISIBILITY_NOT_SELECTED = 0.4f;
+        private float button_size = 0f;
 
         public byte class_id { get; private set; }
         UIText text;
@@ -25,11 +26,13 @@ namespace ExperienceAndClasses.UI {
             text = new UIText("", TEXT_SCALE);
             Append(text);
 
+            button_size = texture.Width;
+
             image_lock = new UIImage(Shared.TEXTURE_BLANK);
             image_lock.Width.Set(Shared.TEXTURE_LOCK_WIDTH, 0f);
             image_lock.Height.Set(Shared.TEXTURE_LOCK_HEIGHT, 0f);
-            image_lock.Left.Set(UIMain.CLASS_BUTTON_SIZE/2 - Shared.TEXTURE_LOCK_WIDTH/2, 0f);
-            image_lock.Top.Set(UIMain.CLASS_BUTTON_SIZE/2 - Shared.TEXTURE_LOCK_HEIGHT/2, 0f);
+            image_lock.Left.Set(button_size / 2 - Shared.TEXTURE_LOCK_WIDTH / 2, 0f);
+            image_lock.Top.Set(button_size / 2 - Shared.TEXTURE_LOCK_HEIGHT / 2, 0f);
             Append(image_lock);
 
             SetVisibility(1f, VISIBILITY_NOT_SELECTED);
@@ -69,8 +72,8 @@ namespace ExperienceAndClasses.UI {
                 }
                 text.SetText(str, TEXT_SCALE, false);
                 float message_size = Main.fontMouseText.MeasureString(str).X * TEXT_SCALE;
-                text.Left.Set(UIMain.CLASS_BUTTON_SIZE/2 - message_size / 2, 0f);
-                text.Top.Set(UIMain.CLASS_BUTTON_SIZE + TEXT_OFFSET, 0F);
+                text.Left.Set(button_size / 2 - message_size / 2, 0f);
+                text.Top.Set(button_size + TEXT_OFFSET, 0F);
                 text.Recalculate();
 
                 if ((ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary.ID == class_id) || (ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary.ID == class_id)) {
@@ -96,6 +99,7 @@ namespace ExperienceAndClasses.UI {
 
     // Copied from ExampleMod on GitHub
     // Added locking of drag panel
+    // added auto and close
 
     // This DragableUIPanel class inherits from UIPanel. 
     // Inheriting is a great tool for UI design. By inheriting, we get the background drawing for free from UIPanel
@@ -105,9 +109,117 @@ namespace ExperienceAndClasses.UI {
     class DragableUIPanel : UIPanel {
         // Stores the offset from the top left of the UIPanel while dragging.
         private Vector2 offset;
+
         public bool dragging = false;
-        public bool pinned = false;
-        public bool stop_pin = false;
+
+        private bool stop_pin = false;
+        public bool Auto { get; private set; }
+        public bool Pinned { get; private set; }
+
+        private UIHoverImageButton button_pinned, button_auto, button_close;
+        private float padding;
+
+        public DragableUIPanel(float width, float height, Color color, float padding, MouseEvent event_close, bool enable_auto, bool enable_pin) : base() {
+            Auto = true;
+            Pinned = false;
+
+            button_pinned = null;
+            button_auto = null;
+            button_close = null;
+
+            BackgroundColor = color;
+
+            SetPadding(0);
+            this.padding = padding;
+
+            Left.Set(0f, 0f);
+            Top.Set(0f, 0f);
+            Width.Set(width, 0f);
+            Height.Set(height, 0f);
+
+            if (event_close != null) {
+                button_close = new UIHoverImageButton(Shared.TEXTURE_CORNER_BUTTON_CLOSE, "Close");
+                button_close.Width.Set(Shared.TEXTURE_CORNER_BUTTON_SIZE, 0f);
+                button_close.Height.Set(Shared.TEXTURE_CORNER_BUTTON_SIZE, 0f);
+                button_close.OnClick += event_close;
+                Append(button_close);
+            }
+
+            if (enable_auto) {
+                button_auto = new UIHoverImageButton(Shared.TEXTURE_BLANK, "");
+                button_auto.Width.Set(Shared.TEXTURE_CORNER_BUTTON_SIZE, 0f);
+                button_auto.Height.Set(Shared.TEXTURE_CORNER_BUTTON_SIZE, 0f);
+                button_auto.OnClick += new MouseEvent(ButtonClickAuto);
+                Append(button_auto);
+                SetAuto(Auto);
+            }
+
+            if (enable_pin) {
+                button_pinned = new UIHoverImageButton(Shared.TEXTURE_BLANK, "");
+                button_pinned.Width.Set(Shared.TEXTURE_CORNER_BUTTON_SIZE, 0f);
+                button_pinned.Height.Set(Shared.TEXTURE_CORNER_BUTTON_SIZE, 0f);
+                button_pinned.OnClick += new MouseEvent(ButtonClickPin);
+                Append(button_pinned);
+                SetPinned(Pinned);
+            }
+
+            //Recalculate();
+        }
+
+        public override void Recalculate() {
+            float left = Width.Pixels - padding;
+            if (button_close != null) {
+                button_close.Left.Set(left -= Shared.TEXTURE_CORNER_BUTTON_SIZE, 0f);
+                button_close.Top.Set(padding, 0f);
+            }
+            if (button_auto != null) {
+                button_auto.Left.Set(left -= Shared.TEXTURE_CORNER_BUTTON_SIZE, 0f);
+                button_auto.Top.Set(padding, 0f);
+            }
+            if (button_pinned != null) {
+                button_pinned.Left.Set(left -= Shared.TEXTURE_CORNER_BUTTON_SIZE, 0f);
+                button_pinned.Top.Set(padding, 0f);
+            }
+
+            base.Recalculate();
+        }
+
+        private void ButtonClickPin(UIMouseEvent evt, UIElement listeningElement) {
+            SetPinned(!Pinned);
+        }
+
+        private void ButtonClickAuto(UIMouseEvent evt, UIElement listeningElement) {
+            SetAuto(!Auto);
+        }
+
+        public void SetPinned(bool new_state) {
+            Pinned = new_state;
+            if (button_pinned != null) {
+                if (Pinned) {
+                    button_pinned.SetImage(Shared.TEXTURE_CORNER_BUTTON_PINNED);
+                    button_pinned.hoverText = "Allow Dragging";
+                }
+                else {
+                    stop_pin = true;
+                    button_pinned.SetImage(Shared.TEXTURE_CORNER_BUTTON_UNPINNED);
+                    button_pinned.hoverText = "Prevent Dragging";
+                }
+            }
+        }
+
+        public void SetAuto(bool new_state) {
+            Auto = new_state;
+            if (button_auto != null) {
+                if (Auto) {
+                    button_auto.SetImage(Shared.TEXTURE_CORNER_BUTTON_AUTO);
+                    button_auto.hoverText = "Don't Show Menu In Inventory Screen";
+                }
+                else {
+                    button_auto.SetImage(Shared.TEXTURE_CORNER_BUTTON_NO_AUTO);
+                    button_auto.hoverText = "Show Menu In Inventory Screen";
+                }
+            }
+        }
 
         public override void MouseDown(UIMouseEvent evt) {
             DragStart(evt);
@@ -118,7 +230,7 @@ namespace ExperienceAndClasses.UI {
         }
 
         private void DragStart(UIMouseEvent evt) {
-            if (!pinned) {
+            if (!Pinned) {
                 offset = new Vector2(evt.MousePosition.X - Left.Pixels, evt.MousePosition.Y - Top.Pixels);
                 dragging = true;
                 stop_pin = false;
@@ -130,10 +242,10 @@ namespace ExperienceAndClasses.UI {
 
         private void DragEnd(UIMouseEvent evt) {
             if (stop_pin) {
-                pinned = false;
+                Pinned = false;
                 stop_pin = false;
             }
-            else if (!pinned) {
+            else if (!Pinned) {
                 Vector2 end = evt.MousePosition;
                 dragging = false;
 
