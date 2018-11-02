@@ -25,11 +25,11 @@ namespace ExperienceAndClasses.UI {
             text = new UIText("", TEXT_SCALE);
             Append(text);
 
-            image_lock = new UIImage(Constants.TEXTURE_BLANK);
-            image_lock.Width.Set(Constants.TEXTURE_LOCK_WIDTH, 0f);
-            image_lock.Height.Set(Constants.TEXTURE_LOCK_HEIGHT, 0f);
-            image_lock.Left.Set(UIMain.CLASS_BUTTON_SIZE/2 - Constants.TEXTURE_LOCK_WIDTH/2, 0f);
-            image_lock.Top.Set(UIMain.CLASS_BUTTON_SIZE/2 - Constants.TEXTURE_LOCK_HEIGHT/2, 0f);
+            image_lock = new UIImage(Shared.TEXTURE_BLANK);
+            image_lock.Width.Set(Shared.TEXTURE_LOCK_WIDTH, 0f);
+            image_lock.Height.Set(Shared.TEXTURE_LOCK_HEIGHT, 0f);
+            image_lock.Left.Set(UIMain.CLASS_BUTTON_SIZE/2 - Shared.TEXTURE_LOCK_WIDTH/2, 0f);
+            image_lock.Top.Set(UIMain.CLASS_BUTTON_SIZE/2 - Shared.TEXTURE_LOCK_HEIGHT/2, 0f);
             Append(image_lock);
 
             SetVisibility(1f, VISIBILITY_NOT_SELECTED);
@@ -57,11 +57,11 @@ namespace ExperienceAndClasses.UI {
             byte level = ExperienceAndClasses.LOCAL_MPLAYER.class_levels[class_id];
             if (level > 0) {
                 //not locked
-                image_lock.SetImage(Constants.TEXTURE_BLANK);
+                image_lock.SetImage(Shared.TEXTURE_BLANK);
 
                 //text level
                 string str = "";
-                if (level >= Constants.MAX_LEVEL) {
+                if (level >= Shared.MAX_LEVEL) {
                     str = "MAX";
                 }
                 else {
@@ -84,7 +84,7 @@ namespace ExperienceAndClasses.UI {
             }
             else {
                 //locked
-                image_lock.SetImage(Constants.TEXTURE_LOCK);
+                image_lock.SetImage(Shared.TEXTURE_LOCK);
                 SetVisibility(1f, VISIBILITY_NOT_SELECTED);
 
                 //no text

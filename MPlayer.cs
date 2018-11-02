@@ -39,7 +39,7 @@ namespace ExperienceAndClasses {
             Class_Secondary = Systems.Classes.CLASS_LOOKUP[(byte)Systems.Classes.ID.New];
             Allow_Secondary = true;
 
-            //temp: set random levels
+            //temp: set levels
             class_levels[(byte)Systems.Classes.ID.Novice] = 10;
             class_levels[(byte)Systems.Classes.ID.Mage] = 50;
             class_levels[(byte)Systems.Classes.ID.Sage] = 14;
@@ -136,6 +136,15 @@ namespace ExperienceAndClasses {
                                     id_pre = Systems.Classes.CLASS_LOOKUP[id_pre].ID_Prereq;
                                 }
                             }
+                            id_pre = Systems.Classes.CLASS_LOOKUP[id].ID_Prereq;
+                            while (id_pre != (byte)Systems.Classes.ID.New) {
+                                if (id_other == id_pre) {
+                                    return CLASS_VALIDITY.INVALID_COMBINATION; //invalid combination (same as other class or one of its prereqs)
+                                }
+                                else {
+                                    id_pre = Systems.Classes.CLASS_LOOKUP[id_pre].ID_Prereq;
+                                }
+                            }
 
                             //valid choice
                             return CLASS_VALIDITY.VALID;
@@ -152,13 +161,13 @@ namespace ExperienceAndClasses {
 
             //local MPlayer only
             if (!is_local_player) {
-                Main.NewText("ERROR: Tried to set non-local player with SetClass! (please report)", Constants.COLOUR_ERROR);
+                Main.NewText("ERROR: Tried to set non-local player with SetClass! (please report)", Shared.COLOUR_ERROR);
                 return false;
             }
 
             //fail if secondary not allowed
             if (!is_primary && !Allow_Secondary) {
-                Main.NewText("Failed to set class because secondary class feature is locked!", Constants.COLOUR_ERROR);
+                Main.NewText("Failed to set class because secondary class feature is locked!", Shared.COLOUR_ERROR);
                 return false;
             }
 
@@ -187,23 +196,23 @@ namespace ExperienceAndClasses {
                         return true;
 
                     case CLASS_VALIDITY.INVALID_COMBINATION:
-                        Main.NewText("Failed to set class because combination is invalid!", Constants.COLOUR_ERROR);
+                        Main.NewText("Failed to set class because combination is invalid!", Shared.COLOUR_ERROR);
                         break;
 
                     case CLASS_VALIDITY.INVALID_ID:
-                        Main.NewText("Failed to set class because class id is invalid!", Constants.COLOUR_ERROR);
+                        Main.NewText("Failed to set class because class id is invalid!", Shared.COLOUR_ERROR);
                         break;
 
                     case CLASS_VALIDITY.INVALID_LEVEL:
-                        Main.NewText("Failed to set class because it is locked!", Constants.COLOUR_ERROR);
+                        Main.NewText("Failed to set class because it is locked!", Shared.COLOUR_ERROR);
                         break;
 
                     case CLASS_VALIDITY.INVALID_NON_LOCAL:
-                        Main.NewText("ERROR: Tried to set non-local player with SetClass! (please report)", Constants.COLOUR_ERROR);
+                        Main.NewText("ERROR: Tried to set non-local player with SetClass! (please report)", Shared.COLOUR_ERROR);
                         break;
 
                     default:
-                        Main.NewText("ERROR: Failed to set class for unknown reasons! (please report)", Constants.COLOUR_ERROR);
+                        Main.NewText("ERROR: Failed to set class for unknown reasons! (please report)", Shared.COLOUR_ERROR);
                         break;
                 }
             }

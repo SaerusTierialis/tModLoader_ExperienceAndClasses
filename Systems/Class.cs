@@ -66,7 +66,7 @@ namespace ExperienceAndClasses.Systems {
                 desc = "";
                 tier = 0;
                 id_prereq = ID.New;
-                texture = ModLoader.GetTexture("ExperienceAndClasses/Items/ClassToken_Novice");
+                texture = ModLoader.GetTexture("ExperienceAndClasses/Textures/Tokens/ClassToken_Novice");
 
                 //specifics
                 switch (id) {
@@ -78,7 +78,7 @@ namespace ExperienceAndClasses.Systems {
                         name = "Novice";
                         desc = "TODO";
                         tier = 1;
-                        texture = ModLoader.GetTexture("ExperienceAndClasses/Items/ClassToken_Novice");
+                        texture = ModLoader.GetTexture("ExperienceAndClasses/Textures/Tokens/ClassToken_Novice");
                         class_locations[0, 3] = id_byte;
                         break;
 
@@ -86,7 +86,7 @@ namespace ExperienceAndClasses.Systems {
                         name = "Warrior";
                         desc = "TODO";
                         tier = 2;
-                        texture = ModLoader.GetTexture("ExperienceAndClasses/Items/ClassToken_Warrior");
+                        texture = ModLoader.GetTexture("ExperienceAndClasses/Textures/Tokens/ClassToken_Warrior");
                         class_locations[1, 0] = id_byte;
                         id_prereq = ID.Novice;
                         break;
@@ -95,7 +95,7 @@ namespace ExperienceAndClasses.Systems {
                         name = "Ranger";
                         desc = "TODO";
                         tier = 2;
-                        texture = ModLoader.GetTexture("ExperienceAndClasses/Items/ClassToken_Ranger");
+                        texture = ModLoader.GetTexture("ExperienceAndClasses/Textures/Tokens/ClassToken_Ranger");
                         class_locations[1, 1] = id_byte;
                         id_prereq = ID.Novice;
                         break;
@@ -104,7 +104,7 @@ namespace ExperienceAndClasses.Systems {
                         name = "Mage";
                         desc = "TODO";
                         tier = 2;
-                        texture = ModLoader.GetTexture("ExperienceAndClasses/Items/ClassToken_Mage");
+                        texture = ModLoader.GetTexture("ExperienceAndClasses/Textures/Tokens/ClassToken_Mage");
                         class_locations[1, 2] = id_byte;
                         id_prereq = ID.Novice;
                         break;
@@ -113,7 +113,7 @@ namespace ExperienceAndClasses.Systems {
                         name = "Rogue";
                         desc = "TODO";
                         tier = 2;
-                        texture = ModLoader.GetTexture("ExperienceAndClasses/Items/ClassToken_Rogue");
+                        texture = ModLoader.GetTexture("ExperienceAndClasses/Textures/Tokens/ClassToken_Rogue");
                         class_locations[1, 3] = id_byte;
                         id_prereq = ID.Novice;
                         break;
@@ -122,7 +122,7 @@ namespace ExperienceAndClasses.Systems {
                         name = "Summoner";
                         desc = "TODO";
                         tier = 2;
-                        texture = ModLoader.GetTexture("ExperienceAndClasses/Items/ClassToken_Summoner");
+                        texture = ModLoader.GetTexture("ExperienceAndClasses/Textures/Tokens/ClassToken_Summoner");
                         class_locations[1, 4] = id_byte;
                         id_prereq = ID.Novice;
                         break;
@@ -131,7 +131,7 @@ namespace ExperienceAndClasses.Systems {
                         name = "Cleric";
                         desc = "TODO";
                         tier = 2;
-                        texture = ModLoader.GetTexture("ExperienceAndClasses/Items/ClassToken_Cleric");
+                        texture = ModLoader.GetTexture("ExperienceAndClasses/Textures/Tokens/ClassToken_Cleric");
                         class_locations[1, 5] = id_byte;
                         id_prereq = ID.Novice;
                         break;
@@ -140,7 +140,7 @@ namespace ExperienceAndClasses.Systems {
                         name = "Hybrid";
                         desc = "TODO";
                         tier = 2;
-                        texture = ModLoader.GetTexture("ExperienceAndClasses/Items/ClassToken_Hybrid");
+                        texture = ModLoader.GetTexture("ExperienceAndClasses/Textures/Tokens/ClassToken_Hybrid");
                         class_locations[1, 6] = id_byte;
                         id_prereq = ID.Novice;
                         break;
@@ -149,7 +149,7 @@ namespace ExperienceAndClasses.Systems {
                         name = "Knight";
                         desc = "TODO";
                         tier = 3;
-                        texture = ModLoader.GetTexture("ExperienceAndClasses/Items/ClassToken_Knight");
+                        texture = ModLoader.GetTexture("ExperienceAndClasses/Textures/Tokens/ClassToken_Knight");
                         class_locations[2, 0] = id_byte;
                         id_prereq = ID.Warrior;
                         break;
@@ -158,7 +158,7 @@ namespace ExperienceAndClasses.Systems {
                         name = "Berserker";
                         desc = "TODO";
                         tier = 3;
-                        texture = ModLoader.GetTexture("ExperienceAndClasses/Items/ClassToken_Berserker");
+                        texture = ModLoader.GetTexture("ExperienceAndClasses/Textures/Tokens/ClassToken_Berserker");
                         class_locations[3, 0] = id_byte;
                         id_prereq = ID.Warrior;
                         break;
@@ -167,7 +167,7 @@ namespace ExperienceAndClasses.Systems {
                         name = "Guardian";
                         desc = "TODO";
                         tier = 3;
-                        texture = ModLoader.GetTexture("ExperienceAndClasses/Items/ClassToken_Guardian");
+                        texture = ModLoader.GetTexture("ExperienceAndClasses/Textures/Tokens/ClassToken_Guardian");
                         class_locations[4, 0] = id_byte;
                         id_prereq = ID.Warrior;
                         break;
@@ -176,7 +176,7 @@ namespace ExperienceAndClasses.Systems {
                         name = "Sniper";
                         desc = "TODO";
                         tier = 3;
-                        texture = ModLoader.GetTexture("ExperienceAndClasses/Items/ClassToken_Sniper");
+                        texture = ModLoader.GetTexture("ExperienceAndClasses/Textures/Tokens/ClassToken_Sniper");
                         class_locations[2, 1] = id_byte;
                         id_prereq = ID.Ranger;
                         break;
@@ -185,7 +185,7 @@ namespace ExperienceAndClasses.Systems {
                         name = "Trickshot";
                         desc = "TODO";
                         tier = 3;
-                        texture = ModLoader.GetTexture("ExperienceAndClasses/Items/ClassToken_Trickshot");
+                        texture = ModLoader.GetTexture("ExperienceAndClasses/Textures/Tokens/ClassToken_Trickshot");
                         class_locations[3, 1] = id_byte;
                         id_prereq = ID.Ranger;
                         break;
@@ -194,7 +194,7 @@ namespace ExperienceAndClasses.Systems {
                         name = "Engineer";
                         desc = "TODO";
                         tier = 3;
-                        texture = ModLoader.GetTexture("ExperienceAndClasses/Items/ClassToken_Engineer");
+                        texture = ModLoader.GetTexture("ExperienceAndClasses/Textures/Tokens/ClassToken_Engineer");
                         class_locations[4, 1] = id_byte;
                         id_prereq = ID.Ranger;
                         break;
@@ -203,7 +203,7 @@ namespace ExperienceAndClasses.Systems {
                         name = "Mystic";
                         desc = "TODO";
                         tier = 3;
-                        texture = ModLoader.GetTexture("ExperienceAndClasses/Items/ClassToken_Mystic");
+                        texture = ModLoader.GetTexture("ExperienceAndClasses/Textures/Tokens/ClassToken_Mystic");
                         class_locations[2, 2] = id_byte;
                         id_prereq = ID.Mage;
                         break;
@@ -212,7 +212,7 @@ namespace ExperienceAndClasses.Systems {
                         name = "Sage";
                         desc = "TODO";
                         tier = 3;
-                        texture = ModLoader.GetTexture("ExperienceAndClasses/Items/ClassToken_Sage");
+                        texture = ModLoader.GetTexture("ExperienceAndClasses/Textures/Tokens/ClassToken_Sage");
                         class_locations[3, 2] = id_byte;
                         id_prereq = ID.Mage;
                         break;
@@ -221,7 +221,7 @@ namespace ExperienceAndClasses.Systems {
                         name = "Assassin";
                         desc = "TODO";
                         tier = 3;
-                        texture = ModLoader.GetTexture("ExperienceAndClasses/Items/ClassToken_Assassin");
+                        texture = ModLoader.GetTexture("ExperienceAndClasses/Textures/Tokens/ClassToken_Assassin");
                         class_locations[2, 3] = id_byte;
                         id_prereq = ID.Rogue;
                         break;
@@ -230,7 +230,7 @@ namespace ExperienceAndClasses.Systems {
                         name = "Ninja";
                         desc = "TODO";
                         tier = 3;
-                        texture = ModLoader.GetTexture("ExperienceAndClasses/Items/ClassToken_Ninja");
+                        texture = ModLoader.GetTexture("ExperienceAndClasses/Textures/Tokens/ClassToken_Ninja");
                         class_locations[3, 3] = id_byte;
                         id_prereq = ID.Rogue;
                         break;
@@ -239,7 +239,7 @@ namespace ExperienceAndClasses.Systems {
                         name = "Soul Binder";
                         desc = "TODO";
                         tier = 3;
-                        texture = ModLoader.GetTexture("ExperienceAndClasses/Items/ClassToken_SoulBinder");
+                        texture = ModLoader.GetTexture("ExperienceAndClasses/Textures/Tokens/ClassToken_SoulBinder");
                         class_locations[2, 4] = id_byte;
                         id_prereq = ID.Summoner;
                         break;
@@ -248,7 +248,7 @@ namespace ExperienceAndClasses.Systems {
                         name = "Hivemind";
                         desc = "TODO";
                         tier = 3;
-                        texture = ModLoader.GetTexture("ExperienceAndClasses/Items/ClassToken_Hivemind");
+                        texture = ModLoader.GetTexture("ExperienceAndClasses/Textures/Tokens/ClassToken_Hivemind");
                         class_locations[3, 4] = id_byte;
                         id_prereq = ID.Summoner;
                         break;
@@ -257,7 +257,7 @@ namespace ExperienceAndClasses.Systems {
                         name = "Saint";
                         desc = "TODO";
                         tier = 3;
-                        texture = ModLoader.GetTexture("ExperienceAndClasses/Items/ClassToken_Saint");
+                        texture = ModLoader.GetTexture("ExperienceAndClasses/Textures/Tokens/ClassToken_Saint");
                         class_locations[2, 5] = id_byte;
                         id_prereq = ID.Cleric;
                         break;
@@ -266,7 +266,7 @@ namespace ExperienceAndClasses.Systems {
                         name = "Hybrid Prime";
                         desc = "TODO";
                         tier = 3;
-                        texture = ModLoader.GetTexture("ExperienceAndClasses/Items/ClassToken_HybridPrime");
+                        texture = ModLoader.GetTexture("ExperienceAndClasses/Textures/Tokens/ClassToken_HybridPrime");
                         class_locations[2, 6] = id_byte;
                         id_prereq = ID.Hybrid;
                         break;

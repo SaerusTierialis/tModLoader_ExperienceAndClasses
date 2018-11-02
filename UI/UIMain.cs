@@ -14,7 +14,6 @@ namespace ExperienceAndClasses.UI {
     class UIMain : UIState {
         private const float WIDTH = 600f;
         private const float HEIGHT = 400f;
-        private const float CORNER_BUTTON_SIZE = 22f;
         private const float PADDING = 5f;
         public const float CLASS_BUTTON_SIZE = 36f;
         private const float CLASS_ROW_PADDING = 40f;
@@ -51,28 +50,27 @@ namespace ExperienceAndClasses.UI {
             panel.Height.Set(HEIGHT, 0f);
             panel.BackgroundColor = COLOR_MAIN;
 
-            Texture2D buttonPlayClose = ModLoader.GetTexture("ExperienceAndClasses/UI/ButtonClose");
-            UIHoverImageButton button_close = new UIHoverImageButton(buttonPlayClose, "Close");
-            button_close.Left.Set(WIDTH - PADDING - CORNER_BUTTON_SIZE, 0f);
+            UIHoverImageButton button_close = new UIHoverImageButton(Shared.TEXTURE_CORNER_BUTTON_CLOSE, "Close");
+            button_close.Left.Set(WIDTH - PADDING - Shared.TEXTURE_CORNER_BUTTON_SIZE, 0f);
             button_close.Top.Set(PADDING, 0f);
-            button_close.Width.Set(CORNER_BUTTON_SIZE, 0f);
-            button_close.Height.Set(CORNER_BUTTON_SIZE, 0f);
+            button_close.Width.Set(Shared.TEXTURE_CORNER_BUTTON_SIZE, 0f);
+            button_close.Height.Set(Shared.TEXTURE_CORNER_BUTTON_SIZE, 0f);
             button_close.OnClick += new MouseEvent(ButtonClickClose);
             panel.Append(button_close);
 
-            button_auto = new UIHoverImageButton(buttonPlayClose, "Error");
-            button_auto.Left.Set(WIDTH - PADDING - (CORNER_BUTTON_SIZE * 2), 0f);
+            button_auto = new UIHoverImageButton(Shared.TEXTURE_BLANK, "Error");
+            button_auto.Left.Set(WIDTH - PADDING - (Shared.TEXTURE_CORNER_BUTTON_SIZE * 2), 0f);
             button_auto.Top.Set(PADDING, 0f);
-            button_auto.Width.Set(CORNER_BUTTON_SIZE, 0f);
-            button_auto.Height.Set(CORNER_BUTTON_SIZE, 0f);
+            button_auto.Width.Set(Shared.TEXTURE_CORNER_BUTTON_SIZE, 0f);
+            button_auto.Height.Set(Shared.TEXTURE_CORNER_BUTTON_SIZE, 0f);
             button_auto.OnClick += new MouseEvent(ButtonClickAuto);
             panel.Append(button_auto);
 
-            button_pin = new UIHoverImageButton(buttonPlayClose, "Error");
-            button_pin.Left.Set(WIDTH - PADDING - (CORNER_BUTTON_SIZE * 3), 0f);
+            button_pin = new UIHoverImageButton(Shared.TEXTURE_BLANK, "Error");
+            button_pin.Left.Set(WIDTH - PADDING - (Shared.TEXTURE_CORNER_BUTTON_SIZE * 3), 0f);
             button_pin.Top.Set(PADDING, 0f);
-            button_pin.Width.Set(CORNER_BUTTON_SIZE, 0f);
-            button_pin.Height.Set(CORNER_BUTTON_SIZE, 0f);
+            button_pin.Width.Set(Shared.TEXTURE_CORNER_BUTTON_SIZE, 0f);
+            button_pin.Height.Set(Shared.TEXTURE_CORNER_BUTTON_SIZE, 0f);
             button_pin.OnClick += new MouseEvent(ButtonClickLock);
             panel.Append(button_pin);
 
@@ -83,12 +81,12 @@ namespace ExperienceAndClasses.UI {
             panel_class.SetPadding(0);
             panel_class.Left.Set(PADDING, 0f);
             panel_class.Top.Set(PADDING, 0f);
-            panel_class.Width.Set((PADDING * 2) + ((CLASS_BUTTON_SIZE+ CLASS_COL_PADDING) * Systems.Classes.class_locations.GetLength(1)), 0f);
+            panel_class.Width.Set((PADDING * 4) + ((CLASS_BUTTON_SIZE + CLASS_COL_PADDING) * Systems.Classes.class_locations.GetLength(1)) - CLASS_COL_PADDING, 0f);
             panel_class.Height.Set(HEIGHT - (PADDING*2), 0f);
             panel_class.BackgroundColor = COLOR_CLASS;
             panel.Append(panel_class);
 
-            Color color = Constants.COLOUR_CLASS_PRIMARY;
+            Color color = Shared.COLOUR_CLASS_PRIMARY;
             color.A = INDICATOR_ALPHA;
             indicate_primary = new UIPanel();
             indicate_primary.SetPadding(0);
@@ -99,9 +97,10 @@ namespace ExperienceAndClasses.UI {
             indicate_primary.BackgroundColor = color;
             indicate_primary.OnClick += new MouseEvent(PrimaryButtonLeft);
             indicate_primary.OnRightClick += new MouseEvent(PrimaryButtonRight);
+            indicate_primary.OnMouseOver += new MouseEvent(PrimaryButtonHover);
             panel_class.Append(indicate_primary);
 
-            color = Constants.COLOUR_CLASS_SECONDARY;
+            color = Shared.COLOUR_CLASS_SECONDARY;
             color.A = INDICATOR_ALPHA;
             indicate_secondary = new UIPanel();
             indicate_secondary.SetPadding(0);
@@ -112,6 +111,7 @@ namespace ExperienceAndClasses.UI {
             indicate_secondary.BackgroundColor = color;
             indicate_secondary.OnClick += new MouseEvent(SecondaryButtonLeft);
             indicate_secondary.OnRightClick += new MouseEvent(SecondaryButtonRight);
+            indicate_secondary.OnMouseOver += new MouseEvent(SecondaryButtonHover);
             panel_class.Append(indicate_secondary);
 
             class_buttons = new List<ClassButton>();
@@ -151,12 +151,12 @@ namespace ExperienceAndClasses.UI {
         public void SetPinned(bool new_state) {
             panel.pinned = new_state;
             if (panel.pinned) {
-                button_pin.SetImage(ModLoader.GetTexture("ExperienceAndClasses/UI/ButtonPinned"));
+                button_pin.SetImage(Shared.TEXTURE_CORNER_BUTTON_PINNED);
                 button_pin.hoverText = "Allow Dragging";
             }
             else {
                 panel.stop_pin = true;
-                button_pin.SetImage(ModLoader.GetTexture("ExperienceAndClasses/UI/ButtonUnpinned"));
+                button_pin.SetImage(Shared.TEXTURE_CORNER_BUTTON_UNPINNED);
                 button_pin.hoverText = "Prevent Dragging";
             }
         }
@@ -164,11 +164,11 @@ namespace ExperienceAndClasses.UI {
         public void SetAuto(bool new_state) {
             Auto = new_state;
             if (Auto) {
-                button_auto.SetImage(ModLoader.GetTexture("ExperienceAndClasses/UI/ButtonAuto"));
+                button_auto.SetImage(Shared.TEXTURE_CORNER_BUTTON_AUTO);
                 button_auto.hoverText = "Don't Show Menu In Inventory Screen";
             }
             else {
-                button_auto.SetImage(ModLoader.GetTexture("ExperienceAndClasses/UI/ButtonUnauto"));
+                button_auto.SetImage(Shared.TEXTURE_CORNER_BUTTON_NO_AUTO);
                 button_auto.hoverText = "Show Menu In Inventory Screen";
             }
         }
@@ -218,11 +218,17 @@ namespace ExperienceAndClasses.UI {
         private void PrimaryButtonRight(UIMouseEvent evt, UIElement listeningElement) {
             button_primary.RightClick(evt);
         }
+        private void PrimaryButtonHover(UIMouseEvent evt, UIElement listeningElement) {
+            button_primary.MouseOver(evt);
+        }
         private void SecondaryButtonLeft(UIMouseEvent evt, UIElement listeningElement) {
             button_secondary.Click(evt);
         }
         private void SecondaryButtonRight(UIMouseEvent evt, UIElement listeningElement) {
             button_secondary.RightClick(evt);
+        }
+        private void SecondaryButtonHover(UIMouseEvent evt, UIElement listeningElement) {
+            button_secondary.MouseOver(evt);
         }
     }
 }
