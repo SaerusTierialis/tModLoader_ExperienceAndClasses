@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.GameContent.UI.Elements;
+using Terraria.ModLoader;
 using Terraria.UI;
 
 namespace ExperienceAndClasses.UI {
@@ -9,35 +10,86 @@ namespace ExperienceAndClasses.UI {
     class ClassButton : UIImageButton {
         private const float TEXT_SCALE = 0.7f;
         private const float TEXT_OFFSET = 5f;
+        private const float VISIBILITY_SELECTED = 1f;
+        private const float VISIBILITY_NOT_SELECTED = 0.4f;
 
-        private Systems.Classes.ID class_id;
+        public byte class_id { get; private set; }
         UIText text;
+        UIImage image_lock;
 
-        public ClassButton(Texture2D texture, Systems.Classes.ID class_id) : base(texture) {
+        public ClassButton(Texture2D texture, byte class_id) : base(texture) {
             this.class_id = class_id;
             OnClick += new MouseEvent(ClickPrimary);
-            OnRightClick += new MouseEvent(ClickSubclass);
-
+            OnRightClick += new MouseEvent(ClickSecondary);
+            
             text = new UIText("", TEXT_SCALE);
             Append(text);
 
-            UpdateText();
+            image_lock = new UIImage(Constants.TEXTURE_BLANK);
+            image_lock.Width.Set(Constants.TEXTURE_LOCK_WIDTH, 0f);
+            image_lock.Height.Set(Constants.TEXTURE_LOCK_HEIGHT, 0f);
+            image_lock.Left.Set(UIMain.CLASS_BUTTON_SIZE/2 - Constants.TEXTURE_LOCK_WIDTH/2, 0f);
+            image_lock.Top.Set(UIMain.CLASS_BUTTON_SIZE/2 - Constants.TEXTURE_LOCK_HEIGHT/2, 0f);
+            Append(image_lock);
+
+            SetVisibility(1f, VISIBILITY_NOT_SELECTED);
         }
 
         private void ClickPrimary(UIMouseEvent evt, UIElement listeningElement) {
-            Main.NewText("Primary: " + class_id);
+            if (ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary.ID == class_id) {
+                ExperienceAndClasses.LOCAL_MPLAYER.LocalSetClass((byte)Systems.Classes.ID.None, true);
+            }
+            else {
+                ExperienceAndClasses.LOCAL_MPLAYER.LocalSetClass(class_id, true);
+            }
         }
 
-        private void ClickSubclass(UIMouseEvent evt, UIElement listeningElement) {
-            Main.NewText("Subclass: " + class_id);
+        private void ClickSecondary(UIMouseEvent evt, UIElement listeningElement) {
+            if (ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary.ID == class_id) {
+                ExperienceAndClasses.LOCAL_MPLAYER.LocalSetClass((byte)Systems.Classes.ID.None, false);
+            }
+            else {
+                ExperienceAndClasses.LOCAL_MPLAYER.LocalSetClass(class_id, false);
+            }
         }
 
-        public void UpdateText() {
-            string message = "Lv." + (1 + Main.rand.Next(255));
-            text.SetText(message, TEXT_SCALE, false);
-            float message_size = Main.fontMouseText.MeasureString(message).X * TEXT_SCALE;
-            text.Left.Set(UIMain.CLASS_BUTTON_SIZE/2 - message_size/2, 0f);
-            text.Top.Set(UIMain.CLASS_BUTTON_SIZE + TEXT_OFFSET, 0F);
+        public void Update() {
+            byte level = ExperienceAndClasses.LOCAL_MPLAYER.class_levels[class_id];
+            if (level > 0) {
+                //not locked
+                image_lock.SetImage(Constants.TEXTURE_BLANK);
+
+                //text level
+                string str = "";
+                if (level >= Constants.MAX_LEVEL) {
+                    str = "MAX";
+                }
+                else {
+                    str = "Lv." + level;
+                }
+                text.SetText(str, TEXT_SCALE, false);
+                float message_size = Main.fontMouseText.MeasureString(str).X * TEXT_SCALE;
+                text.Left.Set(UIMain.CLASS_BUTTON_SIZE/2 - message_size / 2, 0f);
+                text.Top.Set(UIMain.CLASS_BUTTON_SIZE + TEXT_OFFSET, 0F);
+                text.Recalculate();
+
+                if ((ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary.ID == class_id) || (ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary.ID == class_id)) {
+                    //selected
+                    SetVisibility(1f, VISIBILITY_SELECTED);
+                }
+                else {
+                    //not selected
+                    SetVisibility(1f, VISIBILITY_NOT_SELECTED);
+                }
+            }
+            else {
+                //locked
+                image_lock.SetImage(Constants.TEXTURE_LOCK);
+                SetVisibility(1f, VISIBILITY_NOT_SELECTED);
+
+                //no text
+                text.SetText("");
+            }
         }
     }
 

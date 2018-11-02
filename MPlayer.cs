@@ -1,14 +1,7 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Terraria;
-using Terraria.DataStructures;
 using Terraria.GameInput;
-using Terraria.Localization;
 using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
 
@@ -27,20 +20,37 @@ namespace ExperienceAndClasses {
 
         public bool is_local_player = false;
         private TagCompound load_tag;
+        public byte[] class_levels = new byte[(byte)Systems.Classes.ID.NUMBER_OF_IDs];
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Instance Vars (syncing) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         public int sync_test = 0;
 
+        public Systems.Class Class_Primary { get; private set; }
+        public Systems.Class Class_Secondary { get; private set; }
+        public byte Class_Primary_Level { get; private set; }
+        public byte Class_Secondary_Level { get; private set; }
+        public bool Allow_Secondary { get; private set; }
+
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Initialize ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+        public MPlayer() {
+            Class_Primary = Systems.Classes.CLASS_LOOKUP[(byte)Systems.Classes.ID.New];
+            Class_Secondary = Systems.Classes.CLASS_LOOKUP[(byte)Systems.Classes.ID.New];
+            Allow_Secondary = true;
+
+            //temp: set random levels
+            class_levels[(byte)Systems.Classes.ID.Novice] = 10;
+            class_levels[(byte)Systems.Classes.ID.Mage] = 50;
+            class_levels[(byte)Systems.Classes.ID.Sage] = 14;
+            class_levels[(byte)Systems.Classes.ID.Warrior] = 34;
+        }
 
         /// <summary>
         /// instanced arrays must be initialized here (also called during cloning, etc)
         /// </summary>
         public override void Initialize() {
             // instanced arrays must be initialized here
-
-
 
 
 
@@ -64,6 +74,9 @@ namespace ExperienceAndClasses {
                 ExperienceAndClasses.user_interface_state_main.SetPosition(Commons.TryGet<float>(load_tag, "ui_main_left", 100f), Commons.TryGet<float>(load_tag, "ui_main_top", 100f));
                 ExperienceAndClasses.user_interface_state_main.SetAuto(Commons.TryGet<bool>(load_tag, "ui_main_auto", true));
                 ExperienceAndClasses.user_interface_state_main.SetPinned(Commons.TryGet<bool>(load_tag, "ui_main_pinned", false));
+
+                //update class info
+                LocalUpdateClassInfo();
             }
         }
 
@@ -75,6 +88,170 @@ namespace ExperienceAndClasses {
             }
 
             //Main.NewText(player.name + " " + sync_test); //working
+        }
+
+        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ XP & Class ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+        public enum CLASS_VALIDITY : byte {
+            VALID,
+            INVALID_UNKNOWN,
+            INVALID_ID,
+            INVALID_LEVEL,
+            INVALID_COMBINATION,
+            INVALID_NON_LOCAL,
+        }
+        public CLASS_VALIDITY LocalCheckClassValid(byte id, bool is_primary) {
+            //local MPlayer only
+            if (!is_local_player) return CLASS_VALIDITY.INVALID_NON_LOCAL;
+
+            if (id == (byte)Systems.Classes.ID.None) {
+                return CLASS_VALIDITY.VALID; //setting to no class is always allowed
+            }
+            else {
+                if (id >= (byte)Systems.Classes.ID.NUMBER_OF_IDs) {
+                    return CLASS_VALIDITY.INVALID_ID; //invalid idsss
+                }
+                else {
+                    byte id_same, id_other;
+                    if (is_primary) {
+                        id_same = Class_Primary.ID;
+                        id_other = Class_Secondary.ID;
+                    }
+                    else {
+                        id_same = Class_Secondary.ID;
+                        id_other = Class_Primary.ID;
+                    }
+
+                    if ((class_levels[id] <= 0) && (id != (byte)Systems.Classes.ID.None)) {
+                        return CLASS_VALIDITY.INVALID_LEVEL; //locked class
+                    }
+                    else {
+                        if (id != id_same) {
+                            byte id_pre = id_other;
+                            while (id_pre != (byte)Systems.Classes.ID.New) {
+                                if (id == id_pre) {
+                                    return CLASS_VALIDITY.INVALID_COMBINATION; //invalid combination (same as other class or one of its prereqs)
+                                }
+                                else {
+                                    id_pre = Systems.Classes.CLASS_LOOKUP[id_pre].ID_Prereq;
+                                }
+                            }
+
+                            //valid choice
+                            return CLASS_VALIDITY.VALID;
+                        }
+                    }
+                }
+                //default
+                return CLASS_VALIDITY.INVALID_UNKNOWN;
+            }
+        }
+
+        public bool LocalSetClass(byte id, bool is_primary) {
+            Main.NewText(Class_Primary.ID + " " + Class_Secondary.ID + " " + id + " " + is_primary);
+
+            //local MPlayer only
+            if (!is_local_player) {
+                Main.NewText("ERROR: Tried to set non-local player with SetClass! (please report)", Constants.COLOUR_ERROR);
+                return false;
+            }
+
+            //fail if secondary not allowed
+            if (!is_primary && !Allow_Secondary) {
+                Main.NewText("Failed to set class because secondary class feature is locked!", Constants.COLOUR_ERROR);
+                return false;
+            }
+
+            byte id_other;
+            if (is_primary) {
+                id_other = Class_Secondary.ID;
+            }
+            else {
+                id_other = Class_Primary.ID;
+            }
+            if ((id == id_other) && (id != (byte)Systems.Classes.ID.None)) {
+                //if setting to other set class, just swap
+                return LocalSwapClass();
+            }
+            else {
+                CLASS_VALIDITY valid = LocalCheckClassValid(id, is_primary);
+                switch (valid) {
+                    case CLASS_VALIDITY.VALID:
+                        if (is_primary) {
+                            Class_Primary = Systems.Classes.CLASS_LOOKUP[id];
+                        }
+                        else {
+                            Class_Secondary = Systems.Classes.CLASS_LOOKUP[id];
+                        }
+                        LocalUpdateClassInfo();
+                        return true;
+
+                    case CLASS_VALIDITY.INVALID_COMBINATION:
+                        Main.NewText("Failed to set class because combination is invalid!", Constants.COLOUR_ERROR);
+                        break;
+
+                    case CLASS_VALIDITY.INVALID_ID:
+                        Main.NewText("Failed to set class because class id is invalid!", Constants.COLOUR_ERROR);
+                        break;
+
+                    case CLASS_VALIDITY.INVALID_LEVEL:
+                        Main.NewText("Failed to set class because it is locked!", Constants.COLOUR_ERROR);
+                        break;
+
+                    case CLASS_VALIDITY.INVALID_NON_LOCAL:
+                        Main.NewText("ERROR: Tried to set non-local player with SetClass! (please report)", Constants.COLOUR_ERROR);
+                        break;
+
+                    default:
+                        Main.NewText("ERROR: Failed to set class for unknown reasons! (please report)", Constants.COLOUR_ERROR);
+                        break;
+                }
+            }
+
+            //default
+            return false;
+        }
+
+        public bool LocalSwapClass() {
+            //local MPlayer only
+            if (!is_local_player) return false;
+
+            Systems.Class temp = Class_Primary;
+            Class_Primary = Class_Secondary;
+            Class_Secondary = temp;
+            LocalUpdateClassInfo();
+            return true;
+        }
+
+        public void LocalUpdateClassInfo() {
+            //local MPlayer only
+            if (!is_local_player) return;
+
+            //prevent secondary without primary class (move secondary to primary)
+            if ((Class_Primary.ID == (byte)Systems.Classes.ID.New) || (Class_Primary.ID == (byte)Systems.Classes.ID.None)) {
+                Class_Primary = Class_Secondary;
+                Class_Secondary = Systems.Classes.CLASS_LOOKUP[(byte)Systems.Classes.ID.None];
+            }
+
+            //any "new" class should be set "none"
+            if (Class_Primary.ID == (byte)Systems.Classes.ID.New) {
+                Class_Primary = Systems.Classes.CLASS_LOOKUP[(byte)Systems.Classes.ID.None];
+            }
+            if (Class_Secondary.ID == (byte)Systems.Classes.ID.New) {
+                Class_Secondary = Systems.Classes.CLASS_LOOKUP[(byte)Systems.Classes.ID.None];
+            }
+
+            //clear secondary if not allowed
+            if (!Allow_Secondary) {
+                Class_Secondary = Systems.Classes.CLASS_LOOKUP[(byte)Systems.Classes.ID.None];
+            }
+
+            //set current levels for easier checking
+            Class_Primary_Level = class_levels[Class_Primary.ID];
+            Class_Secondary_Level = class_levels[Class_Secondary.ID];
+
+            //update UI
+            ExperienceAndClasses.user_interface_state_main.UpdateClassInfo();
         }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Hotkeys ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
@@ -94,6 +271,9 @@ namespace ExperienceAndClasses {
         public override void clientClone(ModPlayer clientClone) {
             MPlayer clone = clientClone as MPlayer;
             clone.sync_test = sync_test;
+
+            //TODO: current classes
+            //TODO: class levels
         }
 
         /// <summary>
@@ -120,10 +300,21 @@ namespace ExperienceAndClasses {
                     Main.NewText("sent");
                 }
             }
+
+            //TODO: current classes
+            //TODO: class levels
         }
 
+        /// <summary>
+        /// full sync (called to share current players with new players + new player with current players)
+        /// </summary>
+        /// <param name="toWho"></param>
+        /// <param name="fromWho"></param>
+        /// <param name="newPlayer"></param>
         public override void SyncPlayer(int toWho, int fromWho, bool newPlayer) {
-            //full sync (called to share current players with new players + new player with current players)
+
+            //TODO: current classes
+            //TODO: class levels
         }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Drawing ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
@@ -174,13 +365,17 @@ namespace ExperienceAndClasses {
                 {"ui_main_auto", ExperienceAndClasses.user_interface_state_main.Auto },
                 {"ui_main_pinned", ExperienceAndClasses.user_interface_state_main.GetPinned() },
             };
+            //TODO: current classes
+            //TODO: class levels
         }
 
         public override void Load(TagCompound tag) {
             //ui settings must be stored and applied later when entering game
             load_tag = tag;
 
-            
+
+            //TODO: current classes
+            //TODO: class levels
         }
 
     }

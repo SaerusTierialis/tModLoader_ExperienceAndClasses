@@ -26,6 +26,13 @@ namespace ExperienceAndClasses.UI {
         private DragableUIPanel panel;
         private UIHoverImageButton button_pin, button_auto;
 
+        private const float INDICATOR_WIDTH = CLASS_BUTTON_SIZE + (PADDING * 2);
+        private const float INDICATOR_HEIGHT = CLASS_BUTTON_SIZE + CLASS_ROW_PADDING - (PADDING * 2);
+        private const float INDICATOR_OFFSETS = -PADDING;
+        private const byte INDICATOR_ALPHA = 50;
+        private UIPanel indicate_primary, indicate_secondary;
+        private ClassButton button_primary, button_secondary;
+
         private List<ClassButton> class_buttons;
 
         public bool Visible { get; set; }
@@ -81,17 +88,42 @@ namespace ExperienceAndClasses.UI {
             panel_class.BackgroundColor = COLOR_CLASS;
             panel.Append(panel_class);
 
+            Color color = Constants.COLOUR_CLASS_PRIMARY;
+            color.A = INDICATOR_ALPHA;
+            indicate_primary = new UIPanel();
+            indicate_primary.SetPadding(0);
+            indicate_primary.Left.Set(0f, 0f);
+            indicate_primary.Top.Set(0f, 0f);
+            indicate_primary.Width.Set(INDICATOR_WIDTH, 0f);
+            indicate_primary.Height.Set(INDICATOR_HEIGHT, 0f);
+            indicate_primary.BackgroundColor = color;
+            indicate_primary.OnClick += new MouseEvent(PrimaryButtonLeft);
+            indicate_primary.OnRightClick += new MouseEvent(PrimaryButtonRight);
+            panel_class.Append(indicate_primary);
+
+            color = Constants.COLOUR_CLASS_SECONDARY;
+            color.A = INDICATOR_ALPHA;
+            indicate_secondary = new UIPanel();
+            indicate_secondary.SetPadding(0);
+            indicate_secondary.Left.Set(0f, 0f);
+            indicate_secondary.Top.Set(0f, 0f);
+            indicate_secondary.Width.Set(INDICATOR_WIDTH, 0f);
+            indicate_secondary.Height.Set(INDICATOR_HEIGHT, 0f);
+            indicate_secondary.BackgroundColor = color;
+            indicate_secondary.OnClick += new MouseEvent(SecondaryButtonLeft);
+            indicate_secondary.OnRightClick += new MouseEvent(SecondaryButtonRight);
+            panel_class.Append(indicate_secondary);
+
             class_buttons = new List<ClassButton>();
             ClassButton button;
-            Systems.Classes.ID id;
-
+            byte id;
             for (byte row = 0; row<Systems.Classes.class_locations.GetLength(0); row++) {
                 for (byte col = 0; col<Systems.Classes.class_locations.GetLength(1); col++) {
                     id = Systems.Classes.class_locations[row, col];
 
-                    if (id != Systems.Classes.ID.New) {
-                        button = new ClassButton(Systems.Classes.CLASS_LOOKUP[(byte)id].Texture, id);
-                        button.Left.Set(PADDING + (col * (CLASS_BUTTON_SIZE + CLASS_COL_PADDING)), 0f);
+                    if (id != (byte)Systems.Classes.ID.New) {
+                        button = new ClassButton(Systems.Classes.CLASS_LOOKUP[id].Texture, id);
+                        button.Left.Set((PADDING*2) + (col * (CLASS_BUTTON_SIZE + CLASS_COL_PADDING)), 0f);
                         button.Top.Set(PADDING + (row * (CLASS_BUTTON_SIZE + CLASS_ROW_PADDING)), 0f);
                         button.Width.Set(CLASS_BUTTON_SIZE, 0f);
                         button.Height.Set(CLASS_BUTTON_SIZE, 0f);
@@ -157,6 +189,40 @@ namespace ExperienceAndClasses.UI {
 
         public bool GetPinned() {
             return panel.pinned;
+        }
+
+        public void UpdateClassInfo() {
+            //class buttons
+            indicate_primary.Left.Set(-10000f, 0f);
+            indicate_secondary.Left.Set(-10000f, 0f);
+            foreach (ClassButton button in class_buttons) {
+                if (button.class_id == ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary.ID) {
+                    indicate_primary.Left.Set(button.Left.Pixels + INDICATOR_OFFSETS, 0f);
+                    indicate_primary.Top.Set(button.Top.Pixels + INDICATOR_OFFSETS, 0f);
+                    button_primary = button;
+                }
+                else if (button.class_id == ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary.ID) {
+                    indicate_secondary.Left.Set(button.Left.Pixels + INDICATOR_OFFSETS, 0f);
+                    indicate_secondary.Top.Set(button.Top.Pixels + INDICATOR_OFFSETS, 0f);
+                    button_secondary = button;
+                }
+                button.Update();
+            }
+            indicate_primary.Recalculate();
+            indicate_secondary.Recalculate();
+        }
+
+        private void PrimaryButtonLeft(UIMouseEvent evt, UIElement listeningElement) {
+            button_primary.Click(evt);
+        }
+        private void PrimaryButtonRight(UIMouseEvent evt, UIElement listeningElement) {
+            button_primary.RightClick(evt);
+        }
+        private void SecondaryButtonLeft(UIMouseEvent evt, UIElement listeningElement) {
+            button_secondary.Click(evt);
+        }
+        private void SecondaryButtonRight(UIMouseEvent evt, UIElement listeningElement) {
+            button_secondary.RightClick(evt);
         }
     }
 }
