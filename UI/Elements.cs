@@ -117,9 +117,8 @@ namespace ExperienceAndClasses.UI {
         public bool Pinned { get; private set; }
 
         private UIHoverImageButton button_pinned, button_auto, button_close;
-        private float padding;
 
-        public DragableUIPanel(float width, float height, Color color, float padding, MouseEvent event_close, bool enable_auto, bool enable_pin) : base() {
+        public DragableUIPanel(float width, float height, Color color, MouseEvent event_close, bool enable_auto, bool enable_pin) : base() {
             Auto = true;
             Pinned = false;
 
@@ -130,7 +129,6 @@ namespace ExperienceAndClasses.UI {
             BackgroundColor = color;
 
             SetPadding(0);
-            this.padding = padding;
 
             Left.Set(0f, 0f);
             Top.Set(0f, 0f);
@@ -167,18 +165,18 @@ namespace ExperienceAndClasses.UI {
         }
 
         public override void Recalculate() {
-            float left = Width.Pixels - padding;
+            float left = Width.Pixels - Shared.UI_PADDING;
             if (button_close != null) {
                 button_close.Left.Set(left -= Shared.TEXTURE_CORNER_BUTTON_SIZE, 0f);
-                button_close.Top.Set(padding, 0f);
+                button_close.Top.Set(Shared.UI_PADDING, 0f);
             }
             if (button_auto != null) {
                 button_auto.Left.Set(left -= Shared.TEXTURE_CORNER_BUTTON_SIZE, 0f);
-                button_auto.Top.Set(padding, 0f);
+                button_auto.Top.Set(Shared.UI_PADDING, 0f);
             }
             if (button_pinned != null) {
                 button_pinned.Left.Set(left -= Shared.TEXTURE_CORNER_BUTTON_SIZE, 0f);
-                button_pinned.Top.Set(padding, 0f);
+                button_pinned.Top.Set(Shared.UI_PADDING, 0f);
             }
 
             base.Recalculate();

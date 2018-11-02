@@ -15,6 +15,8 @@ namespace ExperienceAndClasses {
 
         public static readonly Color COLOUR_ERROR = new Color(1f, 0f, 0f);
 
+        public static readonly Color COLOR_UI_MAIN = new Color(73, 94, 171);
+
         public static readonly Color COLOUR_CLASS_PRIMARY = new Color(0.5f, 1f, 0f);
         public static readonly Color COLOUR_CLASS_SECONDARY = new Color(1f, 0.9f, 0f);
 
@@ -32,6 +34,10 @@ namespace ExperienceAndClasses {
         public static readonly Texture2D TEXTURE_LOCK = ModLoader.GetTexture("ExperienceAndClasses/Textures/UI/Lock_24_30");
         public static readonly float TEXTURE_LOCK_WIDTH = TEXTURE_LOCK.Width;
         public static readonly float TEXTURE_LOCK_HEIGHT = TEXTURE_LOCK.Height;
+
+        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ UI ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+        public const float UI_PADDING = 5f;
 
     }
 }
