@@ -33,12 +33,12 @@ namespace ExperienceAndClasses.UI {
         private const byte INDICATOR_ALPHA = 50;
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Variables ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-        private static DragableUIPanel panel;
-        
-        private static UIPanel indicate_primary, indicate_secondary;
-        private static ClassButton button_primary, button_secondary;
+        public DragableUIPanel panel { get; private set; }
 
-        private static List<ClassButton> class_buttons;
+        private UIPanel indicate_primary, indicate_secondary;
+        private ClassButton button_primary, button_secondary;
+
+        private List<ClassButton> class_buttons;
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Initialize ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         protected override void InitializeState() {
@@ -65,6 +65,7 @@ namespace ExperienceAndClasses.UI {
             indicate_primary.OnClick += new UIElement.MouseEvent(PrimaryButtonLeft);
             indicate_primary.OnRightClick += new UIElement.MouseEvent(PrimaryButtonRight);
             indicate_primary.OnMouseOver += new UIElement.MouseEvent(PrimaryButtonHover);
+            indicate_primary.OnMouseOut += new UIElement.MouseEvent(PrimaryButtonDeHover);
             panel_class.Append(indicate_primary);
 
             color = Shared.COLOUR_CLASS_SECONDARY;
@@ -79,6 +80,7 @@ namespace ExperienceAndClasses.UI {
             indicate_secondary.OnClick += new UIElement.MouseEvent(SecondaryButtonLeft);
             indicate_secondary.OnRightClick += new UIElement.MouseEvent(SecondaryButtonRight);
             indicate_secondary.OnMouseOver += new UIElement.MouseEvent(SecondaryButtonHover);
+            indicate_secondary.OnMouseOut += new UIElement.MouseEvent(SecondaryButtonDeHover);
             panel_class.Append(indicate_secondary);
 
             class_buttons = new List<ClassButton>();
@@ -104,41 +106,7 @@ namespace ExperienceAndClasses.UI {
         }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Methods ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-        private static void ButtonClickClose(UIMouseEvent evt, UIElement listeningElement) {
-            Instance.Visibility = !Instance.Visibility;
-        }
-
-        public static void SetPosition(float left, float top) {
-            panel.Left.Set(left, 0f);
-            panel.Top.Set(top, 0f);
-            panel.Recalculate();
-        }
-
-        public static float GetLeft() {
-            return panel.Left.Pixels;
-        }
-
-        public static float GetTop() {
-            return panel.Top.Pixels;
-        }
-
-        public static bool GetPinned() {
-            return panel.Pinned;
-        }
-
-        public static bool GetAuto() {
-            return panel.Auto;
-        }
-
-        public static void SetAuto(bool auto) {
-            panel.SetAuto(auto);
-        }
-
-        public static void SetPinned(bool pinned) {
-            panel.SetPinned(pinned);
-        }
-
-        public static void UpdateClassInfo() {
+        public void UpdateClassInfo() {
             //class buttons
             indicate_primary.Left.Set(-10000f, 0f);
             indicate_secondary.Left.Set(-10000f, 0f);
@@ -159,23 +127,34 @@ namespace ExperienceAndClasses.UI {
             indicate_secondary.Recalculate();
         }
 
-        private static void PrimaryButtonLeft(UIMouseEvent evt, UIElement listeningElement) {
+        private void ButtonClickClose(UIMouseEvent evt, UIElement listeningElement) {
+            Instance.Visibility = !Instance.Visibility;
+        }
+
+        //the panel behind the selected buttons prevents their use without this workaround
+        private void PrimaryButtonLeft(UIMouseEvent evt, UIElement listeningElement) {
             button_primary.Click(evt);
         }
-        private static void PrimaryButtonRight(UIMouseEvent evt, UIElement listeningElement) {
+        private void PrimaryButtonRight(UIMouseEvent evt, UIElement listeningElement) {
             button_primary.RightClick(evt);
         }
-        private static void PrimaryButtonHover(UIMouseEvent evt, UIElement listeningElement) {
+        private void PrimaryButtonHover(UIMouseEvent evt, UIElement listeningElement) {
             button_primary.MouseOver(evt);
         }
-        private static void SecondaryButtonLeft(UIMouseEvent evt, UIElement listeningElement) {
+        private void PrimaryButtonDeHover(UIMouseEvent evt, UIElement listeningElement) {
+            button_primary.MouseOut(evt);
+        }
+        private void SecondaryButtonLeft(UIMouseEvent evt, UIElement listeningElement) {
             button_secondary.Click(evt);
         }
-        private static void SecondaryButtonRight(UIMouseEvent evt, UIElement listeningElement) {
+        private void SecondaryButtonRight(UIMouseEvent evt, UIElement listeningElement) {
             button_secondary.RightClick(evt);
         }
-        private static void SecondaryButtonHover(UIMouseEvent evt, UIElement listeningElement) {
+        private void SecondaryButtonHover(UIMouseEvent evt, UIElement listeningElement) {
             button_secondary.MouseOver(evt);
+        }
+        private void SecondaryButtonDeHover(UIMouseEvent evt, UIElement listeningElement) {
+            button_secondary.MouseOut(evt);
         }
     }
 }

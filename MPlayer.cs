@@ -63,14 +63,10 @@ namespace ExperienceAndClasses {
                 //start timer for next full sync
                 time_next_full_sync = DateTime.Now.AddTicks(TICKS_PER_FULL_SYNC);
 
-                //(re)initialize ui
-                UI.UIInfo.Instance.Initialize();
-                UI.UIMain.Instance.Initialize();
-
                 //apply saved ui settings
-                UI.UIMain.SetPosition(Commons.TryGet<float>(load_tag, "eac_ui_main_left", 100f), Commons.TryGet<float>(load_tag, "eac_ui_main_top", 100f));
-                UI.UIMain.SetAuto(Commons.TryGet<bool>(load_tag, "eac_ui_main_auto", true));
-                UI.UIMain.SetPinned(Commons.TryGet<bool>(load_tag, "eac_ui_main_pinned", false));
+                UI.UIMain.Instance.panel.SetPosition(Commons.TryGet<float>(load_tag, "eac_ui_main_left", 100f), Commons.TryGet<float>(load_tag, "eac_ui_main_top", 100f));
+                UI.UIMain.Instance.panel.Auto =Commons.TryGet<bool>(load_tag, "eac_ui_main_auto", true);
+                UI.UIMain.Instance.panel.Pinned = Commons.TryGet<bool>(load_tag, "eac_ui_main_pinned", false);
 
                 //update class info
                 LocalUpdateClassInfo();
@@ -252,7 +248,7 @@ namespace ExperienceAndClasses {
             Class_Secondary_Level = class_levels[Class_Secondary.ID];
 
             //update UI
-            UI.UIMain.UpdateClassInfo();
+            UI.UIMain.Instance.UpdateClassInfo();
 
             //update class features
             UpdateClassInfo();
@@ -381,10 +377,10 @@ namespace ExperienceAndClasses {
 
         public override TagCompound Save() {
             return new TagCompound {
-                {"eac_ui_main_left", UI.UIMain.GetLeft() },
-                {"eac_ui_main_top", UI.UIMain.GetTop() },
-                {"eac_ui_main_auto", UI.UIMain.GetAuto() },
-                {"eac_ui_main_pinned", UI.UIMain.GetPinned() },
+                {"eac_ui_main_left", UI.UIMain.Instance.panel.GetLeft() },
+                {"eac_ui_main_top", UI.UIMain.Instance.panel.GetTop() },
+                {"eac_ui_main_auto", UI.UIMain.Instance.panel.Auto },
+                {"eac_ui_main_pinned", UI.UIMain.Instance.panel.Pinned },
                 {"eac_class_levels", class_levels },
                 {"eac_class_current_primary", Class_Primary.ID },
                 {"eac_class_current_secondary", Class_Secondary.ID },

@@ -65,6 +65,14 @@ namespace ExperienceAndClasses
             //hotkeys
             HOTKEY_UI = RegisterHotKey("Show Class Interface", "P");
 
+            //initialize ui
+            if (!IS_SERVER) {
+                //initialize ui
+                UI.UIInfo.Instance.Initialize();
+                UI.UIMain.Instance.Initialize();
+                UI.UIBars.Instance.Initialize();
+                UI.UIStatus.Instance.Initialize();
+            }
 
         }
 
@@ -76,7 +84,7 @@ namespace ExperienceAndClasses
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ UI ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         public override void UpdateUI(GameTime gameTime) {
-            if (UI.UIMain.GetAuto()) {
+            if (UI.UIMain.Instance.panel.Auto) {
                 if (inventory_state != Main.playerInventory) {
                     inventory_state = Main.playerInventory;
                     UI.UIMain.Instance.Visibility = inventory_state;

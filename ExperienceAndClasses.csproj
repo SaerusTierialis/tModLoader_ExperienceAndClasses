@@ -62,8 +62,10 @@
     <Compile Include="MPlayer.cs" />
     <Compile Include="Systems\Class.cs" />
     <Compile Include="UI\Elements.cs" />
+    <Compile Include="UI\UIBars.cs" />
     <Compile Include="UI\UIInfo.cs" />
     <Compile Include="UI\UIMain.cs" />
+    <Compile Include="UI\UIStatus.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Microsoft.Xna.Framework, Version=4.0.0.0, Culture=neutral, PublicKeyToken=842cf8be1de50553, processorArchitecture=x86">

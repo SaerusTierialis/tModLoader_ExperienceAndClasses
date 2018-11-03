@@ -97,6 +97,7 @@ namespace ExperienceAndClasses.UI {
         }
     }
 
+    //combines a UserInterface and a UIState
     abstract class UIStateCombo {
         public UserInterface UI = null;
         public UIState state = null;
@@ -122,6 +123,7 @@ namespace ExperienceAndClasses.UI {
             InitializeState();
             state.Activate();
             UI.SetState(state);
+            Visibility = false; //default
         }
 
         protected abstract void InitializeState();
@@ -143,21 +145,52 @@ namespace ExperienceAndClasses.UI {
         private Vector2 offset;
 
         public bool dragging = false;
-
         private bool stop_pin = false;
-        public bool Auto { get; private set; }
-        public bool Pinned { get; private set; }
 
-        private UIHoverImageButton button_pinned, button_auto, button_close;
+        private UIHoverImageButton button_pinned = null, button_auto = null, button_close = null;
+
+        private bool auto = false;
+        public bool Auto {
+            get {
+                return auto;
+            }
+            set {
+                auto = value;
+                if (button_auto != null) {
+                    if (auto) {
+                        button_auto.SetImage(Shared.TEXTURE_CORNER_BUTTON_AUTO);
+                        button_auto.hoverText = "Don't Show Menu In Inventory Screen";
+                    }
+                    else {
+                        button_auto.SetImage(Shared.TEXTURE_CORNER_BUTTON_NO_AUTO);
+                        button_auto.hoverText = "Show Menu In Inventory Screen";
+                    }
+                }
+            }
+        }
+
+        private bool pinned = false;
+        public bool Pinned {
+            get {
+                return pinned;
+            }
+            set {
+                pinned = value;
+                if (button_pinned != null) {
+                    if (pinned) {
+                        button_pinned.SetImage(Shared.TEXTURE_CORNER_BUTTON_PINNED);
+                        button_pinned.hoverText = "Allow Dragging";
+                    }
+                    else {
+                        stop_pin = true;
+                        button_pinned.SetImage(Shared.TEXTURE_CORNER_BUTTON_UNPINNED);
+                        button_pinned.hoverText = "Prevent Dragging";
+                    }
+                }
+            }
+        }
 
         public DragableUIPanel(float width, float height, Color color, MouseEvent event_close, bool enable_auto, bool enable_pin) : base() {
-            Auto = true;
-            Pinned = false;
-
-            button_pinned = null;
-            button_auto = null;
-            button_close = null;
-
             BackgroundColor = color;
 
             SetPadding(0);
@@ -181,7 +214,7 @@ namespace ExperienceAndClasses.UI {
                 button_auto.Height.Set(Shared.TEXTURE_CORNER_BUTTON_SIZE, 0f);
                 button_auto.OnClick += new MouseEvent(ButtonClickAuto);
                 Append(button_auto);
-                SetAuto(Auto);
+                Auto = true; //defaults to true if enabled
             }
 
             if (enable_pin) {
@@ -190,7 +223,6 @@ namespace ExperienceAndClasses.UI {
                 button_pinned.Height.Set(Shared.TEXTURE_CORNER_BUTTON_SIZE, 0f);
                 button_pinned.OnClick += new MouseEvent(ButtonClickPin);
                 Append(button_pinned);
-                SetPinned(Pinned);
             }
 
             Recalculate();
@@ -215,40 +247,11 @@ namespace ExperienceAndClasses.UI {
         }
 
         private void ButtonClickPin(UIMouseEvent evt, UIElement listeningElement) {
-            SetPinned(!Pinned);
+            Pinned = !Pinned;
         }
 
         private void ButtonClickAuto(UIMouseEvent evt, UIElement listeningElement) {
-            SetAuto(!Auto);
-        }
-
-        public void SetPinned(bool new_state) {
-            Pinned = new_state;
-            if (button_pinned != null) {
-                if (Pinned) {
-                    button_pinned.SetImage(Shared.TEXTURE_CORNER_BUTTON_PINNED);
-                    button_pinned.hoverText = "Allow Dragging";
-                }
-                else {
-                    stop_pin = true;
-                    button_pinned.SetImage(Shared.TEXTURE_CORNER_BUTTON_UNPINNED);
-                    button_pinned.hoverText = "Prevent Dragging";
-                }
-            }
-        }
-
-        public void SetAuto(bool new_state) {
-            Auto = new_state;
-            if (button_auto != null) {
-                if (Auto) {
-                    button_auto.SetImage(Shared.TEXTURE_CORNER_BUTTON_AUTO);
-                    button_auto.hoverText = "Don't Show Menu In Inventory Screen";
-                }
-                else {
-                    button_auto.SetImage(Shared.TEXTURE_CORNER_BUTTON_NO_AUTO);
-                    button_auto.hoverText = "Show Menu In Inventory Screen";
-                }
-            }
+            Auto = !Auto;
         }
 
         public override void MouseDown(UIMouseEvent evt) {
@@ -313,6 +316,20 @@ namespace ExperienceAndClasses.UI {
                 // Recalculate forces the UI system to do the positioning math again.
                 Recalculate();
             }
+        }
+
+        public void SetPosition(float left, float top) {
+            Left.Set(left, 0f);
+            Top.Set(top, 0f);
+            Recalculate();
+        }
+
+        public float GetLeft() {
+            return Left.Pixels;
+        }
+
+        public float GetTop() {
+            return Top.Pixels;
         }
     }
 
