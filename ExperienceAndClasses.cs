@@ -47,9 +47,6 @@ namespace ExperienceAndClasses
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Variables ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-        private static UserInterface user_interface_main;
-        public static UI.UIMain user_interface_state_main;
-
         public static bool inventory_state = false;
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Constructor ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
@@ -68,13 +65,7 @@ namespace ExperienceAndClasses
             //hotkeys
             HOTKEY_UI = RegisterHotKey("Show Class Interface", "P");
 
-            //main ui
-            if (!IS_SERVER) {
-                user_interface_state_main = new UI.UIMain();
-                user_interface_state_main.Activate();
-                user_interface_main = new UserInterface();
-                user_interface_main.SetState(user_interface_state_main);
-            }
+
         }
 
         public override void Unload() {
@@ -85,15 +76,15 @@ namespace ExperienceAndClasses
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ UI ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         public override void UpdateUI(GameTime gameTime) {
-            if (user_interface_state_main.GetAuto()) {
+            if (UI.UIMain.GetAuto()) {
                 if (inventory_state != Main.playerInventory) {
                     inventory_state = Main.playerInventory;
-                    user_interface_state_main.Visible = inventory_state;
+                    UI.UIMain.Instance.Visibility = inventory_state;
                 }
             }
 
-            if (user_interface_main != null && user_interface_state_main.Visible)
-                user_interface_main.Update(gameTime);
+            if (UI.UIMain.Instance.Visibility)
+                UI.UIMain.Instance.UI.Update(gameTime);
         }
 
         public override void ModifyInterfaceLayers(List<GameInterfaceLayer> layers) {
@@ -101,8 +92,8 @@ namespace ExperienceAndClasses
             if (MouseTextIndex != -1) {
                 layers.Insert(MouseTextIndex, new LegacyGameInterfaceLayer("EAC_UIMain",
                     delegate {
-                        if (user_interface_state_main.Visible) {
-                            user_interface_state_main.Draw(Main.spriteBatch);
+                        if (UI.UIMain.Instance.Visibility) {
+                            UI.UIMain.Instance.state.Draw(Main.spriteBatch);
                         }
                         return true;
                     },

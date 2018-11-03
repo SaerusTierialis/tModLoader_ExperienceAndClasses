@@ -97,6 +97,37 @@ namespace ExperienceAndClasses.UI {
         }
     }
 
+    abstract class UIStateCombo {
+        public UserInterface UI = null;
+        public UIState state = null;
+
+        public bool Visibility { get {
+                if (UI == null) {
+                    return false;
+                }
+                else {
+                    return UI.IsVisible;
+                }
+            }
+            set {
+                if (UI != null) {
+                    UI.IsVisible = value;
+                }
+            }
+        }
+
+        public void Initialize() {
+            UI = new UserInterface();
+            state = new UIState();
+            InitializeState();
+            state.Activate();
+            UI.SetState(state);
+        }
+
+        protected abstract void InitializeState();
+
+    }
+
 
     // Copied from ExampleMod on GitHub
     // Added locking of drag panel

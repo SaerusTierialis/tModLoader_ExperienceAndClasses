@@ -11,7 +11,14 @@ using Terraria.Localization;
 using System.Collections.Generic;
 
 namespace ExperienceAndClasses.UI {
-    class UIMain : UIState {
+
+    //UI for class selection, attributes, and ability info
+
+    class UIMain : UIStateCombo {
+        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Singleton ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+        public static readonly UIMain Instance = new UIMain();
+
+        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Constants ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         private const float WIDTH = 600f;
         private const float HEIGHT = 400f;
         private const float CLASS_BUTTON_SIZE = 36f;
@@ -20,23 +27,22 @@ namespace ExperienceAndClasses.UI {
 
         private readonly Color COLOR_CLASS= new Color(73, 94, 200);
 
-        private DragableUIPanel panel;
-
         private const float INDICATOR_WIDTH = CLASS_BUTTON_SIZE + (Shared.UI_PADDING * 2);
         private const float INDICATOR_HEIGHT = CLASS_BUTTON_SIZE + CLASS_ROW_PADDING - (Shared.UI_PADDING * 2);
         private const float INDICATOR_OFFSETS = -Shared.UI_PADDING;
         private const byte INDICATOR_ALPHA = 50;
-        private UIPanel indicate_primary, indicate_secondary;
-        private ClassButton button_primary, button_secondary;
 
-        private List<ClassButton> class_buttons;
+        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Variables ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+        private static DragableUIPanel panel;
+        
+        private static UIPanel indicate_primary, indicate_secondary;
+        private static ClassButton button_primary, button_secondary;
 
-        public bool Visible { get; set; }
+        private static List<ClassButton> class_buttons;
 
-        public override void OnInitialize() {
-            Visible = false;
-
-            panel = new DragableUIPanel(WIDTH, HEIGHT, Shared.COLOR_UI_MAIN, new MouseEvent(ButtonClickClose), true, true);
+        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Initialize ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+        protected override void InitializeState() {
+            panel = new DragableUIPanel(WIDTH, HEIGHT, Shared.COLOR_UI_MAIN, new UIElement.MouseEvent(ButtonClickClose), true, true);
 
             UIPanel panel_class = new UIPanel();
             panel_class.SetPadding(0);
@@ -56,9 +62,9 @@ namespace ExperienceAndClasses.UI {
             indicate_primary.Width.Set(INDICATOR_WIDTH, 0f);
             indicate_primary.Height.Set(INDICATOR_HEIGHT, 0f);
             indicate_primary.BackgroundColor = color;
-            indicate_primary.OnClick += new MouseEvent(PrimaryButtonLeft);
-            indicate_primary.OnRightClick += new MouseEvent(PrimaryButtonRight);
-            indicate_primary.OnMouseOver += new MouseEvent(PrimaryButtonHover);
+            indicate_primary.OnClick += new UIElement.MouseEvent(PrimaryButtonLeft);
+            indicate_primary.OnRightClick += new UIElement.MouseEvent(PrimaryButtonRight);
+            indicate_primary.OnMouseOver += new UIElement.MouseEvent(PrimaryButtonHover);
             panel_class.Append(indicate_primary);
 
             color = Shared.COLOUR_CLASS_SECONDARY;
@@ -70,9 +76,9 @@ namespace ExperienceAndClasses.UI {
             indicate_secondary.Width.Set(INDICATOR_WIDTH, 0f);
             indicate_secondary.Height.Set(INDICATOR_HEIGHT, 0f);
             indicate_secondary.BackgroundColor = color;
-            indicate_secondary.OnClick += new MouseEvent(SecondaryButtonLeft);
-            indicate_secondary.OnRightClick += new MouseEvent(SecondaryButtonRight);
-            indicate_secondary.OnMouseOver += new MouseEvent(SecondaryButtonHover);
+            indicate_secondary.OnClick += new UIElement.MouseEvent(SecondaryButtonLeft);
+            indicate_secondary.OnRightClick += new UIElement.MouseEvent(SecondaryButtonRight);
+            indicate_secondary.OnMouseOver += new UIElement.MouseEvent(SecondaryButtonHover);
             panel_class.Append(indicate_secondary);
 
             class_buttons = new List<ClassButton>();
@@ -94,44 +100,45 @@ namespace ExperienceAndClasses.UI {
                 }
             }
 
-            Append(panel);
+            state.Append(panel);
         }
 
-        private void ButtonClickClose(UIMouseEvent evt, UIElement listeningElement) {
-            Visible = !Visible;
+        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Methods ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+        private static void ButtonClickClose(UIMouseEvent evt, UIElement listeningElement) {
+            Instance.Visibility = !Instance.Visibility;
         }
 
-        public void SetPosition(float left, float top) {
+        public static void SetPosition(float left, float top) {
             panel.Left.Set(left, 0f);
             panel.Top.Set(top, 0f);
             panel.Recalculate();
         }
 
-        public float GetLeft() {
+        public static float GetLeft() {
             return panel.Left.Pixels;
         }
 
-        public float GetTop() {
+        public static float GetTop() {
             return panel.Top.Pixels;
         }
 
-        public bool GetPinned() {
+        public static bool GetPinned() {
             return panel.Pinned;
         }
 
-        public bool GetAuto() {
+        public static bool GetAuto() {
             return panel.Auto;
         }
 
-        public void SetAuto(bool auto) {
+        public static void SetAuto(bool auto) {
             panel.SetAuto(auto);
         }
 
-        public void SetPinned(bool pinned) {
+        public static void SetPinned(bool pinned) {
             panel.SetPinned(pinned);
         }
 
-        public void UpdateClassInfo() {
+        public static void UpdateClassInfo() {
             //class buttons
             indicate_primary.Left.Set(-10000f, 0f);
             indicate_secondary.Left.Set(-10000f, 0f);
@@ -152,22 +159,22 @@ namespace ExperienceAndClasses.UI {
             indicate_secondary.Recalculate();
         }
 
-        private void PrimaryButtonLeft(UIMouseEvent evt, UIElement listeningElement) {
+        private static void PrimaryButtonLeft(UIMouseEvent evt, UIElement listeningElement) {
             button_primary.Click(evt);
         }
-        private void PrimaryButtonRight(UIMouseEvent evt, UIElement listeningElement) {
+        private static void PrimaryButtonRight(UIMouseEvent evt, UIElement listeningElement) {
             button_primary.RightClick(evt);
         }
-        private void PrimaryButtonHover(UIMouseEvent evt, UIElement listeningElement) {
+        private static void PrimaryButtonHover(UIMouseEvent evt, UIElement listeningElement) {
             button_primary.MouseOver(evt);
         }
-        private void SecondaryButtonLeft(UIMouseEvent evt, UIElement listeningElement) {
+        private static void SecondaryButtonLeft(UIMouseEvent evt, UIElement listeningElement) {
             button_secondary.Click(evt);
         }
-        private void SecondaryButtonRight(UIMouseEvent evt, UIElement listeningElement) {
+        private static void SecondaryButtonRight(UIMouseEvent evt, UIElement listeningElement) {
             button_secondary.RightClick(evt);
         }
-        private void SecondaryButtonHover(UIMouseEvent evt, UIElement listeningElement) {
+        private static void SecondaryButtonHover(UIMouseEvent evt, UIElement listeningElement) {
             button_secondary.MouseOver(evt);
         }
     }

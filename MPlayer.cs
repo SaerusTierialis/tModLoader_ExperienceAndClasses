@@ -63,10 +63,14 @@ namespace ExperienceAndClasses {
                 //start timer for next full sync
                 time_next_full_sync = DateTime.Now.AddTicks(TICKS_PER_FULL_SYNC);
 
+                //(re)initialize ui
+                UI.UIInfo.Instance.Initialize();
+                UI.UIMain.Instance.Initialize();
+
                 //apply saved ui settings
-                ExperienceAndClasses.user_interface_state_main.SetPosition(Commons.TryGet<float>(load_tag, "eac_ui_main_left", 100f), Commons.TryGet<float>(load_tag, "eac_ui_main_top", 100f));
-                ExperienceAndClasses.user_interface_state_main.SetAuto(Commons.TryGet<bool>(load_tag, "eac_ui_main_auto", true));
-                ExperienceAndClasses.user_interface_state_main.SetPinned(Commons.TryGet<bool>(load_tag, "eac_ui_main_pinned", false));
+                UI.UIMain.SetPosition(Commons.TryGet<float>(load_tag, "eac_ui_main_left", 100f), Commons.TryGet<float>(load_tag, "eac_ui_main_top", 100f));
+                UI.UIMain.SetAuto(Commons.TryGet<bool>(load_tag, "eac_ui_main_auto", true));
+                UI.UIMain.SetPinned(Commons.TryGet<bool>(load_tag, "eac_ui_main_pinned", false));
 
                 //update class info
                 LocalUpdateClassInfo();
@@ -76,8 +80,8 @@ namespace ExperienceAndClasses {
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Update ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         public override void PostUpdate() {
-            if (!ExperienceAndClasses.IS_SERVER)
-                Main.NewText(player.name + " " + Class_Primary.Name + " " + Class_Primary_Level + " " + Class_Secondary.Name + " " + Class_Secondary_Level);
+            //if (!ExperienceAndClasses.IS_SERVER)
+            //    Main.NewText(player.name + " " + Class_Primary.Name + " " + Class_Primary_Level + " " + Class_Secondary.Name + " " + Class_Secondary_Level);
         }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ XP & Class ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
@@ -248,7 +252,7 @@ namespace ExperienceAndClasses {
             Class_Secondary_Level = class_levels[Class_Secondary.ID];
 
             //update UI
-            ExperienceAndClasses.user_interface_state_main.UpdateClassInfo();
+            UI.UIMain.UpdateClassInfo();
 
             //update class features
             UpdateClassInfo();
@@ -262,7 +266,7 @@ namespace ExperienceAndClasses {
 
         public override void ProcessTriggers(TriggersSet triggersSet) {
             if (ExperienceAndClasses.HOTKEY_UI.JustPressed) {
-                ExperienceAndClasses.user_interface_state_main.Visible = !ExperienceAndClasses.user_interface_state_main.Visible;
+                UI.UIMain.Instance.Visibility = !UI.UIMain.Instance.Visibility;
             }
         }
 
@@ -377,10 +381,10 @@ namespace ExperienceAndClasses {
 
         public override TagCompound Save() {
             return new TagCompound {
-                {"eac_ui_main_left", ExperienceAndClasses.user_interface_state_main.GetLeft() },
-                {"eac_ui_main_top", ExperienceAndClasses.user_interface_state_main.GetTop() },
-                {"eac_ui_main_auto", ExperienceAndClasses.user_interface_state_main.GetAuto() },
-                {"eac_ui_main_pinned", ExperienceAndClasses.user_interface_state_main.GetPinned() },
+                {"eac_ui_main_left", UI.UIMain.GetLeft() },
+                {"eac_ui_main_top", UI.UIMain.GetTop() },
+                {"eac_ui_main_auto", UI.UIMain.GetAuto() },
+                {"eac_ui_main_pinned", UI.UIMain.GetPinned() },
                 {"eac_class_levels", class_levels },
                 {"eac_class_current_primary", Class_Primary.ID },
                 {"eac_class_current_secondary", Class_Secondary.ID },
