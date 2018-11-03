@@ -80,6 +80,17 @@ namespace ExperienceAndClasses {
         /// <param name="defaultValue"></param>
         /// <returns></returns>
         public static T TryGet<T>(TagCompound tag, string key, T defaultValue) {
+            //new method does not detect if type is wrong
+            if ((tag != null) && (tag.ContainsKey(key))) {
+                return tag.Get<T>(key);
+            }
+            else {
+                return defaultValue;
+            }
+
+            /*
+             * This method no longer works because tag get methods no long throw exceptions when name or type is wrong
+             * 
             try {
                 T val;
                 Type type = typeof(T);
@@ -99,6 +110,7 @@ namespace ExperienceAndClasses {
             catch {
                 return defaultValue;
             }
+            */
         }
 
         public static void Error(string message) {

@@ -7,9 +7,9 @@ namespace ExperienceAndClasses.UI {
 
     //UI for class selection, attributes, and ability info
 
-    class UIMain : UIStateCombo {
+    class UIClass : UIStateCombo {
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Singleton ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-        public static readonly UIMain Instance = new UIMain();
+        public static readonly UIClass Instance = new UIClass();
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Constants ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         private const float WIDTH = 600f;
@@ -35,7 +35,7 @@ namespace ExperienceAndClasses.UI {
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Initialize ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         protected override void InitializeState() {
-            panel = new DragableUIPanel(WIDTH, HEIGHT, Shared.COLOR_UI_MAIN, this, true, true, true);
+            panel = new DragableUIPanel(WIDTH, HEIGHT, Shared.COLOR_UI_PANEL_BACKGROUND, this, true, true, true);
 
             UIPanel panel_class = new UIPanel();
             panel_class.SetPadding(0);

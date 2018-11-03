@@ -25,6 +25,8 @@ namespace ExperienceAndClasses
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Constants (and readonly) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
+        public static readonly byte[] VERSION = new byte[] { 2, 0, 0 };
+
         public static readonly bool IS_SERVER = (Main.netMode == 2);
         public static readonly bool IS_CLIENT = (Main.netMode == 1);
         public static readonly bool IS_SINGLEPLAYER = (Main.netMode == 0);
@@ -65,15 +67,6 @@ namespace ExperienceAndClasses
             //hotkeys
             HOTKEY_UI = RegisterHotKey("Show Class Interface", "P");
 
-            //initialize ui
-            if (!IS_SERVER) {
-                //initialize ui
-                UI.UIInfo.Instance.Initialize();
-                UI.UIMain.Instance.Initialize();
-                UI.UIBars.Instance.Initialize();
-                UI.UIStatus.Instance.Initialize();
-            }
-
         }
 
         public override void Unload() {
@@ -83,17 +76,21 @@ namespace ExperienceAndClasses
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ UI ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
+        public static void SetUIAutoStates() {
+            inventory_state = Main.playerInventory;
+            if (UI.UIClass.Instance.panel.Auto) UI.UIClass.Instance.Visibility = inventory_state;
+            if (UI.UIBars.Instance.panel.Auto) UI.UIBars.Instance.Visibility = !inventory_state;
+            if (UI.UIStatus.Instance.panel.Auto) UI.UIStatus.Instance.Visibility = !inventory_state;
+        }
+
         public override void UpdateUI(GameTime gameTime) {
             //auto ui states
             if (inventory_state != Main.playerInventory) {
-                inventory_state = Main.playerInventory;
-                if (UI.UIMain.Instance.panel.Auto) UI.UIMain.Instance.Visibility = inventory_state;
-                if (UI.UIBars.Instance.panel.Auto) UI.UIBars.Instance.Visibility = !inventory_state;
-                if (UI.UIStatus.Instance.panel.Auto) UI.UIStatus.Instance.Visibility = !inventory_state;
+                SetUIAutoStates();
             }
 
             if (UI.UIInfo.Instance.Visibility) UI.UIInfo.Instance.UI.Update(gameTime);
-            if (UI.UIMain.Instance.Visibility) UI.UIMain.Instance.UI.Update(gameTime);
+            if (UI.UIClass.Instance.Visibility) UI.UIClass.Instance.UI.Update(gameTime);
             if (UI.UIBars.Instance.Visibility) UI.UIBars.Instance.UI.Update(gameTime);
             if (UI.UIStatus.Instance.Visibility) UI.UIStatus.Instance.UI.Update(gameTime);
         }
@@ -104,7 +101,7 @@ namespace ExperienceAndClasses
                 layers.Insert(MouseTextIndex, new LegacyGameInterfaceLayer("EAC_UIMain",
                     delegate {
                         if (UI.UIInfo.Instance.Visibility) UI.UIInfo.Instance.state.Draw(Main.spriteBatch);
-                        if (UI.UIMain.Instance.Visibility) UI.UIMain.Instance.state.Draw(Main.spriteBatch);
+                        if (UI.UIClass.Instance.Visibility) UI.UIClass.Instance.state.Draw(Main.spriteBatch);
                         if (UI.UIBars.Instance.Visibility) UI.UIBars.Instance.state.Draw(Main.spriteBatch);
                         if (UI.UIStatus.Instance.Visibility) UI.UIStatus.Instance.state.Draw(Main.spriteBatch);
                         return true;

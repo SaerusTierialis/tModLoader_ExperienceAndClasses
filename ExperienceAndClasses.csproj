@@ -64,7 +64,7 @@
     <Compile Include="UI\Elements.cs" />
     <Compile Include="UI\UIBars.cs" />
     <Compile Include="UI\UIInfo.cs" />
-    <Compile Include="UI\UIMain.cs" />
+    <Compile Include="UI\UIClass.cs" />
     <Compile Include="UI\UIStatus.cs" />
   </ItemGroup>
   <ItemGroup>

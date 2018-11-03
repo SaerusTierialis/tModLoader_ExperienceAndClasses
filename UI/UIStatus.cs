@@ -21,7 +21,7 @@ namespace ExperienceAndClasses.UI {
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Initialize ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         protected override void InitializeState() {
-            panel = new DragableUIPanel(WIDTH, HEIGHT, Shared.COLOR_UI_MAIN, this, false, true, true);
+            panel = new DragableUIPanel(WIDTH, HEIGHT, Shared.COLOR_UI_PANEL_BACKGROUND, this, false, true, true);
             state.Append(panel);
         }
 

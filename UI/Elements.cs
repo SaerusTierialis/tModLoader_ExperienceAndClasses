@@ -316,6 +316,7 @@ namespace ExperienceAndClasses.UI {
             // Here we check if the DragableUIPanel is outside the Parent UIElement rectangle. 
             // (In our example, the parent would be ExampleUI, a UIState. This means that we are checking that the DragableUIPanel is outside the whole screen)
             // By doing this and some simple math, we can snap the panel back on screen if the user resizes his window or otherwise changes resolution.
+            Parent.Recalculate();
             var parentSpace = Parent.GetDimensions().ToRectangle();
             if (!GetDimensions().ToRectangle().Intersects(parentSpace)) {
                 Left.Pixels = Utils.Clamp(Left.Pixels, 0, parentSpace.Right - Width.Pixels);

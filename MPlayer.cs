@@ -21,6 +21,7 @@ namespace ExperienceAndClasses {
         public bool is_local_player;
         private TagCompound load_tag;
         public byte[] class_levels;
+        public bool initialized;
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Instance Vars (syncing) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -39,6 +40,7 @@ namespace ExperienceAndClasses {
             //defaults
             is_local_player = false;
             Allow_Secondary = false;
+            initialized = false;
 
             //default class level
             class_levels = new byte[(byte)Systems.Classes.ID.NUMBER_OF_IDs];
@@ -63,21 +65,42 @@ namespace ExperienceAndClasses {
                 //start timer for next full sync
                 time_next_full_sync = DateTime.Now.AddTicks(TICKS_PER_FULL_SYNC);
 
+                //(re)initialize ui
+                UI.UIInfo.Instance.Initialize();
+                UI.UIClass.Instance.Initialize();
+                UI.UIBars.Instance.Initialize();
+                UI.UIStatus.Instance.Initialize();
+
                 //apply saved ui settings
-                UI.UIMain.Instance.panel.SetPosition(Commons.TryGet<float>(load_tag, "eac_ui_main_left", 100f), Commons.TryGet<float>(load_tag, "eac_ui_main_top", 100f));
-                UI.UIMain.Instance.panel.Auto =Commons.TryGet<bool>(load_tag, "eac_ui_main_auto", true);
-                UI.UIMain.Instance.panel.Pinned = Commons.TryGet<bool>(load_tag, "eac_ui_main_pinned", false);
+                UI.UIClass.Instance.panel.SetPosition(Commons.TryGet<float>(load_tag, "eac_ui_class_left", 300f), Commons.TryGet<float>(load_tag, "eac_ui_class_top", 300f));
+                UI.UIClass.Instance.panel.Auto =Commons.TryGet<bool>(load_tag, "eac_ui_class_auto", true);
+                UI.UIClass.Instance.panel.Pinned = Commons.TryGet<bool>(load_tag, "eac_ui_class_pinned", false);
+
+                UI.UIBars.Instance.panel.SetPosition(Commons.TryGet<float>(load_tag, "eac_ui_bars_left", 480f), Commons.TryGet<float>(load_tag, "eac_ui_bars_top", 10f));
+                UI.UIBars.Instance.panel.Auto = Commons.TryGet<bool>(load_tag, "eac_ui_bars_auto", true);
+                UI.UIBars.Instance.panel.Pinned = Commons.TryGet<bool>(load_tag, "eac_ui_bars_pinned", false);
+
+                UI.UIStatus.Instance.panel.SetPosition(Commons.TryGet<float>(load_tag, "eac_ui_status_left", 14f), Commons.TryGet<float>(load_tag, "eac_ui_status_top", 100f));
+                UI.UIStatus.Instance.panel.Auto = Commons.TryGet<bool>(load_tag, "eac_ui_status_auto", true);
+                UI.UIStatus.Instance.panel.Pinned = Commons.TryGet<bool>(load_tag, "eac_ui_status_pinned", false);
+
+                //apply ui auto
+                ExperienceAndClasses.SetUIAutoStates();
 
                 //update class info
                 LocalUpdateClassInfo();
+
+                //enter game complete
+                initialized = true;
             }
         }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Update ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         public override void PostUpdate() {
-            //if (!ExperienceAndClasses.IS_SERVER)
-            //    Main.NewText(player.name + " " + Class_Primary.Name + " " + Class_Primary_Level + " " + Class_Secondary.Name + " " + Class_Secondary_Level);
+            if (initialized) {
+
+            }
         }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ XP & Class ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
@@ -248,7 +271,7 @@ namespace ExperienceAndClasses {
             Class_Secondary_Level = class_levels[Class_Secondary.ID];
 
             //update UI
-            UI.UIMain.Instance.UpdateClassInfo();
+            UI.UIClass.Instance.UpdateClassInfo();
 
             UI.UIBars.Instance.Visibility = true;
             UI.UIStatus.Instance.Visibility = true;
@@ -265,7 +288,7 @@ namespace ExperienceAndClasses {
 
         public override void ProcessTriggers(TriggersSet triggersSet) {
             if (ExperienceAndClasses.HOTKEY_UI.JustPressed) {
-                UI.UIMain.Instance.Visibility = !UI.UIMain.Instance.Visibility;
+                UI.UIClass.Instance.Visibility = !UI.UIClass.Instance.Visibility;
             }
         }
 
@@ -380,17 +403,24 @@ namespace ExperienceAndClasses {
 
         public override TagCompound Save() {
             return new TagCompound {
-                {"eac_ui_main_left", UI.UIMain.Instance.panel.GetLeft() },
-                {"eac_ui_main_top", UI.UIMain.Instance.panel.GetTop() },
-                {"eac_ui_main_auto", UI.UIMain.Instance.panel.Auto },
-                {"eac_ui_main_pinned", UI.UIMain.Instance.panel.Pinned },
+                {"eac_save_version", ExperienceAndClasses.VERSION },
+                {"eac_ui_class_left", UI.UIClass.Instance.panel.GetLeft() },
+                {"eac_ui_class_top", UI.UIClass.Instance.panel.GetTop() },
+                {"eac_ui_class_auto", UI.UIClass.Instance.panel.Auto },
+                {"eac_ui_class_pinned", UI.UIClass.Instance.panel.Pinned },
+                {"eac_ui_bars_left", UI.UIBars.Instance.panel.GetLeft() },
+                {"eac_ui_bars_top", UI.UIBars.Instance.panel.GetTop() },
+                {"eac_ui_bars_auto", UI.UIBars.Instance.panel.Auto },
+                {"eac_ui_bars_pinned", UI.UIBars.Instance.panel.Pinned },
+                {"eac_ui_status_left", UI.UIStatus.Instance.panel.GetLeft() },
+                {"eac_ui_status_top", UI.UIStatus.Instance.panel.GetTop() },
+                {"eac_ui_status_auto", UI.UIStatus.Instance.panel.Auto },
+                {"eac_ui_status_pinned", UI.UIStatus.Instance.panel.Pinned },
                 {"eac_class_levels", class_levels },
                 {"eac_class_current_primary", Class_Primary.ID },
                 {"eac_class_current_secondary", Class_Secondary.ID },
                 {"eac_class_subclass_unlocked", Allow_Secondary },
             };
-            //TODO: current classes
-            //TODO: class levels
         }
 
         public override void Load(TagCompound tag) {
