@@ -85,7 +85,7 @@ namespace ExperienceAndClasses.UI {
                     if (id != (byte)Systems.Classes.ID.New) {
                         button = new ClassButton(Systems.Classes.CLASS_LOOKUP[id].Texture, id);
                         button.Left.Set((Shared.UI_PADDING*2) + (col * (CLASS_BUTTON_SIZE + CLASS_COL_PADDING)), 0f);
-                        button.Top.Set(Shared.UI_PADDING + (row * (CLASS_BUTTON_SIZE + CLASS_ROW_PADDING)), 0f);
+                        button.Top.Set((Shared.UI_PADDING*2) + (row * (CLASS_BUTTON_SIZE + CLASS_ROW_PADDING)), 0f);
                         button.Width.Set(CLASS_BUTTON_SIZE, 0f);
                         button.Height.Set(CLASS_BUTTON_SIZE, 0f);
                         panel_class.Append(button);

@@ -99,6 +99,9 @@ public static class Commons
             else if (type == typeof(bool)) val = (T)Convert.ChangeType(tag.GetBool(key), type);
             else if (type == typeof(long)) val = (T)Convert.ChangeType(tag.GetLong(key), type);
             else if (type == typeof(string)) val = (T)Convert.ChangeType(tag.GetString(key), type);
+            else if (type == typeof(byte)) val = (T)Convert.ChangeType(tag.GetByte(key), type);
+            else if (type == typeof(byte[])) val = (T)Convert.ChangeType(tag.GetByteArray(key), type);
+            else if (type == typeof(int[])) val = (T)Convert.ChangeType(tag.GetIntArray(key), type);
             else throw new Exception();
 
             return val;

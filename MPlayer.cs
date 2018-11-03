@@ -18,9 +18,9 @@ namespace ExperienceAndClasses {
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Instance Vars (non-syncing) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-        public bool is_local_player = false;
+        public bool is_local_player;
         private TagCompound load_tag;
-        public byte[] class_levels = new byte[(byte)Systems.Classes.ID.NUMBER_OF_IDs];
+        public byte[] class_levels;
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Instance Vars (syncing) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -34,26 +34,21 @@ namespace ExperienceAndClasses {
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Initialize ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-        public MPlayer() {
-            Class_Primary = Systems.Classes.CLASS_LOOKUP[(byte)Systems.Classes.ID.New];
-            Class_Secondary = Systems.Classes.CLASS_LOOKUP[(byte)Systems.Classes.ID.New];
-            Allow_Secondary = true;
-
-            //temp: set levels
-            class_levels[(byte)Systems.Classes.ID.Novice] = 10;
-            class_levels[(byte)Systems.Classes.ID.Mage] = 50;
-            class_levels[(byte)Systems.Classes.ID.Sage] = 14;
-            class_levels[(byte)Systems.Classes.ID.Warrior] = 34;
-        }
-
         /// <summary>
         /// instanced arrays must be initialized here (also called during cloning, etc)
         /// </summary>
         public override void Initialize() {
-            // instanced arrays must be initialized here
+            //defaults
+            is_local_player = false;
+            Allow_Secondary = false;
 
+            //default class level
+            class_levels = new byte[(byte)Systems.Classes.ID.NUMBER_OF_IDs];
+            class_levels[(byte)Systems.Classes.ID.Novice] = 1;
 
-
+            //default class selection
+            Class_Primary = Systems.Classes.CLASS_LOOKUP[(byte)Systems.Classes.ID.Novice];
+            Class_Secondary = Systems.Classes.CLASS_LOOKUP[(byte)Systems.Classes.ID.None];
         }
 
         /// <summary>
@@ -71,9 +66,9 @@ namespace ExperienceAndClasses {
                 time_next_full_sync = DateTime.Now.AddTicks(TICKS_PER_FULL_SYNC);
 
                 //apply saved ui settings
-                ExperienceAndClasses.user_interface_state_main.SetPosition(Commons.TryGet<float>(load_tag, "ui_main_left", 100f), Commons.TryGet<float>(load_tag, "ui_main_top", 100f));
-                ExperienceAndClasses.user_interface_state_main.SetAuto(Commons.TryGet<bool>(load_tag, "ui_main_auto", true));
-                ExperienceAndClasses.user_interface_state_main.SetPinned(Commons.TryGet<bool>(load_tag, "ui_main_pinned", false));
+                ExperienceAndClasses.user_interface_state_main.SetPosition(Commons.TryGet<float>(load_tag, "eac_ui_main_left", 100f), Commons.TryGet<float>(load_tag, "eac_ui_main_top", 100f));
+                ExperienceAndClasses.user_interface_state_main.SetAuto(Commons.TryGet<bool>(load_tag, "eac_ui_main_auto", true));
+                ExperienceAndClasses.user_interface_state_main.SetPinned(Commons.TryGet<bool>(load_tag, "eac_ui_main_pinned", false));
 
                 //update class info
                 LocalUpdateClassInfo();
@@ -240,9 +235,9 @@ namespace ExperienceAndClasses {
                 Class_Secondary = Systems.Classes.CLASS_LOOKUP[(byte)Systems.Classes.ID.None];
             }
 
-            //any "new" class should be set "none"
+            //any "new" class should be set
             if (Class_Primary.ID == (byte)Systems.Classes.ID.New) {
-                Class_Primary = Systems.Classes.CLASS_LOOKUP[(byte)Systems.Classes.ID.None];
+                Class_Primary = Systems.Classes.CLASS_LOOKUP[(byte)Systems.Classes.ID.Novice];
             }
             if (Class_Secondary.ID == (byte)Systems.Classes.ID.New) {
                 Class_Secondary = Systems.Classes.CLASS_LOOKUP[(byte)Systems.Classes.ID.None];
@@ -367,22 +362,35 @@ namespace ExperienceAndClasses {
 
         public override TagCompound Save() {
             return new TagCompound {
-                {"ui_main_left", ExperienceAndClasses.user_interface_state_main.GetLeft() },
-                {"ui_main_top", ExperienceAndClasses.user_interface_state_main.GetTop() },
-                {"ui_main_auto", ExperienceAndClasses.user_interface_state_main.GetAuto() },
-                {"ui_main_pinned", ExperienceAndClasses.user_interface_state_main.GetPinned() },
+                {"eac_ui_main_left", ExperienceAndClasses.user_interface_state_main.GetLeft() },
+                {"eac_ui_main_top", ExperienceAndClasses.user_interface_state_main.GetTop() },
+                {"eac_ui_main_auto", ExperienceAndClasses.user_interface_state_main.GetAuto() },
+                {"eac_ui_main_pinned", ExperienceAndClasses.user_interface_state_main.GetPinned() },
+                {"eac_class_levels", class_levels },
+                {"eac_class_current_primary", Class_Primary.ID },
+                {"eac_class_current_secondary", Class_Secondary.ID },
+                {"eac_class_subclass_unlocked", Allow_Secondary },
             };
             //TODO: current classes
             //TODO: class levels
         }
 
         public override void Load(TagCompound tag) {
-            //ui settings must be stored and applied later when entering game
+            //some settings must be applied after init
             load_tag = tag;
 
+            //subclass unlocked
+            Allow_Secondary = Commons.TryGet<bool>(tag, "eac_class_current_primary", Allow_Secondary);
 
-            //TODO: current classes
-            //TODO: class levels
+            //current classes
+            Class_Primary = Systems.Classes.CLASS_LOOKUP[Commons.TryGet<byte>(load_tag, "eac_class_current_primary", Class_Primary.ID)];
+            Class_Secondary = Systems.Classes.CLASS_LOOKUP[Commons.TryGet<byte>(load_tag, "eac_class_current_secondary", Class_Secondary.ID)];
+
+            //class levels
+            byte[] class_levels_loaded = Commons.TryGet<byte[]>(load_tag, "eac_class_levels", new byte[0]);
+            for (int i = 0; i < class_levels_loaded.Length; i++) {
+                class_levels[i] = class_levels_loaded[i];
+            }
         }
 
     }

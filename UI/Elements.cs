@@ -93,6 +93,7 @@ namespace ExperienceAndClasses.UI {
                 //no text
                 text.SetText("");
             }
+            this.MouseOut(null);
         }
     }
 
@@ -161,7 +162,7 @@ namespace ExperienceAndClasses.UI {
                 SetPinned(Pinned);
             }
 
-            //Recalculate();
+            Recalculate();
         }
 
         public override void Recalculate() {
