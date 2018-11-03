@@ -10,8 +10,7 @@ namespace ExperienceAndClasses.UI {
     class ClassButton : UIImageButton {
         private const float TEXT_SCALE = 0.7f;
         private const float TEXT_OFFSET = 5f;
-        private const float VISIBILITY_SELECTED = 1f;
-        private const float VISIBILITY_NOT_SELECTED = 0.4f;
+        private const float LOW_VISIBILITY = 0.4f;
         private float button_size = 0f;
 
         public byte class_id { get; private set; }
@@ -35,7 +34,7 @@ namespace ExperienceAndClasses.UI {
             image_lock.Top.Set(button_size / 2 - Shared.TEXTURE_LOCK_HEIGHT / 2, 0f);
             Append(image_lock);
 
-            SetVisibility(1f, VISIBILITY_NOT_SELECTED);
+            SetVisibility(1f, LOW_VISIBILITY);
         }
 
         private void ClickPrimary(UIMouseEvent evt, UIElement listeningElement) {
@@ -78,17 +77,17 @@ namespace ExperienceAndClasses.UI {
 
                 if ((ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary.ID == class_id) || (ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary.ID == class_id)) {
                     //selected
-                    SetVisibility(1f, VISIBILITY_SELECTED);
+                    SetVisibility(LOW_VISIBILITY, 1f);
                 }
                 else {
                     //not selected
-                    SetVisibility(1f, VISIBILITY_NOT_SELECTED);
+                    SetVisibility(1f, LOW_VISIBILITY);
                 }
             }
             else {
                 //locked
                 image_lock.SetImage(Shared.TEXTURE_LOCK);
-                SetVisibility(1f, VISIBILITY_NOT_SELECTED);
+                SetVisibility(1f, LOW_VISIBILITY);
 
                 //no text
                 text.SetText("");
