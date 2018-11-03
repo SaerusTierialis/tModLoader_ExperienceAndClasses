@@ -19,6 +19,9 @@ public class Application
 namespace ExperienceAndClasses
 {
     class ExperienceAndClasses : Mod {
+        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Debug ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+        public static bool trace = true;
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Constants (and readonly) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -26,9 +29,14 @@ namespace ExperienceAndClasses
         public static readonly bool IS_CLIENT = (Main.netMode == 1);
         public static readonly bool IS_SINGLEPLAYER = (Main.netMode == 0);
 
-        public enum MessageType : byte {
-            SYNC_TEST,
+        public enum MESSAGE_TYPE : byte {
+            BROADCAST_TRACE,
+            FORCE_CLASS,
         };
+
+        //chat colors must go here or server gives "Error on message Terraria.MessageBuffer"
+        public static readonly Color COLOUR_MESSAGE_ERROR = new Color(255, 25, 25);
+        public static readonly Color COLOUR_MESSAGE_TRACE = new Color(255, 0, 255);
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Treated like readonly ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -61,10 +69,12 @@ namespace ExperienceAndClasses
             HOTKEY_UI = RegisterHotKey("Show Class Interface", "P");
 
             //main ui
-            user_interface_state_main = new UI.UIMain();
-            user_interface_state_main.Activate();
-            user_interface_main = new UserInterface();
-            user_interface_main.SetState(user_interface_state_main);
+            if (!IS_SERVER) {
+                user_interface_state_main = new UI.UIMain();
+                user_interface_state_main.Activate();
+                user_interface_main = new UserInterface();
+                user_interface_main.SetState(user_interface_state_main);
+            }
         }
 
         public override void Unload() {
@@ -104,13 +114,47 @@ namespace ExperienceAndClasses
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Packets ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         public override void HandlePacket(BinaryReader reader, int whoAmI) {
-            MessageType message_type = (MessageType)reader.ReadByte();
-            byte player_ind;
-            Player player;
-            MPlayer mplayer;
             int int1;
+            byte[] bytes;
+
+            //first 2 bytes are always type and sender
+            MESSAGE_TYPE message_type = (MESSAGE_TYPE)reader.ReadByte();
+            byte player_ind = (byte)reader.ReadByte();
+
+            Player sender_player = Main.player[player_ind];
+            MPlayer sender_mplayer = sender_player.GetModPlayer<MPlayer>(this);
+
+            if (trace) {
+                Commons.Trace("Recieved " + message_type + " originating from player " + player_ind);
+            }
+           
             switch (message_type) {
-                case MessageType.SYNC_TEST:
+                case MESSAGE_TYPE.BROADCAST_TRACE:
+                    //read
+                    string message = reader.ReadString();
+
+                    //broadcast
+                    NetMessage.BroadcastChatMessage(NetworkText.FromLiteral(message), ExperienceAndClasses.COLOUR_MESSAGE_TRACE);
+
+                    break;
+
+                case MESSAGE_TYPE.FORCE_CLASS:
+                    //read
+                    bytes = reader.ReadBytes(4);
+
+                    //set
+                    sender_mplayer.ForceClass(bytes[0], bytes[1], bytes[2], bytes[3]);
+
+                    //relay
+                    if (IS_SERVER) {
+                        PacketSender.SendForceClass(player_ind, bytes[0], bytes[1], bytes[2], bytes[3]);
+                    }
+
+                    break;
+
+
+                /*
+                case MESSAGE_TYPE.SYNC_TEST:
                     //read
                     player_ind = reader.ReadByte();
                     int1 = reader.ReadInt32();
@@ -123,12 +167,13 @@ namespace ExperienceAndClasses
                     //relay
                     if (IS_SERVER) {
                         ModPacket packet = MOD.GetPacket();
-                        packet.Write((byte)ExperienceAndClasses.MessageType.SYNC_TEST);
+                        packet.Write((byte)ExperienceAndClasses.MESSAGE_TYPE.SYNC_TEST);
                         packet.Write((byte)player_ind);
                         packet.Write(int1);
                         packet.Send(-1, player_ind);
                     }
                     break;
+                */
 
                 default:
                     //unknown type

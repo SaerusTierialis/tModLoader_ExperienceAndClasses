@@ -24,8 +24,6 @@ namespace ExperienceAndClasses {
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Instance Vars (syncing) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-        public int sync_test = 0;
-
         public Systems.Class Class_Primary { get; private set; }
         public Systems.Class Class_Secondary { get; private set; }
         public byte Class_Primary_Level { get; private set; }
@@ -78,11 +76,8 @@ namespace ExperienceAndClasses {
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Update ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         public override void PostUpdate() {
-            if (is_local_player) {
-                sync_test = player.statLife;
-            }
-
-            //Main.NewText(player.name + " " + sync_test); //working
+            if (!ExperienceAndClasses.IS_SERVER)
+                Main.NewText(player.name + " " + Class_Primary.Name + " " + Class_Primary_Level + " " + Class_Secondary.Name + " " + Class_Secondary_Level);
         }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ XP & Class ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
@@ -154,13 +149,13 @@ namespace ExperienceAndClasses {
         public bool LocalSetClass(byte id, bool is_primary) {
             //local MPlayer only
             if (!is_local_player) {
-                Main.NewText("ERROR: Tried to set non-local player with SetClass! (please report)", Shared.COLOUR_ERROR);
+                Commons.Error("Tried to set non-local player with SetClass! (please report)");
                 return false;
             }
 
             //fail if secondary not allowed
             if (!is_primary && !Allow_Secondary) {
-                Main.NewText("Failed to set class because secondary class feature is locked!", Shared.COLOUR_ERROR);
+                Main.NewText("Failed to set class because secondary class feature is locked!", ExperienceAndClasses.COLOUR_MESSAGE_ERROR);
                 return false;
             }
 
@@ -189,23 +184,23 @@ namespace ExperienceAndClasses {
                         return true;
 
                     case CLASS_VALIDITY.INVALID_COMBINATION:
-                        Main.NewText("Failed to set class because combination is invalid!", Shared.COLOUR_ERROR);
+                        Main.NewText("Failed to set class because combination is invalid!", ExperienceAndClasses.COLOUR_MESSAGE_ERROR);
                         break;
 
                     case CLASS_VALIDITY.INVALID_ID:
-                        Main.NewText("Failed to set class because class id is invalid!", Shared.COLOUR_ERROR);
+                        Main.NewText("Failed to set class because class id is invalid!", ExperienceAndClasses.COLOUR_MESSAGE_ERROR);
                         break;
 
                     case CLASS_VALIDITY.INVALID_LEVEL:
-                        Main.NewText("Failed to set class because it is locked!", Shared.COLOUR_ERROR);
+                        Main.NewText("Failed to set class because it is locked!", ExperienceAndClasses.COLOUR_MESSAGE_ERROR);
                         break;
 
                     case CLASS_VALIDITY.INVALID_NON_LOCAL:
-                        Main.NewText("ERROR: Tried to set non-local player with SetClass! (please report)", Shared.COLOUR_ERROR);
+                        Commons.Error("Tried to set non-local player with SetClass! (please report)");
                         break;
 
                     default:
-                        Main.NewText("ERROR: Failed to set class for unknown reasons! (please report)", Shared.COLOUR_ERROR);
+                        Commons.Error("Failed to set class for unknown reasons! (please report)");
                         break;
                 }
             }
@@ -254,6 +249,13 @@ namespace ExperienceAndClasses {
 
             //update UI
             ExperienceAndClasses.user_interface_state_main.UpdateClassInfo();
+
+            //update class features
+            UpdateClassInfo();
+        }
+
+        public void UpdateClassInfo() {
+
         }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Hotkeys ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
@@ -272,10 +274,11 @@ namespace ExperienceAndClasses {
         /// <param name="clientClone"></param>
         public override void clientClone(ModPlayer clientClone) {
             MPlayer clone = clientClone as MPlayer;
-            clone.sync_test = sync_test;
 
-            //TODO: current classes
-            //TODO: class levels
+            clone.Class_Primary = Class_Primary;
+            clone.Class_Secondary = Class_Secondary;
+            clone.Class_Primary_Level = Class_Primary_Level;
+            clone.Class_Secondary_Level = Class_Secondary_Level;
         }
 
         /// <summary>
@@ -284,27 +287,22 @@ namespace ExperienceAndClasses {
         /// <param name="clientPlayer"></param>
         public override void SendClientChanges(ModPlayer clientPlayer) {
             DateTime now = DateTime.Now;
-            int me = player.whoAmI;
+            byte me = (byte)player.whoAmI;
             if (now.CompareTo(time_next_full_sync) > 0) {
                 //full sync
                 time_next_full_sync = now.AddTicks(TICKS_PER_FULL_SYNC);
                 SyncPlayer(-1, me, false);
             }
             else {
-                //partial sync
+                //partial sync...
                 MPlayer clone = clientPlayer as MPlayer;
-                if (clone.sync_test != sync_test) {
-                    ModPacket packet = mod.GetPacket();
-                    packet.Write((byte)ExperienceAndClasses.MessageType.SYNC_TEST);
-                    packet.Write((byte)me);
-                    packet.Write(sync_test);
-                    packet.Send(-1, me);
-                    Main.NewText("sent");
+
+                //class selections and levels
+                if ((clone.Class_Primary.ID != Class_Primary.ID) || (clone.Class_Secondary.ID != Class_Secondary.ID) || 
+                    (clone.Class_Primary_Level != Class_Primary_Level) || (clone.Class_Secondary_Level != Class_Secondary_Level)) {
+                    PacketSender.SendForceClass(me, Class_Primary.ID, Class_Primary_Level, Class_Secondary.ID, Class_Secondary_Level);
                 }
             }
-
-            //TODO: current classes
-            //TODO: class levels
         }
 
         /// <summary>
@@ -314,9 +312,26 @@ namespace ExperienceAndClasses {
         /// <param name="fromWho"></param>
         /// <param name="newPlayer"></param>
         public override void SyncPlayer(int toWho, int fromWho, bool newPlayer) {
+            byte me = (byte)player.whoAmI;
 
-            //TODO: current classes
-            //TODO: class levels
+            //class selections and levels
+            PacketSender.SendForceClass(me, Class_Primary.ID, Class_Primary_Level, Class_Secondary.ID, Class_Secondary_Level);
+        }
+
+        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Sync Force Commands ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+        public void ForceClass(byte primary_id, byte primary_level, byte secondary_id, byte secondary_level) {
+            if (is_local_player) {
+                Commons.Error("Cannot force class packet for local player");
+                return;
+            }
+
+            Class_Primary = Systems.Classes.CLASS_LOOKUP[primary_id];
+            Class_Primary_Level = primary_level;
+            Class_Secondary = Systems.Classes.CLASS_LOOKUP[secondary_id];
+            Class_Secondary_Level = secondary_level;
+
+            UpdateClassInfo();
         }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Drawing ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
