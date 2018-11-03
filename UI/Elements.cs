@@ -118,11 +118,11 @@ namespace ExperienceAndClasses.UI {
 
         public void Initialize() {
             UI = new UserInterface();
+            Visibility = false; //default
             state = new UIState();
             InitializeState();
             state.Activate();
             UI.SetState(state);
-            Visibility = false; //default
         }
 
         protected abstract void InitializeState();
@@ -143,8 +143,9 @@ namespace ExperienceAndClasses.UI {
         // Stores the offset from the top left of the UIPanel while dragging.
         private Vector2 offset;
 
-        public bool dragging = false;
+        private bool dragging = false;
         private bool stop_pin = false;
+        private UIStateCombo UI;
 
         private UIHoverImageButton button_pinned = null, button_auto = null, button_close = null;
 
@@ -189,7 +190,9 @@ namespace ExperienceAndClasses.UI {
             }
         }
 
-        public DragableUIPanel(float width, float height, Color color, MouseEvent event_close, bool enable_auto, bool enable_pin) : base() {
+        public DragableUIPanel(float width, float height, Color color, UIStateCombo ui, bool enable_close, bool enable_auto, bool enable_pin) : base() {
+            UI = ui;
+
             BackgroundColor = color;
 
             SetPadding(0);
@@ -199,11 +202,11 @@ namespace ExperienceAndClasses.UI {
             Width.Set(width, 0f);
             Height.Set(height, 0f);
 
-            if (event_close != null) {
+            if (enable_close) {
                 button_close = new UIHoverImageButton(Shared.TEXTURE_CORNER_BUTTON_CLOSE, "Close");
                 button_close.Width.Set(Shared.TEXTURE_CORNER_BUTTON_SIZE, 0f);
                 button_close.Height.Set(Shared.TEXTURE_CORNER_BUTTON_SIZE, 0f);
-                button_close.OnClick += event_close;
+                button_close.OnClick += new MouseEvent(ButtonClickClose);
                 Append(button_close);
             }
 
@@ -222,6 +225,7 @@ namespace ExperienceAndClasses.UI {
                 button_pinned.Height.Set(Shared.TEXTURE_CORNER_BUTTON_SIZE, 0f);
                 button_pinned.OnClick += new MouseEvent(ButtonClickPin);
                 Append(button_pinned);
+                Pinned = pinned;
             }
 
             Recalculate();
@@ -251,6 +255,10 @@ namespace ExperienceAndClasses.UI {
 
         private void ButtonClickAuto(UIMouseEvent evt, UIElement listeningElement) {
             Auto = !Auto;
+        }
+
+        private void ButtonClickClose(UIMouseEvent evt, UIElement listeningElement) {
+            UI.Visibility = !UI.Visibility;
         }
 
         public override void MouseDown(UIMouseEvent evt) {

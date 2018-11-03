@@ -84,15 +84,18 @@ namespace ExperienceAndClasses
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ UI ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         public override void UpdateUI(GameTime gameTime) {
-            if (UI.UIMain.Instance.panel.Auto) {
-                if (inventory_state != Main.playerInventory) {
-                    inventory_state = Main.playerInventory;
-                    UI.UIMain.Instance.Visibility = inventory_state;
-                }
+            //auto ui states
+            if (inventory_state != Main.playerInventory) {
+                inventory_state = Main.playerInventory;
+                if (UI.UIMain.Instance.panel.Auto) UI.UIMain.Instance.Visibility = inventory_state;
+                if (UI.UIBars.Instance.panel.Auto) UI.UIBars.Instance.Visibility = !inventory_state;
+                if (UI.UIStatus.Instance.panel.Auto) UI.UIStatus.Instance.Visibility = !inventory_state;
             }
 
-            if (UI.UIMain.Instance.Visibility)
-                UI.UIMain.Instance.UI.Update(gameTime);
+            if (UI.UIInfo.Instance.Visibility) UI.UIInfo.Instance.UI.Update(gameTime);
+            if (UI.UIMain.Instance.Visibility) UI.UIMain.Instance.UI.Update(gameTime);
+            if (UI.UIBars.Instance.Visibility) UI.UIBars.Instance.UI.Update(gameTime);
+            if (UI.UIStatus.Instance.Visibility) UI.UIStatus.Instance.UI.Update(gameTime);
         }
 
         public override void ModifyInterfaceLayers(List<GameInterfaceLayer> layers) {
@@ -100,9 +103,10 @@ namespace ExperienceAndClasses
             if (MouseTextIndex != -1) {
                 layers.Insert(MouseTextIndex, new LegacyGameInterfaceLayer("EAC_UIMain",
                     delegate {
-                        if (UI.UIMain.Instance.Visibility) {
-                            UI.UIMain.Instance.state.Draw(Main.spriteBatch);
-                        }
+                        if (UI.UIInfo.Instance.Visibility) UI.UIInfo.Instance.state.Draw(Main.spriteBatch);
+                        if (UI.UIMain.Instance.Visibility) UI.UIMain.Instance.state.Draw(Main.spriteBatch);
+                        if (UI.UIBars.Instance.Visibility) UI.UIBars.Instance.state.Draw(Main.spriteBatch);
+                        if (UI.UIStatus.Instance.Visibility) UI.UIStatus.Instance.state.Draw(Main.spriteBatch);
                         return true;
                     },
                     InterfaceScaleType.UI)

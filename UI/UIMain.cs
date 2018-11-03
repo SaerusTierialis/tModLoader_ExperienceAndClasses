@@ -1,13 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using Terraria;
-using Terraria.ModLoader;
 using Terraria.GameContent.UI.Elements;
 using Terraria.UI;
-using System;
-using Terraria.ID;
-using System.Linq;
-using Terraria.Localization;
 using System.Collections.Generic;
 
 namespace ExperienceAndClasses.UI {
@@ -25,7 +18,7 @@ namespace ExperienceAndClasses.UI {
         private const float CLASS_ROW_PADDING = 40f;
         private const float CLASS_COL_PADDING = 10f;
 
-        private readonly Color COLOR_CLASS= new Color(73, 94, 200);
+        private readonly Color COLOR_CLASS_PANEL = new Color(73, 94, 200);
 
         private const float INDICATOR_WIDTH = CLASS_BUTTON_SIZE + (Shared.UI_PADDING * 2);
         private const float INDICATOR_HEIGHT = CLASS_BUTTON_SIZE + CLASS_ROW_PADDING - (Shared.UI_PADDING * 2);
@@ -42,7 +35,7 @@ namespace ExperienceAndClasses.UI {
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Initialize ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         protected override void InitializeState() {
-            panel = new DragableUIPanel(WIDTH, HEIGHT, Shared.COLOR_UI_MAIN, new UIElement.MouseEvent(ButtonClickClose), true, true);
+            panel = new DragableUIPanel(WIDTH, HEIGHT, Shared.COLOR_UI_MAIN, this, true, true, true);
 
             UIPanel panel_class = new UIPanel();
             panel_class.SetPadding(0);
@@ -50,7 +43,7 @@ namespace ExperienceAndClasses.UI {
             panel_class.Top.Set(Shared.UI_PADDING, 0f);
             panel_class.Width.Set((Shared.UI_PADDING * 4) + ((CLASS_BUTTON_SIZE + CLASS_COL_PADDING) * Systems.Classes.class_locations.GetLength(1)) - CLASS_COL_PADDING, 0f);
             panel_class.Height.Set(HEIGHT - (Shared.UI_PADDING * 2), 0f);
-            panel_class.BackgroundColor = COLOR_CLASS;
+            panel_class.BackgroundColor = COLOR_CLASS_PANEL;
             panel.Append(panel_class);
 
             Color color = Shared.COLOUR_CLASS_PRIMARY;
@@ -125,10 +118,6 @@ namespace ExperienceAndClasses.UI {
             }
             indicate_primary.Recalculate();
             indicate_secondary.Recalculate();
-        }
-
-        private void ButtonClickClose(UIMouseEvent evt, UIElement listeningElement) {
-            Instance.Visibility = !Instance.Visibility;
         }
 
         //the panel behind the selected buttons prevents their use without this workaround

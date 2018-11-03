@@ -250,6 +250,9 @@ namespace ExperienceAndClasses {
             //update UI
             UI.UIMain.Instance.UpdateClassInfo();
 
+            UI.UIBars.Instance.Visibility = true;
+            UI.UIStatus.Instance.Visibility = true;
+
             //update class features
             UpdateClassInfo();
         }
