@@ -114,7 +114,6 @@ namespace ExperienceAndClasses
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Packets ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         public override void HandlePacket(BinaryReader reader, int whoAmI) {
-            int int1;
             byte[] bytes;
 
             //first 2 bytes are always type and sender

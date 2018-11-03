@@ -81,8 +81,12 @@ namespace ExperienceAndClasses {
                 UI.UIBars.Instance.panel.Pinned = Commons.TryGet<bool>(load_tag, "eac_ui_bars_pinned", false);
 
                 UI.UIStatus.Instance.panel.SetPosition(Commons.TryGet<float>(load_tag, "eac_ui_status_left", 14f), Commons.TryGet<float>(load_tag, "eac_ui_status_top", 100f));
-                UI.UIStatus.Instance.panel.Auto = Commons.TryGet<bool>(load_tag, "eac_ui_status_auto", true);
+                UI.UIStatus.Instance.panel.Auto = Commons.TryGet<bool>(load_tag, "eac_ui_status_auto", false);
                 UI.UIStatus.Instance.panel.Pinned = Commons.TryGet<bool>(load_tag, "eac_ui_status_pinned", false);
+
+                //temp: show bars and status
+                UI.UIBars.Instance.Visibility = true;
+                UI.UIStatus.Instance.Visibility = true;
 
                 //apply ui auto
                 ExperienceAndClasses.SetUIAutoStates();
@@ -272,9 +276,6 @@ namespace ExperienceAndClasses {
 
             //update UI
             UI.UIClass.Instance.UpdateClassInfo();
-
-            UI.UIBars.Instance.Visibility = true;
-            UI.UIStatus.Instance.Visibility = true;
 
             //update class features
             UpdateClassInfo();
