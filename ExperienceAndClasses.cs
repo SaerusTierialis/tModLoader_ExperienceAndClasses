@@ -151,29 +151,6 @@ namespace ExperienceAndClasses
 
                     break;
 
-
-                /*
-                case MESSAGE_TYPE.SYNC_TEST:
-                    //read
-                    player_ind = reader.ReadByte();
-                    int1 = reader.ReadInt32();
-
-                    //apply
-                    player = Main.player[player_ind]; //sender
-                    mplayer = player.GetModPlayer<MPlayer>(this);
-                    mplayer.sync_test = int1;
-
-                    //relay
-                    if (IS_SERVER) {
-                        ModPacket packet = MOD.GetPacket();
-                        packet.Write((byte)ExperienceAndClasses.MESSAGE_TYPE.SYNC_TEST);
-                        packet.Write((byte)player_ind);
-                        packet.Write(int1);
-                        packet.Send(-1, player_ind);
-                    }
-                    break;
-                */
-
                 default:
                     //unknown type
                     break;
