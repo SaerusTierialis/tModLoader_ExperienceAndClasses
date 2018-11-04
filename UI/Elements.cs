@@ -146,6 +146,7 @@ namespace ExperienceAndClasses.UI {
         private bool dragging = false;
         private bool stop_pin = false;
         private UIStateCombo UI;
+        private bool buttons_hidden = false;
 
         private UIHoverImageButton button_pinned = null, button_auto = null, button_close = null;
 
@@ -250,15 +251,21 @@ namespace ExperienceAndClasses.UI {
         }
 
         private void ButtonClickPin(UIMouseEvent evt, UIElement listeningElement) {
-            Pinned = !Pinned;
+            if (!buttons_hidden) {
+                Pinned = !Pinned;
+            }
         }
 
         private void ButtonClickAuto(UIMouseEvent evt, UIElement listeningElement) {
-            Auto = !Auto;
+            if (!buttons_hidden) {
+                Auto = !Auto;
+            }
         }
 
         private void ButtonClickClose(UIMouseEvent evt, UIElement listeningElement) {
-            UI.Visibility = !UI.Visibility;
+            if (!buttons_hidden) {
+                UI.Visibility = !UI.Visibility;
+            }
         }
 
         public override void MouseDown(UIMouseEvent evt) {
@@ -338,6 +345,32 @@ namespace ExperienceAndClasses.UI {
 
         public float GetTop() {
             return Top.Pixels;
+        }
+
+        public void HideButtons() {
+            buttons_hidden = true;
+            if (button_pinned != null) {
+                button_pinned.SetImage(Shared.TEXTURE_BLANK);
+            }
+            if (button_auto != null) {
+                button_auto.SetImage(Shared.TEXTURE_BLANK);
+            }
+            if (button_close != null) {
+                button_close.SetImage(Shared.TEXTURE_BLANK);
+            }
+        }
+
+        public void ShowButtons() {
+            buttons_hidden = false;
+            if (button_pinned != null) {
+                Pinned = pinned;
+            }
+            if (button_auto != null) {
+                Auto = auto;
+            }
+            if (button_close != null) {
+                button_close.SetImage(Shared.TEXTURE_CORNER_BUTTON_CLOSE);
+            }
         }
     }
 
