@@ -55,6 +55,14 @@ namespace ExperienceAndClasses.UI {
             }
         }
 
+        public override void MouseOver(UIMouseEvent evt) {
+            UIInfo.Instance.ShowText(this, "test");
+        }
+
+        public override void MouseOut(UIMouseEvent evt) {
+            UIInfo.Instance.EndText(this);
+        }
+
         public void Update() {
             byte level = ExperienceAndClasses.LOCAL_MPLAYER.class_levels[class_id];
             if (level > 0) {
@@ -112,6 +120,9 @@ namespace ExperienceAndClasses.UI {
             set {
                 if (UI != null) {
                     UI.IsVisible = value;
+                    if (!UI.IsVisible) {
+                        UIInfo.Instance.EndTextChildren(state);
+                    }
                 }
             }
         }

@@ -15,7 +15,7 @@ namespace ExperienceAndClasses.UI {
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Constants ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         private const float WIDTH = 280f;
-        private const float HEIGHT = 200;
+        private const float HEIGHT = 200f;
 
         private readonly Color COLOR_BACKGROUND = new Color(Shared.COLOR_UI_PANEL_BACKGROUND.R, Shared.COLOR_UI_PANEL_BACKGROUND.G, Shared.COLOR_UI_PANEL_BACKGROUND.B, 50);
 

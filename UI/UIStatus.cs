@@ -15,7 +15,7 @@ namespace ExperienceAndClasses.UI {
         public static readonly UIStatus Instance = new UIStatus();
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Constants ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-        private const float WIDTH = 450;
+        private const float WIDTH = 450f;
         private const float HEIGHT = 100f;
 
         private readonly Color COLOR_BACKGROUND = new Color(0, 0, 0, 0);

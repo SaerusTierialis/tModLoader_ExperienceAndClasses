@@ -89,10 +89,10 @@ namespace ExperienceAndClasses
                 SetUIAutoStates();
             }
 
-            if (UI.UIInfo.Instance.Visibility) UI.UIInfo.Instance.UI.Update(gameTime);
-            if (UI.UIClass.Instance.Visibility) UI.UIClass.Instance.UI.Update(gameTime);
-            if (UI.UIBars.Instance.Visibility) UI.UIBars.Instance.UI.Update(gameTime);
             if (UI.UIStatus.Instance.Visibility) UI.UIStatus.Instance.UI.Update(gameTime);
+            if (UI.UIBars.Instance.Visibility) UI.UIBars.Instance.UI.Update(gameTime);
+            if (UI.UIClass.Instance.Visibility) UI.UIClass.Instance.UI.Update(gameTime);
+            if (UI.UIInfo.Instance.Visibility) UI.UIInfo.Instance.UI.Update(gameTime);
         }
 
         public override void ModifyInterfaceLayers(List<GameInterfaceLayer> layers) {
@@ -100,10 +100,10 @@ namespace ExperienceAndClasses
             if (MouseTextIndex != -1) {
                 layers.Insert(MouseTextIndex, new LegacyGameInterfaceLayer("EAC_UIMain",
                     delegate {
-                        if (UI.UIInfo.Instance.Visibility) UI.UIInfo.Instance.state.Draw(Main.spriteBatch);
-                        if (UI.UIClass.Instance.Visibility) UI.UIClass.Instance.state.Draw(Main.spriteBatch);
-                        if (UI.UIBars.Instance.Visibility) UI.UIBars.Instance.state.Draw(Main.spriteBatch);
                         if (UI.UIStatus.Instance.Visibility) UI.UIStatus.Instance.state.Draw(Main.spriteBatch);
+                        if (UI.UIBars.Instance.Visibility) UI.UIBars.Instance.state.Draw(Main.spriteBatch);
+                        if (UI.UIClass.Instance.Visibility) UI.UIClass.Instance.state.Draw(Main.spriteBatch);
+                        if (UI.UIInfo.Instance.Visibility) UI.UIInfo.Instance.state.Draw(Main.spriteBatch);
                         return true;
                     },
                     InterfaceScaleType.UI)
