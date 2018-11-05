@@ -56,7 +56,7 @@ namespace ExperienceAndClasses.UI {
         }
 
         public override void MouseOver(UIMouseEvent evt) {
-            UIInfo.Instance.ShowText(this, "test");
+            UIInfo.Instance.ShowTextClass(this, class_id);
         }
 
         public override void MouseOut(UIMouseEvent evt) {
@@ -347,6 +347,12 @@ namespace ExperienceAndClasses.UI {
         public void SetPosition(float left, float top) {
             Left.Set(left, 0f);
             Top.Set(top, 0f);
+            Recalculate();
+        }
+
+        public void SetSize(float width, float height) {
+            Width.Set(width, 0f);
+            Height.Set(height, 0f);
             Recalculate();
         }
 

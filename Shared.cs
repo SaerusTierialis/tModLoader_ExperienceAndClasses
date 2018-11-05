@@ -10,6 +10,9 @@ namespace ExperienceAndClasses {
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ XP & Levels ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
+        public const byte LEVEL_REQUIRED_TIER_2 = 10;
+        public const byte LEVEL_REQUIRED_TIER_3 = 50;
+
         public const byte MAX_LEVEL = 100;
 
         public const double SUBCLASS_PENALTY_MULTIPLIER_PRIMARY = 0.7;

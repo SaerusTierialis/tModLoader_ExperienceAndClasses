@@ -79,7 +79,7 @@ namespace ExperienceAndClasses.Systems {
 
                     case ID.Novice:
                         name = "Novice";
-                        desc = "TODO";
+                        desc = "TODO_description";
                         tier = 1;
                         texture = ModLoader.GetTexture("ExperienceAndClasses/Textures/Tokens/ClassToken_Novice");
                         class_locations[0, 3] = id_byte;
@@ -87,7 +87,7 @@ namespace ExperienceAndClasses.Systems {
 
                     case ID.Warrior:
                         name = "Warrior";
-                        desc = "TODO";
+                        desc = "TODO_description";
                         tier = 2;
                         texture = ModLoader.GetTexture("ExperienceAndClasses/Textures/Tokens/ClassToken_Warrior");
                         class_locations[1, 0] = id_byte;
@@ -96,7 +96,7 @@ namespace ExperienceAndClasses.Systems {
 
                     case ID.Ranger:
                         name = "Ranger";
-                        desc = "TODO";
+                        desc = "TODO_description";
                         tier = 2;
                         texture = ModLoader.GetTexture("ExperienceAndClasses/Textures/Tokens/ClassToken_Ranger");
                         class_locations[1, 1] = id_byte;
@@ -105,7 +105,7 @@ namespace ExperienceAndClasses.Systems {
 
                     case ID.Mage:
                         name = "Mage";
-                        desc = "TODO";
+                        desc = "TODO_description";
                         tier = 2;
                         texture = ModLoader.GetTexture("ExperienceAndClasses/Textures/Tokens/ClassToken_Mage");
                         class_locations[1, 2] = id_byte;
@@ -114,7 +114,7 @@ namespace ExperienceAndClasses.Systems {
 
                     case ID.Rogue:
                         name = "Rogue";
-                        desc = "TODO";
+                        desc = "TODO_description";
                         tier = 2;
                         texture = ModLoader.GetTexture("ExperienceAndClasses/Textures/Tokens/ClassToken_Rogue");
                         class_locations[1, 3] = id_byte;
@@ -123,7 +123,7 @@ namespace ExperienceAndClasses.Systems {
 
                     case ID.Summoner:
                         name = "Summoner";
-                        desc = "TODO";
+                        desc = "TODO_description";
                         tier = 2;
                         texture = ModLoader.GetTexture("ExperienceAndClasses/Textures/Tokens/ClassToken_Summoner");
                         class_locations[1, 4] = id_byte;
@@ -132,7 +132,7 @@ namespace ExperienceAndClasses.Systems {
 
                     case ID.Cleric:
                         name = "Cleric";
-                        desc = "TODO";
+                        desc = "TODO_description";
                         tier = 2;
                         texture = ModLoader.GetTexture("ExperienceAndClasses/Textures/Tokens/ClassToken_Cleric");
                         class_locations[1, 5] = id_byte;
@@ -141,7 +141,7 @@ namespace ExperienceAndClasses.Systems {
 
                     case ID.Hybrid:
                         name = "Hybrid";
-                        desc = "TODO";
+                        desc = "TODO_description";
                         tier = 2;
                         texture = ModLoader.GetTexture("ExperienceAndClasses/Textures/Tokens/ClassToken_Hybrid");
                         class_locations[1, 6] = id_byte;
@@ -150,7 +150,7 @@ namespace ExperienceAndClasses.Systems {
 
                     case ID.Knight:
                         name = "Knight";
-                        desc = "TODO";
+                        desc = "TODO_description";
                         tier = 3;
                         texture = ModLoader.GetTexture("ExperienceAndClasses/Textures/Tokens/ClassToken_Knight");
                         class_locations[2, 0] = id_byte;
@@ -159,7 +159,7 @@ namespace ExperienceAndClasses.Systems {
 
                     case ID.Berserker:
                         name = "Berserker";
-                        desc = "TODO";
+                        desc = "TODO_description";
                         tier = 3;
                         texture = ModLoader.GetTexture("ExperienceAndClasses/Textures/Tokens/ClassToken_Berserker");
                         class_locations[3, 0] = id_byte;
@@ -168,7 +168,7 @@ namespace ExperienceAndClasses.Systems {
 
                     case ID.Guardian:
                         name = "Guardian";
-                        desc = "TODO";
+                        desc = "TODO_description";
                         tier = 3;
                         texture = ModLoader.GetTexture("ExperienceAndClasses/Textures/Tokens/ClassToken_Guardian");
                         class_locations[4, 0] = id_byte;
@@ -177,7 +177,7 @@ namespace ExperienceAndClasses.Systems {
 
                     case ID.Sniper:
                         name = "Sniper";
-                        desc = "TODO";
+                        desc = "TODO_description";
                         tier = 3;
                         texture = ModLoader.GetTexture("ExperienceAndClasses/Textures/Tokens/ClassToken_Sniper");
                         class_locations[2, 1] = id_byte;
@@ -186,7 +186,7 @@ namespace ExperienceAndClasses.Systems {
 
                     case ID.Trickshot:
                         name = "Trickshot";
-                        desc = "TODO";
+                        desc = "TODO_description";
                         tier = 3;
                         texture = ModLoader.GetTexture("ExperienceAndClasses/Textures/Tokens/ClassToken_Trickshot");
                         class_locations[3, 1] = id_byte;
@@ -195,7 +195,7 @@ namespace ExperienceAndClasses.Systems {
 
                     case ID.Engineer:
                         name = "Engineer";
-                        desc = "TODO";
+                        desc = "TODO_description";
                         tier = 3;
                         texture = ModLoader.GetTexture("ExperienceAndClasses/Textures/Tokens/ClassToken_Engineer");
                         class_locations[4, 1] = id_byte;
@@ -204,7 +204,7 @@ namespace ExperienceAndClasses.Systems {
 
                     case ID.Mystic:
                         name = "Mystic";
-                        desc = "TODO";
+                        desc = "TODO_description";
                         tier = 3;
                         texture = ModLoader.GetTexture("ExperienceAndClasses/Textures/Tokens/ClassToken_Mystic");
                         class_locations[2, 2] = id_byte;
@@ -213,7 +213,7 @@ namespace ExperienceAndClasses.Systems {
 
                     case ID.Sage:
                         name = "Sage";
-                        desc = "TODO";
+                        desc = "TODO_description";
                         tier = 3;
                         texture = ModLoader.GetTexture("ExperienceAndClasses/Textures/Tokens/ClassToken_Sage");
                         class_locations[3, 2] = id_byte;
@@ -222,7 +222,7 @@ namespace ExperienceAndClasses.Systems {
 
                     case ID.Assassin:
                         name = "Assassin";
-                        desc = "TODO";
+                        desc = "TODO_description";
                         tier = 3;
                         texture = ModLoader.GetTexture("ExperienceAndClasses/Textures/Tokens/ClassToken_Assassin");
                         class_locations[2, 3] = id_byte;
@@ -231,7 +231,7 @@ namespace ExperienceAndClasses.Systems {
 
                     case ID.Ninja:
                         name = "Ninja";
-                        desc = "TODO";
+                        desc = "TODO_description";
                         tier = 3;
                         texture = ModLoader.GetTexture("ExperienceAndClasses/Textures/Tokens/ClassToken_Ninja");
                         class_locations[3, 3] = id_byte;
@@ -240,7 +240,7 @@ namespace ExperienceAndClasses.Systems {
 
                     case ID.SoulBinder:
                         name = "Soul Binder";
-                        desc = "TODO";
+                        desc = "TODO_description";
                         tier = 3;
                         texture = ModLoader.GetTexture("ExperienceAndClasses/Textures/Tokens/ClassToken_SoulBinder");
                         class_locations[2, 4] = id_byte;
@@ -249,7 +249,7 @@ namespace ExperienceAndClasses.Systems {
 
                     case ID.Hivemind:
                         name = "Hivemind";
-                        desc = "TODO";
+                        desc = "TODO_description";
                         tier = 3;
                         texture = ModLoader.GetTexture("ExperienceAndClasses/Textures/Tokens/ClassToken_Hivemind");
                         class_locations[3, 4] = id_byte;
@@ -258,7 +258,7 @@ namespace ExperienceAndClasses.Systems {
 
                     case ID.Saint:
                         name = "Saint";
-                        desc = "TODO";
+                        desc = "TODO_description";
                         tier = 3;
                         texture = ModLoader.GetTexture("ExperienceAndClasses/Textures/Tokens/ClassToken_Saint");
                         class_locations[2, 5] = id_byte;
@@ -267,7 +267,7 @@ namespace ExperienceAndClasses.Systems {
 
                     case ID.HybridPrime:
                         name = "Hybrid Prime";
-                        desc = "TODO";
+                        desc = "TODO_description";
                         tier = 3;
                         texture = ModLoader.GetTexture("ExperienceAndClasses/Textures/Tokens/ClassToken_HybridPrime");
                         class_locations[2, 6] = id_byte;
@@ -302,6 +302,24 @@ namespace ExperienceAndClasses.Systems {
             Texture = texture;
             ID_Prereq = id_prereq;
             Gives_Attributes = gives_attributes;
+        }
+
+        public string GetPrereqString() {
+            string text = Classes.CLASS_LOOKUP[ID_Prereq].Name;
+            switch (Tier) {
+                case 2:
+                    text += " Lv." + Shared.LEVEL_REQUIRED_TIER_2;
+                    break;
+
+                case 3:
+                    text += " Lv." + Shared.LEVEL_REQUIRED_TIER_3;
+                    break;
+            }
+            return text;
+        }
+
+        public string GetAttributeString() {
+            return "TODO_attribute";
         }
     }
 }
