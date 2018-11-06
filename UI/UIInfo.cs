@@ -96,12 +96,12 @@ namespace ExperienceAndClasses.UI {
             Systems.Class c = Systems.Class.CLASS_LOOKUP[class_id];
 
             string title = c.Name.ToUpper();
-            string text = "";
+            string text = c.Description + "\n\n";
             if (ExperienceAndClasses.LOCAL_MPLAYER.class_levels[class_id] <= 0) {
                 title += " (locked)";
                 text += c.GetPrereqString() + "\n\n";
             }
-            text += c.GetDamagetring() + "\n\n" + c.GetAttributeString() + "\n\n" + c.Description;
+            text += c.GetDamagetring() + "\n\n" + c.GetAttributeString();
 
             ShowText(source, title, text, WIDTH_CLASS);
         }

@@ -21,6 +21,7 @@ namespace ExperienceAndClasses {
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Colours ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         public static readonly Color COLOR_UI_PANEL_BACKGROUND = new Color(73, 94, 171);
+        public static readonly Color COLOR_UI_PANEL_HIGHLIGHT = new Color(103, 124, 201);
 
         public static readonly Color COLOUR_CLASS_PRIMARY = new Color(128, 255, 0);
         public static readonly Color COLOUR_CLASS_SECONDARY = new Color(250, 220, 0);

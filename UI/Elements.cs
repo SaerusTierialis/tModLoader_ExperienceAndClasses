@@ -7,6 +7,49 @@ using Terraria.UI;
 
 namespace ExperienceAndClasses.UI {
 
+    class AttributeText : UIPanel {
+
+        private const float LEFT_VALUE = 90;
+
+        private Systems.Attribute attribute;
+        private UIText title, value;
+
+        public AttributeText(float width, float height, float scale, Systems.Attribute attribute) {
+            this.attribute = attribute;
+
+            SetPadding(0f);
+            Left.Set(0f, 0f);
+            Top.Set(0f, 0f);
+            Width.Set(width, 0f);
+            Height.Set(height, 0f);
+            BackgroundColor = Shared.COLOR_UI_PANEL_HIGHLIGHT;
+
+            title = new UIText(attribute.Name.ToUpper(), scale);
+            title.Left.Set(Shared.UI_PADDING, 0f);
+            title.Top.Set(Shared.UI_PADDING, 0f);
+            Append(title);
+
+            value = new UIText("0 (0+0)", scale);
+            value.Left.Set(LEFT_VALUE, 0f);
+            value.Top.Set(Shared.UI_PADDING, 0f);
+            Append(value);
+
+            Update();
+        }
+
+        public override void MouseOver(UIMouseEvent evt) {
+            
+        }
+
+        public override void MouseOut(UIMouseEvent evt) {
+            
+        }
+
+        public void Update() {
+            
+        }
+    }
+
     class ClassButton : UIImageButton {
         private const float TEXT_SCALE = 0.7f;
         private const float TEXT_OFFSET = 5f;

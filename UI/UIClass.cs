@@ -2,6 +2,7 @@
 using Terraria.GameContent.UI.Elements;
 using Terraria.UI;
 using System.Collections.Generic;
+using Terraria;
 
 namespace ExperienceAndClasses.UI {
 
@@ -12,18 +13,25 @@ namespace ExperienceAndClasses.UI {
         public static readonly UIClass Instance = new UIClass();
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Constants ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-        private const float WIDTH = 600f;
-        private const float HEIGHT = 400f;
+        private const float WIDTH = 700f;
+        private const float HEIGHT = 430f;
         private const float CLASS_BUTTON_SIZE = 36f;
         private const float CLASS_ROW_PADDING = 40f;
         private const float CLASS_COL_PADDING = 10f;
 
-        private readonly Color COLOR_CLASS_PANEL = new Color(73, 94, 200);
+        private const float WIDTH_ATTRIBUTES = 200f;
+        private const float HEIGHT_ATTRIBUTES = 300f;
+        private const float HEIGHT_ATTRIBUTE = 30f;
+
+        private readonly Color COLOR_SUBPANEL = new Color(73, 94, 200);
 
         private const float INDICATOR_WIDTH = CLASS_BUTTON_SIZE + (Shared.UI_PADDING * 2);
         private const float INDICATOR_HEIGHT = CLASS_BUTTON_SIZE + CLASS_ROW_PADDING - (Shared.UI_PADDING * 2);
         private const float INDICATOR_OFFSETS = -Shared.UI_PADDING;
         private const byte INDICATOR_ALPHA = 50;
+
+        private const float FONT_SCALE_TITLE = 1.5f;
+        private const float FONT_SCALE_ATTRIBUTE = 1f;
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Variables ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         public DragableUIPanel panel { get; private set; }
@@ -33,19 +41,43 @@ namespace ExperienceAndClasses.UI {
 
         private List<ClassButton> class_buttons;
 
+        private List<AttributeText> attribute_texts;
+
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Initialize ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         protected override void InitializeState() {
+            string text;
+            Vector2 text_measure;
+
+            //main panel
             panel = new DragableUIPanel(WIDTH, HEIGHT, Shared.COLOR_UI_PANEL_BACKGROUND, this, true, true, true);
 
+            //class panel
             UIPanel panel_class = new UIPanel();
             panel_class.SetPadding(0);
             panel_class.Left.Set(Shared.UI_PADDING, 0f);
             panel_class.Top.Set(Shared.UI_PADDING, 0f);
             panel_class.Width.Set((Shared.UI_PADDING * 4) + ((CLASS_BUTTON_SIZE + CLASS_COL_PADDING) * Systems.Class.class_locations.GetLength(1)) - CLASS_COL_PADDING, 0f);
             panel_class.Height.Set(HEIGHT - (Shared.UI_PADDING * 2), 0f);
-            panel_class.BackgroundColor = COLOR_CLASS_PANEL;
+            panel_class.BackgroundColor = COLOR_SUBPANEL;
             panel.Append(panel_class);
 
+            //class title
+            UIPanel panel_class_title = new UIPanel();
+            panel_class_title.BackgroundColor = COLOR_SUBPANEL;
+            panel_class_title.SetPadding(0);
+            panel_class_title.Left.Set(0f, 0f);
+            panel_class_title.Top.Set(0f, 0f);
+            panel_class_title.Width.Set(panel_class.Width.Pixels, 0f);
+            text = "Classes";
+            text_measure = Main.fontMouseText.MeasureString(text);
+            UIText class_title = new UIText(text, FONT_SCALE_TITLE);
+            class_title.Left.Set((panel_class_title.Width.Pixels - (text_measure.X * FONT_SCALE_TITLE)) / 2, 0f);
+            class_title.Top.Set(Shared.UI_PADDING, 0f);
+            panel_class_title.Height.Set((text_measure.Y * FONT_SCALE_TITLE) - Shared.UI_PADDING*2, 0f);
+            panel_class_title.Append(class_title);
+            panel_class.Append(panel_class_title);
+
+            //indicator for primary class
             Color color = Shared.COLOUR_CLASS_PRIMARY;
             color.A = INDICATOR_ALPHA;
             indicate_primary = new UIPanel();
@@ -61,6 +93,7 @@ namespace ExperienceAndClasses.UI {
             indicate_primary.OnMouseOut += new UIElement.MouseEvent(PrimaryButtonDeHover);
             panel_class.Append(indicate_primary);
 
+            //indicator for secondary class
             color = Shared.COLOUR_CLASS_SECONDARY;
             color.A = INDICATOR_ALPHA;
             indicate_secondary = new UIPanel();
@@ -76,6 +109,7 @@ namespace ExperienceAndClasses.UI {
             indicate_secondary.OnMouseOut += new UIElement.MouseEvent(SecondaryButtonDeHover);
             panel_class.Append(indicate_secondary);
 
+            //class selection buttons
             class_buttons = new List<ClassButton>();
             ClassButton button;
             byte id;
@@ -86,7 +120,7 @@ namespace ExperienceAndClasses.UI {
                     if (id != (byte)Systems.Class.CLASS_IDS.New) {
                         button = new ClassButton(Systems.Class.CLASS_LOOKUP[id].Texture, id);
                         button.Left.Set((Shared.UI_PADDING*2) + (col * (CLASS_BUTTON_SIZE + CLASS_COL_PADDING)), 0f);
-                        button.Top.Set((Shared.UI_PADDING*2) + (row * (CLASS_BUTTON_SIZE + CLASS_ROW_PADDING)), 0f);
+                        button.Top.Set(panel_class_title.Height.Pixels + (Shared.UI_PADDING * 2) + (row * (CLASS_BUTTON_SIZE + CLASS_ROW_PADDING)), 0f);
                         button.Width.Set(CLASS_BUTTON_SIZE, 0f);
                         button.Height.Set(CLASS_BUTTON_SIZE, 0f);
                         panel_class.Append(button);
@@ -95,6 +129,47 @@ namespace ExperienceAndClasses.UI {
                 }
             }
 
+            //attribute panel
+            UIPanel panel_attribute = new UIPanel();
+            panel_attribute.SetPadding(0);
+            panel_attribute.Left.Set(panel_class.Width.Pixels + Shared.UI_PADDING, 0f);
+            panel_attribute.Top.Set(Shared.UI_PADDING, 0f);
+            panel_attribute.Width.Set(WIDTH_ATTRIBUTES, 0f);
+            panel_attribute.Height.Set(HEIGHT_ATTRIBUTES, 0f);
+            panel_attribute.BackgroundColor = COLOR_SUBPANEL;
+            panel.Append(panel_attribute);
+
+            //attribute title
+            UIPanel panel_attribute_title = new UIPanel();
+            panel_attribute_title.BackgroundColor = COLOR_SUBPANEL;
+            panel_attribute_title.SetPadding(0);
+            panel_attribute_title.Left.Set(0f, 0f);
+            panel_attribute_title.Top.Set(0f, 0f);
+            panel_attribute_title.Width.Set(panel_attribute.Width.Pixels, 0f);
+            text = "Attributes";
+            text_measure = Main.fontMouseText.MeasureString(text);
+            UIText attribute_title = new UIText(text, FONT_SCALE_TITLE);
+            attribute_title.Left.Set((panel_attribute_title.Width.Pixels - (text_measure.X * FONT_SCALE_TITLE)) / 2, 0f);
+            attribute_title.Top.Set(Shared.UI_PADDING, 0f);
+            panel_attribute_title.Height.Set((text_measure.Y * FONT_SCALE_TITLE) - Shared.UI_PADDING * 2, 0f);
+            panel_attribute_title.Append(attribute_title);
+            panel_attribute.Append(panel_attribute_title);
+
+            //attributes
+            float top = panel_attribute_title.Height.Pixels + Shared.UI_PADDING;
+            AttributeText attribute_text;
+            attribute_texts = new List<AttributeText>();
+            foreach (Systems.Attribute.ATTRIBUTE_IDS attribute_id in Systems.Attribute.ATTRIBUTES_UI_ORDER) {
+                attribute_text = new AttributeText(WIDTH_ATTRIBUTES - (Shared.UI_PADDING * 2), HEIGHT_ATTRIBUTE, FONT_SCALE_ATTRIBUTE, Systems.Attribute.ATTRIBUTE_LOOKUP[(byte)attribute_id]);
+                attribute_text.Left.Set(Shared.UI_PADDING, 0f);
+                attribute_text.Top.Set(top, 0f);
+                top += HEIGHT_ATTRIBUTE;
+
+                panel_attribute.Append(attribute_text);
+                attribute_texts.Add(attribute_text);
+            }
+
+            //done adding to main panel
             state.Append(panel);
         }
 

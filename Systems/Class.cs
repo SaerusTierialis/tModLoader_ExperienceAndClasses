@@ -339,7 +339,7 @@ namespace ExperienceAndClasses.Systems {
         }
 
         public string GetAttributeString() {
-            return "ATTRIBUTE GROWTH:\nTODO_attribute ★★★☆☆";
+            return "ATTRIBUTES:\nTODO_attribute ★★★☆☆";
         }
     }
 }

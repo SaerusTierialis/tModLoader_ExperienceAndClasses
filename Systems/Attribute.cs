@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Terraria.GameContent.UI.Elements;
 
 namespace ExperienceAndClasses.Systems {
     class Attribute {
@@ -12,9 +13,10 @@ namespace ExperienceAndClasses.Systems {
         public enum ATTRIBUTE_IDS : byte {
             Power,
             Vitality,
+            Mind,
             Spirit,
             Agility,
-            Precision,
+            Dexterity,
 
             //insert here
 
@@ -22,7 +24,7 @@ namespace ExperienceAndClasses.Systems {
         }
 
         //this may be reordered, UI uses this order
-        public ATTRIBUTE_IDS[] ATTRIBUTES_UI_ORDER = new ATTRIBUTE_IDS[] { ATTRIBUTE_IDS.Power, ATTRIBUTE_IDS.Vitality, ATTRIBUTE_IDS.Spirit, ATTRIBUTE_IDS.Agility, ATTRIBUTE_IDS.Precision };
+        public static ATTRIBUTE_IDS[] ATTRIBUTES_UI_ORDER = new ATTRIBUTE_IDS[] { ATTRIBUTE_IDS.Power, ATTRIBUTE_IDS.Vitality, ATTRIBUTE_IDS.Mind, ATTRIBUTE_IDS.Spirit, ATTRIBUTE_IDS.Agility, ATTRIBUTE_IDS.Dexterity };
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Treated like readonly ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         public static Attribute[] ATTRIBUTE_LOOKUP { get; private set; }
@@ -31,16 +33,107 @@ namespace ExperienceAndClasses.Systems {
         static Attribute() {
             ATTRIBUTE_LOOKUP = new Attribute[(byte)ATTRIBUTE_IDS.NUMBER_OF_IDs];
 
+            byte id_byte;
             string name, desc;
+            bool active;
+
+            for (ATTRIBUTE_IDS id = 0; id < ATTRIBUTE_IDS.NUMBER_OF_IDs; id++) {
+                id_byte = (byte)id;
+
+                //bonuses are defined in the instance because it would be a lot to pass to constructor
+
+                //defaults
+                name = "unknown";
+                desc = "unknown";
+                active = true;
+
+                switch (id) {
+                    case ATTRIBUTE_IDS.Power:
+                        name = "Power";
+                        desc = "TODO_description";
+                        break;
+
+                    case ATTRIBUTE_IDS.Vitality:
+                        name = "Vitality";
+                        desc = "TODO_description";
+                        break;
+
+                    case ATTRIBUTE_IDS.Mind:
+                        name = "Mind";
+                        desc = "TODO_description";
+                        break;
+
+                    case ATTRIBUTE_IDS.Spirit:
+                        name = "Spirit";
+                        desc = "TODO_description";
+                        break;
+
+                    case ATTRIBUTE_IDS.Agility:
+                        name = "Agility";
+                        desc = "TODO_description";
+                        break;
+
+                    case ATTRIBUTE_IDS.Dexterity:
+                        name = "Dexterity";
+                        desc = "TODO_description";
+                        break;
+
+                    default:
+                        active = false;
+                        break;
+                }
+
+                ATTRIBUTE_LOOKUP[id_byte] = new Attribute(id_byte, name, desc, active);
+            }
         }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Instance ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         public byte ID { get; private set; }
         public string Name { get; private set; }
         public string Description { get; private set; }
+        public bool Active { get; private set; }
+        public string Bonus { get; private set; }
 
-        public Attribute() {
+        public Attribute(byte id, string name, string description, bool active) {
+            ID = id;
+            Name = name;
+            Description = description;
+            Active = active;
+            Bonus = "";
+        }
 
+        //per point bonuses
+        private const float POWER_DAMAGE = 1f;
+
+        public void ApplyEffect(MPlayer mplayer) {
+            if (Active) {
+
+                switch ((ATTRIBUTE_IDS)ID) {
+                    case ATTRIBUTE_IDS.Power:
+                        //TODO
+                        break;
+
+                    case ATTRIBUTE_IDS.Vitality:
+                        //TODO
+                        break;
+
+                    case ATTRIBUTE_IDS.Mind:
+                        //TODO
+                        break;
+
+                    case ATTRIBUTE_IDS.Spirit:
+                        //TODO
+                        break;
+
+                    case ATTRIBUTE_IDS.Agility:
+                        //TODO
+                        break;
+
+                    case ATTRIBUTE_IDS.Dexterity:
+                        //TODO
+                        break;
+                }
+            }
         }
     }
 
