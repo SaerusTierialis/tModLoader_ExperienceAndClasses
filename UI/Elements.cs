@@ -39,7 +39,7 @@ namespace ExperienceAndClasses.UI {
 
         private void ClickPrimary(UIMouseEvent evt, UIElement listeningElement) {
             if (ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary.ID == class_id) {
-                ExperienceAndClasses.LOCAL_MPLAYER.LocalSetClass((byte)Systems.Classes.ID.None, true);
+                ExperienceAndClasses.LOCAL_MPLAYER.LocalSetClass((byte)Systems.Class.CLASS_IDS.None, true);
             }
             else {
                 ExperienceAndClasses.LOCAL_MPLAYER.LocalSetClass(class_id, true);
@@ -48,7 +48,7 @@ namespace ExperienceAndClasses.UI {
 
         private void ClickSecondary(UIMouseEvent evt, UIElement listeningElement) {
             if (ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary.ID == class_id) {
-                ExperienceAndClasses.LOCAL_MPLAYER.LocalSetClass((byte)Systems.Classes.ID.None, false);
+                ExperienceAndClasses.LOCAL_MPLAYER.LocalSetClass((byte)Systems.Class.CLASS_IDS.None, false);
             }
             else {
                 ExperienceAndClasses.LOCAL_MPLAYER.LocalSetClass(class_id, false);

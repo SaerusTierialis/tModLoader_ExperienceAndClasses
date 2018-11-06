@@ -41,7 +41,7 @@ namespace ExperienceAndClasses.UI {
             panel_class.SetPadding(0);
             panel_class.Left.Set(Shared.UI_PADDING, 0f);
             panel_class.Top.Set(Shared.UI_PADDING, 0f);
-            panel_class.Width.Set((Shared.UI_PADDING * 4) + ((CLASS_BUTTON_SIZE + CLASS_COL_PADDING) * Systems.Classes.class_locations.GetLength(1)) - CLASS_COL_PADDING, 0f);
+            panel_class.Width.Set((Shared.UI_PADDING * 4) + ((CLASS_BUTTON_SIZE + CLASS_COL_PADDING) * Systems.Class.class_locations.GetLength(1)) - CLASS_COL_PADDING, 0f);
             panel_class.Height.Set(HEIGHT - (Shared.UI_PADDING * 2), 0f);
             panel_class.BackgroundColor = COLOR_CLASS_PANEL;
             panel.Append(panel_class);
@@ -79,12 +79,12 @@ namespace ExperienceAndClasses.UI {
             class_buttons = new List<ClassButton>();
             ClassButton button;
             byte id;
-            for (byte row = 0; row<Systems.Classes.class_locations.GetLength(0); row++) {
-                for (byte col = 0; col<Systems.Classes.class_locations.GetLength(1); col++) {
-                    id = Systems.Classes.class_locations[row, col];
+            for (byte row = 0; row<Systems.Class.class_locations.GetLength(0); row++) {
+                for (byte col = 0; col<Systems.Class.class_locations.GetLength(1); col++) {
+                    id = Systems.Class.class_locations[row, col];
 
-                    if (id != (byte)Systems.Classes.ID.New) {
-                        button = new ClassButton(Systems.Classes.CLASS_LOOKUP[id].Texture, id);
+                    if (id != (byte)Systems.Class.CLASS_IDS.New) {
+                        button = new ClassButton(Systems.Class.CLASS_LOOKUP[id].Texture, id);
                         button.Left.Set((Shared.UI_PADDING*2) + (col * (CLASS_BUTTON_SIZE + CLASS_COL_PADDING)), 0f);
                         button.Top.Set((Shared.UI_PADDING*2) + (row * (CLASS_BUTTON_SIZE + CLASS_ROW_PADDING)), 0f);
                         button.Width.Set(CLASS_BUTTON_SIZE, 0f);

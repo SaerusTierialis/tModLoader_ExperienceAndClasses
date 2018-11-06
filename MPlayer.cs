@@ -43,12 +43,12 @@ namespace ExperienceAndClasses {
             initialized = false;
 
             //default class level
-            class_levels = new byte[(byte)Systems.Classes.ID.NUMBER_OF_IDs];
-            class_levels[(byte)Systems.Classes.ID.Novice] = 1;
+            class_levels = new byte[(byte)Systems.Class.CLASS_IDS.NUMBER_OF_IDs];
+            class_levels[(byte)Systems.Class.CLASS_IDS.Novice] = 1;
 
             //default class selection
-            Class_Primary = Systems.Classes.CLASS_LOOKUP[(byte)Systems.Classes.ID.Novice];
-            Class_Secondary = Systems.Classes.CLASS_LOOKUP[(byte)Systems.Classes.ID.None];
+            Class_Primary = Systems.Class.CLASS_LOOKUP[(byte)Systems.Class.CLASS_IDS.Novice];
+            Class_Secondary = Systems.Class.CLASS_LOOKUP[(byte)Systems.Class.CLASS_IDS.None];
         }
 
         /// <summary>
@@ -121,11 +121,11 @@ namespace ExperienceAndClasses {
             //local MPlayer only
             if (!is_local_player) return CLASS_VALIDITY.INVALID_NON_LOCAL;
 
-            if (id == (byte)Systems.Classes.ID.None) {
+            if (id == (byte)Systems.Class.CLASS_IDS.None) {
                 return CLASS_VALIDITY.VALID; //setting to no class is always allowed
             }
             else {
-                if (id >= (byte)Systems.Classes.ID.NUMBER_OF_IDs) {
+                if (id >= (byte)Systems.Class.CLASS_IDS.NUMBER_OF_IDs) {
                     return CLASS_VALIDITY.INVALID_ID; //invalid idsss
                 }
                 else {
@@ -139,27 +139,27 @@ namespace ExperienceAndClasses {
                         id_other = Class_Primary.ID;
                     }
 
-                    if ((class_levels[id] <= 0) && (id != (byte)Systems.Classes.ID.None)) {
+                    if ((class_levels[id] <= 0) && (id != (byte)Systems.Class.CLASS_IDS.None)) {
                         return CLASS_VALIDITY.INVALID_LEVEL; //locked class
                     }
                     else {
                         if (id != id_same) {
                             byte id_pre = id_other;
-                            while (id_pre != (byte)Systems.Classes.ID.New) {
+                            while (id_pre != (byte)Systems.Class.CLASS_IDS.New) {
                                 if (id == id_pre) {
                                     return CLASS_VALIDITY.INVALID_COMBINATION; //invalid combination (same as other class or one of its prereqs)
                                 }
                                 else {
-                                    id_pre = Systems.Classes.CLASS_LOOKUP[id_pre].ID_Prereq;
+                                    id_pre = Systems.Class.CLASS_LOOKUP[id_pre].ID_Prereq;
                                 }
                             }
-                            id_pre = Systems.Classes.CLASS_LOOKUP[id].ID_Prereq;
-                            while (id_pre != (byte)Systems.Classes.ID.New) {
+                            id_pre = Systems.Class.CLASS_LOOKUP[id].ID_Prereq;
+                            while (id_pre != (byte)Systems.Class.CLASS_IDS.New) {
                                 if (id_other == id_pre) {
                                     return CLASS_VALIDITY.INVALID_COMBINATION; //invalid combination (same as other class or one of its prereqs)
                                 }
                                 else {
-                                    id_pre = Systems.Classes.CLASS_LOOKUP[id_pre].ID_Prereq;
+                                    id_pre = Systems.Class.CLASS_LOOKUP[id_pre].ID_Prereq;
                                 }
                             }
 
@@ -193,7 +193,7 @@ namespace ExperienceAndClasses {
             else {
                 id_other = Class_Primary.ID;
             }
-            if ((id == id_other) && (id != (byte)Systems.Classes.ID.None)) {
+            if ((id == id_other) && (id != (byte)Systems.Class.CLASS_IDS.None)) {
                 //if setting to other set class, just swap
                 return LocalSwapClass();
             }
@@ -202,10 +202,10 @@ namespace ExperienceAndClasses {
                 switch (valid) {
                     case CLASS_VALIDITY.VALID:
                         if (is_primary) {
-                            Class_Primary = Systems.Classes.CLASS_LOOKUP[id];
+                            Class_Primary = Systems.Class.CLASS_LOOKUP[id];
                         }
                         else {
-                            Class_Secondary = Systems.Classes.CLASS_LOOKUP[id];
+                            Class_Secondary = Systems.Class.CLASS_LOOKUP[id];
                         }
                         LocalUpdateClassInfo();
                         return true;
@@ -252,22 +252,22 @@ namespace ExperienceAndClasses {
             if (!is_local_player) return;
 
             //prevent secondary without primary class (move secondary to primary)
-            if ((Class_Primary.ID == (byte)Systems.Classes.ID.New) || (Class_Primary.ID == (byte)Systems.Classes.ID.None)) {
+            if ((Class_Primary.ID == (byte)Systems.Class.CLASS_IDS.New) || (Class_Primary.ID == (byte)Systems.Class.CLASS_IDS.None)) {
                 Class_Primary = Class_Secondary;
-                Class_Secondary = Systems.Classes.CLASS_LOOKUP[(byte)Systems.Classes.ID.None];
+                Class_Secondary = Systems.Class.CLASS_LOOKUP[(byte)Systems.Class.CLASS_IDS.None];
             }
 
             //any "new" class should be set
-            if (Class_Primary.ID == (byte)Systems.Classes.ID.New) {
-                Class_Primary = Systems.Classes.CLASS_LOOKUP[(byte)Systems.Classes.ID.Novice];
+            if (Class_Primary.ID == (byte)Systems.Class.CLASS_IDS.New) {
+                Class_Primary = Systems.Class.CLASS_LOOKUP[(byte)Systems.Class.CLASS_IDS.Novice];
             }
-            if (Class_Secondary.ID == (byte)Systems.Classes.ID.New) {
-                Class_Secondary = Systems.Classes.CLASS_LOOKUP[(byte)Systems.Classes.ID.None];
+            if (Class_Secondary.ID == (byte)Systems.Class.CLASS_IDS.New) {
+                Class_Secondary = Systems.Class.CLASS_LOOKUP[(byte)Systems.Class.CLASS_IDS.None];
             }
 
             //clear secondary if not allowed
             if (!Allow_Secondary) {
-                Class_Secondary = Systems.Classes.CLASS_LOOKUP[(byte)Systems.Classes.ID.None];
+                Class_Secondary = Systems.Class.CLASS_LOOKUP[(byte)Systems.Class.CLASS_IDS.None];
             }
 
             //set current levels for easier checking
@@ -353,9 +353,9 @@ namespace ExperienceAndClasses {
                 return;
             }
 
-            Class_Primary = Systems.Classes.CLASS_LOOKUP[primary_id];
+            Class_Primary = Systems.Class.CLASS_LOOKUP[primary_id];
             Class_Primary_Level = primary_level;
-            Class_Secondary = Systems.Classes.CLASS_LOOKUP[secondary_id];
+            Class_Secondary = Systems.Class.CLASS_LOOKUP[secondary_id];
             Class_Secondary_Level = secondary_level;
 
             UpdateClassInfo();
@@ -432,8 +432,8 @@ namespace ExperienceAndClasses {
             Allow_Secondary = Commons.TryGet<bool>(tag, "eac_class_current_primary", Allow_Secondary);
 
             //current classes
-            Class_Primary = Systems.Classes.CLASS_LOOKUP[Commons.TryGet<byte>(load_tag, "eac_class_current_primary", Class_Primary.ID)];
-            Class_Secondary = Systems.Classes.CLASS_LOOKUP[Commons.TryGet<byte>(load_tag, "eac_class_current_secondary", Class_Secondary.ID)];
+            Class_Primary = Systems.Class.CLASS_LOOKUP[Commons.TryGet<byte>(load_tag, "eac_class_current_primary", Class_Primary.ID)];
+            Class_Secondary = Systems.Class.CLASS_LOOKUP[Commons.TryGet<byte>(load_tag, "eac_class_current_secondary", Class_Secondary.ID)];
 
             //class levels
             byte[] class_levels_loaded = Commons.TryGet<byte[]>(load_tag, "eac_class_levels", new byte[0]);

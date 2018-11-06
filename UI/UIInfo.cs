@@ -17,8 +17,8 @@ namespace ExperienceAndClasses.UI {
         public static readonly UIInfo Instance = new UIInfo();
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Constants ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-        private const float TEXT_SCALE_TITLE = 1;
-        private const float TEXT_SCALE_BODY = 0.7f;
+        private const float TEXT_SCALE_TITLE = 1.1f;
+        private const float TEXT_SCALE_BODY = 0.9f;
 
         private const float WIDTH_CLASS = 300;
 
@@ -84,7 +84,7 @@ namespace ExperienceAndClasses.UI {
                 UIElement parent = source.Parent;
                 while (parent != null) {
                     if (parent.Equals(state)) {
-                        this.source = null;
+                        source = null;
                         Visibility = false;
                     }
                     parent = parent.Parent;
@@ -93,15 +93,15 @@ namespace ExperienceAndClasses.UI {
         }
 
         public void ShowTextClass(UIElement source, byte class_id) {
-            Systems.Class c = Systems.Classes.CLASS_LOOKUP[class_id];
+            Systems.Class c = Systems.Class.CLASS_LOOKUP[class_id];
 
             string title = c.Name.ToUpper();
             string text = "";
             if (ExperienceAndClasses.LOCAL_MPLAYER.class_levels[class_id] <= 0) {
                 title += " (locked)";
-                text += "Requirement: " + c.GetPrereqString() + "\n\n";
+                text += c.GetPrereqString() + "\n\n";
             }
-            text += c.GetAttributeString() + "\n\n" + c.Description;
+            text += c.GetDamagetring() + "\n\n" + c.GetAttributeString() + "\n\n" + c.Description;
 
             ShowText(source, title, text, WIDTH_CLASS);
         }

@@ -60,6 +60,7 @@
     <Compile Include="Shared.cs" />
     <Compile Include="ExperienceAndClasses.cs" />
     <Compile Include="MPlayer.cs" />
+    <Compile Include="Systems\Attribute.cs" />
     <Compile Include="Systems\Class.cs" />
     <Compile Include="UI\Elements.cs" />
     <Compile Include="UI\UIBars.cs" />
