@@ -34,19 +34,22 @@ namespace ExperienceAndClasses.UI {
             value.Top.Set(Shared.UI_PADDING, 0f);
             Append(value);
 
+            //split value components
+            //add +/- buttons
+
             Update();
         }
 
         public override void MouseOver(UIMouseEvent evt) {
-            
+            //TODO
         }
 
         public override void MouseOut(UIMouseEvent evt) {
-            
+            //TODO
         }
 
         public void Update() {
-            
+            //TODO
         }
     }
 
