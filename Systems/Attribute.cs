@@ -35,6 +35,10 @@ namespace ExperienceAndClasses.Systems {
         }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Instance ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+        public byte ID { get; private set; }
+        public string Name { get; private set; }
+        public string Description { get; private set; }
+
         public Attribute() {
 
         }
@@ -43,14 +47,14 @@ namespace ExperienceAndClasses.Systems {
     class PowerScaling {
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Constants (and readonly) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         public enum POWER_SCALING_TYPES : byte {
-            NONE,
-            MELEE,
-            RANGED,
-            MAGIC,
-            THROWING,
-            MINION,
-            ALL,
-            ROGUE,
+            None,
+            Melee,
+            Ranged,
+            Magic,
+            Throwing,
+            Minion,
+            All,
+            Rogue,
 
             //insert here
 
@@ -80,36 +84,36 @@ namespace ExperienceAndClasses.Systems {
                 minion = 0f;
 
                 switch (id) {
-                    case POWER_SCALING_TYPES.NONE:
+                    case POWER_SCALING_TYPES.None:
                         name = "None";
                         break;
 
-                    case POWER_SCALING_TYPES.MELEE:
+                    case POWER_SCALING_TYPES.Melee:
                         name = "Melee";
                         melee = 1f;
                         break;
 
-                    case POWER_SCALING_TYPES.RANGED:
+                    case POWER_SCALING_TYPES.Ranged:
                         name = "Ranged";
                         ranged = 1f;
                         break;
 
-                    case POWER_SCALING_TYPES.MAGIC:
+                    case POWER_SCALING_TYPES.Magic:
                         name = "Magic";
                         magic = 1f;
                         break;
 
-                    case POWER_SCALING_TYPES.THROWING:
+                    case POWER_SCALING_TYPES.Throwing:
                         name = "Throwing";
                         throwing = 1f;
                         break;
 
-                    case POWER_SCALING_TYPES.MINION:
+                    case POWER_SCALING_TYPES.Minion:
                         name = "Minion";
                         minion = 1f;
                         break;
 
-                    case POWER_SCALING_TYPES.ALL:
+                    case POWER_SCALING_TYPES.All:
                         name = "Melee, Ranged, Magic, Throwing, Minion";
                         melee = 1f;
                         ranged = 1f;
@@ -118,25 +122,28 @@ namespace ExperienceAndClasses.Systems {
                         minion = 1f;
                         break;
 
-                    case POWER_SCALING_TYPES.ROGUE:
+                    case POWER_SCALING_TYPES.Rogue:
                         name = "Melee, Throwing";
                         melee = 1f;
                         throwing = 1f;
                         break;
                 }
 
-                POWER_SCALING_LOOKUP[id_byte] = new PowerScaling(name, melee, ranged, magic, throwing, minion);
+                POWER_SCALING_LOOKUP[id_byte] = new PowerScaling(id_byte, name, melee, ranged, magic, throwing, minion);
             }
         }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Instance ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+        public byte ID { get; private set; }
         public string Name { get; private set; }
         public float Melee { get; private set; }
         public float Ranged { get; private set; }
         public float Magic { get; private set; }
         public float Throwing { get; private set; }
         public float Minion { get; private set; }
-        public PowerScaling(string name, float melee, float ranged, float magic, float throwing, float minion) {
+
+        public PowerScaling(byte id, string name, float melee, float ranged, float magic, float throwing, float minion) {
+            ID = id;
             Name = name;
             Melee = melee;
             Ranged = ranged;

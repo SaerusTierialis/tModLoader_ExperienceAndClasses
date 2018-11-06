@@ -68,7 +68,7 @@ namespace ExperienceAndClasses.Systems {
                 tier = 0;
                 id_prereq = CLASS_IDS.New;
                 texture = ModLoader.GetTexture("ExperienceAndClasses/Textures/Tokens/ClassToken_Novice");
-                power_scaling = PowerScaling.POWER_SCALING_TYPES.NONE;
+                power_scaling = PowerScaling.POWER_SCALING_TYPES.None;
 
                 //specifics
                 switch (id) {
@@ -82,7 +82,7 @@ namespace ExperienceAndClasses.Systems {
                         tier = 1;
                         texture = ModLoader.GetTexture("ExperienceAndClasses/Textures/Tokens/ClassToken_Novice");
                         class_locations[0, 3] = id_byte;
-                        power_scaling = PowerScaling.POWER_SCALING_TYPES.ALL;
+                        power_scaling = PowerScaling.POWER_SCALING_TYPES.All;
                         break;
 
                     case CLASS_IDS.Warrior:
@@ -92,7 +92,7 @@ namespace ExperienceAndClasses.Systems {
                         texture = ModLoader.GetTexture("ExperienceAndClasses/Textures/Tokens/ClassToken_Warrior");
                         class_locations[1, 0] = id_byte;
                         id_prereq = CLASS_IDS.Novice;
-                        power_scaling = PowerScaling.POWER_SCALING_TYPES.MELEE;
+                        power_scaling = PowerScaling.POWER_SCALING_TYPES.Melee;
                         break;
 
                     case CLASS_IDS.Ranger:
@@ -102,7 +102,7 @@ namespace ExperienceAndClasses.Systems {
                         texture = ModLoader.GetTexture("ExperienceAndClasses/Textures/Tokens/ClassToken_Ranger");
                         class_locations[1, 1] = id_byte;
                         id_prereq = CLASS_IDS.Novice;
-                        power_scaling = PowerScaling.POWER_SCALING_TYPES.RANGED;
+                        power_scaling = PowerScaling.POWER_SCALING_TYPES.Ranged;
                         break;
 
                     case CLASS_IDS.Mage:
@@ -112,7 +112,7 @@ namespace ExperienceAndClasses.Systems {
                         texture = ModLoader.GetTexture("ExperienceAndClasses/Textures/Tokens/ClassToken_Mage");
                         class_locations[1, 2] = id_byte;
                         id_prereq = CLASS_IDS.Novice;
-                        power_scaling = PowerScaling.POWER_SCALING_TYPES.MAGIC;
+                        power_scaling = PowerScaling.POWER_SCALING_TYPES.Magic;
                         break;
 
                     case CLASS_IDS.Rogue:
@@ -122,7 +122,7 @@ namespace ExperienceAndClasses.Systems {
                         texture = ModLoader.GetTexture("ExperienceAndClasses/Textures/Tokens/ClassToken_Rogue");
                         class_locations[1, 3] = id_byte;
                         id_prereq = CLASS_IDS.Novice;
-                        power_scaling = PowerScaling.POWER_SCALING_TYPES.ROGUE;
+                        power_scaling = PowerScaling.POWER_SCALING_TYPES.Rogue;
                         break;
 
                     case CLASS_IDS.Summoner:
@@ -132,7 +132,7 @@ namespace ExperienceAndClasses.Systems {
                         texture = ModLoader.GetTexture("ExperienceAndClasses/Textures/Tokens/ClassToken_Summoner");
                         class_locations[1, 4] = id_byte;
                         id_prereq = CLASS_IDS.Novice;
-                        power_scaling = PowerScaling.POWER_SCALING_TYPES.MINION;
+                        power_scaling = PowerScaling.POWER_SCALING_TYPES.Minion;
                         break;
 
                     case CLASS_IDS.Cleric:
@@ -142,7 +142,7 @@ namespace ExperienceAndClasses.Systems {
                         texture = ModLoader.GetTexture("ExperienceAndClasses/Textures/Tokens/ClassToken_Cleric");
                         class_locations[1, 5] = id_byte;
                         id_prereq = CLASS_IDS.Novice;
-                        power_scaling = PowerScaling.POWER_SCALING_TYPES.ALL;
+                        power_scaling = PowerScaling.POWER_SCALING_TYPES.All;
                         break;
 
                     case CLASS_IDS.Hybrid:
@@ -152,7 +152,7 @@ namespace ExperienceAndClasses.Systems {
                         texture = ModLoader.GetTexture("ExperienceAndClasses/Textures/Tokens/ClassToken_Hybrid");
                         class_locations[1, 6] = id_byte;
                         id_prereq = CLASS_IDS.Novice;
-                        power_scaling = PowerScaling.POWER_SCALING_TYPES.ALL;
+                        power_scaling = PowerScaling.POWER_SCALING_TYPES.All;
                         break;
 
                     case CLASS_IDS.Knight:
@@ -162,7 +162,7 @@ namespace ExperienceAndClasses.Systems {
                         texture = ModLoader.GetTexture("ExperienceAndClasses/Textures/Tokens/ClassToken_Knight");
                         class_locations[2, 0] = id_byte;
                         id_prereq = CLASS_IDS.Warrior;
-                        power_scaling = PowerScaling.POWER_SCALING_TYPES.MELEE;
+                        power_scaling = PowerScaling.POWER_SCALING_TYPES.Melee;
                         break;
 
                     case CLASS_IDS.Berserker:
@@ -172,7 +172,7 @@ namespace ExperienceAndClasses.Systems {
                         texture = ModLoader.GetTexture("ExperienceAndClasses/Textures/Tokens/ClassToken_Berserker");
                         class_locations[3, 0] = id_byte;
                         id_prereq = CLASS_IDS.Warrior;
-                        power_scaling = PowerScaling.POWER_SCALING_TYPES.MELEE;
+                        power_scaling = PowerScaling.POWER_SCALING_TYPES.Melee;
                         break;
 
                     case CLASS_IDS.Guardian:
@@ -182,7 +182,7 @@ namespace ExperienceAndClasses.Systems {
                         texture = ModLoader.GetTexture("ExperienceAndClasses/Textures/Tokens/ClassToken_Guardian");
                         class_locations[4, 0] = id_byte;
                         id_prereq = CLASS_IDS.Warrior;
-                        power_scaling = PowerScaling.POWER_SCALING_TYPES.MELEE;
+                        power_scaling = PowerScaling.POWER_SCALING_TYPES.Melee;
                         break;
 
                     case CLASS_IDS.Sniper:
@@ -192,7 +192,7 @@ namespace ExperienceAndClasses.Systems {
                         texture = ModLoader.GetTexture("ExperienceAndClasses/Textures/Tokens/ClassToken_Sniper");
                         class_locations[2, 1] = id_byte;
                         id_prereq = CLASS_IDS.Ranger;
-                        power_scaling = PowerScaling.POWER_SCALING_TYPES.RANGED;
+                        power_scaling = PowerScaling.POWER_SCALING_TYPES.Ranged;
                         break;
 
                     case CLASS_IDS.Trickshot:
@@ -202,7 +202,7 @@ namespace ExperienceAndClasses.Systems {
                         texture = ModLoader.GetTexture("ExperienceAndClasses/Textures/Tokens/ClassToken_Trickshot");
                         class_locations[3, 1] = id_byte;
                         id_prereq = CLASS_IDS.Ranger;
-                        power_scaling = PowerScaling.POWER_SCALING_TYPES.RANGED;
+                        power_scaling = PowerScaling.POWER_SCALING_TYPES.Ranged;
                         break;
 
                     case CLASS_IDS.Engineer:
@@ -212,7 +212,7 @@ namespace ExperienceAndClasses.Systems {
                         texture = ModLoader.GetTexture("ExperienceAndClasses/Textures/Tokens/ClassToken_Engineer");
                         class_locations[4, 1] = id_byte;
                         id_prereq = CLASS_IDS.Ranger;
-                        power_scaling = PowerScaling.POWER_SCALING_TYPES.RANGED;
+                        power_scaling = PowerScaling.POWER_SCALING_TYPES.Ranged;
                         break;
 
                     case CLASS_IDS.Mystic:
@@ -222,7 +222,7 @@ namespace ExperienceAndClasses.Systems {
                         texture = ModLoader.GetTexture("ExperienceAndClasses/Textures/Tokens/ClassToken_Mystic");
                         class_locations[2, 2] = id_byte;
                         id_prereq = CLASS_IDS.Mage;
-                        power_scaling = PowerScaling.POWER_SCALING_TYPES.MAGIC;
+                        power_scaling = PowerScaling.POWER_SCALING_TYPES.Magic;
                         break;
 
                     case CLASS_IDS.Sage:
@@ -232,7 +232,7 @@ namespace ExperienceAndClasses.Systems {
                         texture = ModLoader.GetTexture("ExperienceAndClasses/Textures/Tokens/ClassToken_Sage");
                         class_locations[3, 2] = id_byte;
                         id_prereq = CLASS_IDS.Mage;
-                        power_scaling = PowerScaling.POWER_SCALING_TYPES.MAGIC;
+                        power_scaling = PowerScaling.POWER_SCALING_TYPES.Magic;
                         break;
 
                     case CLASS_IDS.Assassin:
@@ -242,7 +242,7 @@ namespace ExperienceAndClasses.Systems {
                         texture = ModLoader.GetTexture("ExperienceAndClasses/Textures/Tokens/ClassToken_Assassin");
                         class_locations[2, 3] = id_byte;
                         id_prereq = CLASS_IDS.Rogue;
-                        power_scaling = PowerScaling.POWER_SCALING_TYPES.MELEE;
+                        power_scaling = PowerScaling.POWER_SCALING_TYPES.Melee;
                         break;
 
                     case CLASS_IDS.Ninja:
@@ -252,7 +252,7 @@ namespace ExperienceAndClasses.Systems {
                         texture = ModLoader.GetTexture("ExperienceAndClasses/Textures/Tokens/ClassToken_Ninja");
                         class_locations[3, 3] = id_byte;
                         id_prereq = CLASS_IDS.Rogue;
-                        power_scaling = PowerScaling.POWER_SCALING_TYPES.THROWING;
+                        power_scaling = PowerScaling.POWER_SCALING_TYPES.Throwing;
                         break;
 
                     case CLASS_IDS.SoulBinder:
@@ -262,7 +262,7 @@ namespace ExperienceAndClasses.Systems {
                         texture = ModLoader.GetTexture("ExperienceAndClasses/Textures/Tokens/ClassToken_SoulBinder");
                         class_locations[2, 4] = id_byte;
                         id_prereq = CLASS_IDS.Summoner;
-                        power_scaling = PowerScaling.POWER_SCALING_TYPES.MINION;
+                        power_scaling = PowerScaling.POWER_SCALING_TYPES.Minion;
                         break;
 
                     case CLASS_IDS.Hivemind:
@@ -272,7 +272,7 @@ namespace ExperienceAndClasses.Systems {
                         texture = ModLoader.GetTexture("ExperienceAndClasses/Textures/Tokens/ClassToken_Hivemind");
                         class_locations[3, 4] = id_byte;
                         id_prereq = CLASS_IDS.Summoner;
-                        power_scaling = PowerScaling.POWER_SCALING_TYPES.MINION;
+                        power_scaling = PowerScaling.POWER_SCALING_TYPES.Minion;
                         break;
 
                     case CLASS_IDS.Saint:
@@ -282,7 +282,7 @@ namespace ExperienceAndClasses.Systems {
                         texture = ModLoader.GetTexture("ExperienceAndClasses/Textures/Tokens/ClassToken_Saint");
                         class_locations[2, 5] = id_byte;
                         id_prereq = CLASS_IDS.Cleric;
-                        power_scaling = PowerScaling.POWER_SCALING_TYPES.ALL;
+                        power_scaling = PowerScaling.POWER_SCALING_TYPES.All;
                         break;
 
                     case CLASS_IDS.HybridPrime:
@@ -292,7 +292,7 @@ namespace ExperienceAndClasses.Systems {
                         texture = ModLoader.GetTexture("ExperienceAndClasses/Textures/Tokens/ClassToken_HybridPrime");
                         class_locations[2, 6] = id_byte;
                         id_prereq = CLASS_IDS.Hybrid;
-                        power_scaling = PowerScaling.POWER_SCALING_TYPES.ALL;
+                        power_scaling = PowerScaling.POWER_SCALING_TYPES.All;
                         break;
                 }
 
