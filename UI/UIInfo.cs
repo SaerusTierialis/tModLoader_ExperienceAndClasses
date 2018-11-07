@@ -83,6 +83,15 @@ namespace ExperienceAndClasses.UI {
                     ui_text_extra.SetText("");
                 }
 
+                //adjust vertical position
+                float screen_height = state.GetDimensions().Height;
+                if (screen_height < (panel_body.Top.Pixels + panel_body.Height.Pixels)) {
+                    float adjust = (panel_body.Top.Pixels + panel_body.Height.Pixels) - screen_height;
+                    panel_title.Top.Set(panel_title.Top.Pixels - adjust, 0f);
+                    panel_body.Top.Set(panel_body.Top.Pixels - adjust, 0f);
+                }
+
+                //show
                 Visibility = true;
             }
         }
