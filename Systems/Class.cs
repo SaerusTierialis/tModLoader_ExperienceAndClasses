@@ -221,9 +221,8 @@ namespace ExperienceAndClasses.Systems {
                         class_locations[4, 0] = id_byte;
                         id_prereq = CLASS_IDS.Warrior;
                         power_scaling = PowerScaling.POWER_SCALING_TYPES.Melee;
-                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Power] = 2;
+                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Power] = 3;
                         attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Vitality] = 5;
-                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Spirit] = 2;
                         break;
 
                     case CLASS_IDS.Trickshot:
