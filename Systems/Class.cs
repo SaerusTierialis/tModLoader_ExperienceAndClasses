@@ -58,6 +58,7 @@ namespace ExperienceAndClasses.Systems {
             Texture2D texture;
             CLASS_IDS id_prereq;
             PowerScaling.POWER_SCALING_TYPES power_scaling;
+            float[] attribute_growth;
 
             for (CLASS_IDS id = 0; id < CLASS_IDS.NUMBER_OF_IDs; id++) {
                 id_byte = (byte)id;
@@ -70,10 +71,21 @@ namespace ExperienceAndClasses.Systems {
                 texture = ModLoader.GetTexture("ExperienceAndClasses/Textures/Tokens/ClassToken_Novice");
                 power_scaling = PowerScaling.POWER_SCALING_TYPES.None;
 
+                //default attribute growth of active attributes to 1 (per 10 levels)
+                attribute_growth = new float[(byte)Attribute.ATTRIBUTE_IDS.NUMBER_OF_IDs];
+                for (byte i = 0; i< attribute_growth.Length; i++) {
+                    if (Attribute.ATTRIBUTE_LOOKUP[i].Active) {
+                        attribute_growth[i] = 1;
+                    }
+                }
+
                 //specifics
                 switch (id) {
                     case CLASS_IDS.None:
                         name = "None";
+                        for (byte i = 0; i < attribute_growth.Length; i++) {
+                            attribute_growth[i] = 0;
+                        }
                         break;
 
                     case CLASS_IDS.Novice:
@@ -93,6 +105,9 @@ namespace ExperienceAndClasses.Systems {
                         class_locations[1, 0] = id_byte;
                         id_prereq = CLASS_IDS.Novice;
                         power_scaling = PowerScaling.POWER_SCALING_TYPES.Melee;
+                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Power] = 2;
+                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Vitality] = 3;
+                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Dexterity] = 2;
                         break;
 
                     case CLASS_IDS.Ranger:
@@ -103,6 +118,9 @@ namespace ExperienceAndClasses.Systems {
                         class_locations[1, 1] = id_byte;
                         id_prereq = CLASS_IDS.Novice;
                         power_scaling = PowerScaling.POWER_SCALING_TYPES.Ranged;
+                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Power] = 3;
+                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Spirit] = 2;
+                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Dexterity] = 2;
                         break;
 
                     case CLASS_IDS.Mage:
@@ -113,6 +131,8 @@ namespace ExperienceAndClasses.Systems {
                         class_locations[1, 2] = id_byte;
                         id_prereq = CLASS_IDS.Novice;
                         power_scaling = PowerScaling.POWER_SCALING_TYPES.Magic;
+                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Power] = 3;
+                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Mind] = 3;
                         break;
 
                     case CLASS_IDS.Rogue:
@@ -123,6 +143,8 @@ namespace ExperienceAndClasses.Systems {
                         class_locations[1, 3] = id_byte;
                         id_prereq = CLASS_IDS.Novice;
                         power_scaling = PowerScaling.POWER_SCALING_TYPES.Rogue;
+                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Spirit] = 3;
+                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Agility] = 3;
                         break;
 
                     case CLASS_IDS.Summoner:
@@ -133,6 +155,8 @@ namespace ExperienceAndClasses.Systems {
                         class_locations[1, 4] = id_byte;
                         id_prereq = CLASS_IDS.Novice;
                         power_scaling = PowerScaling.POWER_SCALING_TYPES.Minion;
+                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Power] = 3;
+                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Spirit] = 3;
                         break;
 
                     case CLASS_IDS.Cleric:
@@ -143,6 +167,8 @@ namespace ExperienceAndClasses.Systems {
                         class_locations[1, 5] = id_byte;
                         id_prereq = CLASS_IDS.Novice;
                         power_scaling = PowerScaling.POWER_SCALING_TYPES.All;
+                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Mind] = 3;
+                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Spirit] = 3;
                         break;
 
                     case CLASS_IDS.Hybrid:
@@ -153,6 +179,12 @@ namespace ExperienceAndClasses.Systems {
                         class_locations[1, 6] = id_byte;
                         id_prereq = CLASS_IDS.Novice;
                         power_scaling = PowerScaling.POWER_SCALING_TYPES.All;
+                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Power] = 2;
+                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Vitality] = 2;
+                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Mind] = 2;
+                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Spirit] = 2;
+                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Agility] = 2;
+                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Dexterity] = 2;
                         break;
 
                     case CLASS_IDS.Knight:
@@ -163,6 +195,8 @@ namespace ExperienceAndClasses.Systems {
                         class_locations[2, 0] = id_byte;
                         id_prereq = CLASS_IDS.Warrior;
                         power_scaling = PowerScaling.POWER_SCALING_TYPES.Melee;
+                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Power] = 5;
+                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Vitality] = 3;
                         break;
 
                     case CLASS_IDS.Berserker:
@@ -173,6 +207,10 @@ namespace ExperienceAndClasses.Systems {
                         class_locations[3, 0] = id_byte;
                         id_prereq = CLASS_IDS.Warrior;
                         power_scaling = PowerScaling.POWER_SCALING_TYPES.Melee;
+                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Power] = 2;
+                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Vitality] = 2;
+                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Agility] = 2;
+                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Dexterity] = 4;
                         break;
 
                     case CLASS_IDS.Guardian:
@@ -183,16 +221,9 @@ namespace ExperienceAndClasses.Systems {
                         class_locations[4, 0] = id_byte;
                         id_prereq = CLASS_IDS.Warrior;
                         power_scaling = PowerScaling.POWER_SCALING_TYPES.Melee;
-                        break;
-
-                    case CLASS_IDS.Sniper:
-                        name = "Sniper";
-                        desc = "TODO_description";
-                        tier = 3;
-                        texture = ModLoader.GetTexture("ExperienceAndClasses/Textures/Tokens/ClassToken_Sniper");
-                        class_locations[2, 1] = id_byte;
-                        id_prereq = CLASS_IDS.Ranger;
-                        power_scaling = PowerScaling.POWER_SCALING_TYPES.Ranged;
+                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Power] = 2;
+                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Vitality] = 5;
+                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Dexterity] = 2;
                         break;
 
                     case CLASS_IDS.Trickshot:
@@ -203,6 +234,21 @@ namespace ExperienceAndClasses.Systems {
                         class_locations[3, 1] = id_byte;
                         id_prereq = CLASS_IDS.Ranger;
                         power_scaling = PowerScaling.POWER_SCALING_TYPES.Ranged;
+                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Power] = 2;
+                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Spirit] = 2;
+                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Dexterity] = 5;
+                        break;
+
+                    case CLASS_IDS.Sniper:
+                        name = "Sniper";
+                        desc = "TODO_description";
+                        tier = 3;
+                        texture = ModLoader.GetTexture("ExperienceAndClasses/Textures/Tokens/ClassToken_Sniper");
+                        class_locations[2, 1] = id_byte;
+                        id_prereq = CLASS_IDS.Ranger;
+                        power_scaling = PowerScaling.POWER_SCALING_TYPES.Ranged;
+                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Power] = 4;
+                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Spirit] = 4;
                         break;
 
                     case CLASS_IDS.Engineer:
@@ -213,6 +259,10 @@ namespace ExperienceAndClasses.Systems {
                         class_locations[4, 1] = id_byte;
                         id_prereq = CLASS_IDS.Ranger;
                         power_scaling = PowerScaling.POWER_SCALING_TYPES.Ranged;
+                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Power] = 3;
+                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Vitality] = 3;
+                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Spirit] = 2;
+                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Dexterity] = 2;
                         break;
 
                     case CLASS_IDS.Mystic:
@@ -223,6 +273,8 @@ namespace ExperienceAndClasses.Systems {
                         class_locations[2, 2] = id_byte;
                         id_prereq = CLASS_IDS.Mage;
                         power_scaling = PowerScaling.POWER_SCALING_TYPES.Magic;
+                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Power] = 5;
+                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Mind] = 3;
                         break;
 
                     case CLASS_IDS.Sage:
@@ -233,6 +285,9 @@ namespace ExperienceAndClasses.Systems {
                         class_locations[3, 2] = id_byte;
                         id_prereq = CLASS_IDS.Mage;
                         power_scaling = PowerScaling.POWER_SCALING_TYPES.Magic;
+                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Power] = 3;
+                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Vitality] = 2;
+                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Mind] = 4;
                         break;
 
                     case CLASS_IDS.Assassin:
@@ -242,7 +297,10 @@ namespace ExperienceAndClasses.Systems {
                         texture = ModLoader.GetTexture("ExperienceAndClasses/Textures/Tokens/ClassToken_Assassin");
                         class_locations[2, 3] = id_byte;
                         id_prereq = CLASS_IDS.Rogue;
-                        power_scaling = PowerScaling.POWER_SCALING_TYPES.Melee;
+                        power_scaling = PowerScaling.POWER_SCALING_TYPES.Rogue;
+                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Power] = 2;
+                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Spirit] = 4;
+                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Agility] = 3;
                         break;
 
                     case CLASS_IDS.Ninja:
@@ -253,16 +311,9 @@ namespace ExperienceAndClasses.Systems {
                         class_locations[3, 3] = id_byte;
                         id_prereq = CLASS_IDS.Rogue;
                         power_scaling = PowerScaling.POWER_SCALING_TYPES.Throwing;
-                        break;
-
-                    case CLASS_IDS.SoulBinder:
-                        name = "Soul Binder";
-                        desc = "TODO_description";
-                        tier = 3;
-                        texture = ModLoader.GetTexture("ExperienceAndClasses/Textures/Tokens/ClassToken_SoulBinder");
-                        class_locations[2, 4] = id_byte;
-                        id_prereq = CLASS_IDS.Summoner;
-                        power_scaling = PowerScaling.POWER_SCALING_TYPES.Minion;
+                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Power] = 3;
+                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Spirit] = 3;
+                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Agility] = 3;
                         break;
 
                     case CLASS_IDS.Hivemind:
@@ -273,6 +324,22 @@ namespace ExperienceAndClasses.Systems {
                         class_locations[3, 4] = id_byte;
                         id_prereq = CLASS_IDS.Summoner;
                         power_scaling = PowerScaling.POWER_SCALING_TYPES.Minion;
+                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Power] = 3;
+                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Mind] = 2;
+                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Spirit] = 4;
+                        break;
+
+                    case CLASS_IDS.SoulBinder:
+                        name = "Soul Binder";
+                        desc = "TODO_description";
+                        tier = 3;
+                        texture = ModLoader.GetTexture("ExperienceAndClasses/Textures/Tokens/ClassToken_SoulBinder");
+                        class_locations[2, 4] = id_byte;
+                        id_prereq = CLASS_IDS.Summoner;
+                        power_scaling = PowerScaling.POWER_SCALING_TYPES.Minion;
+                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Power] = 5;
+                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Mind] = 2;
+                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Spirit] = 2;
                         break;
 
                     case CLASS_IDS.Saint:
@@ -283,6 +350,8 @@ namespace ExperienceAndClasses.Systems {
                         class_locations[2, 5] = id_byte;
                         id_prereq = CLASS_IDS.Cleric;
                         power_scaling = PowerScaling.POWER_SCALING_TYPES.All;
+                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Mind] = 3;
+                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Spirit] = 5;
                         break;
 
                     case CLASS_IDS.HybridPrime:
@@ -293,11 +362,23 @@ namespace ExperienceAndClasses.Systems {
                         class_locations[2, 6] = id_byte;
                         id_prereq = CLASS_IDS.Hybrid;
                         power_scaling = PowerScaling.POWER_SCALING_TYPES.All;
+                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Power] = 2.5f;
+                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Vitality] = 2.5f;
+                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Mind] = 2.5f;
+                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Spirit] = 2.5f;
+                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Agility] = 2.5f;
+                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Dexterity] = 2.5f;
+                        break;
+
+                    default:
+                        for (byte i = 0; i < attribute_growth.Length; i++) {
+                            attribute_growth[i] = 0;
+                        }
                         break;
                 }
 
                 //add
-                CLASS_LOOKUP[id_byte] = new Class(id_byte, name, desc, tier, texture, (byte)id_prereq, PowerScaling.POWER_SCALING_LOOKUP[(byte)power_scaling]);
+                CLASS_LOOKUP[id_byte] = new Class(id_byte, name, desc, tier, texture, (byte)id_prereq, PowerScaling.POWER_SCALING_LOOKUP[(byte)power_scaling], attribute_growth);
             }
         }
 
@@ -309,8 +390,9 @@ namespace ExperienceAndClasses.Systems {
         public Texture2D Texture { get; private set; }
         public byte ID_Prereq { get; private set; }
         public PowerScaling Power_Scaling { get; private set; }
+        public float[] Attribute_Growth { get; private set; }
 
-        public Class(byte id, string name, string description, byte tier, Texture2D texture, byte id_prereq, PowerScaling power_scaling) {
+        public Class(byte id, string name, string description, byte tier, Texture2D texture, byte id_prereq, PowerScaling power_scaling, float[] attribute_growth) {
             ID = id;
             Name = name;
             Description = description;
@@ -318,6 +400,7 @@ namespace ExperienceAndClasses.Systems {
             Texture = texture;
             ID_Prereq = id_prereq;
             Power_Scaling = power_scaling;
+            Attribute_Growth = attribute_growth;
         }
 
         public string GetPrereqString() {
@@ -339,7 +422,7 @@ namespace ExperienceAndClasses.Systems {
         }
 
         public string GetAttributeString() {
-            return "ATTRIBUTES:\nTODO_attribute ★★★☆☆";
+            return "ATTRIBUTES:\nTODO_attribute ★★✰☆☆";
         }
     }
 }
