@@ -402,27 +402,5 @@ namespace ExperienceAndClasses.Systems {
             Power_Scaling = power_scaling;
             Attribute_Growth = attribute_growth;
         }
-
-        public string GetPrereqString() {
-            string text = "REQUIREMENT:\n" + CLASS_LOOKUP[ID_Prereq].Name;
-            switch (Tier) {
-                case 2:
-                    text += " Lv." + Shared.LEVEL_REQUIRED_TIER_2;
-                    break;
-
-                case 3:
-                    text += " Lv." + Shared.LEVEL_REQUIRED_TIER_3;
-                    break;
-            }
-            return text;
-        }
-
-        public string GetDamagetring() {
-            return "DAMAGE TYPE:\n" + Power_Scaling.Name;
-        }
-
-        public string GetAttributeString() {
-            return "ATTRIBUTES:\nTODO_attribute ★★✰☆☆";
-        }
     }
 }

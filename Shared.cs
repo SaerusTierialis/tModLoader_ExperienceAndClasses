@@ -19,6 +19,7 @@ namespace ExperienceAndClasses {
         public const double SUBCLASS_PENALTY_MULTIPLIER_SECONDARY = 0.4;
 
         public const short LEVELS_PER_ATTRIBUTE = 15;
+        public const byte ATTRIBUTE_GROWTH_LEVELS = 10;
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Colours ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 

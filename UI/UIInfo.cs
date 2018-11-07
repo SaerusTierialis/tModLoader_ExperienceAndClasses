@@ -27,7 +27,7 @@ namespace ExperienceAndClasses.UI {
         private DragableUIPanel panel_title;
         private DragableUIPanel panel_body;
         private UIText ui_text_title;
-        private UIText ui_text_body;
+        private UIText ui_text_body, ui_text_extra;
         private UIElement source = null;
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Initialize ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
@@ -45,12 +45,17 @@ namespace ExperienceAndClasses.UI {
             ui_text_body.Top.Set(Shared.UI_PADDING, 0f);
             panel_body.Append(ui_text_body);
 
+            ui_text_extra = new UIText("", TEXT_SCALE_BODY, false);
+            ui_text_extra.Left.Set(Shared.UI_PADDING, 0f);
+            ui_text_extra.Top.Set(Shared.UI_PADDING, 0f);
+            panel_body.Append(ui_text_extra);
+
             state.Append(panel_body);
             state.Append(panel_title);
         }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Methods ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-        private void ShowText(UIElement source, string title, string body, float width) {
+        private void ShowText(UIElement source, string title, string body, float width, string extra=null, float extra_left=0f) {
             if ((this.source == null) || !this.source.Equals(source)) {
                 this.source = source;
 
@@ -67,6 +72,16 @@ namespace ExperienceAndClasses.UI {
                 panel_body.SetSize(width, (Main.fontMouseText.MeasureString(body).Y*TEXT_SCALE_BODY) + panel_title.Height.Pixels + Shared.UI_PADDING);
                 ui_text_body.Top.Set(Shared.UI_PADDING + panel_title.Height.Pixels, 0f);
                 ui_text_body.SetText(body);
+
+                //extra
+                if (extra != null) {
+                    ui_text_extra.SetText(extra);
+                    ui_text_extra.Left.Set(extra_left, 0f);
+                    ui_text_extra.Top.Set(panel_body.Height.Pixels - (Main.fontMouseText.MeasureString(extra).Y * TEXT_SCALE_BODY), 0f);
+                }
+                else {
+                    ui_text_extra.SetText("");
+                }
 
                 Visibility = true;
             }
@@ -99,11 +114,52 @@ namespace ExperienceAndClasses.UI {
             string text = c.Description + "\n\n";
             if (ExperienceAndClasses.LOCAL_MPLAYER.Class_Levels[class_id] <= 0) {
                 title += " (locked)";
-                text += c.GetPrereqString() + "\n\n";
-            }
-            text += c.GetDamagetring() + "\n\n" + c.GetAttributeString();
+                text += "REQUIREMENT: " + Systems.Class.CLASS_LOOKUP[c.ID_Prereq].Name;
+                switch (c.Tier) {
+                    case 2:
+                        text += " Lv." + Shared.LEVEL_REQUIRED_TIER_2;
+                        break;
 
-            ShowText(source, title, text, WIDTH_CLASS);
+                    case 3:
+                        text += " Lv." + Shared.LEVEL_REQUIRED_TIER_3;
+                        break;
+                }
+                text += "\n\n";
+            }
+            text += "DAMAGE TYPE: " + c.Power_Scaling.Name + "\n\nATTRIBUTES:";
+
+            //attributes
+            bool first = true;
+            string attribute_names = "";
+            string attribute_growth = "";
+            foreach (byte id in Systems.Attribute.ATTRIBUTES_UI_ORDER) {
+                if (first) {
+                    first = false;
+                }
+                else {
+                    attribute_names += "\n";
+                    attribute_growth += "\n";
+                }
+                attribute_names += Systems.Attribute.ATTRIBUTE_LOOKUP[id].Name + ":";
+
+                for (byte i = 0; i < 5; i++) {
+                    if (c.Attribute_Growth[id] >= (i + 1)) {
+                        attribute_growth += "★";
+                    }
+                    else if (c.Attribute_Growth[id] > i) {
+                        attribute_growth += "✯";
+                    }
+                    else {
+                        attribute_growth += "☆";
+                    }
+                }
+            }
+
+            float extra_left = (Main.fontMouseText.MeasureString(attribute_names).X * TEXT_SCALE_BODY) + 10f;
+
+            text += "\n" + attribute_names;
+
+            ShowText(source, title, text, WIDTH_CLASS, attribute_growth, extra_left);
         }
 
         public void ShowTextAttribute(UIElement source, Systems.Attribute attribute) {
