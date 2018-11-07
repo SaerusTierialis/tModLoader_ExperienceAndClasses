@@ -59,8 +59,15 @@ namespace ExperienceAndClasses.UI {
             if ((this.source == null) || !this.source.Equals(source)) {
                 this.source = source;
 
+                //left position
+                float screen_width = state.GetDimensions().Width;
+                float left = source.GetDimensions().X + source.Width.Pixels;
+                if (screen_width < (left + width)) {
+                    left -= ((left + width) - screen_width);
+                }
+
                 //title
-                panel_title.SetPosition(source.GetDimensions().X + source.Width.Pixels, source.GetDimensions().Y);
+                panel_title.SetPosition(left, source.GetDimensions().Y);
                 Vector2 measure_title = Main.fontMouseText.MeasureString(title);
                 panel_title.SetSize(width, measure_title.Y * TEXT_SCALE_TITLE);
                 ui_text_title.Left.Set((width - (measure_title.X*TEXT_SCALE_TITLE)) / 2f, 0f);
