@@ -223,7 +223,7 @@ namespace ExperienceAndClasses.Systems {
                         power_scaling = PowerScaling.POWER_SCALING_TYPES.Melee;
                         attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Power] = 2;
                         attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Vitality] = 5;
-                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Dexterity] = 2;
+                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Spirit] = 2;
                         break;
 
                     case CLASS_IDS.Trickshot:
