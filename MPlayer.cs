@@ -476,6 +476,12 @@ namespace ExperienceAndClasses {
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Save/Load ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         public override TagCompound Save() {
+            //must be byte[], int[], or List<>
+            List<short> attributes_allocated = new List<short>();
+            foreach (short value in Attributes_Allocated) {
+                attributes_allocated.Add(value);
+            }
+
             return new TagCompound {
                 {"eac_save_version", ExperienceAndClasses.VERSION },
                 {"eac_ui_class_left", UI.UIClass.Instance.panel.GetLeft() },
@@ -494,6 +500,7 @@ namespace ExperienceAndClasses {
                 {"eac_class_current_primary", Class_Primary.ID },
                 {"eac_class_current_secondary", Class_Secondary.ID },
                 {"eac_class_subclass_unlocked", Allow_Secondary },
+                {"eac_attribute_allocation", attributes_allocated },
             };
         }
 
@@ -510,10 +517,18 @@ namespace ExperienceAndClasses {
 
             //class levels
             byte[] class_levels_loaded = Commons.TryGet<byte[]>(load_tag, "eac_class_levels", new byte[0]);
-            for (int i = 0; i < class_levels_loaded.Length; i++) {
+            for (byte i = 0; i < class_levels_loaded.Length; i++) {
                 Class_Levels[i] = class_levels_loaded[i];
             }
-        }
 
+            //allocated attributes
+            List<short> attribute_allocation = Commons.TryGet<List<short>>(load_tag, "eac_attribute_allocation", new List<short>());
+            for(byte i = 0; i < attribute_allocation.Count; i++) {
+                if (Systems.Attribute.ATTRIBUTE_LOOKUP[i].Active) {
+                    Attributes_Allocated[i] = attribute_allocation[i];
+                }
+            }
+            
+        }
     }
 }
