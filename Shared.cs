@@ -18,6 +18,8 @@ namespace ExperienceAndClasses {
         public const double SUBCLASS_PENALTY_MULTIPLIER_PRIMARY = 0.7;
         public const double SUBCLASS_PENALTY_MULTIPLIER_SECONDARY = 0.4;
 
+        public const short LEVELS_PER_ATTRIBUTE = 15;
+
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Colours ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         public static readonly Color COLOR_UI_PANEL_BACKGROUND = new Color(73, 94, 171);

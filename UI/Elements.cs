@@ -11,6 +11,8 @@ namespace ExperienceAndClasses.UI {
 
         private const float RIGHT_SIDE_PADDING = 5f;
         private const float LEFT_SUM = 60f;
+        private const float SCALE_SUM = 0.8f;
+        private const float SCALE_SUM_SMALL = 0.6f;
 
         private Systems.Attribute attribute;
         private UIText title, sum, sum_small, final;
@@ -35,16 +37,14 @@ namespace ExperienceAndClasses.UI {
             title.Top.Set(top, 0f);
             Append(title);
 
-            float scale_sum = scale * 0.8f;
-            float top_sum = ((height - (Main.fontMouseText.MeasureString("A").Y * scale_sum)) / 2f) + Shared.UI_PADDING;
-            sum = new UIText("", scale_sum);
+            float top_sum = ((height - (Main.fontMouseText.MeasureString("A").Y * SCALE_SUM)) / 2f) + Shared.UI_PADDING;
+            sum = new UIText("", SCALE_SUM);
             sum.Left.Set(LEFT_SUM, 0f);
             sum.Top.Set(top_sum, 0f);
             Append(sum);
 
-            scale_sum = scale * 0.6f;
-            top_sum = ((height - (Main.fontMouseText.MeasureString("A").Y * scale_sum)) / 2f) + Shared.UI_PADDING;
-            sum_small = new UIText("", scale_sum);
+            top_sum = ((height - (Main.fontMouseText.MeasureString("A").Y * SCALE_SUM_SMALL)) / 2f) + Shared.UI_PADDING;
+            sum_small = new UIText("", SCALE_SUM_SMALL);
             sum_small.Left.Set(LEFT_SUM, 0f);
             sum_small.Top.Set(top_sum, 0f);
             Append(sum_small);
@@ -59,6 +59,7 @@ namespace ExperienceAndClasses.UI {
             button_add.Height.Set(Shared.TEXTURE_BUTTON_SIZE, 0f);
             button_add.Left.Set(width - (button_add.Width.Pixels * 2f) - RIGHT_SIDE_PADDING, 0f);
             button_add.Top.Set((height - button_add.Height.Pixels) / 2f, 0f);
+            button_add.OnClick += new MouseEvent(ClickAdd);
             Append(button_add);
 
             UIImageButton button_subtract = new UIImageButton(Shared.TEXTURE_BUTTON_MINUS);
@@ -66,9 +67,18 @@ namespace ExperienceAndClasses.UI {
             button_subtract.Height.Set(height, 0f);
             button_subtract.Left.Set(width - button_add.Width.Pixels - RIGHT_SIDE_PADDING, 0f);
             button_subtract.Top.Set((height - button_add.Height.Pixels) / 2f, 0f);
+            button_subtract.OnClick += new MouseEvent(ClickSubtract);
             Append(button_subtract);
 
             Update();
+        }
+
+        public void ClickAdd(UIMouseEvent evt, UIElement listeningElement) {
+            ExperienceAndClasses.LOCAL_MPLAYER.LocalAttributeAllocation(attribute.ID, +1);
+        }
+
+        public void ClickSubtract(UIMouseEvent evt, UIElement listeningElement) {
+            ExperienceAndClasses.LOCAL_MPLAYER.LocalAttributeAllocation(attribute.ID, -1);
         }
 
         public override void MouseOver(UIMouseEvent evt) {
@@ -80,15 +90,20 @@ namespace ExperienceAndClasses.UI {
         }
 
         public void Update() {
-            short bonus = ExperienceAndClasses.LOCAL_MPLAYER.Attributes_Bonus[attribute.ID];
+            string str = "" + ExperienceAndClasses.LOCAL_MPLAYER.Attributes_Final[attribute.ID];
+            final.SetText(str);
+            final.Left.Set(left_final - (Main.fontMouseText.MeasureString(str).X * scale), 0f);
 
-            string str = "(" + ExperienceAndClasses.LOCAL_MPLAYER.Attributes_Base[attribute.ID] + "+" + ExperienceAndClasses.LOCAL_MPLAYER.Attributes_Allocated[attribute.ID];
+            float width_cutoff = final.Left.Pixels - sum.Left.Pixels;
+
+            short bonus = ExperienceAndClasses.LOCAL_MPLAYER.Attributes_Bonus[attribute.ID];
+            str = "(" + ExperienceAndClasses.LOCAL_MPLAYER.Attributes_Base[attribute.ID] + "+" + ExperienceAndClasses.LOCAL_MPLAYER.Attributes_Allocated[attribute.ID];
             if (bonus != 0) {
                 str += "+" + bonus;
             }
             str += ")";
 
-            if (bonus != 0) {
+            if ((Main.fontMouseText.MeasureString(str).X * SCALE_SUM) >= width_cutoff) {
                 sum_small.SetText(str);
                 sum.SetText("");
             }
@@ -96,10 +111,6 @@ namespace ExperienceAndClasses.UI {
                 sum_small.SetText("");
                 sum.SetText(str);
             }
-
-            str = "" + ExperienceAndClasses.LOCAL_MPLAYER.Attributes_Final[attribute.ID];
-            final.SetText(str);
-            final.Left.Set(left_final - (Main.fontMouseText.MeasureString(str).X * scale), 0f);
         }
     }
 

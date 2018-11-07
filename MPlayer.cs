@@ -30,6 +30,7 @@ namespace ExperienceAndClasses {
         public short Attribute_Points_Unallocated { get; private set; }
         private short Attribute_Points_Allocated;
         private short Attribute_Points_Total;
+        public byte Levels_To_Next_Point { get; private set; }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Instance Vars (syncing) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -68,9 +69,13 @@ namespace ExperienceAndClasses {
             Attribute_Points_Unallocated = 0;
             Attribute_Points_Allocated = 0;
             Attribute_Points_Total = 0;
+            Levels_To_Next_Point = 0;
 
             Attributes_Base[2] = 10;
             Attributes_Bonus[2] = 3;
+
+            Attributes_Base[3] = 255;
+            Attributes_Bonus[3] = 255;
         }
 
         /// <summary>
@@ -312,7 +317,20 @@ namespace ExperienceAndClasses {
                 Class_Secondary_Level_Effective = Shared.MAX_LEVEL[Class_Secondary.Tier];
             }
 
-            Main.NewText(Class_Primary_Level_Effective + " " + Class_Secondary_Level_Effective);
+            //allocated attributes
+            short class_sum = 0;
+            for (byte id = 0; id < (byte)Systems.Class.CLASS_IDS.NUMBER_OF_IDs; id++) {
+                class_sum += Math.Min(Class_Levels[id], Shared.MAX_LEVEL[Systems.Class.CLASS_LOOKUP[id].Tier]);
+            }
+            int temp;
+            Attribute_Points_Total = (byte)Math.DivRem(class_sum, Shared.LEVELS_PER_ATTRIBUTE, out temp);
+            Levels_To_Next_Point = (byte)temp;
+            Attribute_Points_Allocated = 0;
+            foreach (short allocated in Attributes_Allocated) {
+                Attribute_Points_Allocated += allocated;
+            }
+            Attribute_Points_Unallocated = (short)(Attribute_Points_Total - Attribute_Points_Allocated);
+            CalculateFinalAttributes();
 
             //update UI
             UI.UIClass.Instance.UpdateClassInfo();
@@ -399,6 +417,21 @@ namespace ExperienceAndClasses {
             Class_Secondary_Level_Effective = secondary_level;
 
             UpdateClassInfo();
+        }
+
+        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Attributes ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+        public void LocalAttributeAllocation(byte id, short value) {
+            if ((Attribute_Points_Unallocated >= value) && ((Attributes_Allocated[id] + value) >= 0)) {
+                Attributes_Allocated[id] += value;
+                LocalUpdateClassInfo();
+            }
+        }
+
+        public void CalculateFinalAttributes() {
+            for (byte id = 0; id < (byte)Systems.Attribute.ATTRIBUTE_IDS.NUMBER_OF_IDs; id++) {
+                Attributes_Final[id] = (short)(Attributes_Base[id] + Attributes_Allocated[id] + Attributes_Bonus[id]);
+            }
         }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Drawing ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
