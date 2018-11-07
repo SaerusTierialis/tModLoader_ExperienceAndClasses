@@ -26,15 +26,17 @@ namespace ExperienceAndClasses {
         
         public short[] Attributes_Base { get; private set; }
         public short[] Attributes_Allocated { get; private set; }
+        public short[] Attributes_Bonus { get; private set; }
         public short Attribute_Points_Unallocated { get; private set; }
         private short Attribute_Points_Allocated;
+        private short Attribute_Points_Total;
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Instance Vars (syncing) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         public Systems.Class Class_Primary { get; private set; }
         public Systems.Class Class_Secondary { get; private set; }
-        public byte Class_Primary_Level { get; private set; }
-        public byte Class_Secondary_Level { get; private set; }
+        public byte Class_Primary_Level_Effective { get; private set; }
+        public byte Class_Secondary_Level_Effective { get; private set; }
 
         public bool Allow_Secondary { get; private set; }
         public short[] Attributes_Final { get; private set; }
@@ -61,9 +63,14 @@ namespace ExperienceAndClasses {
             //initialize attributes
             Attributes_Base = new short[(byte)Systems.Attribute.ATTRIBUTE_IDS.NUMBER_OF_IDs];
             Attributes_Allocated = new short[(byte)Systems.Attribute.ATTRIBUTE_IDS.NUMBER_OF_IDs];
+            Attributes_Bonus = new short[(byte)Systems.Attribute.ATTRIBUTE_IDS.NUMBER_OF_IDs];
             Attributes_Final = new short[(byte)Systems.Attribute.ATTRIBUTE_IDS.NUMBER_OF_IDs];
             Attribute_Points_Unallocated = 0;
             Attribute_Points_Allocated = 0;
+            Attribute_Points_Total = 0;
+
+            Attributes_Base[2] = 10;
+            Attributes_Bonus[2] = 3;
         }
 
         /// <summary>
@@ -289,8 +296,23 @@ namespace ExperienceAndClasses {
             }
 
             //set current levels for easier checking
-            Class_Primary_Level = Class_Levels[Class_Primary.ID];
-            Class_Secondary_Level = Class_Levels[Class_Secondary.ID];
+            Class_Primary_Level_Effective = Class_Levels[Class_Primary.ID];
+            Class_Secondary_Level_Effective = Class_Levels[Class_Secondary.ID];
+
+            //level cap primary
+            if (Class_Primary_Level_Effective > Shared.MAX_LEVEL[Class_Primary.Tier]) {
+                Class_Primary_Level_Effective = Shared.MAX_LEVEL[Class_Primary.Tier];
+            }
+
+            //limit secondary to half of primary
+            Class_Secondary_Level_Effective = (byte)Math.Min(Class_Secondary_Level_Effective, Class_Primary_Level_Effective / 2);
+
+            //level cap secondary
+            if (Class_Secondary_Level_Effective > Shared.MAX_LEVEL[Class_Secondary.Tier]) {
+                Class_Secondary_Level_Effective = Shared.MAX_LEVEL[Class_Secondary.Tier];
+            }
+
+            Main.NewText(Class_Primary_Level_Effective + " " + Class_Secondary_Level_Effective);
 
             //update UI
             UI.UIClass.Instance.UpdateClassInfo();
@@ -322,8 +344,8 @@ namespace ExperienceAndClasses {
 
             clone.Class_Primary = Class_Primary;
             clone.Class_Secondary = Class_Secondary;
-            clone.Class_Primary_Level = Class_Primary_Level;
-            clone.Class_Secondary_Level = Class_Secondary_Level;
+            clone.Class_Primary_Level_Effective = Class_Primary_Level_Effective;
+            clone.Class_Secondary_Level_Effective = Class_Secondary_Level_Effective;
         }
 
         /// <summary>
@@ -344,8 +366,8 @@ namespace ExperienceAndClasses {
 
                 //class selections and levels
                 if ((clone.Class_Primary.ID != Class_Primary.ID) || (clone.Class_Secondary.ID != Class_Secondary.ID) || 
-                    (clone.Class_Primary_Level != Class_Primary_Level) || (clone.Class_Secondary_Level != Class_Secondary_Level)) {
-                    PacketSender.SendForceClass(me, Class_Primary.ID, Class_Primary_Level, Class_Secondary.ID, Class_Secondary_Level);
+                    (clone.Class_Primary_Level_Effective != Class_Primary_Level_Effective) || (clone.Class_Secondary_Level_Effective != Class_Secondary_Level_Effective)) {
+                    PacketSender.SendForceClass(me, Class_Primary.ID, Class_Primary_Level_Effective, Class_Secondary.ID, Class_Secondary_Level_Effective);
                 }
             }
         }
@@ -360,7 +382,7 @@ namespace ExperienceAndClasses {
             byte me = (byte)player.whoAmI;
 
             //class selections and levels
-            PacketSender.SendForceClass(me, Class_Primary.ID, Class_Primary_Level, Class_Secondary.ID, Class_Secondary_Level);
+            PacketSender.SendForceClass(me, Class_Primary.ID, Class_Primary_Level_Effective, Class_Secondary.ID, Class_Secondary_Level_Effective);
         }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Sync Force Commands ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
@@ -372,9 +394,9 @@ namespace ExperienceAndClasses {
             }
 
             Class_Primary = Systems.Class.CLASS_LOOKUP[primary_id];
-            Class_Primary_Level = primary_level;
+            Class_Primary_Level_Effective = primary_level;
             Class_Secondary = Systems.Class.CLASS_LOOKUP[secondary_id];
-            Class_Secondary_Level = secondary_level;
+            Class_Secondary_Level_Effective = secondary_level;
 
             UpdateClassInfo();
         }

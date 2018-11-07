@@ -13,7 +13,7 @@ namespace ExperienceAndClasses.UI {
         private const float LEFT_SUM = 60f;
 
         private Systems.Attribute attribute;
-        private UIText title, sum, final;
+        private UIText title, sum, sum_small, final;
         private float scale, left_final;
 
         public AttributeText(float width, float height, float scale, Systems.Attribute attribute) {
@@ -35,12 +35,19 @@ namespace ExperienceAndClasses.UI {
             title.Top.Set(top, 0f);
             Append(title);
 
-            float scale_sum = scale * 0.85f;
+            float scale_sum = scale * 0.8f;
             float top_sum = ((height - (Main.fontMouseText.MeasureString("A").Y * scale_sum)) / 2f) + Shared.UI_PADDING;
             sum = new UIText("", scale_sum);
             sum.Left.Set(LEFT_SUM, 0f);
             sum.Top.Set(top_sum, 0f);
             Append(sum);
+
+            scale_sum = scale * 0.6f;
+            top_sum = ((height - (Main.fontMouseText.MeasureString("A").Y * scale_sum)) / 2f) + Shared.UI_PADDING;
+            sum_small = new UIText("", scale_sum);
+            sum_small.Left.Set(LEFT_SUM, 0f);
+            sum_small.Top.Set(top_sum, 0f);
+            Append(sum_small);
 
             final = new UIText("", scale);
             final.Left.Set(left_final, 0f);
@@ -73,9 +80,24 @@ namespace ExperienceAndClasses.UI {
         }
 
         public void Update() {
-            sum.SetText("(" + ExperienceAndClasses.LOCAL_MPLAYER.Attributes_Base[attribute.ID] + " + " + ExperienceAndClasses.LOCAL_MPLAYER.Attributes_Allocated[attribute.ID] + ")");
+            short bonus = ExperienceAndClasses.LOCAL_MPLAYER.Attributes_Bonus[attribute.ID];
 
-            string str = "" + ExperienceAndClasses.LOCAL_MPLAYER.Attributes_Final[attribute.ID];
+            string str = "(" + ExperienceAndClasses.LOCAL_MPLAYER.Attributes_Base[attribute.ID] + "+" + ExperienceAndClasses.LOCAL_MPLAYER.Attributes_Allocated[attribute.ID];
+            if (bonus != 0) {
+                str += "+" + bonus;
+            }
+            str += ")";
+
+            if (bonus != 0) {
+                sum_small.SetText(str);
+                sum.SetText("");
+            }
+            else {
+                sum_small.SetText("");
+                sum.SetText(str);
+            }
+
+            str = "" + ExperienceAndClasses.LOCAL_MPLAYER.Attributes_Final[attribute.ID];
             final.SetText(str);
             final.Left.Set(left_final - (Main.fontMouseText.MeasureString(str).X * scale), 0f);
         }
@@ -147,7 +169,7 @@ namespace ExperienceAndClasses.UI {
 
                 //text level
                 string str = "";
-                if (level >= Shared.MAX_LEVEL) {
+                if (level >= Shared.MAX_LEVEL[Systems.Class.CLASS_LOOKUP[class_id].Tier]) {
                     str = "MAX";
                 }
                 else {

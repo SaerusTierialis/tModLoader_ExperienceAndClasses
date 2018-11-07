@@ -13,7 +13,7 @@ namespace ExperienceAndClasses {
         public const byte LEVEL_REQUIRED_TIER_2 = 10;
         public const byte LEVEL_REQUIRED_TIER_3 = 50;
 
-        public const byte MAX_LEVEL = 100;
+        public static readonly byte[] MAX_LEVEL = new byte[] { 0, 10, 50, 100 };
 
         public const double SUBCLASS_PENALTY_MULTIPLIER_PRIMARY = 0.7;
         public const double SUBCLASS_PENALTY_MULTIPLIER_SECONDARY = 0.4;
