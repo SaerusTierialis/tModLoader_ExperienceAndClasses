@@ -9,13 +9,18 @@ namespace ExperienceAndClasses.UI {
 
     class AttributeText : UIPanel {
 
-        private const float LEFT_VALUE = 90;
+        private const float RIGHT_SIDE_PADDING = 5f;
+        private const float LEFT_SUM = 60f;
 
         private Systems.Attribute attribute;
-        private UIText title, value;
+        private UIText title, sum, final;
+        private float scale, left_final;
 
         public AttributeText(float width, float height, float scale, Systems.Attribute attribute) {
             this.attribute = attribute;
+            this.scale = scale;
+
+            left_final = width - (Shared.TEXTURE_BUTTON_SIZE*2) - RIGHT_SIDE_PADDING - Shared.UI_PADDING;
 
             SetPadding(0f);
             Left.Set(0f, 0f);
@@ -24,32 +29,55 @@ namespace ExperienceAndClasses.UI {
             Height.Set(height, 0f);
             BackgroundColor = Shared.COLOR_UI_PANEL_HIGHLIGHT;
 
-            title = new UIText(attribute.Name.ToUpper(), scale);
+            float top = ((height - (Main.fontMouseText.MeasureString("A").Y * scale)) / 2f) + Shared.UI_PADDING;
+            title = new UIText(attribute.Name_Short.ToUpper(), scale);
             title.Left.Set(Shared.UI_PADDING, 0f);
-            title.Top.Set(Shared.UI_PADDING, 0f);
+            title.Top.Set(top, 0f);
             Append(title);
 
-            value = new UIText("0 (0+0)", scale);
-            value.Left.Set(LEFT_VALUE, 0f);
-            value.Top.Set(Shared.UI_PADDING, 0f);
-            Append(value);
+            float scale_sum = scale * 0.85f;
+            float top_sum = ((height - (Main.fontMouseText.MeasureString("A").Y * scale_sum)) / 2f) + Shared.UI_PADDING;
+            sum = new UIText("", scale_sum);
+            sum.Left.Set(LEFT_SUM, 0f);
+            sum.Top.Set(top_sum, 0f);
+            Append(sum);
 
-            //split value components
-            //add +/- buttons
+            final = new UIText("", scale);
+            final.Left.Set(left_final, 0f);
+            final.Top.Set(top, 0f);
+            Append(final);
+
+            UIImageButton button_add = new UIImageButton(Shared.TEXTURE_BUTTON_PLUS);
+            button_add.Width.Set(Shared.TEXTURE_BUTTON_SIZE, 0f);
+            button_add.Height.Set(Shared.TEXTURE_BUTTON_SIZE, 0f);
+            button_add.Left.Set(width - (button_add.Width.Pixels * 2f) - RIGHT_SIDE_PADDING, 0f);
+            button_add.Top.Set((height - button_add.Height.Pixels) / 2f, 0f);
+            Append(button_add);
+
+            UIImageButton button_subtract = new UIImageButton(Shared.TEXTURE_BUTTON_MINUS);
+            button_subtract.Width.Set(height, 0f);
+            button_subtract.Height.Set(height, 0f);
+            button_subtract.Left.Set(width - button_add.Width.Pixels - RIGHT_SIDE_PADDING, 0f);
+            button_subtract.Top.Set((height - button_add.Height.Pixels) / 2f, 0f);
+            Append(button_subtract);
 
             Update();
         }
 
         public override void MouseOver(UIMouseEvent evt) {
-            //TODO
+            UIInfo.Instance.ShowTextAttribute(this, attribute);
         }
 
         public override void MouseOut(UIMouseEvent evt) {
-            //TODO
+            UIInfo.Instance.EndText(this);
         }
 
         public void Update() {
-            //TODO
+            sum.SetText("(" + ExperienceAndClasses.LOCAL_MPLAYER.Attributes_Base[attribute.ID] + " + " + ExperienceAndClasses.LOCAL_MPLAYER.Attributes_Allocated[attribute.ID] + ")");
+
+            string str = "" + ExperienceAndClasses.LOCAL_MPLAYER.Attributes_Final[attribute.ID];
+            final.SetText(str);
+            final.Left.Set(left_final - (Main.fontMouseText.MeasureString(str).X * scale), 0f);
         }
     }
 
@@ -103,14 +131,16 @@ namespace ExperienceAndClasses.UI {
 
         public override void MouseOver(UIMouseEvent evt) {
             UIInfo.Instance.ShowTextClass(this, class_id);
+            base.MouseOver(evt);
         }
 
         public override void MouseOut(UIMouseEvent evt) {
             UIInfo.Instance.EndText(this);
+            base.MouseOut(evt);
         }
 
         public void Update() {
-            byte level = ExperienceAndClasses.LOCAL_MPLAYER.class_levels[class_id];
+            byte level = ExperienceAndClasses.LOCAL_MPLAYER.Class_Levels[class_id];
             if (level > 0) {
                 //not locked
                 image_lock.SetImage(Shared.TEXTURE_BLANK);

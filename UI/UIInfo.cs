@@ -21,7 +21,7 @@ namespace ExperienceAndClasses.UI {
         private const float TEXT_SCALE_BODY = 0.9f;
 
         private const float WIDTH_CLASS = 300;
-
+        private const float WIDTH_ATTRIBUTE = 300;
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Variables ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         private DragableUIPanel panel_title;
@@ -97,13 +97,19 @@ namespace ExperienceAndClasses.UI {
 
             string title = c.Name.ToUpper();
             string text = c.Description + "\n\n";
-            if (ExperienceAndClasses.LOCAL_MPLAYER.class_levels[class_id] <= 0) {
+            if (ExperienceAndClasses.LOCAL_MPLAYER.Class_Levels[class_id] <= 0) {
                 title += " (locked)";
                 text += c.GetPrereqString() + "\n\n";
             }
             text += c.GetDamagetring() + "\n\n" + c.GetAttributeString();
 
             ShowText(source, title, text, WIDTH_CLASS);
+        }
+
+        public void ShowTextAttribute(UIElement source, Systems.Attribute attribute) {
+            string title = attribute.Name;
+            string text = attribute.Description + "\n\n" + attribute.Bonus;
+            ShowText(source, title, text, WIDTH_ATTRIBUTE);
         }
 
     }

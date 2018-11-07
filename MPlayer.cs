@@ -18,10 +18,16 @@ namespace ExperienceAndClasses {
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Instance Vars (non-syncing) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-        public bool is_local_player;
         private TagCompound load_tag;
-        public byte[] class_levels;
-        public bool initialized;
+        public bool Initialized { get; private set; }
+        public bool Is_Local_Player { get; private set; }
+
+        public byte[] Class_Levels { get; private set; }
+        
+        public short[] Attributes_Base { get; private set; }
+        public short[] Attributes_Allocated { get; private set; }
+        public short Attribute_Points_Unallocated { get; private set; }
+        private short Attribute_Points_Allocated;
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Instance Vars (syncing) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -29,7 +35,9 @@ namespace ExperienceAndClasses {
         public Systems.Class Class_Secondary { get; private set; }
         public byte Class_Primary_Level { get; private set; }
         public byte Class_Secondary_Level { get; private set; }
+
         public bool Allow_Secondary { get; private set; }
+        public short[] Attributes_Final { get; private set; }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Initialize ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -38,17 +46,24 @@ namespace ExperienceAndClasses {
         /// </summary>
         public override void Initialize() {
             //defaults
-            is_local_player = false;
+            Is_Local_Player = false;
             Allow_Secondary = false;
-            initialized = false;
+            Initialized = false;
 
             //default class level
-            class_levels = new byte[(byte)Systems.Class.CLASS_IDS.NUMBER_OF_IDs];
-            class_levels[(byte)Systems.Class.CLASS_IDS.Novice] = 1;
+            Class_Levels = new byte[(byte)Systems.Class.CLASS_IDS.NUMBER_OF_IDs];
+            Class_Levels[(byte)Systems.Class.CLASS_IDS.Novice] = 1;
 
             //default class selection
             Class_Primary = Systems.Class.CLASS_LOOKUP[(byte)Systems.Class.CLASS_IDS.Novice];
             Class_Secondary = Systems.Class.CLASS_LOOKUP[(byte)Systems.Class.CLASS_IDS.None];
+
+            //initialize attributes
+            Attributes_Base = new short[(byte)Systems.Attribute.ATTRIBUTE_IDS.NUMBER_OF_IDs];
+            Attributes_Allocated = new short[(byte)Systems.Attribute.ATTRIBUTE_IDS.NUMBER_OF_IDs];
+            Attributes_Final = new short[(byte)Systems.Attribute.ATTRIBUTE_IDS.NUMBER_OF_IDs];
+            Attribute_Points_Unallocated = 0;
+            Attribute_Points_Allocated = 0;
         }
 
         /// <summary>
@@ -59,7 +74,7 @@ namespace ExperienceAndClasses {
             // is this the local player?
             if (player.whoAmI == Main.LocalPlayer.whoAmI) {
                 //this is the current local player
-                is_local_player = true;
+                Is_Local_Player = true;
                 ExperienceAndClasses.LOCAL_MPLAYER = this;
 
                 //start timer for next full sync
@@ -84,6 +99,9 @@ namespace ExperienceAndClasses {
                 UI.UIStatus.Instance.panel.Auto = Commons.TryGet<bool>(load_tag, "eac_ui_status_auto", false);
                 UI.UIStatus.Instance.panel.Pinned = Commons.TryGet<bool>(load_tag, "eac_ui_status_pinned", false);
 
+                //rehide status buttons
+                UI.UIStatus.Instance.panel.HideButtons();
+
                 //temp: show bars and status
                 UI.UIBars.Instance.Visibility = true;
                 UI.UIStatus.Instance.Visibility = true;
@@ -95,14 +113,14 @@ namespace ExperienceAndClasses {
                 LocalUpdateClassInfo();
 
                 //enter game complete
-                initialized = true;
+                Initialized = true;
             }
         }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Update ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         public override void PostUpdate() {
-            if (initialized) {
+            if (Initialized) {
 
             }
         }
@@ -119,7 +137,7 @@ namespace ExperienceAndClasses {
         }
         public CLASS_VALIDITY LocalCheckClassValid(byte id, bool is_primary) {
             //local MPlayer only
-            if (!is_local_player) return CLASS_VALIDITY.INVALID_NON_LOCAL;
+            if (!Is_Local_Player) return CLASS_VALIDITY.INVALID_NON_LOCAL;
 
             if (id == (byte)Systems.Class.CLASS_IDS.None) {
                 return CLASS_VALIDITY.VALID; //setting to no class is always allowed
@@ -139,7 +157,7 @@ namespace ExperienceAndClasses {
                         id_other = Class_Primary.ID;
                     }
 
-                    if ((class_levels[id] <= 0) && (id != (byte)Systems.Class.CLASS_IDS.None)) {
+                    if ((Class_Levels[id] <= 0) && (id != (byte)Systems.Class.CLASS_IDS.None)) {
                         return CLASS_VALIDITY.INVALID_LEVEL; //locked class
                     }
                     else {
@@ -175,7 +193,7 @@ namespace ExperienceAndClasses {
 
         public bool LocalSetClass(byte id, bool is_primary) {
             //local MPlayer only
-            if (!is_local_player) {
+            if (!Is_Local_Player) {
                 Commons.Error("Tried to set non-local player with SetClass! (please report)");
                 return false;
             }
@@ -238,7 +256,7 @@ namespace ExperienceAndClasses {
 
         public bool LocalSwapClass() {
             //local MPlayer only
-            if (!is_local_player) return false;
+            if (!Is_Local_Player) return false;
 
             Systems.Class temp = Class_Primary;
             Class_Primary = Class_Secondary;
@@ -249,7 +267,7 @@ namespace ExperienceAndClasses {
 
         public void LocalUpdateClassInfo() {
             //local MPlayer only
-            if (!is_local_player) return;
+            if (!Is_Local_Player) return;
 
             //prevent secondary without primary class (move secondary to primary)
             if ((Class_Primary.ID == (byte)Systems.Class.CLASS_IDS.New) || (Class_Primary.ID == (byte)Systems.Class.CLASS_IDS.None)) {
@@ -271,8 +289,8 @@ namespace ExperienceAndClasses {
             }
 
             //set current levels for easier checking
-            Class_Primary_Level = class_levels[Class_Primary.ID];
-            Class_Secondary_Level = class_levels[Class_Secondary.ID];
+            Class_Primary_Level = Class_Levels[Class_Primary.ID];
+            Class_Secondary_Level = Class_Levels[Class_Secondary.ID];
 
             //update UI
             UI.UIClass.Instance.UpdateClassInfo();
@@ -348,7 +366,7 @@ namespace ExperienceAndClasses {
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Sync Force Commands ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         public void ForceClass(byte primary_id, byte primary_level, byte secondary_id, byte secondary_level) {
-            if (is_local_player) {
+            if (Is_Local_Player) {
                 Commons.Error("Cannot force class packet for local player");
                 return;
             }
@@ -417,7 +435,7 @@ namespace ExperienceAndClasses {
                 {"eac_ui_status_top", UI.UIStatus.Instance.panel.GetTop() },
                 {"eac_ui_status_auto", UI.UIStatus.Instance.panel.Auto },
                 {"eac_ui_status_pinned", UI.UIStatus.Instance.panel.Pinned },
-                {"eac_class_levels", class_levels },
+                {"eac_class_levels", Class_Levels },
                 {"eac_class_current_primary", Class_Primary.ID },
                 {"eac_class_current_secondary", Class_Secondary.ID },
                 {"eac_class_subclass_unlocked", Allow_Secondary },
@@ -438,7 +456,7 @@ namespace ExperienceAndClasses {
             //class levels
             byte[] class_levels_loaded = Commons.TryGet<byte[]>(load_tag, "eac_class_levels", new byte[0]);
             for (int i = 0; i < class_levels_loaded.Length; i++) {
-                class_levels[i] = class_levels_loaded[i];
+                Class_Levels[i] = class_levels_loaded[i];
             }
         }
 

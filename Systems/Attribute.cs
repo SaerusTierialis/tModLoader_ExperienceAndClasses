@@ -34,7 +34,7 @@ namespace ExperienceAndClasses.Systems {
             ATTRIBUTE_LOOKUP = new Attribute[(byte)ATTRIBUTE_IDS.NUMBER_OF_IDs];
 
             byte id_byte;
-            string name, desc;
+            string name, name_short, desc;
             bool active;
 
             for (ATTRIBUTE_IDS id = 0; id < ATTRIBUTE_IDS.NUMBER_OF_IDs; id++) {
@@ -44,37 +44,44 @@ namespace ExperienceAndClasses.Systems {
 
                 //defaults
                 name = "unknown";
+                name_short = "unknown";
                 desc = "unknown";
                 active = true;
 
                 switch (id) {
                     case ATTRIBUTE_IDS.Power:
                         name = "Power";
+                        name_short = "PWR";
                         desc = "TODO_description";
                         break;
 
                     case ATTRIBUTE_IDS.Vitality:
                         name = "Vitality";
+                        name_short = "VIT";
                         desc = "TODO_description";
                         break;
 
                     case ATTRIBUTE_IDS.Mind:
                         name = "Mind";
+                        name_short = "MND";
                         desc = "TODO_description";
                         break;
 
                     case ATTRIBUTE_IDS.Spirit:
                         name = "Spirit";
+                        name_short = "SPT";
                         desc = "TODO_description";
                         break;
 
                     case ATTRIBUTE_IDS.Agility:
                         name = "Agility";
+                        name_short = "AGI";
                         desc = "TODO_description";
                         break;
 
                     case ATTRIBUTE_IDS.Dexterity:
                         name = "Dexterity";
+                        name_short = "DEX";
                         desc = "TODO_description";
                         break;
 
@@ -83,20 +90,22 @@ namespace ExperienceAndClasses.Systems {
                         break;
                 }
 
-                ATTRIBUTE_LOOKUP[id_byte] = new Attribute(id_byte, name, desc, active);
+                ATTRIBUTE_LOOKUP[id_byte] = new Attribute(id_byte, name, name_short, desc, active);
             }
         }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Instance ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         public byte ID { get; private set; }
         public string Name { get; private set; }
+        public string Name_Short { get; private set; }
         public string Description { get; private set; }
         public bool Active { get; private set; }
         public string Bonus { get; private set; }
 
-        public Attribute(byte id, string name, string description, bool active) {
+        public Attribute(byte id, string name, string name_short, string description, bool active) {
             ID = id;
             Name = name;
+            Name_Short = name_short;
             Description = description;
             Active = active;
             Bonus = "";

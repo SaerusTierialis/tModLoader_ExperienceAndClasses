@@ -13,14 +13,14 @@ namespace ExperienceAndClasses.UI {
         public static readonly UIClass Instance = new UIClass();
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Constants ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-        private const float WIDTH = 700f;
+        private const float WIDTH = 800f;
         private const float HEIGHT = 430f;
         private const float CLASS_BUTTON_SIZE = 36f;
         private const float CLASS_ROW_PADDING = 40f;
         private const float CLASS_COL_PADDING = 10f;
 
-        private const float WIDTH_ATTRIBUTES = 200f;
-        private const float HEIGHT_ATTRIBUTES = 300f;
+        private const float WIDTH_ATTRIBUTES = 230f;
+        private const float HEIGHT_ATTRIBUTES = 250f;
         private const float HEIGHT_ATTRIBUTE = 30f;
 
         private readonly Color COLOR_SUBPANEL = new Color(73, 94, 200);
@@ -42,6 +42,7 @@ namespace ExperienceAndClasses.UI {
         private List<ClassButton> class_buttons;
 
         private List<AttributeText> attribute_texts;
+        private UIText attribute_point_text;
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Initialize ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         protected override void InitializeState() {
@@ -132,8 +133,8 @@ namespace ExperienceAndClasses.UI {
             //attribute panel
             UIPanel panel_attribute = new UIPanel();
             panel_attribute.SetPadding(0);
-            panel_attribute.Left.Set(panel_class.Width.Pixels + Shared.UI_PADDING, 0f);
-            panel_attribute.Top.Set(Shared.UI_PADDING, 0f);
+            panel_attribute.Left.Set(panel_class.Left.Pixels + panel_class.Width.Pixels - 1f, 0f);
+            panel_attribute.Top.Set(HEIGHT - Shared.UI_PADDING - HEIGHT_ATTRIBUTES, 0f);
             panel_attribute.Width.Set(WIDTH_ATTRIBUTES, 0f);
             panel_attribute.Height.Set(HEIGHT_ATTRIBUTES, 0f);
             panel_attribute.BackgroundColor = COLOR_SUBPANEL;
@@ -169,6 +170,12 @@ namespace ExperienceAndClasses.UI {
                 attribute_texts.Add(attribute_text);
             }
 
+            //attribute points
+            attribute_point_text = new UIText("Available Points: 0", FONT_SCALE_ATTRIBUTE);
+            attribute_point_text.Left.Set(Shared.UI_PADDING, 0f);
+            attribute_point_text.Top.Set(top + Shared.UI_PADDING, 0f);
+            panel_attribute.Append(attribute_point_text);
+
             //done adding to main panel
             state.Append(panel);
         }
@@ -193,6 +200,18 @@ namespace ExperienceAndClasses.UI {
             }
             indicate_primary.Recalculate();
             indicate_secondary.Recalculate();
+
+            //attribute
+            foreach (AttributeText button in attribute_texts) {
+                button.Update();
+            }
+
+            //attribute points
+            UpdateAttributePoints();
+        }
+
+        private void UpdateAttributePoints() {
+            attribute_point_text.SetText("Available Points: " + ExperienceAndClasses.LOCAL_MPLAYER.Attribute_Points_Unallocated);
         }
 
         //the panel behind the selected buttons prevents their use without this workaround
