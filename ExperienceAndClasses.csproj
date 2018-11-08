@@ -56,7 +56,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Commons.cs" />
-    <Compile Include="PacketSender.cs" />
+    <Compile Include="PacketHandler.cs" />
     <Compile Include="Shared.cs" />
     <Compile Include="ExperienceAndClasses.cs" />
     <Compile Include="MPlayer.cs" />

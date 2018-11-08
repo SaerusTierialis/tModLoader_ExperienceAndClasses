@@ -123,7 +123,7 @@ namespace ExperienceAndClasses {
             else {
                 message = "Error from Player" + Main.LocalPlayer.whoAmI + ": " + message;
                 Main.NewText(message, ExperienceAndClasses.COLOUR_MESSAGE_ERROR);
-                if (ExperienceAndClasses.IS_CLIENT) PacketSender.SendBroadcastTrace((byte)Main.LocalPlayer.whoAmI, message);
+                if (ExperienceAndClasses.IS_CLIENT) PacketHandler.SendBroadcastTrace((byte)Main.LocalPlayer.whoAmI, message);
             }
             ErrorLogger.Log(message);
         }
@@ -137,7 +137,7 @@ namespace ExperienceAndClasses {
             else {
                 message = "TRACE from Player" + Main.LocalPlayer.whoAmI + ": " + message;
                 Main.NewText(message, ExperienceAndClasses.COLOUR_MESSAGE_TRACE);
-                if (ExperienceAndClasses.IS_CLIENT) PacketSender.SendBroadcastTrace((byte)Main.LocalPlayer.whoAmI, message);
+                if (ExperienceAndClasses.IS_CLIENT) PacketHandler.SendBroadcastTrace((byte)Main.LocalPlayer.whoAmI, message);
             }
         }
     }

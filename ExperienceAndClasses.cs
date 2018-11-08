@@ -1,13 +1,10 @@
+using Microsoft.Xna.Framework;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using Terraria;
 using Terraria.ModLoader;
 using Terraria.UI;
-using Terraria;
-using System.Collections.Generic;
-using System;
-using System.IO;
-using Terraria.Localization;
-using Microsoft.Xna.Framework;
-using Terraria.ID;
-using System.Reflection;
 
 //needed for compiling outside of Terraria
 public class Application
@@ -16,8 +13,7 @@ public class Application
     static void Main(string[] args) { }
 }
 
-namespace ExperienceAndClasses
-{
+namespace ExperienceAndClasses {
     class ExperienceAndClasses : Mod {
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Debug ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -31,8 +27,9 @@ namespace ExperienceAndClasses
         public static readonly bool IS_CLIENT = (Main.netMode == 1);
         public static readonly bool IS_SINGLEPLAYER = (Main.netMode == 0);
 
-        public enum MESSAGE_TYPE : byte {
+        public enum PACKET_TYPE : byte {
             BROADCAST_TRACE,
+            FORCE_FULL,
             FORCE_CLASS,
             FORCE_ATTRIBUTE,
         };
@@ -115,64 +112,18 @@ namespace ExperienceAndClasses
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Packets ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         public override void HandlePacket(BinaryReader reader, int whoAmI) {
-            byte[] bytes;
-
             //first 2 bytes are always type and sender
-            MESSAGE_TYPE message_type = (MESSAGE_TYPE)reader.ReadByte();
-            byte player_ind = (byte)reader.ReadByte();
+            PACKET_TYPE packet_type = (PACKET_TYPE)reader.ReadByte();
+            byte origin_id = (byte)reader.ReadByte();
 
-            Player sender_player = Main.player[player_ind];
-            MPlayer sender_mplayer = sender_player.GetModPlayer<MPlayer>(this);
+            Player origin_player = Main.player[origin_id];
+            MPlayer origin_mplayer = origin_player.GetModPlayer<MPlayer>(this);
 
             if (trace) {
-                Commons.Trace("Recieved " + message_type + " originating from player " + player_ind);
+                Commons.Trace("Recieved " + packet_type + " originating from player " + origin_id);
             }
-           
-            switch (message_type) {
-                case MESSAGE_TYPE.BROADCAST_TRACE:
-                    //read
-                    string message = reader.ReadString();
 
-                    //broadcast
-                    NetMessage.BroadcastChatMessage(NetworkText.FromLiteral(message), ExperienceAndClasses.COLOUR_MESSAGE_TRACE);
-
-                    break;
-
-                case MESSAGE_TYPE.FORCE_CLASS:
-                    //read
-                    bytes = reader.ReadBytes(4);
-
-                    //set
-                    sender_mplayer.ForceClass(bytes[0], bytes[1], bytes[2], bytes[3]);
-
-                    //relay
-                    if (IS_SERVER) {
-                        PacketSender.SendForceClass(player_ind, bytes[0], bytes[1], bytes[2], bytes[3]);
-                    }
-
-                    break;
-
-                case MESSAGE_TYPE.FORCE_ATTRIBUTE:
-                    //read
-                    short[] attributes = new short[(byte)Systems.Attribute.ATTRIBUTE_IDS.NUMBER_OF_IDs];
-                    for (byte i = 0; i < (byte)Systems.Attribute.ATTRIBUTE_IDS.NUMBER_OF_IDs; i++) {
-                        attributes[i] = reader.ReadInt16();
-                    }
-
-                    //set
-                    sender_mplayer.ForceAttribute(attributes);
-
-                    //relay
-                    if (IS_SERVER) {
-                        PacketSender.SendForceAttribute(player_ind, attributes);
-                    }
-
-                    break;
-
-                default:
-                    //unknown type
-                    break;
-            }
+            PacketHandler.HandlePacketContents(origin_id, origin_player, origin_mplayer, packet_type, reader);
         }
 
     }

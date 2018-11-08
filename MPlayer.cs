@@ -406,11 +406,8 @@ namespace ExperienceAndClasses {
         private void FullSync() {
             byte me = (byte)player.whoAmI;
 
-            //class selections and levels
-            PacketSender.SendForceClass(me, Class_Primary.ID, Class_Primary_Level_Effective, Class_Secondary.ID, Class_Secondary_Level_Effective);
-
-            //attributes
-            PacketSender.SendForceAttribute(me, Attributes_Final);
+            //send one packet with everything needed
+            PacketHandler.SendForceFull(me, Class_Primary.ID, Class_Primary_Level_Effective, Class_Secondary.ID, Class_Secondary_Level_Effective, Attributes_Final);
         }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Sync Force Commands ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
