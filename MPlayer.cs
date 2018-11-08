@@ -70,12 +70,6 @@ namespace ExperienceAndClasses {
             Attribute_Points_Allocated = 0;
             Attribute_Points_Total = 0;
             Levels_To_Next_Point = 0;
-
-            Attributes_Base[2] = 10;
-            Attributes_Bonus[2] = 3;
-
-            Attributes_Base[3] = 255;
-            Attributes_Bonus[3] = 255;
         }
 
         /// <summary>
@@ -317,6 +311,34 @@ namespace ExperienceAndClasses {
                 Class_Secondary_Level_Effective = Shared.MAX_LEVEL[Class_Secondary.Tier];
             }
 
+            //base class attributes
+            float sum_primary, sum_secondary;
+            Systems.Class c;
+            for (byte id = 0; id < (byte)Systems.Attribute.ATTRIBUTE_IDS.NUMBER_OF_IDs; id++) {
+                sum_primary = 0;
+                sum_secondary = 0;
+
+                c = Class_Primary;
+                while (c.Tier > 0) {
+                    sum_primary += (c.Attribute_Growth[id] * Math.Min(Class_Levels[c.ID], Shared.MAX_LEVEL[c.Tier]));
+                    c = Systems.Class.CLASS_LOOKUP[c.ID_Prereq];
+                }
+
+                c = Class_Secondary;
+                while (c.Tier > 0) {
+                    sum_secondary += (c.Attribute_Growth[id] * Math.Min(Class_Levels[c.ID], Shared.MAX_LEVEL[c.Tier]));
+                    c = Systems.Class.CLASS_LOOKUP[c.ID_Prereq];
+                }
+
+                if (Class_Secondary_Level_Effective > 0) {
+                    Attributes_Base[id] = (short)Math.Floor((sum_primary / Shared.ATTRIBUTE_GROWTH_LEVELS * Shared.SUBCLASS_PENALTY_ATTRIBUTE_MULTIPLIER_PRIMARY) +
+                                                            (sum_secondary / Shared.ATTRIBUTE_GROWTH_LEVELS * Shared.SUBCLASS_PENALTY_ATTRIBUTE_MULTIPLIER_SECONDARY));
+                }
+                else {
+                    Attributes_Base[id] = (short)Math.Floor(sum_primary / Shared.ATTRIBUTE_GROWTH_LEVELS);
+                }
+            }
+
             //allocated attributes
             short class_sum = 0;
             for (byte id = 0; id < (byte)Systems.Class.CLASS_IDS.NUMBER_OF_IDs; id++) {
@@ -330,6 +352,8 @@ namespace ExperienceAndClasses {
                 Attribute_Points_Allocated += allocated;
             }
             Attribute_Points_Unallocated = (short)(Attribute_Points_Total - Attribute_Points_Allocated);
+
+            //sum attributes
             CalculateFinalAttributes();
 
             //update UI
