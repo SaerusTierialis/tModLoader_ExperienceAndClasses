@@ -114,11 +114,31 @@ namespace ExperienceAndClasses.Systems {
         //per point bonuses
         private const float POWER_DAMAGE = 0.01f;
 
+        private const float VITALITY_LIFE = 1f;
+        private const float VITALITY_LIFE_REGEN = 0.2f;
+        private const float VITALITY_DEFENSE = 0.1f;
+
+        private const float MIND_MANA = 1f;
+        private const float MIND_MANA_REGEN = 0.5f;
+        private const float MIND_MANA_DELAY = 0.5f;
+
+        private const float SPIRIT_CRIT = 0.25f;
+        private const float SPIRIT_MINION_CAP = 0.05f;
+        private const float SPIRIT_HEAL = 1f;
+
+        private const float AGILITY_MOVEMENT = 0.005f;
+        private const float AGILITY_JUMP = 0.01f;
+        private const float AGILITY_DODGE = 0.0025f;
+
+        private const float DEXTERITY_ATTACK_SPEED = 0.0025f;
+        private const float DEXTERITY_COOLDOWN = 0.01f;
+
         public void ApplyEffect(MPlayer mplayer, short points) {
             if (Active) {
 
                 if (mplayer.Is_Local_Player) Bonus = "";
-                float b, bpp;
+                float bf, bpp;
+                int bi;
 
                 switch ((ATTRIBUTE_IDS)ID) {
                     case ATTRIBUTE_IDS.Power:
@@ -129,60 +149,150 @@ namespace ExperienceAndClasses.Systems {
                         float minion_per = Math.Max(mplayer.Class_Primary.Power_Scaling.Minion, mplayer.Class_Secondary.Power_Scaling.Minion / 2);
 
                         bpp = melee_per * POWER_DAMAGE;
-                        b = bpp * points;
+                        bf = bpp * points;
                         if(bpp > 0) {
-                            mplayer.player.meleeDamage += b;
-                            if (mplayer.Is_Local_Player) Bonus += "\n+" + (b * 100) + "% melee damage (" + (bpp * 100) + "% per point)";
+                            mplayer.player.meleeDamage += bf;
+                            if (mplayer.Is_Local_Player) Bonus += "\n+" + (bf * 100) + "% melee damage (" + (bpp * 100) + " per point)";
                         }
 
                         bpp = ranged_per * POWER_DAMAGE;
-                        b = bpp * points;
+                        bf = bpp * points;
                         if (bpp > 0) {
-                            mplayer.player.rangedDamage += b;
-                            if (mplayer.Is_Local_Player) Bonus += "\n+" + (b * 100) + "% ranged damage (" + (bpp * 100) + "% per point)";
+                            mplayer.player.rangedDamage += bf;
+                            if (mplayer.Is_Local_Player) Bonus += "\n+" + (bf * 100) + "% ranged damage (" + (bpp * 100) + " per point)";
                         }
 
                         bpp = magic_per * POWER_DAMAGE;
-                        b = bpp * points;
+                        bf = bpp * points;
                         if (bpp > 0) {
-                            mplayer.player.magicDamage += b;
-                            if (mplayer.Is_Local_Player) Bonus += "\n+" + (b * 100) + "% magic damage (" + (bpp * 100) + "% per point)";
+                            mplayer.player.magicDamage += bf;
+                            if (mplayer.Is_Local_Player) Bonus += "\n+" + (bf * 100) + "% magic damage (" + (bpp * 100) + " per point)";
                         }
 
                         bpp = throwing_per * POWER_DAMAGE;
-                        b = bpp * points;
+                        bf = bpp * points;
                         if (bpp > 0) {
-                            mplayer.player.thrownDamage += b;
-                            if (mplayer.Is_Local_Player) Bonus += "\n+" + (b * 100) + "% throwing damage (" + (bpp * 100) + "% per point)";
+                            mplayer.player.thrownDamage += bf;
+                            if (mplayer.Is_Local_Player) Bonus += "\n+" + (bf * 100) + "% throwing damage (" + (bpp * 100) + " per point)";
                         }
 
                         bpp = minion_per * POWER_DAMAGE;
-                        b = bpp * points;
+                        bf = bpp * points;
                         if (bpp > 0) {
-                            mplayer.player.minionDamage += b;
-                            if (mplayer.Is_Local_Player) Bonus += "\n+" + (b * 100) + "% minion damage (" + (bpp * 100) + "% per point)";
+                            mplayer.player.minionDamage += bf;
+                            if (mplayer.Is_Local_Player) Bonus += "\n+" + (bf * 100) + "% minion damage (" + (bpp * 100) + " per point)";
                         }
 
                         break;
 
                     case ATTRIBUTE_IDS.Vitality:
-                        //TODO
+                        //life
+                        bpp = VITALITY_LIFE;
+                        bi = (int)Math.Floor(bpp * points);
+                        mplayer.player.statLifeMax2 += bi;
+                        if (mplayer.Is_Local_Player) Bonus += "\n+" + bi + " maximum life (" + bpp + " per point)";
+
+                        //life regen
+                        bpp = VITALITY_LIFE_REGEN;
+                        bi = (int)Math.Floor(bpp * points);
+                        mplayer.player.lifeRegen += bi;
+                        if (mplayer.Is_Local_Player) Bonus += "\n+" + bi + " life regen (" + bpp + " per point)";
+
+                        //defense
+                        bpp = VITALITY_DEFENSE;
+                        bi = (int)Math.Floor(bpp * points);
+                        mplayer.player.statDefense += bi;
+                        if (mplayer.Is_Local_Player) Bonus += "\n+" + bi + " defense (" + bpp + " per point)";
+
                         break;
 
                     case ATTRIBUTE_IDS.Mind:
-                        //TODO
+                        //mana
+                        bpp = MIND_MANA;
+                        bi = (int)Math.Floor(bpp * points);
+                        mplayer.player.statManaMax2 += bi;
+                        if (mplayer.Is_Local_Player) Bonus += "\n+" + bi + " maximum mana (" + bpp + " per point)";
+
+                        //mana regen
+                        bpp = MIND_MANA_REGEN;
+                        bi = (int)Math.Floor(bpp * points);
+                        mplayer.player.manaRegenBonus += bi;
+                        if (mplayer.Is_Local_Player) Bonus += "\n+" + bi + " mana regen (" + bpp + " per point)";
+
+                        //mana regen delay (do not reduce too low - causes instant regen)
+                        bpp = MIND_MANA_DELAY;
+                        bi = (int)Math.Floor(bpp * points);
+                        if (mplayer.player.manaRegenDelay > 50) {
+                            int new_delay = (int)Math.Max(Math.Round(mplayer.player.manaRegenDelay * (100f / (100f + bi))), 50);
+                            mplayer.player.manaRegenDelayBonus += mplayer.player.manaRegenDelay - new_delay;
+                        }
+                        if (mplayer.Is_Local_Player) Bonus += "\n+" + bi + "% reduced mana delay (" + bpp + " per point)";
+
                         break;
 
                     case ATTRIBUTE_IDS.Spirit:
-                        //TODO
+                        //crit
+                        bpp = SPIRIT_CRIT;
+                        bi = (int)Math.Floor(bpp * points);
+                        mplayer.player.meleeCrit += bi;
+                        if (mplayer.Is_Local_Player) Bonus += "\n+" + bi + "% melee critical chance (" + bpp + " per point)";
+                        mplayer.player.rangedCrit += bi;
+                        if (mplayer.Is_Local_Player) Bonus += "\n+" + bi + "% ranged critical chance (" + bpp + " per point)";
+                        mplayer.player.magicCrit += bi;
+                        if (mplayer.Is_Local_Player) Bonus += "\n+" + bi + "% magic critical chance (" + bpp + " per point)";
+                        mplayer.player.thrownCrit += bi;
+                        if (mplayer.Is_Local_Player) Bonus += "\n+" + bi + "% throwing critical chance (" + bpp + " per point)";
+
+                        //minion cap
+                        bpp = SPIRIT_MINION_CAP;
+                        bi = (int)Math.Floor(bpp * points);
+                        mplayer.player.maxMinions += bi;
+                        if (mplayer.Is_Local_Player) Bonus += "\n+" + bi + " maximum minions (" + bpp + " per point)";
+
+                        //healing
+                        bpp = SPIRIT_HEAL;
+                        bf = bpp * points;
+                        mplayer.heal_damage += bf;
+                        if (mplayer.Is_Local_Player) Bonus += "\n+" + bf + "% healing (" + bpp + " per point)";
+
                         break;
 
                     case ATTRIBUTE_IDS.Agility:
-                        //TODO
+                        //run
+                        bpp = AGILITY_MOVEMENT;
+                        bf = bpp * points;
+                        mplayer.player.maxRunSpeed *= (1f + bf);
+                        mplayer.player.runAcceleration *= (1f + bf);
+                        mplayer.player.runSlowdown *= (1f / (1f + bf));
+                        if (mplayer.Is_Local_Player) Bonus += "\n+" + (bf * 100) + "% movement speed (" + (bpp*100) + " per point)";
+
+                        //jump
+                        bpp = AGILITY_JUMP;
+                        bf = bpp * points;
+                        mplayer.player.jumpSpeedBoost += (bf * 5);
+                        if (mplayer.Is_Local_Player) Bonus += "\n+" + (bf * 100) + "% increased jump (" + (bpp * 100) + " per point)";
+
+                        //dodge
+                        bpp = AGILITY_DODGE;
+                        bf = bpp * points;
+                        mplayer.dodge_chance += bf;
+                        if (mplayer.Is_Local_Player) Bonus += "\n+" + (bf * 100) + "% dodge chance (" + (bpp * 100) + " per point)";
+
                         break;
 
                     case ATTRIBUTE_IDS.Dexterity:
-                        //TODO
+                        //attack speed
+                        bpp = DEXTERITY_ATTACK_SPEED;
+                        bf = bpp * points;
+                        mplayer.player.meleeSpeed += bf;
+                        if (mplayer.Is_Local_Player) Bonus += "\n+" + (bf * 100) + "% melee attack speed (" + (bpp * 100) + " per point)";
+
+                        //cooldown reduction
+                        bpp = DEXTERITY_COOLDOWN;
+                        bf = bpp * points;
+                        mplayer.cooldown_reduction += bf;
+                        if (mplayer.Is_Local_Player) Bonus += "\n+" + (bf * 100) + "% cooldown reduction (" + (bpp * 100) + " per point)";
+
                         break;
                 }
             }

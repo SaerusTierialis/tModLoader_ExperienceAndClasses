@@ -21,7 +21,7 @@ namespace ExperienceAndClasses.UI {
         private const float TEXT_SCALE_BODY = 0.9f;
 
         private const float WIDTH_CLASS = 300;
-        private const float WIDTH_ATTRIBUTE = 300;
+        private const float WIDTH_ATTRIBUTE = 350;
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Variables ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         private DragableUIPanel panel_title;

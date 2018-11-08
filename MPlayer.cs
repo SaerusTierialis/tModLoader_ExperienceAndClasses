@@ -22,7 +22,8 @@ namespace ExperienceAndClasses {
         public bool Is_Local_Player { get; private set; }
 
         public byte[] Class_Levels { get; private set; }
-        
+        public bool Allow_Secondary { get; private set; }
+
         public short[] Attributes_Base { get; private set; }
         public short[] Attributes_Allocated { get; private set; }
         public short[] Attributes_Bonus { get; private set; }
@@ -30,7 +31,10 @@ namespace ExperienceAndClasses {
         private short Attribute_Points_Allocated;
         private short Attribute_Points_Total;
         public byte Levels_To_Next_Point { get; private set; }
-        public bool Allow_Secondary { get; private set; }
+
+        public float heal_damage; //TODO
+        public float dodge_chance; //TODO
+        public float cooldown_reduction; //TODO
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Instance Vars (syncing) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -68,6 +72,11 @@ namespace ExperienceAndClasses {
             Attribute_Points_Allocated = 0;
             Attribute_Points_Total = 0;
             Levels_To_Next_Point = 0;
+
+            //stats
+            heal_damage = 1f;
+            dodge_chance = 0f;
+            cooldown_reduction = 0f;
         }
 
         /// <summary>
@@ -120,15 +129,19 @@ namespace ExperienceAndClasses {
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Update ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-        public override void PostUpdate() {
-            //string str = player.name + " ";
-            //for (byte i = 0; i < Attributes_Final.Length; i++) {
-            //    str += Attributes_Final[i] + " ";
-            //}
-            //Main.NewText(str);
+        public override void PreUpdate() {
+            base.PreUpdate();
+            heal_damage = 1f;
+            dodge_chance = 0f;
+            cooldown_reduction = 0f;
+        }
 
+        public override void PostUpdateEquips() {
+            base.PostUpdateEquips();
             ApplyAttributes();
-            Main.NewText(player.name + " " + player.meleeDamage);
+            
+            Main.NewText(player.name + " " + player.meleeSpeed);
+
         }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ XP & Class ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
