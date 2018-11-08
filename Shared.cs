@@ -10,10 +10,10 @@ namespace ExperienceAndClasses {
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ XP & Levels ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-        public const byte LEVEL_REQUIRED_TIER_2 = 10;
-        public const byte LEVEL_REQUIRED_TIER_3 = 50;
-
         public static readonly byte[] MAX_LEVEL = new byte[] { 0, 10, 50, 100 };
+
+        public static readonly byte LEVEL_REQUIRED_TIER_2 = MAX_LEVEL[1];
+        public static readonly byte LEVEL_REQUIRED_TIER_3 = MAX_LEVEL[2];
 
         public const double SUBCLASS_PENALTY_XP_MULTIPLIER_PRIMARY = 0.7;
         public const double SUBCLASS_PENALTY_XP_MULTIPLIER_SECONDARY = 0.4;
