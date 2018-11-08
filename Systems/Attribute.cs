@@ -152,35 +152,35 @@ namespace ExperienceAndClasses.Systems {
                         bf = bpp * points;
                         if(bpp > 0) {
                             mplayer.player.meleeDamage += bf;
-                            if (mplayer.Is_Local_Player) Bonus += "\n+" + (bf * 100) + "% melee damage (" + (bpp * 100) + " per point)";
+                            if (mplayer.Is_Local_Player) Bonus += "\n+" + Math.Round(bf * 100, 2) + "% melee damage (" + Math.Round(bpp * 100, 2) + " per point)";
                         }
 
                         bpp = ranged_per * POWER_DAMAGE;
                         bf = bpp * points;
                         if (bpp > 0) {
                             mplayer.player.rangedDamage += bf;
-                            if (mplayer.Is_Local_Player) Bonus += "\n+" + (bf * 100) + "% ranged damage (" + (bpp * 100) + " per point)";
+                            if (mplayer.Is_Local_Player) Bonus += "\n+" + Math.Round(bf * 100, 2) + "% ranged damage (" + Math.Round(bpp * 100, 2) + " per point)";
                         }
 
                         bpp = magic_per * POWER_DAMAGE;
                         bf = bpp * points;
                         if (bpp > 0) {
                             mplayer.player.magicDamage += bf;
-                            if (mplayer.Is_Local_Player) Bonus += "\n+" + (bf * 100) + "% magic damage (" + (bpp * 100) + " per point)";
+                            if (mplayer.Is_Local_Player) Bonus += "\n+" + Math.Round(bf * 100, 2) + "% magic damage (" + Math.Round(bpp * 100, 2) + " per point)";
                         }
 
                         bpp = throwing_per * POWER_DAMAGE;
                         bf = bpp * points;
                         if (bpp > 0) {
                             mplayer.player.thrownDamage += bf;
-                            if (mplayer.Is_Local_Player) Bonus += "\n+" + (bf * 100) + "% throwing damage (" + (bpp * 100) + " per point)";
+                            if (mplayer.Is_Local_Player) Bonus += "\n+" + Math.Round(bf * 100, 2) + "% throwing damage (" + Math.Round(bpp * 100, 2) + " per point)";
                         }
 
                         bpp = minion_per * POWER_DAMAGE;
                         bf = bpp * points;
                         if (bpp > 0) {
                             mplayer.player.minionDamage += bf;
-                            if (mplayer.Is_Local_Player) Bonus += "\n+" + (bf * 100) + "% minion damage (" + (bpp * 100) + " per point)";
+                            if (mplayer.Is_Local_Player) Bonus += "\n+" + Math.Round(bf * 100, 2) + "% minion damage (" + Math.Round(bpp * 100, 2) + " per point)";
                         }
 
                         break;
@@ -264,19 +264,19 @@ namespace ExperienceAndClasses.Systems {
                         mplayer.player.maxRunSpeed *= (1f + bf);
                         mplayer.player.runAcceleration *= (1f + bf);
                         mplayer.player.runSlowdown *= (1f / (1f + bf));
-                        if (mplayer.Is_Local_Player) Bonus += "\n+" + (bf * 100) + "% movement speed (" + (bpp*100) + " per point)";
+                        if (mplayer.Is_Local_Player) Bonus += "\n+" + Math.Round(bf * 100, 2) + "% movement speed (" + Math.Round(bpp * 100, 2) + " per point)";
 
                         //jump
                         bpp = AGILITY_JUMP;
                         bf = bpp * points;
                         mplayer.player.jumpSpeedBoost += (bf * 5);
-                        if (mplayer.Is_Local_Player) Bonus += "\n+" + (bf * 100) + "% increased jump (" + (bpp * 100) + " per point)";
+                        if (mplayer.Is_Local_Player) Bonus += "\n+" + Math.Round(bf * 100, 2) + "% increased jump (" + Math.Round(bpp * 100, 2) + " per point)";
 
                         //dodge
                         bpp = AGILITY_DODGE;
                         bf = bpp * points;
                         mplayer.dodge_chance += bf;
-                        if (mplayer.Is_Local_Player) Bonus += "\n+" + (bf * 100) + "% dodge chance (" + (bpp * 100) + " per point)";
+                        if (mplayer.Is_Local_Player) Bonus += "\n+" + Math.Round(bf * 100, 2) + "% dodge chance (" + Math.Round(bpp * 100, 2) + " per point)";
 
                         break;
 
@@ -285,13 +285,13 @@ namespace ExperienceAndClasses.Systems {
                         bpp = DEXTERITY_ATTACK_SPEED;
                         bf = bpp * points;
                         mplayer.player.meleeSpeed += bf;
-                        if (mplayer.Is_Local_Player) Bonus += "\n+" + (bf * 100) + "% melee attack speed (" + (bpp * 100) + " per point)";
+                        if (mplayer.Is_Local_Player) Bonus += "\n+" + Math.Round(bf * 100, 2) + "% melee attack speed (" + Math.Round(bpp * 100, 2) + " per point)";
 
                         //cooldown reduction
                         bpp = DEXTERITY_COOLDOWN;
                         bf = bpp * points;
                         mplayer.cooldown_reduction += bf;
-                        if (mplayer.Is_Local_Player) Bonus += "\n+" + (bf * 100) + "% cooldown reduction (" + (bpp * 100) + " per point)";
+                        if (mplayer.Is_Local_Player) Bonus += "\n+" + Math.Round(bf * 100, 2) + "% cooldown reduction (" + Math.Round(bpp * 100, 2) + " per point)";
 
                         break;
                 }
