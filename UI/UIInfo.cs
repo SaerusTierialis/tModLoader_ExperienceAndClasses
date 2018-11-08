@@ -56,7 +56,7 @@ namespace ExperienceAndClasses.UI {
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Methods ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         private void ShowText(UIElement source, string title, string body, float width, string extra=null, float extra_left=0f) {
-            if ((this.source == null) || !this.source.Equals(source)) {
+            //if ((this.source == null) || !this.source.Equals(source)) {
                 this.source = source;
 
                 //left position
@@ -100,7 +100,7 @@ namespace ExperienceAndClasses.UI {
 
                 //show
                 Visibility = true;
-            }
+            //}
         }
 
         public void EndText(UIElement source) {

@@ -140,7 +140,7 @@ namespace ExperienceAndClasses {
             base.PostUpdateEquips();
             ApplyAttributes();
             
-            Main.NewText(player.name + " " + player.meleeSpeed);
+            //Main.NewText(player.name + " " + player.meleeSpeed);
 
         }
 

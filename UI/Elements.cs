@@ -59,7 +59,7 @@ namespace ExperienceAndClasses.UI {
             button_add.Height.Set(Shared.TEXTURE_BUTTON_SIZE, 0f);
             button_add.Left.Set(width - (button_add.Width.Pixels * 2f) - RIGHT_SIDE_PADDING, 0f);
             button_add.Top.Set((height - button_add.Height.Pixels) / 2f, 0f);
-            button_add.OnClick += new MouseEvent(ClickAdd);
+            button_add.OnMouseDown += new MouseEvent(ClickAdd);
             Append(button_add);
 
             UIImageButton button_subtract = new UIImageButton(Shared.TEXTURE_BUTTON_MINUS);
@@ -67,7 +67,7 @@ namespace ExperienceAndClasses.UI {
             button_subtract.Height.Set(height, 0f);
             button_subtract.Left.Set(width - button_add.Width.Pixels - RIGHT_SIDE_PADDING, 0f);
             button_subtract.Top.Set((height - button_add.Height.Pixels) / 2f, 0f);
-            button_subtract.OnClick += new MouseEvent(ClickSubtract);
+            button_subtract.OnMouseDown += new MouseEvent(ClickSubtract);
             Append(button_subtract);
 
             Update();
@@ -81,12 +81,19 @@ namespace ExperienceAndClasses.UI {
             ExperienceAndClasses.LOCAL_MPLAYER.LocalAttributeAllocation(attribute.ID, -1);
         }
 
+        public override void MouseUp(UIMouseEvent evt) {
+            UIInfo.Instance.ShowTextAttribute(this, attribute);
+            base.MouseUp(evt);
+        }
+
         public override void MouseOver(UIMouseEvent evt) {
             UIInfo.Instance.ShowTextAttribute(this, attribute);
+            base.MouseOver(evt);
         }
 
         public override void MouseOut(UIMouseEvent evt) {
             UIInfo.Instance.EndText(this);
+            base.MouseOut(evt);
         }
 
         public void Update() {
