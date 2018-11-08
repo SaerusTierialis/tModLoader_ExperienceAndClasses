@@ -397,6 +397,7 @@ namespace ExperienceAndClasses {
         /// <param name="fromWho"></param>
         /// <param name="newPlayer"></param>
         public override void SyncPlayer(int toWho, int fromWho, bool newPlayer) {
+            base.SyncPlayer(toWho, fromWho, newPlayer);
             FullSync();
         }
 
