@@ -14,12 +14,11 @@ namespace ExperienceAndClasses {
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Static Vars ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-        private static DateTime time_next_full_sync = DateTime.MaxValue;
+        private static DateTime time_next_full_sync;
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Instance Vars (non-syncing) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         private TagCompound load_tag;
-        public bool Initialized { get; private set; }
         public bool Is_Local_Player { get; private set; }
 
         public byte[] Class_Levels { get; private set; }
@@ -31,6 +30,7 @@ namespace ExperienceAndClasses {
         private short Attribute_Points_Allocated;
         private short Attribute_Points_Total;
         public byte Levels_To_Next_Point { get; private set; }
+        public bool Allow_Secondary { get; private set; }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Instance Vars (syncing) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -39,7 +39,6 @@ namespace ExperienceAndClasses {
         public byte Class_Primary_Level_Effective { get; private set; }
         public byte Class_Secondary_Level_Effective { get; private set; }
 
-        public bool Allow_Secondary { get; private set; }
         public short[] Attributes_Final { get; private set; }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Initialize ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
@@ -51,7 +50,6 @@ namespace ExperienceAndClasses {
             //defaults
             Is_Local_Player = false;
             Allow_Secondary = false;
-            Initialized = false;
 
             //default class level
             Class_Levels = new byte[(byte)Systems.Class.CLASS_IDS.NUMBER_OF_IDs];
@@ -73,18 +71,18 @@ namespace ExperienceAndClasses {
         }
 
         /// <summary>
-        /// new player enters
+        /// player enters (not other players)
         /// </summary>
         /// <param name="player"></param>
         public override void OnEnterWorld(Player player) {
             // is this the local player?
-            if (player.whoAmI == Main.LocalPlayer.whoAmI) {
+            if (!ExperienceAndClasses.IS_SERVER) {
                 //this is the current local player
                 Is_Local_Player = true;
                 ExperienceAndClasses.LOCAL_MPLAYER = this;
 
                 //start timer for next full sync
-                time_next_full_sync = DateTime.Now.AddTicks(TICKS_PER_FULL_SYNC);
+                time_next_full_sync = DateTime.Now;
 
                 //(re)initialize ui
                 UI.UIInfo.Instance.Initialize();
@@ -117,18 +115,17 @@ namespace ExperienceAndClasses {
 
                 //update class info
                 LocalUpdateClassInfo();
-
-                //enter game complete
-                Initialized = true;
             }
         }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Update ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-        public override void PostUpdate() {
-            if (Initialized) {
-
+        public override void PostUpdateEquips() {
+            string str = player.name + " ";
+            for (byte i = 0; i < Attributes_Final.Length; i++) {
+                str += Attributes_Final[i] + " ";
             }
+            Main.NewText(str);
         }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ XP & Class ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
@@ -361,6 +358,9 @@ namespace ExperienceAndClasses {
 
             //update class features
             UpdateClassInfo();
+
+            //need sync
+            time_next_full_sync = DateTime.Now;
         }
 
         public void UpdateClassInfo() {
@@ -378,39 +378,15 @@ namespace ExperienceAndClasses {
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Syncing ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         /// <summary>
-        /// store prior state to detect changes to sync
-        /// </summary>
-        /// <param name="clientClone"></param>
-        public override void clientClone(ModPlayer clientClone) {
-            MPlayer clone = clientClone as MPlayer;
-
-            clone.Class_Primary = Class_Primary;
-            clone.Class_Secondary = Class_Secondary;
-            clone.Class_Primary_Level_Effective = Class_Primary_Level_Effective;
-            clone.Class_Secondary_Level_Effective = Class_Secondary_Level_Effective;
-        }
-
-        /// <summary>
         /// look for changes to sync + send any changes via packet
         /// </summary>
         /// <param name="clientPlayer"></param>
         public override void SendClientChanges(ModPlayer clientPlayer) {
             DateTime now = DateTime.Now;
-            byte me = (byte)player.whoAmI;
-            if (now.CompareTo(time_next_full_sync) > 0) {
+            if (now.CompareTo(time_next_full_sync) >= 0) {
                 //full sync
                 time_next_full_sync = now.AddTicks(TICKS_PER_FULL_SYNC);
-                SyncPlayer(-1, me, false);
-            }
-            else {
-                //partial sync...
-                MPlayer clone = clientPlayer as MPlayer;
-
-                //class selections and levels
-                if ((clone.Class_Primary.ID != Class_Primary.ID) || (clone.Class_Secondary.ID != Class_Secondary.ID) || 
-                    (clone.Class_Primary_Level_Effective != Class_Primary_Level_Effective) || (clone.Class_Secondary_Level_Effective != Class_Secondary_Level_Effective)) {
-                    PacketSender.SendForceClass(me, Class_Primary.ID, Class_Primary_Level_Effective, Class_Secondary.ID, Class_Secondary_Level_Effective);
-                }
+                FullSync();
             }
         }
 
@@ -421,10 +397,20 @@ namespace ExperienceAndClasses {
         /// <param name="fromWho"></param>
         /// <param name="newPlayer"></param>
         public override void SyncPlayer(int toWho, int fromWho, bool newPlayer) {
+            FullSync();
+        }
+
+        /// <summary>
+        /// sync all neccessary mod vars
+        /// </summary>
+        private void FullSync() {
             byte me = (byte)player.whoAmI;
 
             //class selections and levels
             PacketSender.SendForceClass(me, Class_Primary.ID, Class_Primary_Level_Effective, Class_Secondary.ID, Class_Secondary_Level_Effective);
+
+            //attributes
+            PacketSender.SendForceAttribute(me, Attributes_Final);
         }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Sync Force Commands ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
@@ -439,6 +425,19 @@ namespace ExperienceAndClasses {
             Class_Primary_Level_Effective = primary_level;
             Class_Secondary = Systems.Class.CLASS_LOOKUP[secondary_id];
             Class_Secondary_Level_Effective = secondary_level;
+
+            UpdateClassInfo();
+        }
+
+        public void ForceAttribute(short[] attributes) {
+            if (Is_Local_Player) {
+                Commons.Error("Cannot force attribute packet for local player");
+                return;
+            }
+
+            for (byte i = 0; i < attributes.Length; i++) {
+                Attributes_Final[i] = attributes[i];
+            }
 
             UpdateClassInfo();
         }

@@ -18,6 +18,16 @@ namespace ExperienceAndClasses {
             packet.Send(-1, who);
         }
 
+        public static void SendForceAttribute(byte who, short[] attributes) {
+            ModPacket packet = ExperienceAndClasses.MOD.GetPacket();
+            packet.Write((byte)ExperienceAndClasses.MESSAGE_TYPE.FORCE_ATTRIBUTE);
+            packet.Write(who);
+            for (byte i = 0; i < (byte)Systems.Attribute.ATTRIBUTE_IDS.NUMBER_OF_IDs; i++) {
+                packet.Write(attributes[i]);
+            }
+            packet.Send(-1, who);
+        }
+
         public static void SendBroadcastTrace(byte who, string message) {
             ModPacket packet = ExperienceAndClasses.MOD.GetPacket();
             packet.Write((byte)ExperienceAndClasses.MESSAGE_TYPE.BROADCAST_TRACE);

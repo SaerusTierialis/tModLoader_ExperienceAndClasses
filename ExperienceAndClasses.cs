@@ -21,7 +21,7 @@ namespace ExperienceAndClasses
     class ExperienceAndClasses : Mod {
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Debug ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-        public static bool trace = false;
+        public static bool trace = true;
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Constants (and readonly) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -34,6 +34,7 @@ namespace ExperienceAndClasses
         public enum MESSAGE_TYPE : byte {
             BROADCAST_TRACE,
             FORCE_CLASS,
+            FORCE_ATTRIBUTE,
         };
 
         //chat colors must go here or server gives "Error on message Terraria.MessageBuffer"
@@ -147,6 +148,23 @@ namespace ExperienceAndClasses
                     //relay
                     if (IS_SERVER) {
                         PacketSender.SendForceClass(player_ind, bytes[0], bytes[1], bytes[2], bytes[3]);
+                    }
+
+                    break;
+
+                case MESSAGE_TYPE.FORCE_ATTRIBUTE:
+                    //read
+                    short[] attributes = new short[(byte)Systems.Attribute.ATTRIBUTE_IDS.NUMBER_OF_IDs];
+                    for (byte i = 0; i < (byte)Systems.Attribute.ATTRIBUTE_IDS.NUMBER_OF_IDs; i++) {
+                        attributes[i] = reader.ReadInt16();
+                    }
+
+                    //set
+                    sender_mplayer.ForceAttribute(attributes);
+
+                    //relay
+                    if (IS_SERVER) {
+                        PacketSender.SendForceAttribute(player_ind, attributes);
                     }
 
                     break;
