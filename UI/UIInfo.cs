@@ -180,7 +180,7 @@ namespace ExperienceAndClasses.UI {
 
         public void ShowTextAttribute(UIElement source, Systems.Attribute attribute) {
             string title = attribute.Name;
-            string text = attribute.Description + "\n\n" + attribute.Bonus;
+            string text = attribute.Description + "\n" + attribute.Bonus;
             ShowText(source, title, text, WIDTH_ATTRIBUTE);
         }
 

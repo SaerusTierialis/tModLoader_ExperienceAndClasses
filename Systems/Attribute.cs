@@ -112,14 +112,57 @@ namespace ExperienceAndClasses.Systems {
         }
 
         //per point bonuses
-        private const float POWER_DAMAGE = 1f;
+        private const float POWER_DAMAGE = 0.01f;
 
-        public void ApplyEffect(MPlayer mplayer) {
+        public void ApplyEffect(MPlayer mplayer, short points) {
             if (Active) {
+
+                if (mplayer.Is_Local_Player) Bonus = "";
+                float b, bpp;
 
                 switch ((ATTRIBUTE_IDS)ID) {
                     case ATTRIBUTE_IDS.Power:
-                        //TODO
+                        float melee_per = Math.Max(mplayer.Class_Primary.Power_Scaling.Melee, mplayer.Class_Secondary.Power_Scaling.Melee / 2);
+                        float ranged_per = Math.Max(mplayer.Class_Primary.Power_Scaling.Ranged, mplayer.Class_Secondary.Power_Scaling.Ranged / 2);
+                        float magic_per = Math.Max(mplayer.Class_Primary.Power_Scaling.Magic, mplayer.Class_Secondary.Power_Scaling.Magic / 2);
+                        float throwing_per = Math.Max(mplayer.Class_Primary.Power_Scaling.Throwing, mplayer.Class_Secondary.Power_Scaling.Throwing / 2);
+                        float minion_per = Math.Max(mplayer.Class_Primary.Power_Scaling.Minion, mplayer.Class_Secondary.Power_Scaling.Minion / 2);
+
+                        bpp = melee_per * POWER_DAMAGE;
+                        b = bpp * points;
+                        if(bpp > 0) {
+                            mplayer.player.meleeDamage += b;
+                            if (mplayer.Is_Local_Player) Bonus += "\n+" + (b * 100) + "% melee damage (" + (bpp * 100) + "% per point)";
+                        }
+
+                        bpp = ranged_per * POWER_DAMAGE;
+                        b = bpp * points;
+                        if (bpp > 0) {
+                            mplayer.player.rangedDamage += b;
+                            if (mplayer.Is_Local_Player) Bonus += "\n+" + (b * 100) + "% ranged damage (" + (bpp * 100) + "% per point)";
+                        }
+
+                        bpp = magic_per * POWER_DAMAGE;
+                        b = bpp * points;
+                        if (bpp > 0) {
+                            mplayer.player.magicDamage += b;
+                            if (mplayer.Is_Local_Player) Bonus += "\n+" + (b * 100) + "% magic damage (" + (bpp * 100) + "% per point)";
+                        }
+
+                        bpp = throwing_per * POWER_DAMAGE;
+                        b = bpp * points;
+                        if (bpp > 0) {
+                            mplayer.player.thrownDamage += b;
+                            if (mplayer.Is_Local_Player) Bonus += "\n+" + (b * 100) + "% throwing damage (" + (bpp * 100) + "% per point)";
+                        }
+
+                        bpp = minion_per * POWER_DAMAGE;
+                        b = bpp * points;
+                        if (bpp > 0) {
+                            mplayer.player.minionDamage += b;
+                            if (mplayer.Is_Local_Player) Bonus += "\n+" + (b * 100) + "% minion damage (" + (bpp * 100) + "% per point)";
+                        }
+
                         break;
 
                     case ATTRIBUTE_IDS.Vitality:

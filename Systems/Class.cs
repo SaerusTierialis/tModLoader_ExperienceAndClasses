@@ -59,6 +59,7 @@ namespace ExperienceAndClasses.Systems {
             CLASS_IDS id_prereq;
             PowerScaling.POWER_SCALING_TYPES power_scaling;
             float[] attribute_growth;
+            bool gives_allocation_attributes;
 
             for (CLASS_IDS id = 0; id < CLASS_IDS.NUMBER_OF_IDs; id++) {
                 id_byte = (byte)id;
@@ -70,6 +71,7 @@ namespace ExperienceAndClasses.Systems {
                 id_prereq = CLASS_IDS.New;
                 texture = ModLoader.GetTexture("ExperienceAndClasses/Textures/Tokens/ClassToken_Novice");
                 power_scaling = PowerScaling.POWER_SCALING_TYPES.None;
+                gives_allocation_attributes = true;
 
                 //default attribute growth of active attributes to 1 (per 10 levels)
                 attribute_growth = new float[(byte)Attribute.ATTRIBUTE_IDS.NUMBER_OF_IDs];
@@ -83,6 +85,7 @@ namespace ExperienceAndClasses.Systems {
                 switch (id) {
                     case CLASS_IDS.None:
                         name = "None";
+                        gives_allocation_attributes = false;
                         for (byte i = 0; i < attribute_growth.Length; i++) {
                             attribute_growth[i] = 0;
                         }
@@ -370,6 +373,7 @@ namespace ExperienceAndClasses.Systems {
                         break;
 
                     default:
+                        gives_allocation_attributes = false;
                         for (byte i = 0; i < attribute_growth.Length; i++) {
                             attribute_growth[i] = 0;
                         }
@@ -377,7 +381,7 @@ namespace ExperienceAndClasses.Systems {
                 }
 
                 //add
-                CLASS_LOOKUP[id_byte] = new Class(id_byte, name, desc, tier, texture, (byte)id_prereq, PowerScaling.POWER_SCALING_LOOKUP[(byte)power_scaling], attribute_growth);
+                CLASS_LOOKUP[id_byte] = new Class(id_byte, name, desc, tier, texture, (byte)id_prereq, PowerScaling.POWER_SCALING_LOOKUP[(byte)power_scaling], attribute_growth, gives_allocation_attributes);
             }
         }
 
@@ -390,8 +394,9 @@ namespace ExperienceAndClasses.Systems {
         public byte ID_Prereq { get; private set; }
         public PowerScaling Power_Scaling { get; private set; }
         public float[] Attribute_Growth { get; private set; }
+        public bool Gives_Allocation_Attributes { get; private set; }
 
-        public Class(byte id, string name, string description, byte tier, Texture2D texture, byte id_prereq, PowerScaling power_scaling, float[] attribute_growth) {
+        public Class(byte id, string name, string description, byte tier, Texture2D texture, byte id_prereq, PowerScaling power_scaling, float[] attribute_growth, bool gives_allocation_attributes) {
             ID = id;
             Name = name;
             Description = description;
@@ -400,6 +405,7 @@ namespace ExperienceAndClasses.Systems {
             ID_Prereq = id_prereq;
             Power_Scaling = power_scaling;
             Attribute_Growth = attribute_growth;
+            Gives_Allocation_Attributes = gives_allocation_attributes;
         }
     }
 }

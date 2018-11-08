@@ -120,12 +120,15 @@ namespace ExperienceAndClasses {
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Update ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-        public override void PostUpdateEquips() {
-            string str = player.name + " ";
-            for (byte i = 0; i < Attributes_Final.Length; i++) {
-                str += Attributes_Final[i] + " ";
-            }
-            Main.NewText(str);
+        public override void PostUpdate() {
+            //string str = player.name + " ";
+            //for (byte i = 0; i < Attributes_Final.Length; i++) {
+            //    str += Attributes_Final[i] + " ";
+            //}
+            //Main.NewText(str);
+
+            ApplyAttributes();
+            Main.NewText(player.name + " " + player.meleeDamage);
         }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ XP & Class ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
@@ -339,7 +342,9 @@ namespace ExperienceAndClasses {
             //allocated attributes
             short class_sum = 0;
             for (byte id = 0; id < (byte)Systems.Class.CLASS_IDS.NUMBER_OF_IDs; id++) {
-                class_sum += Math.Min(Class_Levels[id], Shared.MAX_LEVEL[Systems.Class.CLASS_LOOKUP[id].Tier]);
+                if (Systems.Class.CLASS_LOOKUP[id].Gives_Allocation_Attributes) {
+                    class_sum += Math.Min(Class_Levels[id], Shared.MAX_LEVEL[Systems.Class.CLASS_LOOKUP[id].Tier]);
+                }
             }
             int temp;
             Attribute_Points_Total = (byte)Math.DivRem(class_sum, Shared.LEVELS_PER_ATTRIBUTE, out temp);
@@ -351,7 +356,7 @@ namespace ExperienceAndClasses {
             Attribute_Points_Unallocated = (short)(Attribute_Points_Total - Attribute_Points_Allocated);
 
             //sum attributes
-            CalculateFinalAttributes();
+            LocalCalculateFinalAttributes();
 
             //update UI
             UI.UIClass.Instance.UpdateClassInfo();
@@ -442,14 +447,30 @@ namespace ExperienceAndClasses {
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Attributes ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
+        private void ApplyAttributes() {
+            for (byte i=0; i<(byte)Systems.Attribute.ATTRIBUTE_IDS.NUMBER_OF_IDs; i++) {
+                Systems.Attribute.ATTRIBUTE_LOOKUP[i].ApplyEffect(this, Attributes_Final[i]);
+            }
+        }
+
         public void LocalAttributeAllocation(byte id, short value) {
+            if (!Is_Local_Player) {
+                Commons.Error("Cannot set attribute allocation for non-local player");
+                return;
+            }
+
             if ((Attribute_Points_Unallocated >= value) && ((Attributes_Allocated[id] + value) >= 0)) {
                 Attributes_Allocated[id] += value;
                 LocalUpdateClassInfo();
             }
         }
 
-        public void CalculateFinalAttributes() {
+        public void LocalCalculateFinalAttributes() {
+            if (!Is_Local_Player) {
+                Commons.Error("Cannot calculate final attribute for non-local player");
+                return;
+            }
+
             for (byte id = 0; id < (byte)Systems.Attribute.ATTRIBUTE_IDS.NUMBER_OF_IDs; id++) {
                 Attributes_Final[id] = (short)(Attributes_Base[id] + Attributes_Allocated[id] + Attributes_Bonus[id]);
             }
