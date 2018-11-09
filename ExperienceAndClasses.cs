@@ -63,7 +63,9 @@ namespace ExperienceAndClasses {
             //hotkeys
             HOTKEY_UI = RegisterHotKey("Show Class Interface", "P");
 
-            Textures.LoadTextures();
+            if (!IS_SERVER) {
+                Textures.LoadTextures();
+            }
         }
 
         public override void Unload() {

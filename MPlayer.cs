@@ -91,7 +91,7 @@ namespace ExperienceAndClasses {
                 ExperienceAndClasses.LOCAL_MPLAYER = this;
 
                 //start timer for next full sync
-                time_next_full_sync = DateTime.Now;
+                time_next_full_sync = DateTime.Now.AddTicks(TICKS_PER_FULL_SYNC);
 
                 //(re)initialize ui
                 UI.UIInfo.Instance.Initialize();
@@ -376,9 +376,6 @@ namespace ExperienceAndClasses {
 
             //update class features
             UpdateClassInfo();
-
-            //need sync
-            time_next_full_sync = DateTime.Now;
         }
 
         public void UpdateClassInfo() {
@@ -395,6 +392,17 @@ namespace ExperienceAndClasses {
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Syncing ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
+        public override void clientClone(ModPlayer clientClone) {
+            MPlayer clone = clientClone as MPlayer;
+
+            clone.Class_Primary = Class_Primary;
+            clone.Class_Secondary = Class_Secondary;
+            clone.Class_Primary_Level_Effective = Class_Primary_Level_Effective;
+            clone.Class_Secondary_Level_Effective = Class_Secondary_Level_Effective;
+
+            Attributes_Final.CopyTo(clone.Attributes_Final, 0);
+        }
+
         /// <summary>
         /// look for changes to sync + send any changes via packet
         /// </summary>
@@ -405,6 +413,26 @@ namespace ExperienceAndClasses {
                 //full sync
                 time_next_full_sync = now.AddTicks(TICKS_PER_FULL_SYNC);
                 FullSync();
+            }
+            else {
+                //partial sync
+                MPlayer clone = clientPlayer as MPlayer;
+                byte me = (byte)player.whoAmI;
+
+                //class and class levels
+                if ((clone.Class_Primary.ID != Class_Primary.ID) || (clone.Class_Secondary.ID != Class_Secondary.ID) ||
+                    (clone.Class_Primary_Level_Effective != Class_Primary_Level_Effective) || (clone.Class_Secondary_Level_Effective != Class_Secondary_Level_Effective)) {
+                    PacketHandler.SendForceClass(me, Class_Primary.ID, Class_Primary_Level_Effective, Class_Secondary.ID, Class_Secondary_Level_Effective);
+                }
+
+                //final attribute
+                for (byte i=0; i<(byte)Systems.Attribute.ATTRIBUTE_IDS.NUMBER_OF_IDs; i++) {
+                    if (clone.Attributes_Final[i] != Attributes_Final[i]) {
+                        PacketHandler.SendForceAttribute(me, Attributes_Final);
+                        break;
+                    }
+                }
+
             }
         }
 
