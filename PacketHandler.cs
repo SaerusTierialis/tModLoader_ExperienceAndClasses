@@ -11,12 +11,12 @@ using Terraria.ModLoader;
 namespace ExperienceAndClasses {
     class PacketHandler {
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Sending ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-        public static void SendForceClass(byte who, byte primary_id, byte primary_level, byte secondary_id, byte secondary_level) {
+        public static void SendForceClass(byte origin, byte primary_id, byte primary_level, byte secondary_id, byte secondary_level) {
             ModPacket packet = ExperienceAndClasses.MOD.GetPacket();
             packet.Write((byte)ExperienceAndClasses.PACKET_TYPE.FORCE_CLASS);
-            packet.Write(who);
+            packet.Write(origin);
             packet = SendForceClass_Body(packet, primary_id, primary_level, secondary_id, secondary_level);
-            packet.Send(-1, who);
+            packet.Send(-1, origin);
         }
         private static ModPacket SendForceClass_Body(ModPacket packet, byte primary_id, byte primary_level, byte secondary_id, byte secondary_level) {
             packet.Write(primary_id);
@@ -26,12 +26,12 @@ namespace ExperienceAndClasses {
             return packet;
         }
 
-        public static void SendForceAttribute(byte who, short[] attributes) {
+        public static void SendForceAttribute(byte origin, short[] attributes) {
             ModPacket packet = ExperienceAndClasses.MOD.GetPacket();
             packet.Write((byte)ExperienceAndClasses.PACKET_TYPE.FORCE_ATTRIBUTE);
-            packet.Write(who);
+            packet.Write(origin);
             packet = SendForceAttribute_Body(packet, attributes);
-            packet.Send(-1, who);
+            packet.Send(-1, origin);
         }
         private static ModPacket SendForceAttribute_Body(ModPacket packet, short[] attributes) {
             for (byte i = 0; i < (byte)Systems.Attribute.ATTRIBUTE_IDS.NUMBER_OF_IDs; i++) {
@@ -40,36 +40,56 @@ namespace ExperienceAndClasses {
             return packet;
         }
 
-        public static void SendForceFull(byte who, byte primary_id, byte primary_level, byte secondary_id, byte secondary_level, short[] attributes) {
+        public static void SendForceFull(byte origin, byte primary_id, byte primary_level, byte secondary_id, byte secondary_level, short[] attributes) {
             ModPacket packet = ExperienceAndClasses.MOD.GetPacket();
             packet.Write((byte)ExperienceAndClasses.PACKET_TYPE.FORCE_FULL);
-            packet.Write(who);
+            packet.Write(origin);
             packet = SendForceClass_Body(packet, primary_id, primary_level, secondary_id, secondary_level);
             packet = SendForceAttribute_Body(packet, attributes);
-            packet.Send(-1, who);
+            packet.Send(-1, origin);
         }
 
-        public static void SendBroadcastTrace(byte who, string message) {
+        public static void SendBroadcastTrace(byte origin, string message) {
             ModPacket packet = ExperienceAndClasses.MOD.GetPacket();
             packet.Write((byte)ExperienceAndClasses.PACKET_TYPE.BROADCAST_TRACE);
-            packet.Write(who);
+            packet.Write(origin);
             packet.Write(message);
             packet.Send(-1);
         }
 
+        public static void SendHeal(byte origin, byte target, int amount_life, int amount_mana) {
+            ModPacket packet = ExperienceAndClasses.MOD.GetPacket();
+            packet.Write((byte)ExperienceAndClasses.PACKET_TYPE.HEAL);
+            packet.Write(origin);
+            packet.Write(target);
+            packet.Write(amount_life);
+            packet.Write(amount_mana);
+            if (ExperienceAndClasses.IS_SERVER) {
+                packet.Send(target);
+            }
+            else {
+                packet.Send(-1);
+            }
+        }
+
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Recieving ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         public static void HandlePacketContents(byte origin_id, Player origin_player, MPlayer origin_mplayer, ExperienceAndClasses.PACKET_TYPE packet_type, BinaryReader reader) {
+            /*
             if (ExperienceAndClasses.trace) {
                 Commons.Trace("Handling " + packet_type + " originating from player " + origin_id);
             }
+            */
 
             switch (packet_type) {
-                case ExperienceAndClasses.PACKET_TYPE.BROADCAST_TRACE:
+                case ExperienceAndClasses.PACKET_TYPE.BROADCAST_TRACE: //sent by client to server
                     //read
                     string message = reader.ReadString();
 
                     //broadcast
                     NetMessage.BroadcastChatMessage(NetworkText.FromLiteral(message), ExperienceAndClasses.COLOUR_MESSAGE_TRACE);
+
+                    //also write in console
+                    Console.WriteLine(message);
 
                     break;
 
@@ -87,7 +107,7 @@ namespace ExperienceAndClasses {
 
                     //relay
                     if (ExperienceAndClasses.IS_SERVER) {
-                        PacketHandler.SendForceClass(origin_id, bytes[0], bytes[1], bytes[2], bytes[3]);
+                        SendForceClass(origin_id, bytes[0], bytes[1], bytes[2], bytes[3]);
                     }
 
                     break;
@@ -104,8 +124,19 @@ namespace ExperienceAndClasses {
 
                     //relay
                     if (ExperienceAndClasses.IS_SERVER) {
-                        PacketHandler.SendForceAttribute(origin_id, attributes);
+                        SendForceAttribute(origin_id, attributes);
                     }
+
+                    break;
+
+                case ExperienceAndClasses.PACKET_TYPE.HEAL:
+                    //read
+                    byte target = reader.ReadByte();
+                    int amount_life = reader.ReadInt32();
+                    int amount_mana = reader.ReadInt32();
+
+                    //do or relay
+                    Main.player[target].GetModPlayer<MPlayer>(ExperienceAndClasses.MOD).Heal(amount_life, amount_mana);
 
                     break;
 

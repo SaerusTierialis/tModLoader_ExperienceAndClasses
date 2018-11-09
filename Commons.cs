@@ -116,14 +116,19 @@ namespace ExperienceAndClasses {
         public static void Error(string message) {
             message = message + " (please report)";
             if (ExperienceAndClasses.IS_SERVER) {
-                message = "Error from Server: " + message;
+                message = "ERROR from Server: " + message;
                 Console.WriteLine(message);
                 NetMessage.BroadcastChatMessage(NetworkText.FromLiteral(message), ExperienceAndClasses.COLOUR_MESSAGE_ERROR);
             }
             else {
-                message = "Error from Player" + Main.LocalPlayer.whoAmI + ": " + message;
-                Main.NewText(message, ExperienceAndClasses.COLOUR_MESSAGE_ERROR);
-                if (ExperienceAndClasses.IS_CLIENT) PacketHandler.SendBroadcastTrace((byte)Main.LocalPlayer.whoAmI, message);
+                if (ExperienceAndClasses.IS_CLIENT) {
+                    message = "ERROR from Player" + Main.LocalPlayer.whoAmI + ": " + message;
+                    Main.NewText("Sending " + message, ExperienceAndClasses.COLOUR_MESSAGE_ERROR);
+                    PacketHandler.SendBroadcastTrace((byte)Main.LocalPlayer.whoAmI, message);
+                }
+                else {
+                    Main.NewText("ERROR: " + message, ExperienceAndClasses.COLOUR_MESSAGE_TRACE);
+                }
             }
             ErrorLogger.Log(message);
         }
@@ -135,9 +140,14 @@ namespace ExperienceAndClasses {
                 NetMessage.BroadcastChatMessage(NetworkText.FromLiteral(message), ExperienceAndClasses.COLOUR_MESSAGE_TRACE);
             }
             else {
-                message = "TRACE from Player" + Main.LocalPlayer.whoAmI + ": " + message;
-                Main.NewText(message, ExperienceAndClasses.COLOUR_MESSAGE_TRACE);
-                if (ExperienceAndClasses.IS_CLIENT) PacketHandler.SendBroadcastTrace((byte)Main.LocalPlayer.whoAmI, message);
+                if (ExperienceAndClasses.IS_CLIENT) {
+                    message = "TRACE from Player" + Main.LocalPlayer.whoAmI + ": " + message;
+                    Main.NewText("Sending " + message, ExperienceAndClasses.COLOUR_MESSAGE_TRACE);
+                    PacketHandler.SendBroadcastTrace((byte)Main.LocalPlayer.whoAmI, message);
+                }
+                else {
+                    Main.NewText("TRACE: " + message, ExperienceAndClasses.COLOUR_MESSAGE_TRACE);
+                }
             }
         }
     }

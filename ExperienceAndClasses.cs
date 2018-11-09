@@ -23,15 +23,17 @@ namespace ExperienceAndClasses {
 
         public static readonly byte[] VERSION = new byte[] { 2, 0, 0 };
 
-        public static readonly bool IS_SERVER = (Main.netMode == 2);
-        public static readonly bool IS_CLIENT = (Main.netMode == 1);
-        public static readonly bool IS_SINGLEPLAYER = (Main.netMode == 0);
+        //updated client-side when entering game to detect client vs singleplayer mode
+        public static bool IS_SERVER = (Main.netMode == 2);
+        public static bool IS_CLIENT = (Main.netMode == 1);
+        public static bool IS_SINGLEPLAYER = (Main.netMode == 0);
 
         public enum PACKET_TYPE : byte {
             BROADCAST_TRACE,
             FORCE_FULL,
             FORCE_CLASS,
             FORCE_ATTRIBUTE,
+            HEAL,
         };
 
         //chat colors must go here or server gives "Error on message Terraria.MessageBuffer"
@@ -118,7 +120,7 @@ namespace ExperienceAndClasses {
         public override void HandlePacket(BinaryReader reader, int whoAmI) {
             //first 2 bytes are always type and sender
             PACKET_TYPE packet_type = (PACKET_TYPE)reader.ReadByte();
-            byte origin_id = (byte)reader.ReadByte();
+            byte origin_id = reader.ReadByte();
 
             Player origin_player = Main.player[origin_id];
             MPlayer origin_mplayer = origin_player.GetModPlayer<MPlayer>(this);
@@ -130,5 +132,11 @@ namespace ExperienceAndClasses {
             PacketHandler.HandlePacketContents(origin_id, origin_player, origin_mplayer, packet_type, reader);
         }
 
+        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Other ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+        public static void CheckMultiplater() {
+            IS_SERVER = (Main.netMode == 2);
+            IS_CLIENT = (Main.netMode == 1);
+            IS_SINGLEPLAYER = (Main.netMode == 0);
+        }
     }
 }

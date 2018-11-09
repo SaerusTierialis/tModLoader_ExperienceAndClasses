@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Terraria;
 using Terraria.GameInput;
+using Terraria.Localization;
 using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
 
@@ -20,6 +21,7 @@ namespace ExperienceAndClasses {
 
         private TagCompound load_tag;
         public bool Is_Local_Player { get; private set; }
+        private bool initialized;
 
         public byte[] Class_Levels { get; private set; }
         public bool Allow_Secondary { get; private set; }
@@ -54,6 +56,7 @@ namespace ExperienceAndClasses {
             //defaults
             Is_Local_Player = false;
             Allow_Secondary = false;
+            initialized = false;
 
             //default class level
             Class_Levels = new byte[(byte)Systems.Class.CLASS_IDS.NUMBER_OF_IDs];
@@ -84,11 +87,14 @@ namespace ExperienceAndClasses {
         /// </summary>
         /// <param name="player"></param>
         public override void OnEnterWorld(Player player) {
-            // is this the local player?
+            base.OnEnterWorld(player);
             if (!ExperienceAndClasses.IS_SERVER) {
                 //this is the current local player
                 Is_Local_Player = true;
                 ExperienceAndClasses.LOCAL_MPLAYER = this;
+
+                //is this multiplayer?
+                ExperienceAndClasses.CheckMultiplater();
 
                 //start timer for next full sync
                 time_next_full_sync = DateTime.Now.AddTicks(TICKS_PER_FULL_SYNC);
@@ -124,6 +130,9 @@ namespace ExperienceAndClasses {
 
                 //update class info
                 LocalUpdateClassInfo();
+
+                //initialized
+                initialized = true;
             }
         }
 
@@ -131,17 +140,22 @@ namespace ExperienceAndClasses {
 
         public override void PreUpdate() {
             base.PreUpdate();
-            heal_damage = 1f;
-            dodge_chance = 0f;
-            cooldown_reduction = 0f;
+            if (initialized) {
+                //defaults before update
+                heal_damage = 1f;
+                dodge_chance = 0f;
+                cooldown_reduction = 0f;
+            }
         }
 
         public override void PostUpdateEquips() {
             base.PostUpdateEquips();
-            ApplyAttributes();
-            
-            //Main.NewText(player.name + " " + player.meleeSpeed);
+            if (initialized) {
+                ApplyAttributes();
 
+                //Main.NewText(Main.netMode + " " + ExperienceAndClasses.IS_CLIENT + " " + ExperienceAndClasses.IS_SINGLEPLAYER);
+
+            }
         }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ XP & Class ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
@@ -417,7 +431,7 @@ namespace ExperienceAndClasses {
             else {
                 //partial sync
                 MPlayer clone = clientPlayer as MPlayer;
-                byte me = (byte)player.whoAmI;
+                Byte me = (byte)player.whoAmI;
 
                 //class and class levels
                 if ((clone.Class_Primary.ID != Class_Primary.ID) || (clone.Class_Secondary.ID != Class_Secondary.ID) ||
@@ -451,10 +465,8 @@ namespace ExperienceAndClasses {
         /// sync all neccessary mod vars
         /// </summary>
         private void FullSync() {
-            byte me = (byte)player.whoAmI;
-
             //send one packet with everything needed
-            PacketHandler.SendForceFull(me, Class_Primary.ID, Class_Primary_Level_Effective, Class_Secondary.ID, Class_Secondary_Level_Effective, Attributes_Final);
+            PacketHandler.SendForceFull((byte)player.whoAmI, Class_Primary.ID, Class_Primary_Level_Effective, Class_Secondary.ID, Class_Secondary_Level_Effective, Attributes_Final);
         }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Sync Force Commands ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
@@ -463,6 +475,10 @@ namespace ExperienceAndClasses {
             if (Is_Local_Player) {
                 Commons.Error("Cannot force class packet for local player");
                 return;
+            }
+
+            if (!initialized) {
+                initialized = true;
             }
 
             Class_Primary = Systems.Class.CLASS_LOOKUP[primary_id];
@@ -477,6 +493,10 @@ namespace ExperienceAndClasses {
             if (Is_Local_Player) {
                 Commons.Error("Cannot force attribute packet for local player");
                 return;
+            }
+
+            if (!initialized) {
+                initialized = true;
             }
 
             for (byte i = 0; i < attributes.Length; i++) {
@@ -613,5 +633,31 @@ namespace ExperienceAndClasses {
             }
             
         }
+
+        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Ability & Status ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+        public void Heal(int amount_life, int amount_mana) {
+            if (Is_Local_Player) {
+                Main.NewText("do " + amount_life + " " + amount_mana);
+
+                //life
+                amount_life = Math.Min(amount_life, player.statLifeMax2 - player.statLife);
+                if (amount_life > 0) {
+                    player.statLife += amount_life;
+                    player.HealEffect(amount_life, true);
+                }
+
+                //mana
+                amount_mana = Math.Min(amount_mana, player.statManaMax2 - player.statMana);
+                if (amount_mana > 0) {
+                    player.statMana += amount_mana;
+                    player.ManaEffect(amount_mana);
+                }
+            }
+            else {
+                PacketHandler.SendHeal((byte)Main.LocalPlayer.whoAmI, (byte)player.whoAmI, amount_life, amount_mana);
+            }
+        }
+
     }
 }
