@@ -22,6 +22,7 @@ namespace ExperienceAndClasses {
         private TagCompound load_tag;
         public bool Is_Local_Player { get; private set; }
         private bool initialized;
+        public int[] Load_Version { get; private set; }
 
         public byte[] Class_Levels { get; private set; }
         public bool Allow_Secondary { get; private set; }
@@ -57,6 +58,7 @@ namespace ExperienceAndClasses {
             Is_Local_Player = false;
             Allow_Secondary = false;
             initialized = false;
+            Load_Version = new int[3];
 
             //default class level
             Class_Levels = new byte[(byte)Systems.Class.CLASS_IDS.NUMBER_OF_IDs];
@@ -152,8 +154,6 @@ namespace ExperienceAndClasses {
             base.PostUpdateEquips();
             if (initialized) {
                 ApplyAttributes();
-
-                //Main.NewText(Main.netMode + " " + ExperienceAndClasses.IS_CLIENT + " " + ExperienceAndClasses.IS_SINGLEPLAYER);
 
             }
         }
@@ -585,8 +585,12 @@ namespace ExperienceAndClasses {
                 attributes_allocated.Add(value);
             }
 
+            //version
+            Version version = ExperienceAndClasses.MOD.Version;
+            int[] version_array = new int[] { version.Major, version.Minor, version.Build };
+
             return new TagCompound {
-                {"eac_save_version", ExperienceAndClasses.VERSION },
+                {"eac_version", version_array },
                 {"eac_ui_class_left", UI.UIClass.Instance.panel.GetLeft() },
                 {"eac_ui_class_top", UI.UIClass.Instance.panel.GetTop() },
                 {"eac_ui_class_auto", UI.UIClass.Instance.panel.Auto },
@@ -610,6 +614,9 @@ namespace ExperienceAndClasses {
         public override void Load(TagCompound tag) {
             //some settings must be applied after init
             load_tag = tag;
+
+            //get version in case needed
+            Load_Version = Commons.TryGet<int[]>(tag, "eac_version", new int[3]);
 
             //subclass unlocked
             Allow_Secondary = Commons.TryGet<bool>(tag, "eac_class_current_primary", Allow_Secondary);

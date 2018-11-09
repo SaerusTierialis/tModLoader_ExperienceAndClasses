@@ -21,13 +21,6 @@ namespace ExperienceAndClasses {
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Constants (and readonly) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-        public static readonly byte[] VERSION = new byte[] { 2, 0, 0 };
-
-        //updated client-side when entering game to detect client vs singleplayer mode
-        public static bool IS_SERVER = (Main.netMode == 2);
-        public static bool IS_CLIENT = (Main.netMode == 1);
-        public static bool IS_SINGLEPLAYER = (Main.netMode == 0);
-
         public enum PACKET_TYPE : byte {
             BROADCAST_TRACE,
             FORCE_FULL,
@@ -40,7 +33,12 @@ namespace ExperienceAndClasses {
         public static readonly Color COLOUR_MESSAGE_ERROR = new Color(255, 25, 25);
         public static readonly Color COLOUR_MESSAGE_TRACE = new Color(255, 0, 255);
 
-        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Treated like readonly ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Treated like readonly after entering map ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+        //updated client-side when entering game to detect client vs singleplayer mode
+        public static bool IS_SERVER = (Main.netMode == 2);
+        public static bool IS_CLIENT = (Main.netMode == 1);
+        public static bool IS_SINGLEPLAYER = (Main.netMode == 0);
 
         public static MPlayer LOCAL_MPLAYER;
         public static Mod MOD;
