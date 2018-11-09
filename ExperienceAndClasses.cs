@@ -52,9 +52,7 @@ namespace ExperienceAndClasses {
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Constructor ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         public ExperienceAndClasses() {
-            Properties = new ModProperties() {
-                Autoload = true,
-            };
+            
         }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Load/Unload ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
@@ -65,11 +63,15 @@ namespace ExperienceAndClasses {
             //hotkeys
             HOTKEY_UI = RegisterHotKey("Show Class Interface", "P");
 
+            Textures.LoadTextures();
         }
 
         public override void Unload() {
+            MOD = null;
+
             //hotkeys
             HOTKEY_UI = null;
+
         }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ UI ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/

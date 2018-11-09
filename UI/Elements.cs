@@ -22,7 +22,7 @@ namespace ExperienceAndClasses.UI {
             this.attribute = attribute;
             this.scale = scale;
 
-            left_final = width - (Shared.TEXTURE_BUTTON_SIZE*2) - RIGHT_SIDE_PADDING - Shared.UI_PADDING;
+            left_final = width - (Textures.TEXTURE_BUTTON_SIZE*2) - RIGHT_SIDE_PADDING - Shared.UI_PADDING;
 
             SetPadding(0f);
             Left.Set(0f, 0f);
@@ -54,15 +54,15 @@ namespace ExperienceAndClasses.UI {
             final.Top.Set(top, 0f);
             Append(final);
 
-            UIImageButton button_add = new UIImageButton(Shared.TEXTURE_BUTTON_PLUS);
-            button_add.Width.Set(Shared.TEXTURE_BUTTON_SIZE, 0f);
-            button_add.Height.Set(Shared.TEXTURE_BUTTON_SIZE, 0f);
+            UIImageButton button_add = new UIImageButton(Textures.TEXTURE_BUTTON_PLUS);
+            button_add.Width.Set(Textures.TEXTURE_BUTTON_SIZE, 0f);
+            button_add.Height.Set(Textures.TEXTURE_BUTTON_SIZE, 0f);
             button_add.Left.Set(width - (button_add.Width.Pixels * 2f) - RIGHT_SIDE_PADDING, 0f);
             button_add.Top.Set((height - button_add.Height.Pixels) / 2f, 0f);
             button_add.OnMouseDown += new MouseEvent(ClickAdd);
             Append(button_add);
 
-            UIImageButton button_subtract = new UIImageButton(Shared.TEXTURE_BUTTON_MINUS);
+            UIImageButton button_subtract = new UIImageButton(Textures.TEXTURE_BUTTON_MINUS);
             button_subtract.Width.Set(height, 0f);
             button_subtract.Height.Set(height, 0f);
             button_subtract.Left.Set(width - button_add.Width.Pixels - RIGHT_SIDE_PADDING, 0f);
@@ -141,11 +141,11 @@ namespace ExperienceAndClasses.UI {
 
             button_size = texture.Width;
 
-            image_lock = new UIImage(Shared.TEXTURE_BLANK);
-            image_lock.Width.Set(Shared.TEXTURE_LOCK_WIDTH, 0f);
-            image_lock.Height.Set(Shared.TEXTURE_LOCK_HEIGHT, 0f);
-            image_lock.Left.Set(button_size / 2 - Shared.TEXTURE_LOCK_WIDTH / 2, 0f);
-            image_lock.Top.Set(button_size / 2 - Shared.TEXTURE_LOCK_HEIGHT / 2, 0f);
+            image_lock = new UIImage(Textures.TEXTURE_BLANK);
+            image_lock.Width.Set(Textures.TEXTURE_LOCK_WIDTH, 0f);
+            image_lock.Height.Set(Textures.TEXTURE_LOCK_HEIGHT, 0f);
+            image_lock.Left.Set(button_size / 2 - Textures.TEXTURE_LOCK_WIDTH / 2, 0f);
+            image_lock.Top.Set(button_size / 2 - Textures.TEXTURE_LOCK_HEIGHT / 2, 0f);
             Append(image_lock);
 
             SetVisibility(1f, LOW_VISIBILITY);
@@ -183,7 +183,7 @@ namespace ExperienceAndClasses.UI {
             byte level = ExperienceAndClasses.LOCAL_MPLAYER.Class_Levels[class_id];
             if (level > 0) {
                 //not locked
-                image_lock.SetImage(Shared.TEXTURE_BLANK);
+                image_lock.SetImage(Textures.TEXTURE_BLANK);
 
                 //text level
                 string str = "";
@@ -210,7 +210,7 @@ namespace ExperienceAndClasses.UI {
             }
             else {
                 //locked
-                image_lock.SetImage(Shared.TEXTURE_LOCK);
+                image_lock.SetImage(Textures.TEXTURE_LOCK);
                 SetVisibility(1f, LOW_VISIBILITY);
 
                 //no text
@@ -286,11 +286,11 @@ namespace ExperienceAndClasses.UI {
                 auto = value;
                 if (button_auto != null) {
                     if (auto) {
-                        button_auto.SetImage(Shared.TEXTURE_CORNER_BUTTON_AUTO);
+                        button_auto.SetImage(Textures.TEXTURE_CORNER_BUTTON_AUTO);
                         button_auto.hoverText = "Don't Show Menu In Inventory Screen";
                     }
                     else {
-                        button_auto.SetImage(Shared.TEXTURE_CORNER_BUTTON_NO_AUTO);
+                        button_auto.SetImage(Textures.TEXTURE_CORNER_BUTTON_NO_AUTO);
                         button_auto.hoverText = "Show Menu In Inventory Screen";
                     }
                 }
@@ -306,12 +306,12 @@ namespace ExperienceAndClasses.UI {
                 pinned = value;
                 if (button_pinned != null) {
                     if (pinned) {
-                        button_pinned.SetImage(Shared.TEXTURE_CORNER_BUTTON_PINNED);
+                        button_pinned.SetImage(Textures.TEXTURE_CORNER_BUTTON_PINNED);
                         button_pinned.hoverText = "Allow Dragging";
                     }
                     else {
                         stop_pin = true;
-                        button_pinned.SetImage(Shared.TEXTURE_CORNER_BUTTON_UNPINNED);
+                        button_pinned.SetImage(Textures.TEXTURE_CORNER_BUTTON_UNPINNED);
                         button_pinned.hoverText = "Prevent Dragging";
                     }
                 }
@@ -331,26 +331,26 @@ namespace ExperienceAndClasses.UI {
             Height.Set(height, 0f);
 
             if (enable_close) {
-                button_close = new UIHoverImageButton(Shared.TEXTURE_CORNER_BUTTON_CLOSE, "Close");
-                button_close.Width.Set(Shared.TEXTURE_CORNER_BUTTON_SIZE, 0f);
-                button_close.Height.Set(Shared.TEXTURE_CORNER_BUTTON_SIZE, 0f);
+                button_close = new UIHoverImageButton(Textures.TEXTURE_CORNER_BUTTON_CLOSE, "Close");
+                button_close.Width.Set(Textures.TEXTURE_CORNER_BUTTON_SIZE, 0f);
+                button_close.Height.Set(Textures.TEXTURE_CORNER_BUTTON_SIZE, 0f);
                 button_close.OnClick += new MouseEvent(ButtonClickClose);
                 Append(button_close);
             }
 
             if (enable_auto) {
-                button_auto = new UIHoverImageButton(Shared.TEXTURE_BLANK, "");
-                button_auto.Width.Set(Shared.TEXTURE_CORNER_BUTTON_SIZE, 0f);
-                button_auto.Height.Set(Shared.TEXTURE_CORNER_BUTTON_SIZE, 0f);
+                button_auto = new UIHoverImageButton(Textures.TEXTURE_BLANK, "");
+                button_auto.Width.Set(Textures.TEXTURE_CORNER_BUTTON_SIZE, 0f);
+                button_auto.Height.Set(Textures.TEXTURE_CORNER_BUTTON_SIZE, 0f);
                 button_auto.OnClick += new MouseEvent(ButtonClickAuto);
                 Append(button_auto);
                 Auto = true; //defaults to true if enabled
             }
 
             if (enable_pin) {
-                button_pinned = new UIHoverImageButton(Shared.TEXTURE_BLANK, "");
-                button_pinned.Width.Set(Shared.TEXTURE_CORNER_BUTTON_SIZE, 0f);
-                button_pinned.Height.Set(Shared.TEXTURE_CORNER_BUTTON_SIZE, 0f);
+                button_pinned = new UIHoverImageButton(Textures.TEXTURE_BLANK, "");
+                button_pinned.Width.Set(Textures.TEXTURE_CORNER_BUTTON_SIZE, 0f);
+                button_pinned.Height.Set(Textures.TEXTURE_CORNER_BUTTON_SIZE, 0f);
                 button_pinned.OnClick += new MouseEvent(ButtonClickPin);
                 Append(button_pinned);
                 Pinned = pinned;
@@ -362,15 +362,15 @@ namespace ExperienceAndClasses.UI {
         public override void Recalculate() {
             float left = Width.Pixels - Shared.UI_PADDING;
             if (button_close != null) {
-                button_close.Left.Set(left -= Shared.TEXTURE_CORNER_BUTTON_SIZE, 0f);
+                button_close.Left.Set(left -= Textures.TEXTURE_CORNER_BUTTON_SIZE, 0f);
                 button_close.Top.Set(Shared.UI_PADDING, 0f);
             }
             if (button_auto != null) {
-                button_auto.Left.Set(left -= Shared.TEXTURE_CORNER_BUTTON_SIZE, 0f);
+                button_auto.Left.Set(left -= Textures.TEXTURE_CORNER_BUTTON_SIZE, 0f);
                 button_auto.Top.Set(Shared.UI_PADDING, 0f);
             }
             if (button_pinned != null) {
-                button_pinned.Left.Set(left -= Shared.TEXTURE_CORNER_BUTTON_SIZE, 0f);
+                button_pinned.Left.Set(left -= Textures.TEXTURE_CORNER_BUTTON_SIZE, 0f);
                 button_pinned.Top.Set(Shared.UI_PADDING, 0f);
             }
 
@@ -483,13 +483,13 @@ namespace ExperienceAndClasses.UI {
         public void HideButtons() {
             buttons_hidden = true;
             if (button_pinned != null) {
-                button_pinned.SetImage(Shared.TEXTURE_BLANK);
+                button_pinned.SetImage(Textures.TEXTURE_BLANK);
             }
             if (button_auto != null) {
-                button_auto.SetImage(Shared.TEXTURE_BLANK);
+                button_auto.SetImage(Textures.TEXTURE_BLANK);
             }
             if (button_close != null) {
-                button_close.SetImage(Shared.TEXTURE_BLANK);
+                button_close.SetImage(Textures.TEXTURE_BLANK);
             }
         }
 
@@ -502,7 +502,7 @@ namespace ExperienceAndClasses.UI {
                 Auto = auto;
             }
             if (button_close != null) {
-                button_close.SetImage(Shared.TEXTURE_CORNER_BUTTON_CLOSE);
+                button_close.SetImage(Textures.TEXTURE_CORNER_BUTTON_CLOSE);
             }
         }
     }

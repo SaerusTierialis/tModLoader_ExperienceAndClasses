@@ -466,14 +466,14 @@ namespace ExperienceAndClasses {
             }
         }
 
-        public void LocalAttributeAllocation(byte id, short value) {
+        public void LocalAttributeAllocation(byte id, short adjustment) {
             if (!Is_Local_Player) {
                 Commons.Error("Cannot set attribute allocation for non-local player");
                 return;
             }
 
-            if ((Attribute_Points_Unallocated >= value) && ((Attributes_Allocated[id] + value) >= 0)) {
-                Attributes_Allocated[id] += value;
+            if ((Attribute_Points_Unallocated >= adjustment) && ((Attributes_Allocated[id] + adjustment) >= 0)) {
+                Attributes_Allocated[id] += adjustment;
                 LocalUpdateClassInfo();
             }
         }
