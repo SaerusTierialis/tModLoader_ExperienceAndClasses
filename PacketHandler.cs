@@ -74,11 +74,9 @@ namespace ExperienceAndClasses {
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Recieving ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         public static void HandlePacketContents(byte origin_id, Player origin_player, MPlayer origin_mplayer, ExperienceAndClasses.PACKET_TYPE packet_type, BinaryReader reader) {
-            /*
             if (ExperienceAndClasses.trace) {
                 Commons.Trace("Handling " + packet_type + " originating from player " + origin_id);
             }
-            */
 
             switch (packet_type) {
                 case ExperienceAndClasses.PACKET_TYPE.BROADCAST_TRACE: //sent by client to server

@@ -125,9 +125,11 @@ namespace ExperienceAndClasses {
             Player origin_player = Main.player[origin_id];
             MPlayer origin_mplayer = origin_player.GetModPlayer<MPlayer>(this);
 
+            /*
             if (trace) {
                 Commons.Trace("Recieved " + packet_type + " originating from player " + origin_id);
             }
+            */
 
             PacketHandler.HandlePacketContents(origin_id, origin_player, origin_mplayer, packet_type, reader);
         }
