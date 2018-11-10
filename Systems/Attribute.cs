@@ -129,6 +129,7 @@ namespace ExperienceAndClasses.Systems {
         private const float AGILITY_MOVEMENT = 0.005f;
         private const float AGILITY_JUMP = 0.01f;
         private const float AGILITY_DODGE = 0.0025f;
+        private const float AGILITY_FLY = 0.5f;
 
         private const float DEXTERITY_ATTACK_SPEED = 0.0025f;
         private const float DEXTERITY_COOLDOWN = 0.01f;
@@ -277,6 +278,12 @@ namespace ExperienceAndClasses.Systems {
                         bf = bpp * points;
                         mplayer.dodge_chance += bf;
                         if (mplayer.Is_Local_Player) Bonus += "\n+" + Math.Round(bf * 100, 2) + "% dodge chance (" + Math.Round(bpp * 100, 2) + " per point)";
+
+                        //max fly time
+                        bpp = AGILITY_FLY;
+                        bi = (int)Math.Floor(bpp * points);
+                        mplayer.player.wingTimeMax += bi;
+                        if (mplayer.Is_Local_Player) Bonus += "\n+" + bi + " wing time (" + bpp + " per point)";
 
                         break;
 
