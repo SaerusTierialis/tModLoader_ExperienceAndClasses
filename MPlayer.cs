@@ -47,6 +47,7 @@ namespace ExperienceAndClasses {
         public byte Class_Secondary_Level_Effective { get; private set; }
 
         public short[] Attributes_Final { get; private set; }
+        public bool AFK { get; private set; }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Initialize ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -59,6 +60,7 @@ namespace ExperienceAndClasses {
             Allow_Secondary = false;
             initialized = false;
             Load_Version = new int[3];
+            AFK = false;
 
             //default class level
             Class_Levels = new byte[(byte)Systems.Class.CLASS_IDS.NUMBER_OF_IDs];
@@ -233,7 +235,7 @@ namespace ExperienceAndClasses {
 
             //fail if secondary not allowed
             if (!is_primary && !Allow_Secondary) {
-                Main.NewText("Failed to set class because secondary class feature is locked!", ExperienceAndClasses.COLOUR_MESSAGE_ERROR);
+                Main.NewText("Failed to set class because secondary class feature is locked!", Shared.COLOUR_MESSAGE_ERROR);
                 return false;
             }
 
@@ -262,15 +264,15 @@ namespace ExperienceAndClasses {
                         return true;
 
                     case CLASS_VALIDITY.INVALID_COMBINATION:
-                        Main.NewText("Failed to set class because combination is invalid!", ExperienceAndClasses.COLOUR_MESSAGE_ERROR);
+                        Main.NewText("Failed to set class because combination is invalid!", Shared.COLOUR_MESSAGE_ERROR);
                         break;
 
                     case CLASS_VALIDITY.INVALID_ID:
-                        Main.NewText("Failed to set class because class id is invalid!", ExperienceAndClasses.COLOUR_MESSAGE_ERROR);
+                        Main.NewText("Failed to set class because class id is invalid!", Shared.COLOUR_MESSAGE_ERROR);
                         break;
 
                     case CLASS_VALIDITY.INVALID_LEVEL:
-                        Main.NewText("Failed to set class because it is locked!", ExperienceAndClasses.COLOUR_MESSAGE_ERROR);
+                        Main.NewText("Failed to set class because it is locked!", Shared.COLOUR_MESSAGE_ERROR);
                         break;
 
                     case CLASS_VALIDITY.INVALID_NON_LOCAL:
@@ -415,6 +417,8 @@ namespace ExperienceAndClasses {
             clone.Class_Secondary_Level_Effective = Class_Secondary_Level_Effective;
 
             Attributes_Final.CopyTo(clone.Attributes_Final, 0);
+
+            clone.AFK = AFK;
         }
 
         /// <summary>
@@ -445,6 +449,11 @@ namespace ExperienceAndClasses {
                         PacketHandler.SendForceAttribute(me, Attributes_Final);
                         break;
                     }
+                }
+
+                //afk
+                if (clone.AFK != AFK) {
+
                 }
 
             }
@@ -639,6 +648,20 @@ namespace ExperienceAndClasses {
                 }
             }
             
+        }
+
+        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Misc ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+        public void SetAfk(bool afk) {
+            AFK = afk;
+            if (Is_Local_Player) {
+                if (AFK) {
+                    Main.NewText("You are now AFK. You will not gain or lose XP.", Shared.COLOUR_MESSAGE_ERROR);
+                }
+                else {
+                    Main.NewText("You are no longer AFK. You can gain and lose XP again.", Shared.COLOUR_MESSAGE_SUCCESS);
+                }
+            }
         }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Ability & Status ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/

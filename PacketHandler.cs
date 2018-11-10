@@ -10,10 +10,20 @@ using Terraria.ModLoader;
 
 namespace ExperienceAndClasses {
     class PacketHandler {
+        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Packet Types ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+        public enum PACKET_TYPE : byte {
+            BROADCAST_TRACE,
+            FORCE_FULL,
+            FORCE_CLASS,
+            FORCE_ATTRIBUTE,
+            HEAL,
+            AFK,
+        };
+
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Sending ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         public static void SendForceClass(byte origin, byte primary_id, byte primary_level, byte secondary_id, byte secondary_level) {
             ModPacket packet = ExperienceAndClasses.MOD.GetPacket();
-            packet.Write((byte)ExperienceAndClasses.PACKET_TYPE.FORCE_CLASS);
+            packet.Write((byte)PacketHandler.PACKET_TYPE.FORCE_CLASS);
             packet.Write(origin);
             packet = SendForceClass_Body(packet, primary_id, primary_level, secondary_id, secondary_level);
             packet.Send(-1, origin);
@@ -28,7 +38,7 @@ namespace ExperienceAndClasses {
 
         public static void SendForceAttribute(byte origin, short[] attributes) {
             ModPacket packet = ExperienceAndClasses.MOD.GetPacket();
-            packet.Write((byte)ExperienceAndClasses.PACKET_TYPE.FORCE_ATTRIBUTE);
+            packet.Write((byte)PACKET_TYPE.FORCE_ATTRIBUTE);
             packet.Write(origin);
             packet = SendForceAttribute_Body(packet, attributes);
             packet.Send(-1, origin);
@@ -42,7 +52,7 @@ namespace ExperienceAndClasses {
 
         public static void SendForceFull(byte origin, byte primary_id, byte primary_level, byte secondary_id, byte secondary_level, short[] attributes) {
             ModPacket packet = ExperienceAndClasses.MOD.GetPacket();
-            packet.Write((byte)ExperienceAndClasses.PACKET_TYPE.FORCE_FULL);
+            packet.Write((byte)PACKET_TYPE.FORCE_FULL);
             packet.Write(origin);
             packet = SendForceClass_Body(packet, primary_id, primary_level, secondary_id, secondary_level);
             packet = SendForceAttribute_Body(packet, attributes);
@@ -51,7 +61,7 @@ namespace ExperienceAndClasses {
 
         public static void SendBroadcastTrace(byte origin, string message) {
             ModPacket packet = ExperienceAndClasses.MOD.GetPacket();
-            packet.Write((byte)ExperienceAndClasses.PACKET_TYPE.BROADCAST_TRACE);
+            packet.Write((byte)PACKET_TYPE.BROADCAST_TRACE);
             packet.Write(origin);
             packet.Write(message);
             packet.Send(-1);
@@ -59,7 +69,7 @@ namespace ExperienceAndClasses {
 
         public static void SendHeal(byte origin, byte target, int amount_life, int amount_mana) {
             ModPacket packet = ExperienceAndClasses.MOD.GetPacket();
-            packet.Write((byte)ExperienceAndClasses.PACKET_TYPE.HEAL);
+            packet.Write((byte)PACKET_TYPE.HEAL);
             packet.Write(origin);
             packet.Write(target);
             packet.Write(amount_life);
@@ -72,31 +82,39 @@ namespace ExperienceAndClasses {
             }
         }
 
+        public static void SendAFK(byte origin, bool afk) {
+            ModPacket packet = ExperienceAndClasses.MOD.GetPacket();
+            packet.Write((byte)PACKET_TYPE.AFK);
+            packet.Write(origin);
+            packet.Write(afk);
+            packet.Send(-1, origin);
+        }
+
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Recieving ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-        public static void HandlePacketContents(byte origin_id, Player origin_player, MPlayer origin_mplayer, ExperienceAndClasses.PACKET_TYPE packet_type, BinaryReader reader) {
+        public static void HandlePacketContents(byte origin_id, Player origin_player, MPlayer origin_mplayer, PACKET_TYPE packet_type, BinaryReader reader) {
             if (ExperienceAndClasses.trace) {
                 Commons.Trace("Handling " + packet_type + " originating from player " + origin_id);
             }
 
             switch (packet_type) {
-                case ExperienceAndClasses.PACKET_TYPE.BROADCAST_TRACE: //sent by client to server
+                case PACKET_TYPE.BROADCAST_TRACE: //sent by client to server
                     //read
                     string message = reader.ReadString();
 
                     //broadcast
-                    NetMessage.BroadcastChatMessage(NetworkText.FromLiteral(message), ExperienceAndClasses.COLOUR_MESSAGE_TRACE);
+                    NetMessage.BroadcastChatMessage(NetworkText.FromLiteral(message), Shared.COLOUR_MESSAGE_TRACE);
 
                     //also write in console
                     Console.WriteLine(message);
 
                     break;
 
-                case ExperienceAndClasses.PACKET_TYPE.FORCE_FULL:
-                    HandlePacketContents(origin_id, origin_player, origin_mplayer, ExperienceAndClasses.PACKET_TYPE.FORCE_CLASS, reader);
-                    HandlePacketContents(origin_id, origin_player, origin_mplayer, ExperienceAndClasses.PACKET_TYPE.FORCE_ATTRIBUTE, reader);
+                case PACKET_TYPE.FORCE_FULL:
+                    HandlePacketContents(origin_id, origin_player, origin_mplayer, PACKET_TYPE.FORCE_CLASS, reader);
+                    HandlePacketContents(origin_id, origin_player, origin_mplayer, PACKET_TYPE.FORCE_ATTRIBUTE, reader);
                     break;
 
-                case ExperienceAndClasses.PACKET_TYPE.FORCE_CLASS:
+                case PACKET_TYPE.FORCE_CLASS:
                     //read
                     byte[] bytes = reader.ReadBytes(4);
 
@@ -110,7 +128,7 @@ namespace ExperienceAndClasses {
 
                     break;
 
-                case ExperienceAndClasses.PACKET_TYPE.FORCE_ATTRIBUTE:
+                case PACKET_TYPE.FORCE_ATTRIBUTE:
                     //read
                     short[] attributes = new short[(byte)Systems.Attribute.ATTRIBUTE_IDS.NUMBER_OF_IDs];
                     for (byte i = 0; i < (byte)Systems.Attribute.ATTRIBUTE_IDS.NUMBER_OF_IDs; i++) {
@@ -127,7 +145,7 @@ namespace ExperienceAndClasses {
 
                     break;
 
-                case ExperienceAndClasses.PACKET_TYPE.HEAL:
+                case PACKET_TYPE.HEAL:
                     //read
                     byte target = reader.ReadByte();
                     int amount_life = reader.ReadInt32();
@@ -135,6 +153,20 @@ namespace ExperienceAndClasses {
 
                     //do or relay
                     Main.player[target].GetModPlayer<MPlayer>(ExperienceAndClasses.MOD).Heal(amount_life, amount_mana);
+
+                    break;
+
+                case PACKET_TYPE.AFK:
+                    //read
+                    bool afk = reader.ReadBoolean();
+
+                    //set
+                    origin_mplayer.SetAfk(afk);
+
+                    //relay
+                    if (ExperienceAndClasses.IS_SERVER) {
+                        SendAFK(origin_id, afk);
+                    }
 
                     break;
 

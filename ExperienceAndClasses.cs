@@ -21,17 +21,7 @@ namespace ExperienceAndClasses {
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Constants (and readonly) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-        public enum PACKET_TYPE : byte {
-            BROADCAST_TRACE,
-            FORCE_FULL,
-            FORCE_CLASS,
-            FORCE_ATTRIBUTE,
-            HEAL,
-        };
-
-        //chat colors must go here or server gives "Error on message Terraria.MessageBuffer"
-        public static readonly Color COLOUR_MESSAGE_ERROR = new Color(255, 25, 25);
-        public static readonly Color COLOUR_MESSAGE_TRACE = new Color(255, 0, 255);
+        
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Treated like readonly after entering map ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -117,7 +107,7 @@ namespace ExperienceAndClasses {
 
         public override void HandlePacket(BinaryReader reader, int whoAmI) {
             //first 2 bytes are always type and sender
-            PACKET_TYPE packet_type = (PACKET_TYPE)reader.ReadByte();
+            PacketHandler.PACKET_TYPE packet_type = (PacketHandler.PACKET_TYPE)reader.ReadByte();
             byte origin_id = reader.ReadByte();
 
             Player origin_player = Main.player[origin_id];
