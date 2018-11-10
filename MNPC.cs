@@ -7,7 +7,7 @@ using Terraria;
 using Terraria.ModLoader;
 
 namespace ExperienceAndClasses {
-    class GNPC : GlobalNPC {
+    class MNPC : GlobalNPC {
 
 
 
