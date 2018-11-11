@@ -23,8 +23,10 @@ namespace ExperienceAndClasses {
         public bool Is_Local_Player { get; private set; }
         private bool initialized;
         public int[] Load_Version { get; private set; }
+        public bool Killed_WOF { get; private set; }
 
         public byte[] Class_Levels { get; private set; }
+        public ulong[] Class_XP { get; private set; }
         public bool Allow_Secondary { get; private set; }
 
         public short[] Attributes_Base { get; private set; }
@@ -61,10 +63,12 @@ namespace ExperienceAndClasses {
             initialized = false;
             Load_Version = new int[3];
             AFK = false;
+            Killed_WOF = false;
 
             //default class level
             Class_Levels = new byte[(byte)Systems.Class.CLASS_IDS.NUMBER_OF_IDs];
             Class_Levels[(byte)Systems.Class.CLASS_IDS.Novice] = 1;
+            Class_XP = new ulong[(byte)Systems.Class.CLASS_IDS.NUMBER_OF_IDs];
 
             //default class selection
             Class_Primary = Systems.Class.CLASS_LOOKUP[(byte)Systems.Class.CLASS_IDS.Novice];
@@ -156,7 +160,7 @@ namespace ExperienceAndClasses {
             base.PostUpdateEquips();
             if (initialized) {
                 ApplyAttributes();
-
+                
             }
         }
 
@@ -398,6 +402,30 @@ namespace ExperienceAndClasses {
 
         }
 
+        public void LocalAddXP(double xp) {
+            if (!Is_Local_Player) return;
+
+            if (Class_Primary_Level_Effective > 0) {
+                //5% bonus xp if well fed
+                if (player.wellFed)
+                    xp *= 1.05;
+
+                //add
+                if (Class_Secondary_Level_Effective > 0) {
+                    //subclass penalty
+                    Class_XP[Class_Primary.ID] += (ulong)Math.Max(Math.Floor(xp * Shared.SUBCLASS_PENALTY_XP_MULTIPLIER_PRIMARY), 1);
+                    Class_XP[Class_Secondary.ID] += (ulong)Math.Max(Math.Floor(xp * Shared.SUBCLASS_PENALTY_XP_MULTIPLIER_SECONDARY), 1);
+                }
+                else {
+                    //single class
+                    Class_XP[Class_Primary.ID] += (ulong)Math.Max(Math.Floor(xp), 1);
+                }
+
+                //check if level changed
+                //TODO
+            }
+        }
+
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Hotkeys ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         public override void ProcessTriggers(TriggersSet triggersSet) {
@@ -453,7 +481,7 @@ namespace ExperienceAndClasses {
 
                 //afk
                 if (clone.AFK != AFK) {
-
+                    PacketHandler.SendAFK(me, AFK);
                 }
 
             }
@@ -475,7 +503,7 @@ namespace ExperienceAndClasses {
         /// </summary>
         private void FullSync() {
             //send one packet with everything needed
-            PacketHandler.SendForceFull((byte)player.whoAmI, Class_Primary.ID, Class_Primary_Level_Effective, Class_Secondary.ID, Class_Secondary_Level_Effective, Attributes_Final);
+            PacketHandler.SendForceFull((byte)player.whoAmI, Class_Primary.ID, Class_Primary_Level_Effective, Class_Secondary.ID, Class_Secondary_Level_Effective, Attributes_Final, AFK);
         }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Sync Force Commands ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
@@ -612,11 +640,13 @@ namespace ExperienceAndClasses {
                 {"eac_ui_status_top", UI.UIStatus.Instance.panel.GetTop() },
                 {"eac_ui_status_auto", UI.UIStatus.Instance.panel.Auto },
                 {"eac_ui_status_pinned", UI.UIStatus.Instance.panel.Pinned },
-                {"eac_class_levels", Class_Levels },
+                {"eac_class_levels", Class_Levels }, //TODO: remove
+                {"eac_class_xp", Class_XP },
                 {"eac_class_current_primary", Class_Primary.ID },
                 {"eac_class_current_secondary", Class_Secondary.ID },
                 {"eac_class_subclass_unlocked", Allow_Secondary },
                 {"eac_attribute_allocation", attributes_allocated },
+                {"eac_wof", Killed_WOF },
             };
         }
 
@@ -627,6 +657,9 @@ namespace ExperienceAndClasses {
             //get version in case needed
             Load_Version = Commons.TryGet<int[]>(tag, "eac_version", new int[3]);
 
+            //has killed wof
+            Killed_WOF = Commons.TryGet<bool>(tag, "eac_wof", Killed_WOF);
+
             //subclass unlocked
             Allow_Secondary = Commons.TryGet<bool>(tag, "eac_class_current_primary", Allow_Secondary);
 
@@ -634,10 +667,14 @@ namespace ExperienceAndClasses {
             Class_Primary = Systems.Class.CLASS_LOOKUP[Commons.TryGet<byte>(load_tag, "eac_class_current_primary", Class_Primary.ID)];
             Class_Secondary = Systems.Class.CLASS_LOOKUP[Commons.TryGet<byte>(load_tag, "eac_class_current_secondary", Class_Secondary.ID)];
 
-            //class levels
+            //class xp/levels
             byte[] class_levels_loaded = Commons.TryGet<byte[]>(load_tag, "eac_class_levels", new byte[0]);
             for (byte i = 0; i < class_levels_loaded.Length; i++) {
                 Class_Levels[i] = class_levels_loaded[i];
+            }
+            ulong[] class_xp_loaded = Commons.TryGet<ulong[]>(load_tag, "eac_class_xp", new ulong[0]);
+            for (byte i = 0; i < class_xp_loaded.Length; i++) {
+                Class_XP[i] = class_xp_loaded[i];
             }
 
             //allocated attributes

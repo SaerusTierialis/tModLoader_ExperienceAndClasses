@@ -110,12 +110,20 @@ namespace ExperienceAndClasses {
             PacketHandler.PACKET_TYPE packet_type = (PacketHandler.PACKET_TYPE)reader.ReadByte();
             byte origin_id = reader.ReadByte();
 
-            Player origin_player = Main.player[origin_id];
-            MPlayer origin_mplayer = origin_player.GetModPlayer<MPlayer>(this);
+            Player origin_player;
+            MPlayer origin_mplayer;
+            if ((origin_id >= 0) && (origin_id <= 255)) {
+                origin_player = Main.player[origin_id];
+                origin_mplayer = origin_player.GetModPlayer<MPlayer>(this);
+            }
+            else {
+                origin_player = null;
+                origin_mplayer = null;
+            }
 
             /*
             if (trace) {
-                Commons.Trace("Recieved " + packet_type + " originating from player " + origin_id);
+                Commons.Trace("Recieved " + packet_type + " originating from " + origin_id);
             }
             */
 

@@ -18,6 +18,7 @@ namespace ExperienceAndClasses {
             FORCE_ATTRIBUTE,
             HEAL,
             AFK,
+            XP,
         };
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Sending ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
@@ -50,12 +51,13 @@ namespace ExperienceAndClasses {
             return packet;
         }
 
-        public static void SendForceFull(byte origin, byte primary_id, byte primary_level, byte secondary_id, byte secondary_level, short[] attributes) {
+        public static void SendForceFull(byte origin, byte primary_id, byte primary_level, byte secondary_id, byte secondary_level, short[] attributes, bool afk) {
             ModPacket packet = ExperienceAndClasses.MOD.GetPacket();
             packet.Write((byte)PACKET_TYPE.FORCE_FULL);
             packet.Write(origin);
             packet = SendForceClass_Body(packet, primary_id, primary_level, secondary_id, secondary_level);
             packet = SendForceAttribute_Body(packet, attributes);
+            packet.Write(afk);
             packet.Send(-1, origin);
         }
 
@@ -90,10 +92,18 @@ namespace ExperienceAndClasses {
             packet.Send(-1, origin);
         }
 
+        public static void SendXP(byte target, double xp) {
+            ModPacket packet = ExperienceAndClasses.MOD.GetPacket();
+            packet.Write((byte)PACKET_TYPE.XP);
+            packet.Write(-1); //from server
+            packet.Write(xp);
+            packet.Send(target);
+        }
+
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Recieving ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         public static void HandlePacketContents(byte origin_id, Player origin_player, MPlayer origin_mplayer, PACKET_TYPE packet_type, BinaryReader reader) {
             if (ExperienceAndClasses.trace) {
-                Commons.Trace("Handling " + packet_type + " originating from player " + origin_id);
+                Commons.Trace("Handling " + packet_type + " originating from " + origin_id);
             }
 
             switch (packet_type) {
@@ -112,6 +122,7 @@ namespace ExperienceAndClasses {
                 case PACKET_TYPE.FORCE_FULL:
                     HandlePacketContents(origin_id, origin_player, origin_mplayer, PACKET_TYPE.FORCE_CLASS, reader);
                     HandlePacketContents(origin_id, origin_player, origin_mplayer, PACKET_TYPE.FORCE_ATTRIBUTE, reader);
+                    HandlePacketContents(origin_id, origin_player, origin_mplayer, PACKET_TYPE.AFK, reader);
                     break;
 
                 case PACKET_TYPE.FORCE_CLASS:
@@ -167,6 +178,15 @@ namespace ExperienceAndClasses {
                     if (ExperienceAndClasses.IS_SERVER) {
                         SendAFK(origin_id, afk);
                     }
+
+                    break;
+
+                case PACKET_TYPE.XP:
+                    //read
+                    double xp = reader.ReadDouble();
+
+                    //set
+                    ExperienceAndClasses.LOCAL_MPLAYER.LocalAddXP(xp);
 
                     break;
 
