@@ -405,6 +405,7 @@ namespace ExperienceAndClasses {
         public void LocalAddXP(double xp) {
             if (!Is_Local_Player) return;
 
+            //no xp if no class
             if (Class_Primary_Level_Effective > 0) {
                 //5% bonus xp if well fed
                 if (player.wellFed)

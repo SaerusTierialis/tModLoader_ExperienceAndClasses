@@ -48,14 +48,19 @@ namespace ExperienceAndClasses {
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Load/Unload ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         public override void Load() {
+            //make Mod easily available
             MOD = this;
 
             //hotkeys
             HOTKEY_UI = RegisterHotKey("Show Class Interface", "P");
 
+            //textures
             if (!IS_SERVER) {
                 Textures.LoadTextures();
             }
+
+            //calculate xp requirements
+            Systems.XP.CalcXPRequirements();
         }
 
         public override void Unload() {

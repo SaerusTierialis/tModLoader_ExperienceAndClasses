@@ -19,6 +19,11 @@ namespace ExperienceAndClasses.Systems {
         public const double EATER_BODY_MULT = 1.109713024f;
         public const double EATER_TAIL_MULT = 0.647725809f;
 
+        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Variables ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+        public static ulong[] XP_REQ { get; private set; }
+        public static ulong[] XP_REQ_TOTAL { get; private set; }
+
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ General ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         public static List<int> GetEligiblePlayers(NPC npc) {
@@ -97,7 +102,79 @@ namespace ExperienceAndClasses.Systems {
             return experience;
         }
 
+        /// <summary>
+        /// call once at load
+        /// </summary>
+        public static void CalcXPRequirements() {
+            //tier 1 (predefined)
+            ulong[] xp_predef = new ulong[] { 0, 0, 10, 25, 50, 75, 100, 125, 150, 200, 350 }; //length+1 must be Shared.MAX_LEVEL[1]
+            int num_predef = xp_predef.Length - 1;
 
+            int levels = Shared.MAX_LEVEL[1] + Shared.MAX_LEVEL[2] + Shared.MAX_LEVEL[3];
+
+            XP_REQ = new ulong[1 + levels];
+            XP_REQ_TOTAL = new ulong[1 + levels];
+
+            double adjust;
+            for (int i = 2; i <= levels; i++) {
+                if (i <= num_predef) {
+                    XP_REQ[i] = xp_predef[i];
+                }
+                else {
+                    adjust = Math.Max(1.35 - ((i - 1 - num_predef) / 100), 1.04);
+                    XP_REQ[i] = (ulong)Math.Round(XP_REQ[i - 1] * adjust, 0);
+                }
+                XP_REQ_TOTAL[i] = XP_REQ_TOTAL[i - 1] + XP_REQ[i];
+            }
+        }
+
+        public static byte GetLevel(byte tier, ulong xp_total) {
+            int level = 1;
+            while (XP_REQ_TOTAL[level] <= xp_total) {
+                level++;
+            }
+
+            switch(tier) {
+                case 2:
+                    level -= (Shared.MAX_LEVEL[1] - 1);
+                    break;
+                case 3:
+                    level -= (Shared.MAX_LEVEL[1] + Shared.MAX_LEVEL[2] - 1);
+                    break;
+            }
+
+            return (byte)level;
+        }
+
+        public static ulong GetXPNextLevel(byte tier, byte level) {
+            int ind = level;
+
+            switch (tier) {
+                case 2:
+                    ind += (Shared.MAX_LEVEL[1] - 1);
+                    break;
+                case 3:
+                    ind += (Shared.MAX_LEVEL[1] + Shared.MAX_LEVEL[2] - 1);
+                    break;
+            }
+
+            return (XP_REQ_TOTAL[ind + 1] - XP_REQ_TOTAL[ind]);
+        }
+
+        public static ulong GetXPTowardsNextLevel(byte tier, ulong xp_total) {
+            int ind = GetLevel(tier, xp_total);
+
+            switch (tier) {
+                case 2:
+                    ind += (Shared.MAX_LEVEL[1] - 1);
+                    break;
+                case 3:
+                    ind += (Shared.MAX_LEVEL[1] + Shared.MAX_LEVEL[2] - 1);
+                    break;
+            }
+
+            return (XP_REQ_TOTAL[ind + 1] - xp_total);
+        }
 
     }
 }
