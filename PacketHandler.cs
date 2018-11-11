@@ -95,7 +95,7 @@ namespace ExperienceAndClasses {
         public static void SendXP(byte target, double xp) {
             ModPacket packet = ExperienceAndClasses.MOD.GetPacket();
             packet.Write((byte)PACKET_TYPE.XP);
-            packet.Write(-1); //from server
+            packet.Write((byte)Main.LocalPlayer.whoAmI); //from server
             packet.Write(xp);
             packet.Send(target);
         }

@@ -7,7 +7,7 @@ using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
 
 namespace ExperienceAndClasses {
-    class MPlayer : ModPlayer {
+    public class MPlayer : ModPlayer {
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Constants ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -24,10 +24,11 @@ namespace ExperienceAndClasses {
         private bool initialized;
         public int[] Load_Version { get; private set; }
         public bool Killed_WOF { get; private set; }
+        public bool Allow_Secondary { get; private set; }
 
         public byte[] Class_Levels { get; private set; }
         public ulong[] Class_XP { get; private set; }
-        public bool Allow_Secondary { get; private set; }
+        public bool[] Class_Unlocked { get; private set; }
 
         public short[] Attributes_Base { get; private set; }
         public short[] Attributes_Allocated { get; private set; }
@@ -65,10 +66,16 @@ namespace ExperienceAndClasses {
             AFK = false;
             Killed_WOF = false;
 
-            //default class level
+            //default level/xp/unlock
             Class_Levels = new byte[(byte)Systems.Class.CLASS_IDS.NUMBER_OF_IDs];
-            Class_Levels[(byte)Systems.Class.CLASS_IDS.Novice] = 1;
             Class_XP = new ulong[(byte)Systems.Class.CLASS_IDS.NUMBER_OF_IDs];
+            Class_Unlocked = new bool[(byte)Systems.Class.CLASS_IDS.NUMBER_OF_IDs];
+
+            //default unlocks
+            Class_Levels[(byte)Systems.Class.CLASS_IDS.Novice] = 1;
+            Class_Unlocked[(byte)Systems.Class.CLASS_IDS.New] = true;
+            Class_Unlocked[(byte)Systems.Class.CLASS_IDS.None] = true;
+            Class_Unlocked[(byte)Systems.Class.CLASS_IDS.Novice] = true;
 
             //default class selection
             Class_Primary = Systems.Class.CLASS_LOOKUP[(byte)Systems.Class.CLASS_IDS.Novice];
@@ -160,7 +167,6 @@ namespace ExperienceAndClasses {
             base.PostUpdateEquips();
             if (initialized) {
                 ApplyAttributes();
-                
             }
         }
 
@@ -196,7 +202,7 @@ namespace ExperienceAndClasses {
                         id_other = Class_Primary.ID;
                     }
 
-                    if ((Class_Levels[id] <= 0) && (id != (byte)Systems.Class.CLASS_IDS.None)) {
+                    if (((Class_Levels[id] <= 0) || !Class_Unlocked[id]) && (id != (byte)Systems.Class.CLASS_IDS.None)) {
                         return CLASS_VALIDITY.INVALID_LEVEL; //locked class
                     }
                     else {
@@ -327,22 +333,8 @@ namespace ExperienceAndClasses {
                 Class_Secondary = Systems.Class.CLASS_LOOKUP[(byte)Systems.Class.CLASS_IDS.None];
             }
 
-            //set current levels for easier checking
-            Class_Primary_Level_Effective = Class_Levels[Class_Primary.ID];
-            Class_Secondary_Level_Effective = Class_Levels[Class_Secondary.ID];
-
-            //level cap primary
-            if (Class_Primary_Level_Effective > Shared.MAX_LEVEL[Class_Primary.Tier]) {
-                Class_Primary_Level_Effective = Shared.MAX_LEVEL[Class_Primary.Tier];
-            }
-
-            //limit secondary to half of primary
-            Class_Secondary_Level_Effective = (byte)Math.Min(Class_Secondary_Level_Effective, Class_Primary_Level_Effective / 2);
-
-            //level cap secondary
-            if (Class_Secondary_Level_Effective > Shared.MAX_LEVEL[Class_Secondary.Tier]) {
-                Class_Secondary_Level_Effective = Shared.MAX_LEVEL[Class_Secondary.Tier];
-            }
+            //effective levels
+            SetEffectiveLevels();
 
             //base class attributes
             float sum_primary, sum_secondary;
@@ -375,7 +367,7 @@ namespace ExperienceAndClasses {
             //allocated attributes
             short class_sum = 0;
             for (byte id = 0; id < (byte)Systems.Class.CLASS_IDS.NUMBER_OF_IDs; id++) {
-                if (Systems.Class.CLASS_LOOKUP[id].Gives_Allocation_Attributes) {
+                if (Systems.Class.CLASS_LOOKUP[id].Gives_Allocation_Attributes && Class_Unlocked[id]) {
                     class_sum += Math.Min(Class_Levels[id], Shared.MAX_LEVEL[Systems.Class.CLASS_LOOKUP[id].Tier]);
                 }
             }
@@ -391,6 +383,32 @@ namespace ExperienceAndClasses {
             //sum attributes
             LocalCalculateFinalAttributes();
 
+            //TODO: unlock (temp)
+            byte level_req;
+            for (byte id = 0; id<(byte)Systems.Class.CLASS_IDS.NUMBER_OF_IDs; id++) {
+                if (Class_Unlocked[id])
+                    continue;
+
+                c = Systems.Class.CLASS_LOOKUP[id];
+                switch (c.Tier) {
+                    case 2:
+                        level_req = Shared.LEVEL_REQUIRED_TIER_2;
+                        break;
+
+                    case 3:
+                        level_req = Shared.LEVEL_REQUIRED_TIER_3;
+                        break;
+
+                    default:
+                        continue;
+                }
+                if (Class_Levels[c.ID_Prereq] >= level_req) {
+                    Class_Unlocked[id] = true;
+                    Class_Levels[id] = Systems.XP.GetLevel(c.Tier, Class_XP[id]);
+                    AnnounceClassUnlock(c);
+                }
+            }
+
             //update UI
             UI.UIClass.Instance.UpdateClassInfo();
 
@@ -402,6 +420,32 @@ namespace ExperienceAndClasses {
 
         }
 
+        private void SetEffectiveLevels() {
+            //set current levels for easier checking
+            Class_Primary_Level_Effective = Class_Levels[Class_Primary.ID];
+            Class_Secondary_Level_Effective = Class_Levels[Class_Secondary.ID];
+
+            //level cap primary
+            if (Class_Primary_Level_Effective > Shared.MAX_LEVEL[Class_Primary.Tier]) {
+                Class_Primary_Level_Effective = Shared.MAX_LEVEL[Class_Primary.Tier];
+            }
+
+            //subclass secondary effective level penalty
+            if (Class_Secondary.Tier > Class_Primary.Tier) {
+                //subclass of higher tier limited to lv1
+                Class_Secondary_Level_Effective = 1;
+            }
+            else if (Class_Secondary.Tier == Class_Primary.Tier) {
+                //subclass of same tier limited to half primary
+                Class_Secondary_Level_Effective = (byte)Math.Min(Class_Secondary_Level_Effective, Class_Primary_Level_Effective / 2);
+            }//subclass of lower tier has no penalty
+
+            //level cap secondary
+            if (Class_Secondary_Level_Effective > Shared.MAX_LEVEL[Class_Secondary.Tier]) {
+                Class_Secondary_Level_Effective = Shared.MAX_LEVEL[Class_Secondary.Tier];
+            }
+        }
+
         public void LocalAddXP(double xp) {
             if (!Is_Local_Player) return;
 
@@ -411,7 +455,11 @@ namespace ExperienceAndClasses {
                 if (player.wellFed)
                     xp *= 1.05;
 
-                //add
+                //store current effective levels
+                byte effective_primary = Class_Primary_Level_Effective;
+                byte effective_secondary = Class_Secondary_Level_Effective;
+
+                //add xp
                 if (Class_Secondary_Level_Effective > 0) {
                     //subclass penalty
                     Class_XP[Class_Primary.ID] += (ulong)Math.Max(Math.Floor(xp * Shared.SUBCLASS_PENALTY_XP_MULTIPLIER_PRIMARY), 1);
@@ -422,9 +470,60 @@ namespace ExperienceAndClasses {
                     Class_XP[Class_Primary.ID] += (ulong)Math.Max(Math.Floor(xp), 1);
                 }
 
-                //check if level changed
-                //TODO
+                //level up
+                if (Class_Levels[Class_Primary.ID] < Shared.MAX_LEVEL[Class_Primary.Tier]) {
+                    //fast check if any levels
+                    if (Systems.XP.GetXPTotalNextLevel(Class_Primary.Tier, Class_Levels[Class_Primary.ID]) < Class_XP[Class_Primary.ID]) {
+                        //slower precise level calc
+                        Class_Levels[Class_Primary.ID] = Systems.XP.GetLevel(Class_Primary.Tier, Class_XP[Class_Primary.ID]);
+                        AnnounceLevel(Class_Primary);
+                    }
+                }
+                if (Class_Levels[Class_Secondary.ID] < Shared.MAX_LEVEL[Class_Secondary.Tier]) {
+                    //fast check if any levels
+                    if (Systems.XP.GetXPTotalNextLevel(Class_Secondary.Tier, Class_Levels[Class_Secondary.ID]) < Class_XP[Class_Secondary.ID]) {
+                        //slower precise level calc
+                        Class_Levels[Class_Secondary.ID] = Systems.XP.GetLevel(Class_Secondary.Tier, Class_XP[Class_Secondary.ID]);
+                        AnnounceLevel(Class_Secondary);
+                    }
+                }
+
+                //adjust effective levels
+                SetEffectiveLevels();
+
+                //update class info if needed
+                if ((effective_primary != Class_Primary_Level_Effective) || (effective_secondary != Class_Secondary_Level_Effective)) {
+                    LocalUpdateClassInfo();
+                }
             }
+        }
+
+        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Announce ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+        public void AnnounceClassUnlock(Systems.Class c) {
+            //client/singleplayer only
+            if (ExperienceAndClasses.IS_SERVER)
+                return;
+
+            Main.NewText("You have unlocked " + c.Name + "!", Shared.COLOUR_MESSAGE_ANNOUNCE);
+        }
+
+        public void AnnounceLevel(Systems.Class c) {
+            //client/singleplayer only
+            if (ExperienceAndClasses.IS_SERVER)
+                return;
+
+            byte level = Class_Levels[c.ID];
+
+            string message = "";
+            if (level == Shared.MAX_LEVEL[c.Tier]) {
+                message = "You are now a MAX level " + c.Name + "!";
+            }
+            else {
+                message = "You are now a level " + level + " " + c.Name + "!";
+            }
+
+            Main.NewText(message, Shared.COLOUR_MESSAGE_ANNOUNCE);
         }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Hotkeys ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
@@ -558,7 +657,7 @@ namespace ExperienceAndClasses {
                 return;
             }
 
-            if ((Attribute_Points_Unallocated >= adjustment) && ((Attributes_Allocated[id] + adjustment) >= 0)) {
+        if ((Attributes_Allocated[id] < 0 && adjustment > 0) || ((Attribute_Points_Unallocated >= adjustment) && ((Attributes_Allocated[id] + adjustment) >= 0))) {
                 Attributes_Allocated[id] += adjustment;
                 LocalUpdateClassInfo();
             }
@@ -622,6 +721,14 @@ namespace ExperienceAndClasses {
             foreach (short value in Attributes_Allocated) {
                 attributes_allocated.Add(value);
             }
+            List<bool> class_unlocked = new List<bool>();
+            foreach (bool value in Class_Unlocked) {
+                class_unlocked.Add(value);
+            }
+            List<ulong> class_xp = new List<ulong>();
+            foreach (ulong value in Class_XP) {
+                class_xp.Add(value);
+            }
 
             //version
             Version version = ExperienceAndClasses.MOD.Version;
@@ -641,8 +748,8 @@ namespace ExperienceAndClasses {
                 {"eac_ui_status_top", UI.UIStatus.Instance.panel.GetTop() },
                 {"eac_ui_status_auto", UI.UIStatus.Instance.panel.Auto },
                 {"eac_ui_status_pinned", UI.UIStatus.Instance.panel.Pinned },
-                {"eac_class_levels", Class_Levels }, //TODO: remove
-                {"eac_class_xp", Class_XP },
+                {"eac_class_unlock", class_unlocked },
+                {"eac_class_xp", class_xp },
                 {"eac_class_current_primary", Class_Primary.ID },
                 {"eac_class_current_secondary", Class_Secondary.ID },
                 {"eac_class_subclass_unlocked", Allow_Secondary },
@@ -656,26 +763,29 @@ namespace ExperienceAndClasses {
             load_tag = tag;
 
             //get version in case needed
-            Load_Version = Commons.TryGet<int[]>(tag, "eac_version", new int[3]);
+            Load_Version = Commons.TryGet<int[]>(load_tag, "eac_version", new int[3]);
 
             //has killed wof
-            Killed_WOF = Commons.TryGet<bool>(tag, "eac_wof", Killed_WOF);
+            Killed_WOF = Commons.TryGet<bool>(load_tag, "eac_wof", Killed_WOF);
 
             //subclass unlocked
-            Allow_Secondary = Commons.TryGet<bool>(tag, "eac_class_current_primary", Allow_Secondary);
-
+            Allow_Secondary = Commons.TryGet<bool>(load_tag, "eac_class_current_primary", Allow_Secondary);
+            
             //current classes
             Class_Primary = Systems.Class.CLASS_LOOKUP[Commons.TryGet<byte>(load_tag, "eac_class_current_primary", Class_Primary.ID)];
             Class_Secondary = Systems.Class.CLASS_LOOKUP[Commons.TryGet<byte>(load_tag, "eac_class_current_secondary", Class_Secondary.ID)];
 
-            //class xp/levels
-            byte[] class_levels_loaded = Commons.TryGet<byte[]>(load_tag, "eac_class_levels", new byte[0]);
-            for (byte i = 0; i < class_levels_loaded.Length; i++) {
-                Class_Levels[i] = class_levels_loaded[i];
+            //class unlocked
+            List<bool> class_unlock_loaded = Commons.TryGet<List<bool>>(load_tag, "eac_class_unlock", new List<bool>());
+            for (byte i = 0; i < class_unlock_loaded.Count; i++) {
+                Class_Unlocked[i] = class_unlock_loaded[i];
             }
-            ulong[] class_xp_loaded = Commons.TryGet<ulong[]>(load_tag, "eac_class_xp", new ulong[0]);
-            for (byte i = 0; i < class_xp_loaded.Length; i++) {
+
+            //class xp/level
+            List<ulong> class_xp_loaded = Commons.TryGet<List<ulong>>(load_tag, "eac_class_xp", new List<ulong>());
+            for (byte i = 0; i < class_xp_loaded.Count; i++) {
                 Class_XP[i] = class_xp_loaded[i];
+                Class_Levels[i] = Systems.XP.GetLevel(Systems.Class.CLASS_LOOKUP[i].Tier, Class_XP[i]);
             }
 
             //allocated attributes

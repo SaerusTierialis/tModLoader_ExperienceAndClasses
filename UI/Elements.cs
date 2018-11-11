@@ -181,7 +181,7 @@ namespace ExperienceAndClasses.UI {
 
         public void Update() {
             byte level = ExperienceAndClasses.LOCAL_MPLAYER.Class_Levels[class_id];
-            if (level > 0) {
+            if (ExperienceAndClasses.LOCAL_MPLAYER.Class_Unlocked[class_id]) {
                 //not locked
                 image_lock.SetImage(Textures.TEXTURE_BLANK);
 

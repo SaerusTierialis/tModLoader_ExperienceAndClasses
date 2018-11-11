@@ -8,7 +8,7 @@ using Terraria;
 using Terraria.ModLoader;
 
 namespace ExperienceAndClasses.Systems {
-    class Class {
+    public class Class {
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Constants (and readonly) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         //DO NOT CHANGE THE ORDER OF IDs

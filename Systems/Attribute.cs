@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Terraria.GameContent.UI.Elements;
 
 namespace ExperienceAndClasses.Systems {
-    class Attribute {
+    public class Attribute {
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Constants (and readonly) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         //DO NOT CHANGE THE ORDER OF IDs
@@ -306,7 +306,7 @@ namespace ExperienceAndClasses.Systems {
         }
     }
 
-    class PowerScaling {
+    public class PowerScaling {
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Constants (and readonly) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         public enum POWER_SCALING_TYPES : byte {
             None,
