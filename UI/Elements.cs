@@ -187,7 +187,7 @@ namespace ExperienceAndClasses.UI {
 
                 //text level
                 string str = "";
-                if (level >= Shared.MAX_LEVEL[Systems.Class.CLASS_LOOKUP[class_id].Tier]) {
+                if (level >= Systems.Class.MAX_LEVEL[Systems.Class.CLASS_LOOKUP[class_id].Tier]) {
                     str = "MAX";
                 }
                 else {

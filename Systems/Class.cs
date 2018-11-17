@@ -46,6 +46,11 @@ namespace ExperienceAndClasses.Systems {
         //which classes to show in ui and where
         public static byte[,] class_locations = new byte[5,7];
 
+        public static readonly byte[] MAX_LEVEL = new byte[] { 0, 10, 50, 100 };
+
+        public static readonly byte LEVEL_REQUIRED_TIER_2 = MAX_LEVEL[1];
+        public static readonly byte LEVEL_REQUIRED_TIER_3 = MAX_LEVEL[2];
+
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Treated like readonly ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         public static Class[] CLASS_LOOKUP { get; private set; }
 

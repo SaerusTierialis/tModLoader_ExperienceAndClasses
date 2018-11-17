@@ -27,7 +27,7 @@ namespace ExperienceAndClasses {
         public bool Allow_Secondary { get; private set; }
 
         public byte[] Class_Levels { get; private set; }
-        public ulong[] Class_XP { get; private set; }
+        public uint[] Class_XP { get; private set; }
         public bool[] Class_Unlocked { get; private set; }
 
         public short[] Attributes_Base { get; private set; }
@@ -68,7 +68,7 @@ namespace ExperienceAndClasses {
 
             //default level/xp/unlock
             Class_Levels = new byte[(byte)Systems.Class.CLASS_IDS.NUMBER_OF_IDs];
-            Class_XP = new ulong[(byte)Systems.Class.CLASS_IDS.NUMBER_OF_IDs];
+            Class_XP = new uint[(byte)Systems.Class.CLASS_IDS.NUMBER_OF_IDs];
             Class_Unlocked = new bool[(byte)Systems.Class.CLASS_IDS.NUMBER_OF_IDs];
 
             //default unlocks
@@ -345,22 +345,22 @@ namespace ExperienceAndClasses {
 
                 c = Class_Primary;
                 while (c.Tier > 0) {
-                    sum_primary += (c.Attribute_Growth[id] * Math.Min(Class_Levels[c.ID], Shared.MAX_LEVEL[c.Tier]));
+                    sum_primary += (c.Attribute_Growth[id] * Math.Min(Class_Levels[c.ID], Systems.Class.MAX_LEVEL[c.Tier]));
                     c = Systems.Class.CLASS_LOOKUP[c.ID_Prereq];
                 }
 
                 c = Class_Secondary;
                 while (c.Tier > 0) {
-                    sum_secondary += (c.Attribute_Growth[id] * Math.Min(Class_Levels[c.ID], Shared.MAX_LEVEL[c.Tier]));
+                    sum_secondary += (c.Attribute_Growth[id] * Math.Min(Class_Levels[c.ID], Systems.Class.MAX_LEVEL[c.Tier]));
                     c = Systems.Class.CLASS_LOOKUP[c.ID_Prereq];
                 }
 
                 if (Class_Secondary_Level_Effective > 0) {
-                    Attributes_Base[id] = (short)Math.Floor((sum_primary / Shared.ATTRIBUTE_GROWTH_LEVELS * Shared.SUBCLASS_PENALTY_ATTRIBUTE_MULTIPLIER_PRIMARY) +
-                                                            (sum_secondary / Shared.ATTRIBUTE_GROWTH_LEVELS * Shared.SUBCLASS_PENALTY_ATTRIBUTE_MULTIPLIER_SECONDARY));
+                    Attributes_Base[id] = (short)Math.Floor((sum_primary / Systems.Attribute.ATTRIBUTE_GROWTH_LEVELS * Systems.Attribute.SUBCLASS_PENALTY_ATTRIBUTE_MULTIPLIER_PRIMARY) +
+                                                            (sum_secondary / Systems.Attribute.ATTRIBUTE_GROWTH_LEVELS * Systems.Attribute.SUBCLASS_PENALTY_ATTRIBUTE_MULTIPLIER_SECONDARY));
                 }
                 else {
-                    Attributes_Base[id] = (short)Math.Floor(sum_primary / Shared.ATTRIBUTE_GROWTH_LEVELS);
+                    Attributes_Base[id] = (short)Math.Floor(sum_primary / Systems.Attribute.ATTRIBUTE_GROWTH_LEVELS);
                 }
             }
 
@@ -368,11 +368,11 @@ namespace ExperienceAndClasses {
             short class_sum = 0;
             for (byte id = 0; id < (byte)Systems.Class.CLASS_IDS.NUMBER_OF_IDs; id++) {
                 if (Systems.Class.CLASS_LOOKUP[id].Gives_Allocation_Attributes && Class_Unlocked[id]) {
-                    class_sum += Math.Min(Class_Levels[id], Shared.MAX_LEVEL[Systems.Class.CLASS_LOOKUP[id].Tier]);
+                    class_sum += Math.Min(Class_Levels[id], Systems.Class.MAX_LEVEL[Systems.Class.CLASS_LOOKUP[id].Tier]);
                 }
             }
             int temp;
-            Attribute_Points_Total = (byte)Math.DivRem(class_sum, Shared.LEVELS_PER_ATTRIBUTE, out temp);
+            Attribute_Points_Total = (byte)Math.DivRem(class_sum, Systems.Attribute.LEVELS_PER_ATTRIBUTE, out temp);
             Levels_To_Next_Point = (byte)temp;
             Attribute_Points_Allocated = 0;
             foreach (short allocated in Attributes_Allocated) {
@@ -392,11 +392,11 @@ namespace ExperienceAndClasses {
                 c = Systems.Class.CLASS_LOOKUP[id];
                 switch (c.Tier) {
                     case 2:
-                        level_req = Shared.LEVEL_REQUIRED_TIER_2;
+                        level_req = Systems.Class.LEVEL_REQUIRED_TIER_2;
                         break;
 
                     case 3:
-                        level_req = Shared.LEVEL_REQUIRED_TIER_3;
+                        level_req = Systems.Class.LEVEL_REQUIRED_TIER_3;
                         break;
 
                     default:
@@ -404,7 +404,7 @@ namespace ExperienceAndClasses {
                 }
                 if (Class_Levels[c.ID_Prereq] >= level_req) {
                     Class_Unlocked[id] = true;
-                    Class_Levels[id] = Systems.XP.GetLevel(c.Tier, Class_XP[id]);
+                    if (Class_Levels[id] < 1) Class_Levels[id] = 1;
                     AnnounceClassUnlock(c);
                 }
             }
@@ -426,8 +426,8 @@ namespace ExperienceAndClasses {
             Class_Secondary_Level_Effective = Class_Levels[Class_Secondary.ID];
 
             //level cap primary
-            if (Class_Primary_Level_Effective > Shared.MAX_LEVEL[Class_Primary.Tier]) {
-                Class_Primary_Level_Effective = Shared.MAX_LEVEL[Class_Primary.Tier];
+            if (Class_Primary_Level_Effective > Systems.Class.MAX_LEVEL[Class_Primary.Tier]) {
+                Class_Primary_Level_Effective = Systems.Class.MAX_LEVEL[Class_Primary.Tier];
             }
 
             //subclass secondary effective level penalty
@@ -441,8 +441,8 @@ namespace ExperienceAndClasses {
             }//subclass of lower tier has no penalty
 
             //level cap secondary
-            if (Class_Secondary_Level_Effective > Shared.MAX_LEVEL[Class_Secondary.Tier]) {
-                Class_Secondary_Level_Effective = Shared.MAX_LEVEL[Class_Secondary.Tier];
+            if (Class_Secondary_Level_Effective > Systems.Class.MAX_LEVEL[Class_Secondary.Tier]) {
+                Class_Secondary_Level_Effective = Systems.Class.MAX_LEVEL[Class_Secondary.Tier];
             }
         }
 
@@ -453,7 +453,7 @@ namespace ExperienceAndClasses {
             if (Class_Primary_Level_Effective > 0) {
                 //5% bonus xp if well fed
                 if (player.wellFed)
-                    xp *= 1.05;
+                    xp *= 1.05d;
 
                 //store current effective levels
                 byte effective_primary = Class_Primary_Level_Effective;
@@ -462,30 +462,24 @@ namespace ExperienceAndClasses {
                 //add xp
                 if (Class_Secondary_Level_Effective > 0) {
                     //subclass penalty
-                    Class_XP[Class_Primary.ID] += (ulong)Math.Max(Math.Floor(xp * Shared.SUBCLASS_PENALTY_XP_MULTIPLIER_PRIMARY), 1);
-                    Class_XP[Class_Secondary.ID] += (ulong)Math.Max(Math.Floor(xp * Shared.SUBCLASS_PENALTY_XP_MULTIPLIER_SECONDARY), 1);
+                    AddXP(Class_Primary.ID, (uint)Math.Max(Math.Floor(xp * Systems.XP.SUBCLASS_PENALTY_XP_MULTIPLIER_PRIMARY), 1));
+                    AddXP(Class_Secondary.ID, (uint)Math.Max(Math.Floor(xp * Systems.XP.SUBCLASS_PENALTY_XP_MULTIPLIER_SECONDARY), 1));
                 }
                 else {
                     //single class
-                    Class_XP[Class_Primary.ID] += (ulong)Math.Max(Math.Floor(xp), 1);
+                    AddXP(Class_Primary.ID, (uint)Math.Max(Math.Floor(xp), 1));
                 }
 
                 //level up
-                if (Class_Levels[Class_Primary.ID] < Shared.MAX_LEVEL[Class_Primary.Tier]) {
-                    //fast check if any levels
-                    if (Systems.XP.GetXPTotalNextLevel(Class_Primary.Tier, Class_Levels[Class_Primary.ID]) < Class_XP[Class_Primary.ID]) {
-                        //slower precise level calc
-                        Class_Levels[Class_Primary.ID] = Systems.XP.GetLevel(Class_Primary.Tier, Class_XP[Class_Primary.ID]);
-                        AnnounceLevel(Class_Primary);
-                    }
+                while ((Class_Levels[Class_Primary.ID] < Systems.Class.MAX_LEVEL[Class_Primary.Tier]) && (Class_XP[Class_Primary.ID] > Systems.XP.GetXPReq(Class_Primary.Tier, Class_Levels[Class_Primary.ID]))) {
+                    SubtractXP(Class_Primary.ID, Systems.XP.GetXPReq(Class_Primary.Tier, Class_Levels[Class_Primary.ID]));
+                    Class_Levels[Class_Primary.ID]++;
+                    AnnounceLevel(Class_Primary);
                 }
-                if (Class_Levels[Class_Secondary.ID] < Shared.MAX_LEVEL[Class_Secondary.Tier]) {
-                    //fast check if any levels
-                    if (Systems.XP.GetXPTotalNextLevel(Class_Secondary.Tier, Class_Levels[Class_Secondary.ID]) < Class_XP[Class_Secondary.ID]) {
-                        //slower precise level calc
-                        Class_Levels[Class_Secondary.ID] = Systems.XP.GetLevel(Class_Secondary.Tier, Class_XP[Class_Secondary.ID]);
-                        AnnounceLevel(Class_Secondary);
-                    }
+                while ((Class_Levels[Class_Secondary.ID] < Systems.Class.MAX_LEVEL[Class_Secondary.Tier]) && (Class_XP[Class_Secondary.ID] > Systems.XP.GetXPReq(Class_Secondary.Tier, Class_Levels[Class_Secondary.ID]))) {
+                    SubtractXP(Class_Secondary.ID, Systems.XP.GetXPReq(Class_Secondary.Tier, Class_Levels[Class_Secondary.ID]));
+                    Class_Levels[Class_Secondary.ID]++;
+                    AnnounceLevel(Class_Secondary);
                 }
 
                 //adjust effective levels
@@ -497,6 +491,25 @@ namespace ExperienceAndClasses {
                 }
             }
         }
+
+        private void AddXP(byte class_id, uint amount) {
+            uint new_value = Class_XP[class_id] + amount;
+            if (new_value > Class_XP[class_id]) {
+                Class_XP[class_id] = new_value;
+            }
+            else {
+                Class_XP[class_id] = uint.MaxValue;
+            }
+        }
+        private void SubtractXP(byte class_id, uint amount) {
+            if (Class_XP[class_id] > amount) {
+                Class_XP[class_id] -= amount;
+            }
+            else {
+                Class_XP[class_id] = 0;
+            }
+        }
+        
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Announce ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -516,7 +529,7 @@ namespace ExperienceAndClasses {
             byte level = Class_Levels[c.ID];
 
             string message = "";
-            if (level == Shared.MAX_LEVEL[c.Tier]) {
+            if (level == Systems.Class.MAX_LEVEL[c.Tier]) {
                 message = "You are now a MAX level " + c.Name + "!";
             }
             else {
@@ -725,9 +738,13 @@ namespace ExperienceAndClasses {
             foreach (bool value in Class_Unlocked) {
                 class_unlocked.Add(value);
             }
-            List<ulong> class_xp = new List<ulong>();
-            foreach (ulong value in Class_XP) {
+            List<uint> class_xp = new List<uint>();
+            foreach (uint value in Class_XP) {
                 class_xp.Add(value);
+            }
+            List<byte> class_level = new List<byte>();
+            foreach (byte value in Class_Levels) {
+                class_level.Add(value);
             }
 
             //version
@@ -750,6 +767,7 @@ namespace ExperienceAndClasses {
                 {"eac_ui_status_pinned", UI.UIStatus.Instance.panel.Pinned },
                 {"eac_class_unlock", class_unlocked },
                 {"eac_class_xp", class_xp },
+                {"eac_class_level", class_level },
                 {"eac_class_current_primary", Class_Primary.ID },
                 {"eac_class_current_secondary", Class_Secondary.ID },
                 {"eac_class_subclass_unlocked", Allow_Secondary },
@@ -781,11 +799,43 @@ namespace ExperienceAndClasses {
                 Class_Unlocked[i] = class_unlock_loaded[i];
             }
 
-            //class xp/level
-            List<ulong> class_xp_loaded = Commons.TryGet<List<ulong>>(load_tag, "eac_class_xp", new List<ulong>());
+            //class level
+            List<byte> class_level_loaded = Commons.TryGet<List<byte>>(load_tag, "eac_class_level", new List<byte>());
+            for (byte i = 0; i < class_level_loaded.Count; i++) {
+                Class_Levels[i] = class_level_loaded[i];
+            }
+
+            //class xp
+            List<uint> class_xp_loaded = Commons.TryGet<List<uint>>(load_tag, "eac_class_xp", new List<uint>());
             for (byte i = 0; i < class_xp_loaded.Count; i++) {
                 Class_XP[i] = class_xp_loaded[i];
-                Class_Levels[i] = Systems.XP.GetLevel(Systems.Class.CLASS_LOOKUP[i].Tier, Class_XP[i]);
+            }
+
+            //fix any potential issues...
+            for (byte id = 0; id < (byte)Systems.Class.CLASS_IDS.NUMBER_OF_IDs; id++) {
+
+                //level up if required xp changed
+                while ((Class_Levels[id] < Systems.Class.MAX_LEVEL[Systems.Class.CLASS_LOOKUP[id].Tier]) && (Class_XP[id] > Systems.XP.GetXPReq(Systems.Class.CLASS_LOOKUP[id].Tier, Class_Levels[id]))) {
+                    SubtractXP(id, Systems.XP.GetXPReq(Systems.Class.CLASS_LOOKUP[id].Tier, Class_Levels[id]));
+                    Class_Levels[id]++;
+                }
+
+                //if unlocked, level should be at least one
+                if (Class_Unlocked[id] && (Class_Levels[id] < 1)) {
+                    Class_Levels[id] = 1;
+                }
+
+            }
+
+            //if not allowed secondary, set none
+            if (!Allow_Secondary) {
+                Class_Secondary = Systems.Class.CLASS_LOOKUP[(byte)Systems.Class.CLASS_IDS.None];
+            }
+
+            //if selected class is now locked for some reason, select no class
+            if ((!Class_Unlocked[Class_Primary.ID]) || (!Class_Unlocked[Class_Secondary.ID])) {
+                Class_Primary = Systems.Class.CLASS_LOOKUP[(byte)Systems.Class.CLASS_IDS.None];
+                Class_Secondary = Systems.Class.CLASS_LOOKUP[(byte)Systems.Class.CLASS_IDS.None];
             }
 
             //allocated attributes

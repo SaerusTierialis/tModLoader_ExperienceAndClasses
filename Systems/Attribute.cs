@@ -26,6 +26,12 @@ namespace ExperienceAndClasses.Systems {
         //this may be reordered, UI uses this order
         public static ATTRIBUTE_IDS[] ATTRIBUTES_UI_ORDER = new ATTRIBUTE_IDS[] { ATTRIBUTE_IDS.Power, ATTRIBUTE_IDS.Vitality, ATTRIBUTE_IDS.Mind, ATTRIBUTE_IDS.Spirit, ATTRIBUTE_IDS.Agility, ATTRIBUTE_IDS.Dexterity };
 
+        public const float SUBCLASS_PENALTY_ATTRIBUTE_MULTIPLIER_PRIMARY = 0.8f;
+        public const float SUBCLASS_PENALTY_ATTRIBUTE_MULTIPLIER_SECONDARY = 0.6f;
+
+        public const short LEVELS_PER_ATTRIBUTE = 10;
+        public const byte ATTRIBUTE_GROWTH_LEVELS = 10;
+
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Treated like readonly ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         public static Attribute[] ATTRIBUTE_LOOKUP { get; private set; }
 

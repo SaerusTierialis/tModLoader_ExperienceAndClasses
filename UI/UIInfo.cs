@@ -133,11 +133,11 @@ namespace ExperienceAndClasses.UI {
                 text += "REQUIREMENT: " + Systems.Class.CLASS_LOOKUP[c.ID_Prereq].Name;
                 switch (c.Tier) {
                     case 2:
-                        text += " Lv." + Shared.LEVEL_REQUIRED_TIER_2;
+                        text += " Lv." + Systems.Class.LEVEL_REQUIRED_TIER_2;
                         break;
 
                     case 3:
-                        text += " Lv." + Shared.LEVEL_REQUIRED_TIER_3;
+                        text += " Lv." + Systems.Class.LEVEL_REQUIRED_TIER_3;
                         break;
                 }
                 text += "\n\n";

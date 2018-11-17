@@ -82,7 +82,12 @@ namespace ExperienceAndClasses {
         public static T TryGet<T>(TagCompound tag, string key, T defaultValue) {
             //new method does not detect if type is wrong
             if ((tag != null) && (tag.ContainsKey(key))) {
-                return tag.Get<T>(key);
+                try {
+                    return tag.Get<T>(key);
+                }
+                catch {
+                    return defaultValue;
+                }
             }
             else {
                 return defaultValue;
