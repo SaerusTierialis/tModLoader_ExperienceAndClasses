@@ -432,6 +432,7 @@ namespace ExperienceAndClasses {
 
             //update UI
             UI.UIClass.Instance.UpdateClassInfo();
+            UI.UIBars.Instance.Update();
 
             //update class features
             UpdateClassInfo();
@@ -497,12 +498,12 @@ namespace ExperienceAndClasses {
                 }
 
                 //level up
-                while ((Class_Levels[Class_Primary.ID] < Systems.Class.MAX_LEVEL[Class_Primary.Tier]) && (Class_XP[Class_Primary.ID] > Systems.XP.GetXPReq(Class_Primary.Tier, Class_Levels[Class_Primary.ID]))) {
+                while ((Class_Levels[Class_Primary.ID] < Systems.Class.MAX_LEVEL[Class_Primary.Tier]) && (Class_XP[Class_Primary.ID] >= Systems.XP.GetXPReq(Class_Primary.Tier, Class_Levels[Class_Primary.ID]))) {
                     SubtractXP(Class_Primary.ID, Systems.XP.GetXPReq(Class_Primary.Tier, Class_Levels[Class_Primary.ID]));
                     Class_Levels[Class_Primary.ID]++;
                     AnnounceLevel(Class_Primary);
                 }
-                while ((Class_Levels[Class_Secondary.ID] < Systems.Class.MAX_LEVEL[Class_Secondary.Tier]) && (Class_XP[Class_Secondary.ID] > Systems.XP.GetXPReq(Class_Secondary.Tier, Class_Levels[Class_Secondary.ID]))) {
+                while ((Class_Levels[Class_Secondary.ID] < Systems.Class.MAX_LEVEL[Class_Secondary.Tier]) && (Class_XP[Class_Secondary.ID] >= Systems.XP.GetXPReq(Class_Secondary.Tier, Class_Levels[Class_Secondary.ID]))) {
                     SubtractXP(Class_Secondary.ID, Systems.XP.GetXPReq(Class_Secondary.Tier, Class_Levels[Class_Secondary.ID]));
                     Class_Levels[Class_Secondary.ID]++;
                     AnnounceLevel(Class_Secondary);
@@ -514,6 +515,10 @@ namespace ExperienceAndClasses {
                 //update class info if needed
                 if ((effective_primary != Class_Primary_Level_Effective) || (effective_secondary != Class_Secondary_Level_Effective)) {
                     LocalUpdateClassInfo();
+                }
+                else {
+                    //otherwise just update xp bars
+                    UI.UIBars.Instance.Update();
                 }
             }
         }
@@ -845,7 +850,7 @@ namespace ExperienceAndClasses {
             for (byte id = 0; id < (byte)Systems.Class.CLASS_IDS.NUMBER_OF_IDs; id++) {
 
                 //level up if required xp changed
-                while ((Class_Levels[id] < Systems.Class.MAX_LEVEL[Systems.Class.CLASS_LOOKUP[id].Tier]) && (Class_XP[id] > Systems.XP.GetXPReq(Systems.Class.CLASS_LOOKUP[id].Tier, Class_Levels[id]))) {
+                while ((Class_Levels[id] < Systems.Class.MAX_LEVEL[Systems.Class.CLASS_LOOKUP[id].Tier]) && (Class_XP[id] >= Systems.XP.GetXPReq(Systems.Class.CLASS_LOOKUP[id].Tier, Class_Levels[id]))) {
                     SubtractXP(id, Systems.XP.GetXPReq(Systems.Class.CLASS_LOOKUP[id].Tier, Class_Levels[id]));
                     Class_Levels[id]++;
                 }

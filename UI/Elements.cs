@@ -1,11 +1,117 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System;
 using Terraria;
 using Terraria.GameContent.UI.Elements;
-using Terraria.ModLoader;
 using Terraria.UI;
 
 namespace ExperienceAndClasses.UI {
+
+    class XPBar : UIPanel {
+        private const float TEXT_SCALE = 1f;
+        private const float BAR_HEIGHT = 20f;
+        private const float MIN_PROGRESS = 0.08f;
+
+        private bool visible;
+
+        private UIImage icon;
+        private UIPanel bar_back, bar_progress;
+        private UIText text;
+        public Systems.Class Class_Tracked { get; private set; }
+
+        public XPBar(float width, Systems.Class c) {
+            Class_Tracked = c;
+
+            visible = true;
+
+            SetPadding(0f);
+            BackgroundColor = Color.Transparent;
+            BorderColor = Color.Transparent;
+
+            icon = new UIImage(Class_Tracked.Texture);
+            icon.Width.Set(c.Texture.Width, 0f);
+            icon.Height.Set(c.Texture.Height, 0f);
+            Append(icon);
+
+            bar_back = new UIPanel();
+            bar_back.Left.Set(icon.Width.Pixels + Constants.UI_PADDING, 0f);
+            bar_back.Width.Set(width - bar_back.Left.Pixels - Constants.UI_PADDING, 0f);
+            bar_back.Height.Set(BAR_HEIGHT, 0f);
+            bar_back.Top.Set((icon.Height.Pixels - bar_back.Height.Pixels) / 2f, 0f);
+            Append(bar_back);
+
+            bar_progress = new UIPanel();
+            bar_progress.BackgroundColor = Constants.COLOUR_XP;
+            bar_progress.Left.Set(bar_back.Left.Pixels, 0f);
+            bar_progress.Top.Set(bar_back.Top.Pixels, 0f);
+            bar_progress.Height.Set(bar_back.Height.Pixels, 0f);
+            Append(bar_progress);
+
+            text = new UIText("012345679/", TEXT_SCALE);
+            text.Top.Set(bar_back.Top.Pixels + ((bar_back.Height.Pixels - (Main.fontMouseText.MeasureString(text.Text).Y * TEXT_SCALE)) / 2), 0f);
+            Append(text);
+
+            Width.Set(width, 0f);
+            Height.Set(Math.Max(icon.Height.Pixels, bar_back.Height.Pixels), 0f);
+        }
+
+        public void SetClass(Systems.Class class_new) {
+            Class_Tracked = class_new;
+            icon.SetImage(Class_Tracked.Texture);
+
+            visible = (Class_Tracked.Tier >= 1);
+
+            Update();
+        }
+
+        public void Update() {
+            uint xp = ExperienceAndClasses.LOCAL_MPLAYER.Class_XP[Class_Tracked.ID];
+            uint xp_needed = Systems.XP.GetXPReq(Class_Tracked.Tier, ExperienceAndClasses.LOCAL_MPLAYER.Class_Levels[Class_Tracked.ID]);
+
+            float percent;
+            bool maxed;
+            if (xp_needed <= 0) {
+                percent = 1f;
+                maxed = true;
+            }
+            else {
+                percent = MIN_PROGRESS + ((float)xp / xp_needed * (1f - MIN_PROGRESS));
+                maxed = false;
+            }
+
+            //progress bar
+            bar_progress.Width.Set(bar_back.Width.Pixels * percent, 0f);
+            bar_progress.Recalculate();
+
+            //text
+            string str;
+            float string_width;
+            if (maxed) {
+                str = "MAX";
+                string_width = Main.fontMouseText.MeasureString(str).X * TEXT_SCALE;
+            }
+            else {
+                str = xp + " / " + xp_needed;
+                string_width = Main.fontMouseText.MeasureString(str).X * TEXT_SCALE;
+
+                if (string_width > bar_back.Width.Pixels) {
+                    str = (Math.Round(percent * 10000f) / 100) + "%";
+                    string_width = Main.fontMouseText.MeasureString(str).X * TEXT_SCALE;
+                }
+            }
+            text.SetText(str);
+            text.Left.Set(bar_back.Left.Pixels + ((bar_back.Width.Pixels - string_width) / 2), 0f);
+
+        }
+
+        public override void Draw(SpriteBatch spriteBatch) {
+            if (visible)
+                base.Draw(spriteBatch);
+            else
+                return;
+        }
+
+    }
 
     class AttributeText : UIPanel {
 
