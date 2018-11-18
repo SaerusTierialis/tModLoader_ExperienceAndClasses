@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Terraria;
 
 namespace ExperienceAndClasses.UI {
 
@@ -58,7 +59,7 @@ namespace ExperienceAndClasses.UI {
                 }
 
                 if (ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary.ID != xp_bar_primary.Class_Tracked.ID) {
-                    if (ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary.Tier < 1 || xp_bar_primary.Class_Tracked.ID < 1) {
+                    if (ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary.Tier < 1 || xp_bar_primary.Class_Tracked.Tier < 1) {
                         needs_rearrangement = true;
                     }
                     xp_bar_primary.SetClass(ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary);
@@ -66,7 +67,7 @@ namespace ExperienceAndClasses.UI {
                 xp_bar_primary.Update();
 
                 if (ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary.ID != xp_bar_secondary.Class_Tracked.ID) {
-                    if (ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary.Tier < 1 || xp_bar_secondary.Class_Tracked.ID < 1) {
+                    if (ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary.Tier < 1 || xp_bar_secondary.Class_Tracked.Tier < 1) {
                         needs_rearrangement = true;
                     }
                     xp_bar_secondary.SetClass(ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary);
@@ -78,14 +79,17 @@ namespace ExperienceAndClasses.UI {
 
                     if (ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary.Tier > 0) {
                         xp_bar_primary.Top.Set(y, 0f);
-                        y += xp_bar_primary.Height.Pixels + Constants.UI_PADDING / 2f;
+                        y += xp_bar_primary.Height.Pixels;
                     }
 
                     if (ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary.Tier > 0) {
                         xp_bar_secondary.Top.Set(y, 0f);
-                        y += xp_bar_secondary.Height.Pixels + Constants.UI_PADDING / 2f;
+                        y += (Constants.UI_PADDING / 2f) + xp_bar_secondary.Height.Pixels;
                     }
 
+                    y += Constants.UI_PADDING;
+
+                    panel.Height.Set(y, 0f);
                 }
             }
         }

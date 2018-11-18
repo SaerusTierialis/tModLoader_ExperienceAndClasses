@@ -306,7 +306,7 @@ namespace ExperienceAndClasses.Systems {
                         bf = bpp * points;
                         mplayer.ability_delay_reduction += bf;
                         if (mplayer.Is_Local_Player) Bonus += "\n+" + Math.Round(bf * 100, 2) + "% reduced ability delay (" + Math.Round(bpp * 100, 2) + " per point)";
-
+                        
                         break;
                 }
             }
