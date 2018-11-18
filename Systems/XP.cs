@@ -48,7 +48,7 @@ namespace ExperienceAndClasses.Systems {
                     //must not be afk
                     if (!mplayer.AFK) {
                         //must have hit the target or be nearby (unless boss)
-                        if (treat_as_boss || npc.playerInteraction[player_index] || player.Distance(npc.position) <= RANGE_ELIGIBLE) {
+                        if (treat_as_boss || (!player.dead && (npc.playerInteraction[player_index] || (player.Distance(npc.position) <= RANGE_ELIGIBLE) ))) {
                             eligible_players.Add(player.whoAmI);
                         }
                     }
@@ -69,6 +69,10 @@ namespace ExperienceAndClasses.Systems {
                 case NPCID.EaterofWorldsBody:
                 case NPCID.EaterofWorldsTail:
                     treat_as_boss = true;
+                    break;
+
+                default:
+                    treat_as_boss = npc.boss;
                     break;
             }
 

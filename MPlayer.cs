@@ -12,6 +12,7 @@ namespace ExperienceAndClasses {
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Constants ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         private const long TICKS_PER_FULL_SYNC = TimeSpan.TicksPerMinute * 2;
+        private const long TICKS_PER_XP_MESSAGE = TimeSpan.TicksPerSecond * 1;
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Static Vars ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -25,6 +26,10 @@ namespace ExperienceAndClasses {
         public int[] Load_Version { get; private set; }
         public bool Killed_WOF { get; private set; }
         public bool Allow_Secondary { get; private set; }
+
+        private bool show_xp;
+        private double show_xp_value;
+        private DateTime show_xp_when;
 
         public byte[] Class_Levels { get; private set; }
         public uint[] Class_XP { get; private set; }
@@ -65,6 +70,9 @@ namespace ExperienceAndClasses {
             Load_Version = new int[3];
             AFK = false;
             Killed_WOF = false;
+            show_xp = true;
+            show_xp_value = 0;
+            show_xp_when = DateTime.MinValue;
 
             //default level/xp/unlock
             Class_Levels = new byte[(byte)Systems.Class.CLASS_IDS.NUMBER_OF_IDs];
@@ -167,6 +175,19 @@ namespace ExperienceAndClasses {
             base.PostUpdateEquips();
             if (initialized) {
                 ApplyAttributes();
+            }
+
+            //local timed events
+            if (Is_Local_Player) {
+                DateTime now = DateTime.Now;
+
+                if (show_xp && (show_xp_value > 0)) {
+                    if (now.CompareTo(show_xp_when) >= 0) {
+                        show_xp_when = now.AddTicks(TICKS_PER_XP_MESSAGE);
+                        CombatText.NewText(Main.LocalPlayer.getRect(), UI.Constants.COLOUR_XP, "+" + Math.Max(Math.Floor(show_xp_value), 1) + " XP");
+                        show_xp_value = 0;
+                    }
+                }
             }
         }
 
@@ -454,6 +475,11 @@ namespace ExperienceAndClasses {
                 //5% bonus xp if well fed
                 if (player.wellFed)
                     xp *= 1.05d;
+
+                //display
+                if (show_xp) {
+                    show_xp_value += Math.Max(Math.Floor(xp), 1);
+                }
 
                 //store current effective levels
                 byte effective_primary = Class_Primary_Level_Effective;
@@ -773,6 +799,7 @@ namespace ExperienceAndClasses {
                 {"eac_class_subclass_unlocked", Allow_Secondary },
                 {"eac_attribute_allocation", attributes_allocated },
                 {"eac_wof", Killed_WOF },
+                {"eac_settings_show_xp", show_xp},
             };
         }
 
@@ -788,7 +815,10 @@ namespace ExperienceAndClasses {
 
             //subclass unlocked
             Allow_Secondary = Commons.TryGet<bool>(load_tag, "eac_class_current_primary", Allow_Secondary);
-            
+
+            //settings
+            show_xp = Commons.TryGet<bool>(load_tag, "eac_settings_show_xp", show_xp);
+
             //current classes
             Class_Primary = Systems.Class.CLASS_LOOKUP[Commons.TryGet<byte>(load_tag, "eac_class_current_primary", Class_Primary.ID)];
             Class_Secondary = Systems.Class.CLASS_LOOKUP[Commons.TryGet<byte>(load_tag, "eac_class_current_secondary", Class_Secondary.ID)];

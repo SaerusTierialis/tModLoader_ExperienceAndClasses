@@ -21,6 +21,8 @@ namespace ExperienceAndClasses.UI {
         public static readonly Color COLOUR_MESSAGE_TRACE = new Color(255, 0, 255);
         public static readonly Color COLOUR_MESSAGE_ANNOUNCE = new Color(255, 255, 0);
 
+        public static readonly Color COLOUR_XP = new Color(0, 200, 0);
+
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ UI ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         public const float UI_PADDING = 5f;
