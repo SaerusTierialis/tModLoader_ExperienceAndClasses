@@ -62,17 +62,13 @@ namespace ExperienceAndClasses.Systems {
         }
 
         public static bool TreatAsBoss(NPC npc) {
-            bool treat_as_boss = false;
+            bool treat_as_boss = npc.boss;
 
             switch (npc.netID) {
                 case NPCID.EaterofWorldsHead:
                 case NPCID.EaterofWorldsBody:
                 case NPCID.EaterofWorldsTail:
                     treat_as_boss = true;
-                    break;
-
-                default:
-                    treat_as_boss = npc.boss;
                     break;
             }
 
