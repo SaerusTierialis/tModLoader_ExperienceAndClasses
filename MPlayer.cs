@@ -45,7 +45,8 @@ namespace ExperienceAndClasses {
 
         public float heal_damage; //TODO
         public float dodge_chance; //TODO
-        public float cooldown_reduction; //TODO
+        public float attack_cast_speed;
+        public float ability_delay_reduction;
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Instance Vars (syncing) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -102,7 +103,8 @@ namespace ExperienceAndClasses {
             //stats
             heal_damage = 1f;
             dodge_chance = 0f;
-            cooldown_reduction = 0f;
+            attack_cast_speed = 1f;
+            ability_delay_reduction = 1f;
         }
 
         /// <summary>
@@ -167,7 +169,8 @@ namespace ExperienceAndClasses {
                 //defaults before update
                 heal_damage = 1f;
                 dodge_chance = 0f;
-                cooldown_reduction = 0f;
+                attack_cast_speed = 1f;
+                ability_delay_reduction = 1f;
             }
         }
 
@@ -716,6 +719,14 @@ namespace ExperienceAndClasses {
             for (byte id = 0; id < (byte)Systems.Attribute.ATTRIBUTE_IDS.NUMBER_OF_IDs; id++) {
                 Attributes_Final[id] = (short)(Attributes_Base[id] + Attributes_Allocated[id] + Attributes_Bonus[id]);
             }
+        }
+
+        //dexterity
+        public override float UseTimeMultiplier(Item item) {
+            if (item.damage > 0 || item.summon || item.sentry)
+                return base.UseTimeMultiplier(item) * attack_cast_speed;
+            else
+                return base.UseTimeMultiplier(item);
         }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Drawing ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/

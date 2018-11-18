@@ -78,7 +78,7 @@ namespace ExperienceAndClasses.UI {
 
                     if (ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary.Tier > 0) {
                         xp_bar_primary.Top.Set(y, 0f);
-                        y += xp_bar_primary.Height.Pixels + Constants.UI_PADDING/2f;
+                        y += xp_bar_primary.Height.Pixels + Constants.UI_PADDING / 2f;
                     }
 
                     if (ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary.Tier > 0) {

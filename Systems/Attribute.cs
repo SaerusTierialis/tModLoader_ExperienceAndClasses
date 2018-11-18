@@ -137,8 +137,8 @@ namespace ExperienceAndClasses.Systems {
         private const float AGILITY_DODGE = 0.0025f;
         private const float AGILITY_FLY = 0.5f;
 
-        private const float DEXTERITY_ATTACK_SPEED = 0.0025f;
-        private const float DEXTERITY_COOLDOWN = 0.01f;
+        private const float DEXTERITY_ATTACK_CAST_SPEED = 0.0025f;
+        private const float DEXTERITY_ABILITY_DELAY_REDUCTION = 0.01f;
 
         public void ApplyEffect(MPlayer mplayer, short points) {
             if (Active) {
@@ -295,16 +295,17 @@ namespace ExperienceAndClasses.Systems {
 
                     case ATTRIBUTE_IDS.Dexterity:
                         //attack speed
-                        bpp = DEXTERITY_ATTACK_SPEED;
+                        bpp = DEXTERITY_ATTACK_CAST_SPEED;
                         bf = bpp * points;
-                        mplayer.player.meleeSpeed += bf;
-                        if (mplayer.Is_Local_Player) Bonus += "\n+" + Math.Round(bf * 100, 2) + "% melee attack speed (" + Math.Round(bpp * 100, 2) + " per point)";
+                        //mplayer.player.meleeSpeed += bf;
+                        mplayer.attack_cast_speed += bf;
+                        if (mplayer.Is_Local_Player) Bonus += "\n+" + Math.Round(bf * 100, 2) + "% all attack and cast speed (" + Math.Round(bpp * 100, 2) + " per point)";
 
-                        //cooldown reduction
-                        bpp = DEXTERITY_COOLDOWN;
+                        //ability after use delay
+                        bpp = DEXTERITY_ABILITY_DELAY_REDUCTION;
                         bf = bpp * points;
-                        mplayer.cooldown_reduction += bf;
-                        if (mplayer.Is_Local_Player) Bonus += "\n+" + Math.Round(bf * 100, 2) + "% cooldown reduction (" + Math.Round(bpp * 100, 2) + " per point)";
+                        mplayer.ability_delay_reduction += bf;
+                        if (mplayer.Is_Local_Player) Bonus += "\n+" + Math.Round(bf * 100, 2) + "% reduced ability delay (" + Math.Round(bpp * 100, 2) + " per point)";
 
                         break;
                 }
