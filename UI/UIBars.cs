@@ -22,15 +22,20 @@ namespace ExperienceAndClasses.UI {
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Variables ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         public DragableUIPanel panel { get; private set; }
         private XPBar xp_bar_primary, xp_bar_secondary;
+        private bool needs_first_arrange;
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Initialize ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         protected override void InitializeState() {
+            needs_first_arrange = true;
+
             panel = new DragableUIPanel(WIDTH, HEIGHT, COLOR_BACKGROUND, this, false, true, true);
 
-            xp_bar_primary = new XPBar(WIDTH - (Constants.UI_PADDING * 2), Systems.Class.CLASS_LOOKUP[(byte)Systems.Class.CLASS_IDS.New]);
+            xp_bar_primary = new XPBar(WIDTH - (Constants.UI_PADDING * 2), Systems.Class.CLASS_LOOKUP[(byte)Systems.Class.CLASS_IDS.Novice]);
+            xp_bar_primary.Left.Set(Constants.UI_PADDING, 0f);
             panel.Append(xp_bar_primary);
 
-            xp_bar_secondary = new XPBar(WIDTH - (Constants.UI_PADDING * 2), Systems.Class.CLASS_LOOKUP[(byte)Systems.Class.CLASS_IDS.New]);
+            xp_bar_secondary = new XPBar(WIDTH - (Constants.UI_PADDING * 2), Systems.Class.CLASS_LOOKUP[(byte)Systems.Class.CLASS_IDS.Novice]);
+            xp_bar_secondary.Left.Set(Constants.UI_PADDING, 0f);
             panel.Append(xp_bar_secondary);
 
             state.Append(panel);
@@ -38,25 +43,51 @@ namespace ExperienceAndClasses.UI {
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Methods ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         public void Update() {
-            bool needs_rearrangement = false;
-
-            if (ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary.ID != xp_bar_primary.Class_Tracked.ID) {
-                if (ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary.Tier < 1 || xp_bar_primary.Class_Tracked.ID < 1) {
-                    needs_rearrangement = true;
-                }
-                xp_bar_primary.SetClass(ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary);
+            if (ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary.Tier < 1 && ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary.Tier < 1) {
+                //no class or ability
+                panel.visible = false;
             }
-            xp_bar_primary.Update();
+            else {
+                panel.visible = true;
 
-            if (ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary.ID != xp_bar_secondary.Class_Tracked.ID) {
-                if (ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary.Tier < 1 || xp_bar_secondary.Class_Tracked.ID < 1) {
+                bool needs_rearrangement = false;
+
+                if (needs_first_arrange) {
                     needs_rearrangement = true;
+                    needs_first_arrange = false;
                 }
-                xp_bar_secondary.SetClass(ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary);
-            }
-            xp_bar_secondary.Update();
 
+                if (ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary.ID != xp_bar_primary.Class_Tracked.ID) {
+                    if (ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary.Tier < 1 || xp_bar_primary.Class_Tracked.ID < 1) {
+                        needs_rearrangement = true;
+                    }
+                    xp_bar_primary.SetClass(ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary);
+                }
+                xp_bar_primary.Update();
+
+                if (ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary.ID != xp_bar_secondary.Class_Tracked.ID) {
+                    if (ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary.Tier < 1 || xp_bar_secondary.Class_Tracked.ID < 1) {
+                        needs_rearrangement = true;
+                    }
+                    xp_bar_secondary.SetClass(ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary);
+                }
+                xp_bar_secondary.Update();
+
+                if (needs_rearrangement) {
+                    float y = Constants.UI_PADDING + Textures.TEXTURE_CORNER_BUTTON_SIZE;
+
+                    if (ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary.Tier > 0) {
+                        xp_bar_primary.Top.Set(y, 0f);
+                        y += xp_bar_primary.Height.Pixels + Constants.UI_PADDING/2f;
+                    }
+
+                    if (ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary.Tier > 0) {
+                        xp_bar_secondary.Top.Set(y, 0f);
+                        y += xp_bar_secondary.Height.Pixels + Constants.UI_PADDING / 2f;
+                    }
+
+                }
+            }
         }
-
     }
 }

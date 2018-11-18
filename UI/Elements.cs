@@ -9,33 +9,37 @@ namespace ExperienceAndClasses.UI {
 
     class XPBar : UIPanel {
         private const float TEXT_SCALE = 1f;
-        private const float BAR_HEIGHT = 20f;
+        private const float ICON_SCALE = 0.8f;
+        private const float BAR_HEIGHT = 24f;
         private const float MIN_PROGRESS = 0.08f;
-
-        private bool visible;
 
         private UIImage icon;
         private UIPanel bar_back, bar_progress;
         private UIText text;
+
+        public bool Visible { get; private set; }
         public Systems.Class Class_Tracked { get; private set; }
 
         public XPBar(float width, Systems.Class c) {
             Class_Tracked = c;
 
-            visible = true;
-
+            Visible = true;
+            
             SetPadding(0f);
             BackgroundColor = Color.Transparent;
             BorderColor = Color.Transparent;
 
             icon = new UIImage(Class_Tracked.Texture);
-            icon.Width.Set(c.Texture.Width, 0f);
-            icon.Height.Set(c.Texture.Height, 0f);
+            icon.ImageScale = ICON_SCALE;
+            icon.Top.Set(-(Class_Tracked.Texture.Height * (1f - ICON_SCALE) / 2f), 0f);
+            icon.Left.Set(-(Class_Tracked.Texture.Width * (1f - ICON_SCALE) / 2f), 0f);
+            icon.Width.Set(Class_Tracked.Texture.Width * ICON_SCALE, 0f);
+            icon.Height.Set(Class_Tracked.Texture.Height * ICON_SCALE, 0f);
             Append(icon);
 
             bar_back = new UIPanel();
             bar_back.Left.Set(icon.Width.Pixels + Constants.UI_PADDING, 0f);
-            bar_back.Width.Set(width - bar_back.Left.Pixels - Constants.UI_PADDING, 0f);
+            bar_back.Width.Set(width - bar_back.Left.Pixels, 0f);
             bar_back.Height.Set(BAR_HEIGHT, 0f);
             bar_back.Top.Set((icon.Height.Pixels - bar_back.Height.Pixels) / 2f, 0f);
             Append(bar_back);
@@ -47,8 +51,8 @@ namespace ExperienceAndClasses.UI {
             bar_progress.Height.Set(bar_back.Height.Pixels, 0f);
             Append(bar_progress);
 
-            text = new UIText("012345679/", TEXT_SCALE);
-            text.Top.Set(bar_back.Top.Pixels + ((bar_back.Height.Pixels - (Main.fontMouseText.MeasureString(text.Text).Y * TEXT_SCALE)) / 2), 0f);
+            text = new UIText("0123 / 45679", TEXT_SCALE);
+            text.Top.Set(bar_back.Top.Pixels + ((bar_back.Height.Pixels - (Main.fontMouseText.MeasureString(text.Text).Y * TEXT_SCALE /2f)) / 2f), 0f);
             Append(text);
 
             Width.Set(width, 0f);
@@ -59,7 +63,7 @@ namespace ExperienceAndClasses.UI {
             Class_Tracked = class_new;
             icon.SetImage(Class_Tracked.Texture);
 
-            visible = (Class_Tracked.Tier >= 1);
+            Visible = (Class_Tracked.Tier >= 1);
 
             Update();
         }
@@ -105,7 +109,7 @@ namespace ExperienceAndClasses.UI {
         }
 
         public override void Draw(SpriteBatch spriteBatch) {
-            if (visible)
+            if (Visible)
                 base.Draw(spriteBatch);
             else
                 return;
@@ -366,6 +370,7 @@ namespace ExperienceAndClasses.UI {
     // Copied from ExampleMod on GitHub
     // Added locking of drag panel
     // added auto and close
+    // added visible
 
     // This DragableUIPanel class inherits from UIPanel. 
     // Inheriting is a great tool for UI design. By inheriting, we get the background drawing for free from UIPanel
@@ -380,6 +385,8 @@ namespace ExperienceAndClasses.UI {
         private bool stop_pin = false;
         private UIStateCombo UI;
         private bool buttons_hidden = false;
+
+        public bool visible = true;
 
         private UIHoverImageButton button_pinned = null, button_auto = null, button_close = null;
 
@@ -610,6 +617,13 @@ namespace ExperienceAndClasses.UI {
             if (button_close != null) {
                 button_close.SetImage(Textures.TEXTURE_CORNER_BUTTON_CLOSE);
             }
+        }
+
+        public override void Draw(SpriteBatch spriteBatch) {
+            if (visible)
+                base.Draw(spriteBatch);
+            else
+                return;
         }
     }
 
