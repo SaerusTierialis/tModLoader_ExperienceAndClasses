@@ -22,28 +22,28 @@ namespace ExperienceAndClasses.UI {
             this.attribute = attribute;
             this.scale = scale;
 
-            left_final = width - (Textures.TEXTURE_BUTTON_SIZE*2) - RIGHT_SIDE_PADDING - Shared.UI_PADDING;
+            left_final = width - (Textures.TEXTURE_BUTTON_SIZE*2) - RIGHT_SIDE_PADDING - UI.Constants.UI_PADDING;
 
             SetPadding(0f);
             Left.Set(0f, 0f);
             Top.Set(0f, 0f);
             Width.Set(width, 0f);
             Height.Set(height, 0f);
-            BackgroundColor = Shared.COLOR_UI_PANEL_HIGHLIGHT;
+            BackgroundColor = UI.Constants.COLOR_UI_PANEL_HIGHLIGHT;
 
-            float top = ((height - (Main.fontMouseText.MeasureString("A").Y * scale)) / 2f) + Shared.UI_PADDING;
+            float top = ((height - (Main.fontMouseText.MeasureString("A").Y * scale)) / 2f) + UI.Constants.UI_PADDING;
             title = new UIText(attribute.Name_Short.ToUpper(), scale);
-            title.Left.Set(Shared.UI_PADDING, 0f);
+            title.Left.Set(UI.Constants.UI_PADDING, 0f);
             title.Top.Set(top, 0f);
             Append(title);
 
-            float top_sum = ((height - (Main.fontMouseText.MeasureString("A").Y * SCALE_SUM)) / 2f) + Shared.UI_PADDING;
+            float top_sum = ((height - (Main.fontMouseText.MeasureString("A").Y * SCALE_SUM)) / 2f) + UI.Constants.UI_PADDING;
             sum = new UIText("", SCALE_SUM);
             sum.Left.Set(LEFT_SUM, 0f);
             sum.Top.Set(top_sum, 0f);
             Append(sum);
 
-            top_sum = ((height - (Main.fontMouseText.MeasureString("A").Y * SCALE_SUM_SMALL)) / 2f) + Shared.UI_PADDING;
+            top_sum = ((height - (Main.fontMouseText.MeasureString("A").Y * SCALE_SUM_SMALL)) / 2f) + UI.Constants.UI_PADDING;
             sum_small = new UIText("", SCALE_SUM_SMALL);
             sum_small.Left.Set(LEFT_SUM, 0f);
             sum_small.Top.Set(top_sum, 0f);
@@ -360,18 +360,18 @@ namespace ExperienceAndClasses.UI {
         }
 
         public override void Recalculate() {
-            float left = Width.Pixels - Shared.UI_PADDING;
+            float left = Width.Pixels - Constants.UI_PADDING;
             if (button_close != null) {
                 button_close.Left.Set(left -= Textures.TEXTURE_CORNER_BUTTON_SIZE, 0f);
-                button_close.Top.Set(Shared.UI_PADDING, 0f);
+                button_close.Top.Set(Constants.UI_PADDING, 0f);
             }
             if (button_auto != null) {
                 button_auto.Left.Set(left -= Textures.TEXTURE_CORNER_BUTTON_SIZE, 0f);
-                button_auto.Top.Set(Shared.UI_PADDING, 0f);
+                button_auto.Top.Set(Constants.UI_PADDING, 0f);
             }
             if (button_pinned != null) {
                 button_pinned.Left.Set(left -= Textures.TEXTURE_CORNER_BUTTON_SIZE, 0f);
-                button_pinned.Top.Set(Shared.UI_PADDING, 0f);
+                button_pinned.Top.Set(Constants.UI_PADDING, 0f);
             }
 
             base.Recalculate();

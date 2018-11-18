@@ -117,8 +117,8 @@ namespace ExperienceAndClasses.Systems {
             //new lv100 tier 3 = old level 180
 
             //tier 1 (predefined)
-            //uint[] xp_predef = new uint[] { 0, 0, 10, 25, 50, 75, 100, 125, 150, 200, 350 }; //length+1 must be Shared.MAX_LEVEL[1]
-            uint[] xp_predef = new uint[] { 0, 0, 10, 15, 20, 30, 40, 50, 60, 80, 100 }; //length+1 must be Shared.MAX_LEVEL[1]
+            //uint[] xp_predef = new uint[] { 0, 0, 10, 25, 50, 75, 100, 125, 150, 200, 350 }; //length+1 must be UI.UI.MAX_LEVEL[1]
+            uint[] xp_predef = new uint[] { 0, 0, 10, 15, 20, 30, 40, 50, 60, 80, 100 }; //length+1 must be UI.UI.MAX_LEVEL[1]
             int num_predef = xp_predef.Length - 1;
 
             int levels = Class.MAX_LEVEL[1] + Class.MAX_LEVEL[2] + Class.MAX_LEVEL[3];

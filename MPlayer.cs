@@ -245,7 +245,7 @@ namespace ExperienceAndClasses {
 
             //fail if secondary not allowed
             if (!is_primary && !Allow_Secondary) {
-                Main.NewText("Failed to set class because secondary class feature is locked!", Shared.COLOUR_MESSAGE_ERROR);
+                Main.NewText("Failed to set class because secondary class feature is locked!", UI.Constants.COLOUR_MESSAGE_ERROR);
                 return false;
             }
 
@@ -274,15 +274,15 @@ namespace ExperienceAndClasses {
                         return true;
 
                     case CLASS_VALIDITY.INVALID_COMBINATION:
-                        Main.NewText("Failed to set class because combination is invalid!", Shared.COLOUR_MESSAGE_ERROR);
+                        Main.NewText("Failed to set class because combination is invalid!", UI.Constants.COLOUR_MESSAGE_ERROR);
                         break;
 
                     case CLASS_VALIDITY.INVALID_ID:
-                        Main.NewText("Failed to set class because class id is invalid!", Shared.COLOUR_MESSAGE_ERROR);
+                        Main.NewText("Failed to set class because class id is invalid!", UI.Constants.COLOUR_MESSAGE_ERROR);
                         break;
 
                     case CLASS_VALIDITY.INVALID_LEVEL:
-                        Main.NewText("Failed to set class because it is locked!", Shared.COLOUR_MESSAGE_ERROR);
+                        Main.NewText("Failed to set class because it is locked!", UI.Constants.COLOUR_MESSAGE_ERROR);
                         break;
 
                     case CLASS_VALIDITY.INVALID_NON_LOCAL:
@@ -518,7 +518,7 @@ namespace ExperienceAndClasses {
             if (ExperienceAndClasses.IS_SERVER)
                 return;
 
-            Main.NewText("You have unlocked " + c.Name + "!", Shared.COLOUR_MESSAGE_ANNOUNCE);
+            Main.NewText("You have unlocked " + c.Name + "!", UI.Constants.COLOUR_MESSAGE_ANNOUNCE);
         }
 
         public void AnnounceLevel(Systems.Class c) {
@@ -536,7 +536,7 @@ namespace ExperienceAndClasses {
                 message = "You are now a level " + level + " " + c.Name + "!";
             }
 
-            Main.NewText(message, Shared.COLOUR_MESSAGE_ANNOUNCE);
+            Main.NewText(message, UI.Constants.COLOUR_MESSAGE_ANNOUNCE);
         }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Hotkeys ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
@@ -854,10 +854,10 @@ namespace ExperienceAndClasses {
             AFK = afk;
             if (Is_Local_Player) {
                 if (AFK) {
-                    Main.NewText("You are now AFK. You will not gain or lose XP.", Shared.COLOUR_MESSAGE_ERROR);
+                    Main.NewText("You are now AFK. You will not gain or lose XP.", UI.Constants.COLOUR_MESSAGE_ERROR);
                 }
                 else {
-                    Main.NewText("You are no longer AFK. You can gain and lose XP again.", Shared.COLOUR_MESSAGE_SUCCESS);
+                    Main.NewText("You are no longer AFK. You can gain and lose XP again.", UI.Constants.COLOUR_MESSAGE_SUCCESS);
                 }
             }
         }

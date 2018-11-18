@@ -112,7 +112,7 @@ namespace ExperienceAndClasses {
                     string message = reader.ReadString();
 
                     //broadcast
-                    NetMessage.BroadcastChatMessage(NetworkText.FromLiteral(message), Shared.COLOUR_MESSAGE_TRACE);
+                    NetMessage.BroadcastChatMessage(NetworkText.FromLiteral(message), UI.Constants.COLOUR_MESSAGE_TRACE);
 
                     //also write in console
                     Console.WriteLine(message);

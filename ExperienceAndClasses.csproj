@@ -58,7 +58,6 @@
     <Compile Include="Commons.cs" />
     <Compile Include="MNPC.cs" />
     <Compile Include="PacketHandler.cs" />
-    <Compile Include="Shared.cs" />
     <Compile Include="ExperienceAndClasses.cs" />
     <Compile Include="MPlayer.cs" />
     <Compile Include="Systems\Attribute.cs" />
@@ -66,6 +65,7 @@
     <Compile Include="Systems\XP.cs" />
     <Compile Include="Textures.cs" />
     <Compile Include="UI\Elements.cs" />
+    <Compile Include="UI\Constants.cs" />
     <Compile Include="UI\UIBars.cs" />
     <Compile Include="UI\UIInfo.cs" />
     <Compile Include="UI\UIClass.cs" />

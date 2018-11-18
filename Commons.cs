@@ -123,16 +123,16 @@ namespace ExperienceAndClasses {
             if (ExperienceAndClasses.IS_SERVER) {
                 message = "ERROR from Server: " + message;
                 Console.WriteLine(message);
-                NetMessage.BroadcastChatMessage(NetworkText.FromLiteral(message), Shared.COLOUR_MESSAGE_ERROR);
+                NetMessage.BroadcastChatMessage(NetworkText.FromLiteral(message), UI.Constants.COLOUR_MESSAGE_ERROR);
             }
             else {
                 if (ExperienceAndClasses.IS_CLIENT) {
                     message = "ERROR from Player" + Main.LocalPlayer.whoAmI + ": " + message;
-                    Main.NewText("Sending " + message, Shared.COLOUR_MESSAGE_ERROR);
+                    Main.NewText("Sending " + message, UI.Constants.COLOUR_MESSAGE_ERROR);
                     PacketHandler.SendBroadcastTrace((byte)Main.LocalPlayer.whoAmI, message);
                 }
                 else {
-                    Main.NewText("ERROR: " + message, Shared.COLOUR_MESSAGE_TRACE);
+                    Main.NewText("ERROR: " + message, UI.Constants.COLOUR_MESSAGE_TRACE);
                 }
             }
             ErrorLogger.Log(message);
@@ -142,16 +142,16 @@ namespace ExperienceAndClasses {
             if (ExperienceAndClasses.IS_SERVER) {
                 message = "TRACE from Server: " + message;
                 Console.WriteLine(message);
-                NetMessage.BroadcastChatMessage(NetworkText.FromLiteral(message), Shared.COLOUR_MESSAGE_TRACE);
+                NetMessage.BroadcastChatMessage(NetworkText.FromLiteral(message), UI.Constants.COLOUR_MESSAGE_TRACE);
             }
             else {
                 if (ExperienceAndClasses.IS_CLIENT) {
                     message = "TRACE from Player" + Main.LocalPlayer.whoAmI + ": " + message;
-                    Main.NewText("Sending " + message, Shared.COLOUR_MESSAGE_TRACE);
+                    Main.NewText("Sending " + message, UI.Constants.COLOUR_MESSAGE_TRACE);
                     PacketHandler.SendBroadcastTrace((byte)Main.LocalPlayer.whoAmI, message);
                 }
                 else {
-                    Main.NewText("TRACE: " + message, Shared.COLOUR_MESSAGE_TRACE);
+                    Main.NewText("TRACE: " + message, UI.Constants.COLOUR_MESSAGE_TRACE);
                 }
             }
         }

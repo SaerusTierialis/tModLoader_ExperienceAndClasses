@@ -32,22 +32,22 @@ namespace ExperienceAndClasses.UI {
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Initialize ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         protected override void InitializeState() {
-            panel_title = new DragableUIPanel(1f, 1f, Shared.COLOR_UI_PANEL_BACKGROUND, this, false, false, false);
-            panel_body = new DragableUIPanel(1f, 1f, Shared.COLOR_UI_PANEL_BACKGROUND, this, false, false, false);
+            panel_title = new DragableUIPanel(1f, 1f, Constants.COLOR_UI_PANEL_BACKGROUND, this, false, false, false);
+            panel_body = new DragableUIPanel(1f, 1f, Constants.COLOR_UI_PANEL_BACKGROUND, this, false, false, false);
 
             ui_text_title = new UIText("", TEXT_SCALE_TITLE, false);
             ui_text_title.Left.Set(0f, 0f);
-            ui_text_title.Top.Set(Shared.UI_PADDING, 0f);
+            ui_text_title.Top.Set(Constants.UI_PADDING, 0f);
             panel_title.Append(ui_text_title);
 
             ui_text_body = new UIText("", TEXT_SCALE_BODY, false);
-            ui_text_body.Left.Set(Shared.UI_PADDING, 0f);
-            ui_text_body.Top.Set(Shared.UI_PADDING, 0f);
+            ui_text_body.Left.Set(Constants.UI_PADDING, 0f);
+            ui_text_body.Top.Set(Constants.UI_PADDING, 0f);
             panel_body.Append(ui_text_body);
 
             ui_text_extra = new UIText("", TEXT_SCALE_BODY, false);
-            ui_text_extra.Left.Set(Shared.UI_PADDING, 0f);
-            ui_text_extra.Top.Set(Shared.UI_PADDING, 0f);
+            ui_text_extra.Left.Set(Constants.UI_PADDING, 0f);
+            ui_text_extra.Top.Set(Constants.UI_PADDING, 0f);
             panel_body.Append(ui_text_extra);
 
             state.Append(panel_body);
@@ -75,9 +75,9 @@ namespace ExperienceAndClasses.UI {
 
                 //body
                 panel_body.SetPosition(panel_title.Left.Pixels, panel_title.Top.Pixels);
-                body = Main.fontMouseText.CreateWrappedText(body, (width - Shared.UI_PADDING*2) / TEXT_SCALE_BODY);
-                panel_body.SetSize(width, (Main.fontMouseText.MeasureString(body).Y*TEXT_SCALE_BODY) + panel_title.Height.Pixels + Shared.UI_PADDING);
-                ui_text_body.Top.Set(Shared.UI_PADDING + panel_title.Height.Pixels, 0f);
+                body = Main.fontMouseText.CreateWrappedText(body, (width - Constants.UI_PADDING*2) / TEXT_SCALE_BODY);
+                panel_body.SetSize(width, (Main.fontMouseText.MeasureString(body).Y*TEXT_SCALE_BODY) + panel_title.Height.Pixels + Constants.UI_PADDING);
+                ui_text_body.Top.Set(Constants.UI_PADDING + panel_title.Height.Pixels, 0f);
                 ui_text_body.SetText(body);
 
                 //extra

@@ -17,7 +17,7 @@ namespace ExperienceAndClasses.UI {
         private const float WIDTH = 280f;
         private const float HEIGHT = 200f;
 
-        private readonly Color COLOR_BACKGROUND = new Color(Shared.COLOR_UI_PANEL_BACKGROUND.R, Shared.COLOR_UI_PANEL_BACKGROUND.G, Shared.COLOR_UI_PANEL_BACKGROUND.B, 50);
+        private readonly Color COLOR_BACKGROUND = new Color(Constants.COLOR_UI_PANEL_BACKGROUND.R, Constants.COLOR_UI_PANEL_BACKGROUND.G, Constants.COLOR_UI_PANEL_BACKGROUND.B, 50);
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Variables ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         public DragableUIPanel panel { get; private set; }
