@@ -15,8 +15,8 @@ namespace ExperienceAndClasses.UI {
         public static readonly UIBars Instance = new UIBars();
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Constants ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-        private const float WIDTH = 280f;
-        private const float HEIGHT = 200f;
+        private const float WIDTH = 200f;
+        private const float HEIGHT = 200f; //default, actual height is dynamic
 
         private readonly Color COLOR_BACKGROUND = new Color(Constants.COLOR_UI_PANEL_BACKGROUND.R, Constants.COLOR_UI_PANEL_BACKGROUND.G, Constants.COLOR_UI_PANEL_BACKGROUND.B, 50);
 
