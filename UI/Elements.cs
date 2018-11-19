@@ -371,6 +371,7 @@ namespace ExperienceAndClasses.UI {
     // Added locking of drag panel
     // added auto and close
     // added visible
+    // switch drag to right click
 
     // This DragableUIPanel class inherits from UIPanel. 
     // Inheriting is a great tool for UI design. By inheriting, we get the background drawing for free from UIPanel
@@ -508,11 +509,13 @@ namespace ExperienceAndClasses.UI {
             }
         }
 
-        public override void MouseDown(UIMouseEvent evt) {
+        public override void RightMouseDown(UIMouseEvent evt) {
+            base.RightMouseDown(evt);
             DragStart(evt);
         }
 
-        public override void MouseUp(UIMouseEvent evt) {
+        public override void RightMouseUp(UIMouseEvent evt) {
+            base.RightMouseUp(evt);
             DragEnd(evt);
         }
 
