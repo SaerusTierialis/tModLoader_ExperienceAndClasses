@@ -7,38 +7,7 @@ using Terraria.UI;
 
 namespace ExperienceAndClasses.UI {
 
-    class HelpIcon : UIPanel {
-
-        private UIPanel panel;
-        private UIText text;
-
-        private string help_text;
-        private string title;
-
-        public HelpIcon(float scale, string title, string help_text) {
-            this.title = title;
-            this.help_text = help_text;
-
-            SetPadding(0f);
-
-            text = new UIText("?", scale);
-
-            Vector2 measure = Main.fontMouseText.MeasureString(text.Text);
-            Height.Set(measure.Y * scale, 0f);
-            Width.Set(measure.X * scale, 0f);
-        }
-
-        public override void MouseOver(UIMouseEvent evt) {
-            UIInfo.Instance.ShowHelpText(this, title, help_text);
-            base.MouseOver(evt);
-        }
-
-        public override void MouseOut(UIMouseEvent evt) {
-            UIInfo.Instance.EndText(this);
-            base.MouseOut(evt);
-        }
-
-    }
+    
 
     class XPBar : UIPanel {
         private const float TEXT_SCALE = 1f;
