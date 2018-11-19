@@ -49,13 +49,16 @@ namespace ExperienceAndClasses.UI {
                 if (i > 0)
                     number_buffs++;
             }
-            int number_statuses = 2;
+
+            //TODO count status
+            int number_statuses = 0;
 
             for (byte i = 0; i < icons.Length; i++) {
                 if (i < number_buffs) {
                     icons[i].active = false;
                 }
                 else if (i < (number_buffs+ number_statuses)) {
+                    //TODO set status
                     icons[i].active = true;
                     icons[i].Update();
                 }

@@ -57,7 +57,7 @@ namespace ExperienceAndClasses.UI {
             Width.Set(UIStatus.BUFF_SIZE, 0f);
             Height.Set(UIStatus.BUFF_SIZE, 0f);
 
-            icon = new UITransparantImage(Textures.TEXTURE_STATUS_BLANK, COLOUR_TRANSPARENT);
+            icon = new UITransparantImage(Textures.TEXTURE_BLANK, COLOUR_TRANSPARENT);
             Append(icon);
 
             text = new UIText("", TEXT_SCALE);
