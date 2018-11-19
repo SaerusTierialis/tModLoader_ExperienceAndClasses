@@ -7,8 +7,6 @@ using Terraria.UI;
 
 namespace ExperienceAndClasses.UI {
 
-    
-
     class XPBar : UIPanel {
         private const float TEXT_SCALE = 1f;
         private const float ICON_SCALE = 0.8f;

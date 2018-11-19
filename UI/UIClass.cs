@@ -44,6 +44,8 @@ namespace ExperienceAndClasses.UI {
         private List<AttributeText> attribute_texts;
         private UIText attribute_point_text;
 
+        private UIPanel panel_class_title, panel_attribute_title;
+
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Initialize ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         protected override void InitializeState() {
             string text;
@@ -63,18 +65,20 @@ namespace ExperienceAndClasses.UI {
             panel.Append(panel_class);
 
             //class title
-            UIPanel panel_class_title = new UIPanel();
+            panel_class_title = new UIPanel();
             panel_class_title.BackgroundColor = COLOR_SUBPANEL;
             panel_class_title.SetPadding(0);
             panel_class_title.Left.Set(0f, 0f);
             panel_class_title.Top.Set(0f, 0f);
             panel_class_title.Width.Set(panel_class.Width.Pixels, 0f);
+            panel_class_title.OnMouseOver += new UIElement.MouseEvent(HelpTextClass);
+            panel_class_title.OnMouseOut += new UIElement.MouseEvent(HelpTextClassDone);
             text = "Classes";
             text_measure = Main.fontMouseText.MeasureString(text);
             UIText class_title = new UIText(text, FONT_SCALE_TITLE);
             class_title.Left.Set((panel_class_title.Width.Pixels - (text_measure.X * FONT_SCALE_TITLE)) / 2, 0f);
             class_title.Top.Set(Constants.UI_PADDING, 0f);
-            panel_class_title.Height.Set((text_measure.Y * FONT_SCALE_TITLE) - Constants.UI_PADDING*2, 0f);
+            panel_class_title.Height.Set((text_measure.Y * FONT_SCALE_TITLE) - Constants.UI_PADDING * 2, 0f);
             panel_class_title.Append(class_title);
             panel_class.Append(panel_class_title);
 
@@ -114,13 +118,13 @@ namespace ExperienceAndClasses.UI {
             class_buttons = new List<ClassButton>();
             ClassButton button;
             byte id;
-            for (byte row = 0; row<Systems.Class.class_locations.GetLength(0); row++) {
-                for (byte col = 0; col<Systems.Class.class_locations.GetLength(1); col++) {
+            for (byte row = 0; row < Systems.Class.class_locations.GetLength(0); row++) {
+                for (byte col = 0; col < Systems.Class.class_locations.GetLength(1); col++) {
                     id = Systems.Class.class_locations[row, col];
 
                     if (id != (byte)Systems.Class.CLASS_IDS.New) {
                         button = new ClassButton(Systems.Class.CLASS_LOOKUP[id].Texture, id);
-                        button.Left.Set((Constants.UI_PADDING*2) + (col * (CLASS_BUTTON_SIZE + CLASS_COL_PADDING)), 0f);
+                        button.Left.Set((Constants.UI_PADDING * 2) + (col * (CLASS_BUTTON_SIZE + CLASS_COL_PADDING)), 0f);
                         button.Top.Set(panel_class_title.Height.Pixels + (Constants.UI_PADDING * 2) + (row * (CLASS_BUTTON_SIZE + CLASS_ROW_PADDING)), 0f);
                         button.Width.Set(CLASS_BUTTON_SIZE, 0f);
                         button.Height.Set(CLASS_BUTTON_SIZE, 0f);
@@ -141,12 +145,14 @@ namespace ExperienceAndClasses.UI {
             panel.Append(panel_attribute);
 
             //attribute title
-            UIPanel panel_attribute_title = new UIPanel();
+            panel_attribute_title = new UIPanel();
             panel_attribute_title.BackgroundColor = COLOR_SUBPANEL;
             panel_attribute_title.SetPadding(0);
             panel_attribute_title.Left.Set(0f, 0f);
             panel_attribute_title.Top.Set(0f, 0f);
             panel_attribute_title.Width.Set(panel_attribute.Width.Pixels, 0f);
+            panel_attribute_title.OnMouseOver += new UIElement.MouseEvent(HelpTextAttribute);
+            panel_attribute_title.OnMouseOut += new UIElement.MouseEvent(HelpTextAttributeDone);
             text = "Attributes";
             text_measure = Main.fontMouseText.MeasureString(text);
             UIText attribute_title = new UIText(text, FONT_SCALE_TITLE);
@@ -238,6 +244,19 @@ namespace ExperienceAndClasses.UI {
         }
         private void SecondaryButtonDeHover(UIMouseEvent evt, UIElement listeningElement) {
             button_secondary.MouseOut(evt);
+        }
+
+        private void HelpTextClass(UIMouseEvent evt, UIElement listeningElement) {
+            UIInfo.Instance.ShowHelpText(panel_class_title, "Class", "TODO_help_text");
+        }
+        private void HelpTextClassDone(UIMouseEvent evt, UIElement listeningElement) {
+            UIInfo.Instance.EndText(panel_class_title);
+        }
+        private void HelpTextAttribute(UIMouseEvent evt, UIElement listeningElement) {
+            UIInfo.Instance.ShowHelpText(panel_attribute_title, "Attributes", "TODO_help_text");
+        }
+        private void HelpTextAttributeDone(UIMouseEvent evt, UIElement listeningElement) {
+            UIInfo.Instance.EndText(panel_attribute_title);
         }
     }
 }
