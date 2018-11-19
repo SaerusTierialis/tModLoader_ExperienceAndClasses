@@ -12,7 +12,7 @@ namespace ExperienceAndClasses {
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Constants ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         private const long TICKS_PER_FULL_SYNC = TimeSpan.TicksPerMinute * 2;
-        private const long TICKS_PER_XP_MESSAGE = TimeSpan.TicksPerSecond * 1;
+        private const long TICKS_PER_XP_MESSAGE = (long)(TimeSpan.TicksPerSecond * 0.5);
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Static Vars ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
