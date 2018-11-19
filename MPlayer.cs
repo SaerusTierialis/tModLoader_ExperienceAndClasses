@@ -139,13 +139,6 @@ namespace ExperienceAndClasses {
                 UI.UIBars.Instance.panel.Auto = Commons.TryGet<bool>(load_tag, "eac_ui_bars_auto", true);
                 UI.UIBars.Instance.panel.Pinned = Commons.TryGet<bool>(load_tag, "eac_ui_bars_pinned", false);
 
-                UI.UIStatus.Instance.panel.SetPosition(Commons.TryGet<float>(load_tag, "eac_ui_status_left", 14f), Commons.TryGet<float>(load_tag, "eac_ui_status_top", 100f));
-                UI.UIStatus.Instance.panel.Auto = Commons.TryGet<bool>(load_tag, "eac_ui_status_auto", false);
-                UI.UIStatus.Instance.panel.Pinned = Commons.TryGet<bool>(load_tag, "eac_ui_status_pinned", false);
-
-                //rehide status buttons
-                UI.UIStatus.Instance.panel.HideButtons();
-
                 //temp: show bars and status
                 UI.UIBars.Instance.Visibility = true;
                 UI.UIStatus.Instance.Visibility = true;
@@ -180,8 +173,12 @@ namespace ExperienceAndClasses {
                 ApplyAttributes();
             }
 
-            //local timed events
+            //local events
             if (Is_Local_Player) {
+                //ui
+                UI.UIStatus.Instance.Update();
+
+                //timed events
                 DateTime now = DateTime.Now;
 
                 if (show_xp && (show_xp_value > 0)) {
@@ -803,10 +800,6 @@ namespace ExperienceAndClasses {
                 {"eac_ui_bars_top", UI.UIBars.Instance.panel.GetTop() },
                 {"eac_ui_bars_auto", UI.UIBars.Instance.panel.Auto },
                 {"eac_ui_bars_pinned", UI.UIBars.Instance.panel.Pinned },
-                {"eac_ui_status_left", UI.UIStatus.Instance.panel.GetLeft() },
-                {"eac_ui_status_top", UI.UIStatus.Instance.panel.GetTop() },
-                {"eac_ui_status_auto", UI.UIStatus.Instance.panel.Auto },
-                {"eac_ui_status_pinned", UI.UIStatus.Instance.panel.Pinned },
                 {"eac_class_unlock", class_unlocked },
                 {"eac_class_xp", class_xp },
                 {"eac_class_level", class_level },

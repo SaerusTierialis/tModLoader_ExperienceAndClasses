@@ -62,6 +62,7 @@
     <Compile Include="MPlayer.cs" />
     <Compile Include="Systems\Attribute.cs" />
     <Compile Include="Systems\Class.cs" />
+    <Compile Include="Systems\Status.cs" />
     <Compile Include="Systems\XP.cs" />
     <Compile Include="Textures.cs" />
     <Compile Include="UI\Elements.cs" />

@@ -7,7 +7,114 @@ using Terraria.UI;
 
 namespace ExperienceAndClasses.UI {
 
-    class XPBar : UIPanel {
+    //copied from jopojelly forum post
+    public class UITransparantImage : UIElement {
+        private Texture2D _texture;
+        public float ImageScale = 1f;
+        public Color color;
+
+        public UITransparantImage(Texture2D texture, Color color) {
+            this._texture = texture;
+            this.Width.Set((float)this._texture.Width, 0f);
+            this.Height.Set((float)this._texture.Height, 0f);
+            this.color = color;
+        }
+
+        public void SetImage(Texture2D texture) {
+            this._texture = texture;
+            this.Width.Set((float)this._texture.Width, 0f);
+            this.Height.Set((float)this._texture.Height, 0f);
+        }
+
+        protected override void DrawSelf(SpriteBatch spriteBatch) {
+            CalculatedStyle dimensions = base.GetDimensions();
+            spriteBatch.Draw(this._texture, dimensions.Position() + this._texture.Size() * (1f - this.ImageScale) / 2f, null, color, 0f, Vector2.Zero, this.ImageScale, SpriteEffects.None, 0f);
+        }
+    }
+
+    class StatusIcon : UIElement {
+        private const float TEXT_SCALE = 0.65f;
+        private const float TEXT_VERTICAL_SPACE = 2f;
+
+        private readonly Color COLOUR_TRANSPARENT = new Color(128, 128, 128, 120);
+        private readonly Color COLOUR_SOLID = new Color(255, 255, 255, 255);
+        private readonly Color COLOUR_TEXT = new Color(255, 255, 255, 128);
+
+        private UITransparantImage icon;
+        private UIText text;
+        private Systems.Status status;
+
+        private string prior_text;
+
+        public bool active;
+
+        public StatusIcon() {
+            SetPadding(0f);
+            active = false;
+            prior_text = "";
+
+            Width.Set(UIStatus.BUFF_SIZE, 0f);
+            Height.Set(UIStatus.BUFF_SIZE, 0f);
+
+            icon = new UITransparantImage(Textures.TEXTURE_STATUS_BLANK, COLOUR_TRANSPARENT);
+            Append(icon);
+
+            text = new UIText("", TEXT_SCALE);
+            text.Left.Set(0f, 0f);
+            text.Top.Set(UIStatus.BUFF_SIZE + TEXT_VERTICAL_SPACE, 0f);
+            text.TextColor = COLOUR_TEXT;
+            Append(text);
+        }
+
+        public void SetPosition(float left, float top) {
+            Left.Set(left, 0f);
+            Top.Set(top, 0f);
+            Recalculate();
+            RecalculateChildren();
+        }
+
+        public void SetStatus(Systems.Status status) {
+            this.status = status;
+
+            //TODO set texture
+
+            Update();
+        }
+
+        public void Update() {
+            //TODO make duration string
+            string str = "1 s";
+
+            if (!str.Equals(prior_text)) {
+                text.SetText(str);
+                text.Recalculate();
+            }
+        }
+
+        public override void Draw(SpriteBatch spriteBatch) {
+            if (active)
+                base.Draw(spriteBatch);
+            else
+                return;
+        }
+
+        public override void MouseOver(UIMouseEvent evt) {
+            base.MouseOver(evt);
+            if (active) {
+                icon.color = COLOUR_SOLID;
+                UIInfo.Instance.ShowStatus(this, status);
+            }
+        }
+        public override void MouseOut(UIMouseEvent evt) {
+            base.MouseOut(evt);
+            if (active) {
+                icon.color = COLOUR_TRANSPARENT;
+                UIInfo.Instance.EndText(this);
+            }
+        }
+    }
+
+    class XPBar : UIElement {
         private const float TEXT_SCALE = 1f;
         private const float ICON_SCALE = 0.8f;
         private const float BAR_HEIGHT = 24f;
@@ -26,8 +133,6 @@ namespace ExperienceAndClasses.UI {
             Visible = true;
             
             SetPadding(0f);
-            BackgroundColor = Color.Transparent;
-            BorderColor = Color.Transparent;
 
             icon = new UIImage(Class_Tracked.Texture);
             icon.ImageScale = ICON_SCALE;

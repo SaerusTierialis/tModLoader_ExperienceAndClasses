@@ -77,7 +77,7 @@ namespace ExperienceAndClasses {
             inventory_state = Main.playerInventory;
             if (UI.UIClass.Instance.panel.Auto) UI.UIClass.Instance.Visibility = inventory_state;
             if (UI.UIBars.Instance.panel.Auto) UI.UIBars.Instance.Visibility = !inventory_state;
-            if (UI.UIStatus.Instance.panel.Auto) UI.UIStatus.Instance.Visibility = !inventory_state;
+            UI.UIStatus.Instance.Visibility = !inventory_state;
         }
 
         public override void UpdateUI(GameTime gameTime) {

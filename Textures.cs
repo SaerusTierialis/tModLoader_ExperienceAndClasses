@@ -7,6 +7,7 @@ namespace ExperienceAndClasses {
     class Textures {
 
         public static Texture2D TEXTURE_BLANK { get; private set; }
+        public static Texture2D TEXTURE_STATUS_BLANK { get; private set; }
 
         public static Texture2D TEXTURE_BUTTON_PLUS { get; private set; }
         public static Texture2D TEXTURE_BUTTON_MINUS { get; private set; }
@@ -29,6 +30,7 @@ namespace ExperienceAndClasses {
         /// </summary>
         public static void LoadTextures() {
             TEXTURE_BLANK = ModLoader.GetTexture("ExperienceAndClasses/Textures/Blank");
+            TEXTURE_STATUS_BLANK = ModLoader.GetTexture("ExperienceAndClasses/Textures/Status/BuffTemplate");
 
             TEXTURE_BUTTON_PLUS = ModLoader.GetTexture("ExperienceAndClasses/Textures/UI/ButtonPlus");
             TEXTURE_BUTTON_MINUS = ModLoader.GetTexture("ExperienceAndClasses/Textures/UI/ButtonMinus");

@@ -23,6 +23,7 @@ namespace ExperienceAndClasses.UI {
         private const float WIDTH_CLASS = 300;
         private const float WIDTH_ATTRIBUTE = 350;
         private const float WIDTH_HELP = 300;
+        private const float WIDTH_STATUS = 300;
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Variables ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         private DragableUIPanel panel_title;
@@ -187,6 +188,10 @@ namespace ExperienceAndClasses.UI {
 
         public void ShowHelpText(UIElement source, string title, string help_text) {
             ShowText(source, title, help_text, WIDTH_HELP);
+        }
+
+        public void ShowStatus(UIElement source, Systems.Status status) {
+            ShowText(source, "TODO_status", "TODO_description", WIDTH_STATUS);
         }
 
     }

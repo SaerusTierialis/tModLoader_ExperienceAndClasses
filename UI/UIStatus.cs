@@ -1,10 +1,4 @@
-﻿using Microsoft.Xna.Framework;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Terraria.UI;
+﻿using Terraria;
 
 namespace ExperienceAndClasses.UI {
 
@@ -15,38 +9,61 @@ namespace ExperienceAndClasses.UI {
         public static readonly UIStatus Instance = new UIStatus();
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Constants ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-        private const float WIDTH = 410f;
-        private const float HEIGHT = 75f;
 
-        private readonly Color COLOR_BACKGROUND = Color.Transparent;
-        private readonly Color COLOR_BACKGROUND_HIGHLIGHT = new Color(Constants.COLOR_UI_PANEL_BACKGROUND.R, Constants.COLOR_UI_PANEL_BACKGROUND.G, Constants.COLOR_UI_PANEL_BACKGROUND.B, 0);
+        public const float BUFF_SIZE = 32f;
+        public const float BUFF_HORIZONTAL_SPACING = 6f;
+        public const float BUFF_VERTICAL_SPACING = 20f;
+
+        private const byte COLUMNS = 11;
+        private const byte ROWS = 5; //max number of statuses displayed is (ROWS-2)*COLUMNS
+        private const byte SLOTS = ROWS * COLUMNS;
+
+        private const float LEFT = 32;
+        private const float TOP = 76;
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Variables ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-        public DragableUIPanel panel { get; private set; }
+        private StatusIcon[] icons;
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Initialize ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         protected override void InitializeState() {
-            panel = new DragableUIPanel(WIDTH, HEIGHT, COLOR_BACKGROUND, this, false, true, true);
+            icons = new StatusIcon[SLOTS];
+            for (byte i = 0; i < icons.Length; i++) icons[i] = new StatusIcon();
 
-            panel.BorderColor = COLOR_BACKGROUND;
+            byte row = 0, col = 0;
+            foreach(StatusIcon icon in icons) {
+                icon.SetPosition(LEFT + (col * (BUFF_SIZE + BUFF_HORIZONTAL_SPACING)), TOP + (row * (BUFF_SIZE + BUFF_VERTICAL_SPACING)));
+                state.Append(icon);
 
-            panel.OnMouseOver += new UIElement.MouseEvent(MouseOver);
-            panel.OnMouseOut += new UIElement.MouseEvent(MouseOut);
-
-            panel.HideButtons();
-
-            state.Append(panel);
+                col++;
+                if (col >= COLUMNS) {
+                    row++;
+                    col = 0;
+                }
+            }
         }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Methods ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-        private void MouseOver(UIMouseEvent evt, UIElement listeningElement) {
-            panel.BackgroundColor = COLOR_BACKGROUND_HIGHLIGHT;
-            panel.ShowButtons();
-        }
+        public void Update() {
+            int number_buffs = 0;
+            foreach (int i in Main.LocalPlayer.buffType) {
+                if (i > 0)
+                    number_buffs++;
+            }
+            int number_statuses = 2;
 
-        private void MouseOut(UIMouseEvent evt, UIElement listeningElement) {
-            panel.BackgroundColor = COLOR_BACKGROUND;
-            panel.HideButtons();
+            for (byte i = 0; i < icons.Length; i++) {
+                if (i < number_buffs) {
+                    icons[i].active = false;
+                }
+                else if (i < (number_buffs+ number_statuses)) {
+                    icons[i].active = true;
+                    icons[i].Update();
+                }
+                else {
+                    icons[i].active = false;
+                }
+            }
+
         }
 
     }
