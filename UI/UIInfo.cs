@@ -127,7 +127,7 @@ namespace ExperienceAndClasses.UI {
         public void ShowTextClass(UIElement source, byte class_id) {
             Systems.Class c = Systems.Class.CLASS_LOOKUP[class_id];
 
-            string title = c.Name.ToUpper();
+            string title = c.Name;
             string text = c.Description + "\n\n";
             if (ExperienceAndClasses.LOCAL_MPLAYER.Class_Levels[class_id] <= 0) {
                 title += " (locked)";
