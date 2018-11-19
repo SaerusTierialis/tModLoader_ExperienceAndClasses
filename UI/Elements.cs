@@ -7,7 +7,8 @@ using Terraria.UI;
 
 namespace ExperienceAndClasses.UI {
 
-    //copied from jopojelly forum post
+    //UITransparantImage from jopojelly forum post
+    //set color public 
     public class UITransparantImage : UIElement {
         private Texture2D _texture;
         public float ImageScale = 1f;
