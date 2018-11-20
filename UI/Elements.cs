@@ -7,6 +7,48 @@ using Terraria.UI;
 
 namespace ExperienceAndClasses.UI {
 
+    public class HelpTextPanel : UIPanel {
+        private UIText text;
+        private string help_text_title, help_text;
+        private bool center_text;
+        private float text_scale;
+        private Vector2 text_measure;
+
+        public HelpTextPanel(string title, float text_scale, bool center_text, string help_text_title, string help_text) {
+            SetPadding(0f);
+            this.help_text_title = help_text_title;
+            this.help_text = help_text;
+            this.center_text = center_text;
+            this.text_scale = text_scale;
+
+            text = new UIText(title, text_scale);
+            Append(text);
+
+            text_measure = Main.fontMouseText.MeasureString(text.Text);
+
+            Height.Set((text_measure.Y * text_scale / 2f) + (Constants.UI_PADDING * 2), 0f);
+        }
+
+        public override void Recalculate() {
+            base.Recalculate();
+
+            if (center_text) {
+                text.Top.Set((Height.Pixels - (text_measure.Y * text_scale / 2f)) / 2f , 0f);
+                text.Left.Set((Width.Pixels - (text_measure.X * text_scale)) / 2f, 0f);
+            }
+        }
+
+        public override void MouseOver(UIMouseEvent evt) {
+            base.MouseOver(evt);
+            UIInfo.Instance.ShowHelpText(this, help_text_title, help_text);
+        }
+
+        public override void MouseOut(UIMouseEvent evt) {
+            base.MouseOut(evt);
+            UIInfo.Instance.EndText(this);
+        }
+    }
+
     public class ProgressBar : UIElement {
         private const float MIN_WIDTH = 16f;
         private UIPanel bar_background, bar_progress;
@@ -383,9 +425,10 @@ namespace ExperienceAndClasses.UI {
         UIImage image_lock;
 
         public ClassButton(Texture2D texture, byte class_id) : base(texture) {
+            Width.Set(texture.Width, 0f);
+            Height.Set(texture.Height, 0f);
+
             this.class_id = class_id;
-            OnClick += new MouseEvent(ClickPrimary);
-            OnRightClick += new MouseEvent(ClickSecondary);
             
             text = new UIText("", TEXT_SCALE);
             Append(text);
@@ -402,7 +445,9 @@ namespace ExperienceAndClasses.UI {
             SetVisibility(1f, LOW_VISIBILITY);
         }
 
-        private void ClickPrimary(UIMouseEvent evt, UIElement listeningElement) {
+        public override void Click(UIMouseEvent evt) {
+            base.Click(evt);
+
             if (ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary.ID == class_id) {
                 ExperienceAndClasses.LOCAL_MPLAYER.LocalSetClass((byte)Systems.Class.CLASS_IDS.None, true);
             }
@@ -411,7 +456,9 @@ namespace ExperienceAndClasses.UI {
             }
         }
 
-        private void ClickSecondary(UIMouseEvent evt, UIElement listeningElement) {
+        public override void RightClick(UIMouseEvent evt) {
+            base.RightClick(evt);
+
             if (ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary.ID == class_id) {
                 ExperienceAndClasses.LOCAL_MPLAYER.LocalSetClass((byte)Systems.Class.CLASS_IDS.None, false);
             }

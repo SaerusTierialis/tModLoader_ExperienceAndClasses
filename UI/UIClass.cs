@@ -23,6 +23,9 @@ namespace ExperienceAndClasses.UI {
         private const float HEIGHT_ATTRIBUTES = 250f;
         private const float HEIGHT_ATTRIBUTE = 30f;
 
+        private const float WIDTH_ABILITY = WIDTH_ATTRIBUTES;
+        private const float HEIGHT_ABILITY = (HEIGHT - HEIGHT_ATTRIBUTES) - (Constants.UI_PADDING * 3);
+
         private readonly Color COLOR_SUBPANEL = new Color(73, 94, 200);
 
         private const float INDICATOR_WIDTH = CLASS_BUTTON_SIZE + (Constants.UI_PADDING * 2);
@@ -44,13 +47,8 @@ namespace ExperienceAndClasses.UI {
         private List<AttributeText> attribute_texts;
         private UIText attribute_point_text;
 
-        private UIPanel panel_class_title, panel_attribute_title;
-
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Initialize ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         protected override void InitializeState() {
-            string text;
-            Vector2 text_measure;
-
             //main panel
             panel = new DragableUIPanel(WIDTH, HEIGHT, Constants.COLOR_UI_PANEL_BACKGROUND, this, true, true, true);
 
@@ -65,21 +63,9 @@ namespace ExperienceAndClasses.UI {
             panel.Append(panel_class);
 
             //class title
-            panel_class_title = new UIPanel();
+            HelpTextPanel panel_class_title = new HelpTextPanel("Classes", FONT_SCALE_TITLE, true, "Classes", "TODO_help_text");
             panel_class_title.BackgroundColor = COLOR_SUBPANEL;
-            panel_class_title.SetPadding(0);
-            panel_class_title.Left.Set(0f, 0f);
-            panel_class_title.Top.Set(0f, 0f);
             panel_class_title.Width.Set(panel_class.Width.Pixels, 0f);
-            panel_class_title.OnMouseOver += new UIElement.MouseEvent(HelpTextClass);
-            panel_class_title.OnMouseOut += new UIElement.MouseEvent(HelpTextClassDone);
-            text = "Classes";
-            text_measure = Main.fontMouseText.MeasureString(text);
-            UIText class_title = new UIText(text, FONT_SCALE_TITLE);
-            class_title.Left.Set((panel_class_title.Width.Pixels - (text_measure.X * FONT_SCALE_TITLE)) / 2, 0f);
-            class_title.Top.Set(Constants.UI_PADDING, 0f);
-            panel_class_title.Height.Set((text_measure.Y * FONT_SCALE_TITLE) - Constants.UI_PADDING * 2, 0f);
-            panel_class_title.Append(class_title);
             panel_class.Append(panel_class_title);
 
             //indicator for primary class
@@ -145,21 +131,9 @@ namespace ExperienceAndClasses.UI {
             panel.Append(panel_attribute);
 
             //attribute title
-            panel_attribute_title = new UIPanel();
+            HelpTextPanel panel_attribute_title = new HelpTextPanel("Attributes", FONT_SCALE_TITLE, true, "Attribute Points", "TODO_help_text");
             panel_attribute_title.BackgroundColor = COLOR_SUBPANEL;
-            panel_attribute_title.SetPadding(0);
-            panel_attribute_title.Left.Set(0f, 0f);
-            panel_attribute_title.Top.Set(0f, 0f);
             panel_attribute_title.Width.Set(panel_attribute.Width.Pixels, 0f);
-            panel_attribute_title.OnMouseOver += new UIElement.MouseEvent(HelpTextAttribute);
-            panel_attribute_title.OnMouseOut += new UIElement.MouseEvent(HelpTextAttributeDone);
-            text = "Attributes";
-            text_measure = Main.fontMouseText.MeasureString(text);
-            UIText attribute_title = new UIText(text, FONT_SCALE_TITLE);
-            attribute_title.Left.Set((panel_attribute_title.Width.Pixels - (text_measure.X * FONT_SCALE_TITLE)) / 2, 0f);
-            attribute_title.Top.Set(Constants.UI_PADDING, 0f);
-            panel_attribute_title.Height.Set((text_measure.Y * FONT_SCALE_TITLE) - Constants.UI_PADDING * 2, 0f);
-            panel_attribute_title.Append(attribute_title);
             panel_attribute.Append(panel_attribute_title);
 
             //attributes
@@ -181,6 +155,22 @@ namespace ExperienceAndClasses.UI {
             attribute_point_text.Left.Set(Constants.UI_PADDING, 0f);
             attribute_point_text.Top.Set(top + Constants.UI_PADDING, 0f);
             panel_attribute.Append(attribute_point_text);
+
+            //ability panel
+            UIPanel panel_ability = new UIPanel();
+            panel_ability.SetPadding(0);
+            panel_ability.Left.Set(panel_class.Left.Pixels + panel_class.Width.Pixels - 1f, 0f);
+            panel_ability.Top.Set(Constants.UI_PADDING, 0f);
+            panel_ability.Width.Set(WIDTH_ABILITY, 0f);
+            panel_ability.Height.Set(HEIGHT_ABILITY, 0f);
+            panel_ability.BackgroundColor = COLOR_SUBPANEL;
+            panel.Append(panel_ability);
+
+            //ability title
+            HelpTextPanel panel_ability_title = new HelpTextPanel("Abilities", FONT_SCALE_TITLE, true, "Class Abilities", "TODO_help_text");
+            panel_ability_title.BackgroundColor = COLOR_SUBPANEL;
+            panel_ability_title.Width.Set(panel_attribute.Width.Pixels, 0f);
+            panel_ability.Append(panel_ability_title);
 
             //done adding to main panel
             state.Append(panel);
@@ -244,19 +234,6 @@ namespace ExperienceAndClasses.UI {
         }
         private void SecondaryButtonDeHover(UIMouseEvent evt, UIElement listeningElement) {
             button_secondary.MouseOut(evt);
-        }
-
-        private void HelpTextClass(UIMouseEvent evt, UIElement listeningElement) {
-            UIInfo.Instance.ShowHelpText(panel_class_title, "Class", "TODO_help_text");
-        }
-        private void HelpTextClassDone(UIMouseEvent evt, UIElement listeningElement) {
-            UIInfo.Instance.EndText(panel_class_title);
-        }
-        private void HelpTextAttribute(UIMouseEvent evt, UIElement listeningElement) {
-            UIInfo.Instance.ShowHelpText(panel_attribute_title, "Attributes", "TODO_help_text");
-        }
-        private void HelpTextAttributeDone(UIMouseEvent evt, UIElement listeningElement) {
-            UIInfo.Instance.EndText(panel_attribute_title);
         }
     }
 }
