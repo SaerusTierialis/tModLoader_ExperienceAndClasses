@@ -316,42 +316,42 @@ namespace ExperienceAndClasses.Systems {
                         bf = bpp * points;
                         if (bpp > 0) {
                             mplayer.use_speed_melee += bf;
-                            if (mplayer.Is_Local_Player) Bonus += "\n+" + Math.Round(bf * 100, 3) + "% melee speed (" + Math.Round(bpp * 100, 3) + " per point)";
+                            if (mplayer.Is_Local_Player) Bonus += "\n+" + Math.Round(bf * 100, 3) + "% melee attack speed (" + Math.Round(bpp * 100, 3) + " per point)";
                         }
 
                         bpp = ranged_per * DEXTERITY_USE_SPEED;
                         bf = bpp * points;
                         if (bpp > 0) {
                             mplayer.use_speed_ranged += bf;
-                            if (mplayer.Is_Local_Player) Bonus += "\n+" + Math.Round(bf * 100, 3) + "% ranged speed (" + Math.Round(bpp * 100, 3) + " per point)";
+                            if (mplayer.Is_Local_Player) Bonus += "\n+" + Math.Round(bf * 100, 3) + "% ranged attack speed (" + Math.Round(bpp * 100, 3) + " per point)";
                         }
 
                         bpp = magic_per * DEXTERITY_USE_SPEED;
                         bf = bpp * points;
                         if (bpp > 0) {
                             mplayer.use_speed_magic += bf;
-                            if (mplayer.Is_Local_Player) Bonus += "\n+" + Math.Round(bf * 100, 3) + "% magic speed (" + Math.Round(bpp * 100, 3) + " per point)";
+                            if (mplayer.Is_Local_Player) Bonus += "\n+" + Math.Round(bf * 100, 3) + "% magic cast speed (" + Math.Round(bpp * 100, 3) + " per point)";
                         }
 
                         bpp = throwing_per * DEXTERITY_USE_SPEED;
                         bf = bpp * points;
                         if (bpp > 0) {
                             mplayer.use_speed_throwing += bf;
-                            if (mplayer.Is_Local_Player) Bonus += "\n+" + Math.Round(bf * 100, 3) + "% throwing speed (" + Math.Round(bpp * 100, 3) + " per point)";
+                            if (mplayer.Is_Local_Player) Bonus += "\n+" + Math.Round(bf * 100, 3) + "% throwing attack speed (" + Math.Round(bpp * 100, 3) + " per point)";
                         }
 
                         bpp = minion_per * DEXTERITY_USE_SPEED;
                         bf = bpp * points;
                         if (bpp > 0) {
                             mplayer.use_speed_minion += bf;
-                            if (mplayer.Is_Local_Player) Bonus += "\n+" + Math.Round(bf * 100, 3) + "% minion speed (" + Math.Round(bpp * 100, 3) + " per point)";
+                            if (mplayer.Is_Local_Player) Bonus += "\n+" + Math.Round(bf * 100, 3) + "% minion cast speed (" + Math.Round(bpp * 100, 3) + " per point)";
                         }
 
                         bpp = tool_per * DEXTERITY_USE_SPEED;
                         bf = bpp * points;
                         if (bpp > 0) {
                             mplayer.use_speed_tool += bf;
-                            if (mplayer.Is_Local_Player) Bonus += "\n+" + Math.Round(bf * 100, 3) + "% tool speed (" + Math.Round(bpp * 100, 3) + " per point)";
+                            if (mplayer.Is_Local_Player) Bonus += "\n+" + Math.Round(bf * 100, 3) + "% tool use speed (" + Math.Round(bpp * 100, 3) + " per point)";
                         }
                         
                         break;

@@ -29,7 +29,7 @@ namespace ExperienceAndClasses.UI {
         private static readonly float HEIGHT_UNLOCK = HEIGHT - HEIGHT_HELP - Textures.TEXTURE_CORNER_BUTTON_SIZE + 1 - (Constants.UI_PADDING * 2) + 1;
 
         private const float WIDTH_HELP = WIDTH_UNLOCK;
-        private const float HEIGHT_HELP = 160f;
+        private const float HEIGHT_HELP = 120f;
 
         private static readonly float WIDTH = CLASS_WIDTH + WIDTH_ATTRIBUTES + WIDTH_UNLOCK + (Constants.UI_PADDING * 2) - 4;
         private const float HEIGHT = 430f;
@@ -210,7 +210,7 @@ namespace ExperienceAndClasses.UI {
             panel.Append(panel_help);
 
             //help title
-            HelpTextPanel panel_help_title = new HelpTextPanel("Help", FONT_SCALE_TITLE, true, "Help", "TODO_help_text");
+            HelpTextPanel panel_help_title = new HelpTextPanel("FAQ", FONT_SCALE_TITLE, true, "FAQ", "TODO_help_text");
             panel_help_title.BackgroundColor = COLOR_SUBPANEL;
             panel_help_title.Width.Set(panel_help.Width.Pixels, 0f);
             panel_help.Append(panel_help_title);
