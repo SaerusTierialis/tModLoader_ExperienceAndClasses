@@ -29,6 +29,11 @@ namespace ExperienceAndClasses.UI {
             Height.Set((text_measure.Y * text_scale / 2f) + (Constants.UI_PADDING * 2), 0f);
         }
 
+        public void SetText(string new_text) {
+            text.SetText(new_text);
+            Recalculate();
+        }
+
         public override void Recalculate() {
             base.Recalculate();
 

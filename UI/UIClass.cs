@@ -31,7 +31,7 @@ namespace ExperienceAndClasses.UI {
         private const float WIDTH_HELP = WIDTH_UNLOCK;
         private const float HEIGHT_HELP = 160f;
 
-        private static readonly float WIDTH = CLASS_WIDTH + WIDTH_ATTRIBUTES + WIDTH_UNLOCK + (Constants.UI_PADDING * 2) - 2;
+        private static readonly float WIDTH = CLASS_WIDTH + WIDTH_ATTRIBUTES + WIDTH_UNLOCK + (Constants.UI_PADDING * 2) - 4;
         private const float HEIGHT = 430f;
 
         private readonly Color COLOR_SUBPANEL = new Color(73, 94, 200);
@@ -53,7 +53,7 @@ namespace ExperienceAndClasses.UI {
         private List<ClassButton> class_buttons;
 
         private List<AttributeText> attribute_texts;
-        private UIText attribute_point_text;
+        private HelpTextPanel attribute_point_text;
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Initialize ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         protected override void InitializeState() {
@@ -131,7 +131,7 @@ namespace ExperienceAndClasses.UI {
             //attribute panel
             UIPanel panel_attribute = new UIPanel();
             panel_attribute.SetPadding(0);
-            panel_attribute.Left.Set(panel_class.Left.Pixels + panel_class.Width.Pixels - 1f, 0f);
+            panel_attribute.Left.Set(panel_class.Left.Pixels + panel_class.Width.Pixels - 2f, 0f);
             panel_attribute.Top.Set(HEIGHT - Constants.UI_PADDING - HEIGHT_ATTRIBUTES, 0f);
             panel_attribute.Width.Set(WIDTH_ATTRIBUTES, 0f);
             panel_attribute.Height.Set(HEIGHT_ATTRIBUTES, 0f);
@@ -159,15 +159,18 @@ namespace ExperienceAndClasses.UI {
             }
 
             //attribute points
-            attribute_point_text = new UIText("Available Points: 0", FONT_SCALE_ATTRIBUTE);
+            attribute_point_text = new HelpTextPanel("Available Points: 0", FONT_SCALE_ATTRIBUTE, false, "Attribute Allocation", "TODO_help_text");
             attribute_point_text.Left.Set(Constants.UI_PADDING, 0f);
             attribute_point_text.Top.Set(top + Constants.UI_PADDING, 0f);
+            attribute_point_text.Width.Set(panel_attribute.Width.Pixels - (Constants.UI_PADDING * 2f), 0f);
+            attribute_point_text.BackgroundColor = Color.Transparent;
+            attribute_point_text.BorderColor = Color.Transparent;
             panel_attribute.Append(attribute_point_text);
 
             //ability panel
             UIPanel panel_ability = new UIPanel();
             panel_ability.SetPadding(0);
-            panel_ability.Left.Set(panel_class.Left.Pixels + panel_class.Width.Pixels - 1f, 0f);
+            panel_ability.Left.Set(panel_attribute.Left.Pixels, 0f);
             panel_ability.Top.Set(Constants.UI_PADDING, 0f);
             panel_ability.Width.Set(WIDTH_ABILITY, 0f);
             panel_ability.Height.Set(HEIGHT_ABILITY, 0f);
@@ -183,7 +186,7 @@ namespace ExperienceAndClasses.UI {
             //unlock panel
             UIPanel panel_unlock = new UIPanel();
             panel_unlock.SetPadding(0);
-            panel_unlock.Left.Set(panel_ability.Left.Pixels + panel_ability.Width.Pixels - 1f, 0f);
+            panel_unlock.Left.Set(panel_ability.Left.Pixels + panel_ability.Width.Pixels - 2f, 0f);
             panel_unlock.Top.Set(Constants.UI_PADDING + Textures.TEXTURE_CORNER_BUTTON_SIZE + 1, 0f);
             panel_unlock.Width.Set(WIDTH_UNLOCK, 0f);
             panel_unlock.Height.Set(HEIGHT_UNLOCK, 0f);
