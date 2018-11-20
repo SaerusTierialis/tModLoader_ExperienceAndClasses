@@ -414,22 +414,13 @@ namespace ExperienceAndClasses {
                     continue;
 
                 c = Systems.Class.CLASS_LOOKUP[id];
-                switch (c.Tier) {
-                    case 2:
-                        level_req = Systems.Class.LEVEL_REQUIRED_TIER_2;
-                        break;
-
-                    case 3:
-                        level_req = Systems.Class.LEVEL_REQUIRED_TIER_3;
-                        break;
-
-                    default:
-                        continue;
-                }
-                if (Class_Levels[c.ID_Prereq] >= level_req) {
-                    Class_Unlocked[id] = true;
-                    if (Class_Levels[id] < 1) Class_Levels[id] = 1;
-                    AnnounceClassUnlock(c);
+                level_req = Systems.Class.MAX_LEVEL[Systems.Class.CLASS_LOOKUP[c.ID_Prereq].Tier];
+                if (level_req > 0) {
+                    if (Class_Levels[c.ID_Prereq] >= level_req) {
+                        Class_Unlocked[id] = true;
+                        if (Class_Levels[id] < 1) Class_Levels[id] = 1;
+                        AnnounceClassUnlock(c);
+                    }
                 }
             }
 
@@ -501,13 +492,13 @@ namespace ExperienceAndClasses {
                 }
 
                 //level up
-                while ((Class_Levels[Class_Primary.ID] < Systems.Class.MAX_LEVEL[Class_Primary.Tier]) && (Class_XP[Class_Primary.ID] >= Systems.XP.GetXPReq(Class_Primary.Tier, Class_Levels[Class_Primary.ID]))) {
-                    SubtractXP(Class_Primary.ID, Systems.XP.GetXPReq(Class_Primary.Tier, Class_Levels[Class_Primary.ID]));
+                while ((Class_Levels[Class_Primary.ID] < Systems.Class.MAX_LEVEL[Class_Primary.Tier]) && (Class_XP[Class_Primary.ID] >= Systems.XP.GetXPReq(Class_Primary, Class_Levels[Class_Primary.ID]))) {
+                    SubtractXP(Class_Primary.ID, Systems.XP.GetXPReq(Class_Primary, Class_Levels[Class_Primary.ID]));
                     Class_Levels[Class_Primary.ID]++;
                     AnnounceLevel(Class_Primary);
                 }
-                while ((Class_Levels[Class_Secondary.ID] < Systems.Class.MAX_LEVEL[Class_Secondary.Tier]) && (Class_XP[Class_Secondary.ID] >= Systems.XP.GetXPReq(Class_Secondary.Tier, Class_Levels[Class_Secondary.ID]))) {
-                    SubtractXP(Class_Secondary.ID, Systems.XP.GetXPReq(Class_Secondary.Tier, Class_Levels[Class_Secondary.ID]));
+                while ((Class_Levels[Class_Secondary.ID] < Systems.Class.MAX_LEVEL[Class_Secondary.Tier]) && (Class_XP[Class_Secondary.ID] >= Systems.XP.GetXPReq(Class_Secondary, Class_Levels[Class_Secondary.ID]))) {
+                    SubtractXP(Class_Secondary.ID, Systems.XP.GetXPReq(Class_Secondary, Class_Levels[Class_Secondary.ID]));
                     Class_Levels[Class_Secondary.ID]++;
                     AnnounceLevel(Class_Secondary);
                 }
@@ -873,8 +864,8 @@ namespace ExperienceAndClasses {
             for (byte id = 0; id < (byte)Systems.Class.CLASS_IDS.NUMBER_OF_IDs; id++) {
 
                 //level up if required xp changed
-                while ((Class_Levels[id] < Systems.Class.MAX_LEVEL[Systems.Class.CLASS_LOOKUP[id].Tier]) && (Class_XP[id] >= Systems.XP.GetXPReq(Systems.Class.CLASS_LOOKUP[id].Tier, Class_Levels[id]))) {
-                    SubtractXP(id, Systems.XP.GetXPReq(Systems.Class.CLASS_LOOKUP[id].Tier, Class_Levels[id]));
+                while ((Class_Levels[id] < Systems.Class.MAX_LEVEL[Systems.Class.CLASS_LOOKUP[id].Tier]) && (Class_XP[id] >= Systems.XP.GetXPReq(Systems.Class.CLASS_LOOKUP[id], Class_Levels[id]))) {
+                    SubtractXP(id, Systems.XP.GetXPReq(Systems.Class.CLASS_LOOKUP[id], Class_Levels[id]));
                     Class_Levels[id]++;
                 }
 

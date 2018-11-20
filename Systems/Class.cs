@@ -23,20 +23,21 @@ namespace ExperienceAndClasses.Systems {
             Summoner,
             Cleric,
             Hybrid,
-            Knight,
+            Unnamed1,
             Berserker,
             Guardian,
-            Trickshot,
             Engineer,
             Sniper,
-            Mystic,
+            Elementalist,
             Sage,
             Assassin,
+            Unnamed2,
             Ninja,
             Hivemind,
             SoulBinder,
             Saint,
             HybridPrime,
+            Explorer,
 
             //insert here
 
@@ -47,9 +48,6 @@ namespace ExperienceAndClasses.Systems {
         public static byte[,] class_locations = new byte[5,7];
 
         public static readonly byte[] MAX_LEVEL = new byte[] { 0, 10, 50, 100 };
-
-        public static readonly byte LEVEL_REQUIRED_TIER_2 = MAX_LEVEL[1];
-        public static readonly byte LEVEL_REQUIRED_TIER_3 = MAX_LEVEL[2];
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Treated like readonly ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         public static Class[] CLASS_LOOKUP { get; private set; }
@@ -74,7 +72,7 @@ namespace ExperienceAndClasses.Systems {
                 desc = "";
                 tier = 0;
                 id_prereq = CLASS_IDS.New;
-                texture_path = "ExperienceAndClasses/Textures/Class/ClassToken_Novice";
+                texture_path = "ExperienceAndClasses/Textures/Class/Novice";
                 power_scaling = PowerScaling.POWER_SCALING_TYPES.None;
                 gives_allocation_attributes = true;
 
@@ -100,7 +98,7 @@ namespace ExperienceAndClasses.Systems {
                         name = "Novice";
                         desc = "TODO_description";
                         tier = 1;
-                        texture_path = "ExperienceAndClasses/Textures/Class/ClassToken_Novice";
+                        texture_path = "ExperienceAndClasses/Textures/Class/Novice";
                         class_locations[0, 3] = id_byte;
                         power_scaling = PowerScaling.POWER_SCALING_TYPES.All;
                         break;
@@ -109,7 +107,7 @@ namespace ExperienceAndClasses.Systems {
                         name = "Warrior";
                         desc = "TODO_description";
                         tier = 2;
-                        texture_path = "ExperienceAndClasses/Textures/Class/ClassToken_Warrior";
+                        texture_path = "ExperienceAndClasses/Textures/Class/Warrior";
                         class_locations[1, 0] = id_byte;
                         id_prereq = CLASS_IDS.Novice;
                         power_scaling = PowerScaling.POWER_SCALING_TYPES.Melee;
@@ -122,7 +120,7 @@ namespace ExperienceAndClasses.Systems {
                         name = "Ranger";
                         desc = "TODO_description";
                         tier = 2;
-                        texture_path = "ExperienceAndClasses/Textures/Class/ClassToken_Ranger";
+                        texture_path = "ExperienceAndClasses/Textures/Class/Ranger";
                         class_locations[1, 1] = id_byte;
                         id_prereq = CLASS_IDS.Novice;
                         power_scaling = PowerScaling.POWER_SCALING_TYPES.Ranged;
@@ -135,7 +133,7 @@ namespace ExperienceAndClasses.Systems {
                         name = "Mage";
                         desc = "TODO_description";
                         tier = 2;
-                        texture_path = "ExperienceAndClasses/Textures/Class/ClassToken_Mage";
+                        texture_path = "ExperienceAndClasses/Textures/Class/Mage";
                         class_locations[1, 2] = id_byte;
                         id_prereq = CLASS_IDS.Novice;
                         power_scaling = PowerScaling.POWER_SCALING_TYPES.Magic;
@@ -147,7 +145,7 @@ namespace ExperienceAndClasses.Systems {
                         name = "Rogue";
                         desc = "TODO_description";
                         tier = 2;
-                        texture_path = "ExperienceAndClasses/Textures/Class/ClassToken_Rogue";
+                        texture_path = "ExperienceAndClasses/Textures/Class/Rogue";
                         class_locations[1, 3] = id_byte;
                         id_prereq = CLASS_IDS.Novice;
                         power_scaling = PowerScaling.POWER_SCALING_TYPES.Rogue;
@@ -159,7 +157,7 @@ namespace ExperienceAndClasses.Systems {
                         name = "Summoner";
                         desc = "TODO_description";
                         tier = 2;
-                        texture_path = "ExperienceAndClasses/Textures/Class/ClassToken_Summoner";
+                        texture_path = "ExperienceAndClasses/Textures/Class/Summoner";
                         class_locations[1, 4] = id_byte;
                         id_prereq = CLASS_IDS.Novice;
                         power_scaling = PowerScaling.POWER_SCALING_TYPES.Minion;
@@ -171,7 +169,7 @@ namespace ExperienceAndClasses.Systems {
                         name = "Cleric";
                         desc = "TODO_description";
                         tier = 2;
-                        texture_path = "ExperienceAndClasses/Textures/Class/ClassToken_Cleric";
+                        texture_path = "ExperienceAndClasses/Textures/Class/Cleric";
                         class_locations[1, 5] = id_byte;
                         id_prereq = CLASS_IDS.Novice;
                         power_scaling = PowerScaling.POWER_SCALING_TYPES.All;
@@ -183,7 +181,7 @@ namespace ExperienceAndClasses.Systems {
                         name = "Hybrid";
                         desc = "TODO_description";
                         tier = 2;
-                        texture_path = "ExperienceAndClasses/Textures/Class/ClassToken_Hybrid";
+                        texture_path = "ExperienceAndClasses/Textures/Class/Hybrid";
                         class_locations[1, 6] = id_byte;
                         id_prereq = CLASS_IDS.Novice;
                         power_scaling = PowerScaling.POWER_SCALING_TYPES.All;
@@ -195,11 +193,11 @@ namespace ExperienceAndClasses.Systems {
                         attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Dexterity] = 2;
                         break;
 
-                    case CLASS_IDS.Knight:
-                        name = "Knight";
+                    case CLASS_IDS.Unnamed1:
+                        name = "Unnamed1";
                         desc = "TODO_description";
                         tier = 3;
-                        texture_path = "ExperienceAndClasses/Textures/Class/ClassToken_Knight";
+                        texture_path = "ExperienceAndClasses/Textures/Class/Unnamed1";
                         class_locations[2, 0] = id_byte;
                         id_prereq = CLASS_IDS.Warrior;
                         power_scaling = PowerScaling.POWER_SCALING_TYPES.Melee;
@@ -211,7 +209,7 @@ namespace ExperienceAndClasses.Systems {
                         name = "Berserker";
                         desc = "TODO_description";
                         tier = 3;
-                        texture_path = "ExperienceAndClasses/Textures/Class/ClassToken_Berserker";
+                        texture_path = "ExperienceAndClasses/Textures/Class/Berserker";
                         class_locations[3, 0] = id_byte;
                         id_prereq = CLASS_IDS.Warrior;
                         power_scaling = PowerScaling.POWER_SCALING_TYPES.Melee;
@@ -225,7 +223,7 @@ namespace ExperienceAndClasses.Systems {
                         name = "Guardian";
                         desc = "TODO_description";
                         tier = 3;
-                        texture_path = "ExperienceAndClasses/Textures/Class/ClassToken_Guardian";
+                        texture_path = "ExperienceAndClasses/Textures/Class/Guardian";
                         class_locations[4, 0] = id_byte;
                         id_prereq = CLASS_IDS.Warrior;
                         power_scaling = PowerScaling.POWER_SCALING_TYPES.Melee;
@@ -233,24 +231,11 @@ namespace ExperienceAndClasses.Systems {
                         attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Vitality] = 5;
                         break;
 
-                    case CLASS_IDS.Trickshot:
-                        name = "Trickshot";
-                        desc = "TODO_description";
-                        tier = 3;
-                        texture_path = "ExperienceAndClasses/Textures/Class/ClassToken_Trickshot";
-                        class_locations[3, 1] = id_byte;
-                        id_prereq = CLASS_IDS.Ranger;
-                        power_scaling = PowerScaling.POWER_SCALING_TYPES.Ranged;
-                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Power] = 2;
-                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Spirit] = 2;
-                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Dexterity] = 5;
-                        break;
-
                     case CLASS_IDS.Sniper:
                         name = "Sniper";
                         desc = "TODO_description";
                         tier = 3;
-                        texture_path = "ExperienceAndClasses/Textures/Class/ClassToken_Sniper";
+                        texture_path = "ExperienceAndClasses/Textures/Class/Sniper";
                         class_locations[2, 1] = id_byte;
                         id_prereq = CLASS_IDS.Ranger;
                         power_scaling = PowerScaling.POWER_SCALING_TYPES.Ranged;
@@ -262,8 +247,8 @@ namespace ExperienceAndClasses.Systems {
                         name = "Engineer";
                         desc = "TODO_description";
                         tier = 3;
-                        texture_path = "ExperienceAndClasses/Textures/Class/ClassToken_Engineer";
-                        class_locations[4, 1] = id_byte;
+                        texture_path = "ExperienceAndClasses/Textures/Class/Engineer";
+                        class_locations[3, 1] = id_byte;
                         id_prereq = CLASS_IDS.Ranger;
                         power_scaling = PowerScaling.POWER_SCALING_TYPES.Ranged;
                         attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Power] = 3;
@@ -272,11 +257,11 @@ namespace ExperienceAndClasses.Systems {
                         attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Dexterity] = 2;
                         break;
 
-                    case CLASS_IDS.Mystic:
-                        name = "Mystic";
+                    case CLASS_IDS.Elementalist:
+                        name = "Elementalist";
                         desc = "TODO_description";
                         tier = 3;
-                        texture_path = "ExperienceAndClasses/Textures/Class/ClassToken_Mystic";
+                        texture_path = "ExperienceAndClasses/Textures/Class/Elementalist";
                         class_locations[2, 2] = id_byte;
                         id_prereq = CLASS_IDS.Mage;
                         power_scaling = PowerScaling.POWER_SCALING_TYPES.Magic;
@@ -288,7 +273,7 @@ namespace ExperienceAndClasses.Systems {
                         name = "Sage";
                         desc = "TODO_description";
                         tier = 3;
-                        texture_path = "ExperienceAndClasses/Textures/Class/ClassToken_Sage";
+                        texture_path = "ExperienceAndClasses/Textures/Class/Sage";
                         class_locations[3, 2] = id_byte;
                         id_prereq = CLASS_IDS.Mage;
                         power_scaling = PowerScaling.POWER_SCALING_TYPES.Magic;
@@ -301,7 +286,7 @@ namespace ExperienceAndClasses.Systems {
                         name = "Assassin";
                         desc = "TODO_description";
                         tier = 3;
-                        texture_path = "ExperienceAndClasses/Textures/Class/ClassToken_Assassin";
+                        texture_path = "ExperienceAndClasses/Textures/Class/Assassin";
                         class_locations[2, 3] = id_byte;
                         id_prereq = CLASS_IDS.Rogue;
                         power_scaling = PowerScaling.POWER_SCALING_TYPES.Rogue;
@@ -310,12 +295,25 @@ namespace ExperienceAndClasses.Systems {
                         attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Agility] = 3;
                         break;
 
+                    case CLASS_IDS.Unnamed2:
+                        name = "Unnamed2";
+                        desc = "TODO_description";
+                        tier = 3;
+                        texture_path = "ExperienceAndClasses/Textures/Class/Unnamed2";
+                        class_locations[3, 3] = id_byte;
+                        id_prereq = CLASS_IDS.Rogue;
+                        power_scaling = PowerScaling.POWER_SCALING_TYPES.Rogue;
+                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Power] = 2;
+                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Spirit] = 2;
+                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Dexterity] = 5;
+                        break;
+
                     case CLASS_IDS.Ninja:
                         name = "Ninja";
                         desc = "TODO_description";
                         tier = 3;
-                        texture_path = "ExperienceAndClasses/Textures/Class/ClassToken_Ninja";
-                        class_locations[3, 3] = id_byte;
+                        texture_path = "ExperienceAndClasses/Textures/Class/Ninja";
+                        class_locations[4, 3] = id_byte;
                         id_prereq = CLASS_IDS.Rogue;
                         power_scaling = PowerScaling.POWER_SCALING_TYPES.Throwing;
                         attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Power] = 3;
@@ -327,7 +325,7 @@ namespace ExperienceAndClasses.Systems {
                         name = "Hivemind";
                         desc = "TODO_description";
                         tier = 3;
-                        texture_path = "ExperienceAndClasses/Textures/Class/ClassToken_Hivemind";
+                        texture_path = "ExperienceAndClasses/Textures/Class/Hivemind";
                         class_locations[3, 4] = id_byte;
                         id_prereq = CLASS_IDS.Summoner;
                         power_scaling = PowerScaling.POWER_SCALING_TYPES.Minion;
@@ -340,7 +338,7 @@ namespace ExperienceAndClasses.Systems {
                         name = "Soul Binder";
                         desc = "TODO_description";
                         tier = 3;
-                        texture_path = "ExperienceAndClasses/Textures/Class/ClassToken_SoulBinder";
+                        texture_path = "ExperienceAndClasses/Textures/Class/SoulBinder";
                         class_locations[2, 4] = id_byte;
                         id_prereq = CLASS_IDS.Summoner;
                         power_scaling = PowerScaling.POWER_SCALING_TYPES.Minion;
@@ -353,7 +351,7 @@ namespace ExperienceAndClasses.Systems {
                         name = "Saint";
                         desc = "TODO_description";
                         tier = 3;
-                        texture_path = "ExperienceAndClasses/Textures/Class/ClassToken_Saint";
+                        texture_path = "ExperienceAndClasses/Textures/Class/Saint";
                         class_locations[2, 5] = id_byte;
                         id_prereq = CLASS_IDS.Cleric;
                         power_scaling = PowerScaling.POWER_SCALING_TYPES.All;
@@ -365,7 +363,7 @@ namespace ExperienceAndClasses.Systems {
                         name = "Hybrid Prime";
                         desc = "TODO_description";
                         tier = 3;
-                        texture_path = "ExperienceAndClasses/Textures/Class/ClassToken_HybridPrime";
+                        texture_path = "ExperienceAndClasses/Textures/Class/HybridPrime";
                         class_locations[2, 6] = id_byte;
                         id_prereq = CLASS_IDS.Hybrid;
                         power_scaling = PowerScaling.POWER_SCALING_TYPES.All;
@@ -375,6 +373,22 @@ namespace ExperienceAndClasses.Systems {
                         attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Spirit] = 2.5f;
                         attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Agility] = 2.5f;
                         attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Dexterity] = 2.5f;
+                        break;
+
+                    case CLASS_IDS.Explorer:
+                        name = "Explorer";
+                        desc = "TODO_description";
+                        tier = 3;
+                        texture_path = "ExperienceAndClasses/Textures/Class/Explorer";
+                        class_locations[4, 6] = id_byte;
+                        id_prereq = CLASS_IDS.Novice;
+                        power_scaling = PowerScaling.POWER_SCALING_TYPES.Tool;
+                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Power] = 2f;
+                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Vitality] = 2f;
+                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Mind] = 2f;
+                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Spirit] = 2f;
+                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Agility] = 2f;
+                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Dexterity] = 2f;
                         break;
 
                     default:

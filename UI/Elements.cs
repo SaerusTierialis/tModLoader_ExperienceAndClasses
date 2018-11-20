@@ -176,7 +176,7 @@ namespace ExperienceAndClasses.UI {
 
         public void Update() {
             uint xp = ExperienceAndClasses.LOCAL_MPLAYER.Class_XP[Class_Tracked.ID];
-            uint xp_needed = Systems.XP.GetXPReq(Class_Tracked.Tier, ExperienceAndClasses.LOCAL_MPLAYER.Class_Levels[Class_Tracked.ID]);
+            uint xp_needed = Systems.XP.GetXPReq(Class_Tracked, ExperienceAndClasses.LOCAL_MPLAYER.Class_Levels[Class_Tracked.ID]);
 
             float percent;
             bool maxed;

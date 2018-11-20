@@ -133,14 +133,9 @@ namespace ExperienceAndClasses.UI {
             if (ExperienceAndClasses.LOCAL_MPLAYER.Class_Levels[class_id] <= 0) {
                 title += " (locked)";
                 text += "REQUIREMENT: " + Systems.Class.CLASS_LOOKUP[c.ID_Prereq].Name;
-                switch (c.Tier) {
-                    case 2:
-                        text += " Lv." + Systems.Class.LEVEL_REQUIRED_TIER_2;
-                        break;
-
-                    case 3:
-                        text += " Lv." + Systems.Class.LEVEL_REQUIRED_TIER_3;
-                        break;
+                byte level_req = Systems.Class.MAX_LEVEL[Systems.Class.CLASS_LOOKUP[c.ID_Prereq].Tier];
+                if (level_req > 0) {
+                    text += " Lv." + level_req;
                 }
                 text += "\n\n";
             }

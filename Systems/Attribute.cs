@@ -441,8 +441,10 @@ namespace ExperienceAndClasses.Systems {
                         break;
 
                     case POWER_SCALING_TYPES.Rogue:
-                        name = "Melee, Throwing";
+                        name = "Melee, Ranged, Magic, Throwing";
                         melee = 1f;
+                        ranged = 1f;
+                        magic = 1f;
                         throwing = 1f;
                         break;
 

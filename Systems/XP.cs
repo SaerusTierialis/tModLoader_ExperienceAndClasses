@@ -137,13 +137,15 @@ namespace ExperienceAndClasses.Systems {
             }
         }
 
-        public static uint GetXPReq(byte tier, byte level) {
-            if (level >= Class.MAX_LEVEL[tier]) {
+        public static uint GetXPReq(Systems.Class c, byte level) {
+            if (level >= Class.MAX_LEVEL[c.Tier]) {
                 return 0;
             }
 
-            while (tier > 1) {
-                level += Class.MAX_LEVEL[--tier];
+            byte id = c.ID_Prereq;
+            while (id != (byte)Class.CLASS_IDS.New) {
+                level += Class.MAX_LEVEL[Class.CLASS_LOOKUP[id].Tier];
+                id = Class.CLASS_LOOKUP[id].ID_Prereq;
             }
 
             if (level >= XP_REQ.Length) {
