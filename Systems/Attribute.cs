@@ -449,7 +449,7 @@ namespace ExperienceAndClasses.Systems {
                         break;
 
                     case POWER_SCALING_TYPES.Tool:
-                        name = "Packaxe, Drill, Axe, Chainsaw, Hammer, Fishing";
+                        name = "Packaxe, Axe, Hammer, Fishing";
                         tool = 1f;
                         break;
                 }
