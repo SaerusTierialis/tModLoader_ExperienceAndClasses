@@ -7,6 +7,51 @@ using Terraria.UI;
 
 namespace ExperienceAndClasses.UI {
 
+    public class ProgressBar : UIElement {
+        private const float MIN_WIDTH = 16f;
+        private UIPanel bar_background, bar_progress;
+
+        private Color colour_border, colour_background; 
+
+        public ProgressBar(float width, float height, Color colour) {
+            SetPadding(0f);
+            Width.Set(width, 0f);
+            Height.Set(height, 0f);
+
+            bar_background = new UIPanel();
+            bar_background.Width.Set(width, 0f);
+            bar_background.Height.Set(height, 0f);
+            Append(bar_background);
+
+            bar_progress = new UIPanel();
+            bar_progress.Width.Set(MIN_WIDTH, 0f);
+            bar_progress.Height.Set(height, 0f);
+            bar_progress.BackgroundColor = colour;
+            Append(bar_progress);
+
+            colour_border = bar_progress.BorderColor;
+            colour_background = bar_progress.BackgroundColor;
+        }
+
+        public void SetProgress(float percent) {
+            if (percent < 0f)
+                percent = 0f;
+            else if (percent > 1f)
+                percent = 1f;
+
+            float width = bar_background.Width.Pixels * percent;
+            if (width < MIN_WIDTH) {
+                bar_progress.BackgroundColor = Color.Transparent;
+                bar_progress.BorderColor = Color.Transparent;
+            }
+            else {
+                bar_progress.BorderColor = colour_border;
+                bar_progress.BackgroundColor = colour_background;
+                bar_progress.Width.Set(width, 0f);
+            }
+        }
+    }
+
     //UITransparantImage from jopojelly forum post
     //set color public 
     public class UITransparantImage : UIElement {
@@ -119,10 +164,9 @@ namespace ExperienceAndClasses.UI {
         private const float TEXT_SCALE = 1f;
         private const float ICON_SCALE = 0.8f;
         private const float BAR_HEIGHT = 24f;
-        private const float MIN_PROGRESS = 0.08f;
 
         private UIImage icon;
-        private UIPanel bar_back, bar_progress;
+        private ProgressBar bar;
         private UIText text;
 
         public bool Visible { get; private set; }
@@ -143,26 +187,18 @@ namespace ExperienceAndClasses.UI {
             icon.Height.Set(Class_Tracked.Texture.Height * ICON_SCALE, 0f);
             Append(icon);
 
-            bar_back = new UIPanel();
-            bar_back.Left.Set(icon.Width.Pixels + Constants.UI_PADDING, 0f);
-            bar_back.Width.Set(width - bar_back.Left.Pixels, 0f);
-            bar_back.Height.Set(BAR_HEIGHT, 0f);
-            bar_back.Top.Set((icon.Height.Pixels - bar_back.Height.Pixels) / 2f, 0f);
-            Append(bar_back);
-
-            bar_progress = new UIPanel();
-            bar_progress.BackgroundColor = Constants.COLOUR_XP;
-            bar_progress.Left.Set(bar_back.Left.Pixels, 0f);
-            bar_progress.Top.Set(bar_back.Top.Pixels, 0f);
-            bar_progress.Height.Set(bar_back.Height.Pixels, 0f);
-            Append(bar_progress);
+            float left = icon.Width.Pixels + Constants.UI_PADDING;
+            bar = new ProgressBar(width - left, BAR_HEIGHT, Constants.COLOUR_XP);
+            bar.Left.Set(left, 0f);
+            bar.Top.Set((icon.Height.Pixels - bar.Height.Pixels) / 2f, 0f);
+            Append(bar);
 
             text = new UIText("0123 / 45679", TEXT_SCALE);
-            text.Top.Set(bar_back.Top.Pixels + ((bar_back.Height.Pixels - (Main.fontMouseText.MeasureString(text.Text).Y * TEXT_SCALE /2f)) / 2f), 0f);
+            text.Top.Set(bar.Top.Pixels + ((bar.Height.Pixels - (Main.fontMouseText.MeasureString(text.Text).Y * TEXT_SCALE /2f)) / 2f), 0f);
             Append(text);
 
             Width.Set(width, 0f);
-            Height.Set(Math.Max(icon.Height.Pixels, bar_back.Height.Pixels), 0f);
+            Height.Set(Math.Max(icon.Height.Pixels, bar.Height.Pixels), 0f);
         }
 
         public void SetClass(Systems.Class class_new) {
@@ -185,13 +221,12 @@ namespace ExperienceAndClasses.UI {
                 maxed = true;
             }
             else {
-                percent = MIN_PROGRESS + ((float)xp / xp_needed * (1f - MIN_PROGRESS));
+                percent = (float)xp / xp_needed;
                 maxed = false;
             }
 
             //progress bar
-            bar_progress.Width.Set(bar_back.Width.Pixels * percent, 0f);
-            bar_progress.Recalculate();
+            bar.SetProgress(percent);
 
             //text
             string str;
@@ -204,13 +239,13 @@ namespace ExperienceAndClasses.UI {
                 str = xp + " / " + xp_needed;
                 string_width = Main.fontMouseText.MeasureString(str).X * TEXT_SCALE;
 
-                if (string_width > bar_back.Width.Pixels) {
+                if (string_width > bar.Width.Pixels) {
                     str = (Math.Round(percent * 10000f) / 100) + "%";
                     string_width = Main.fontMouseText.MeasureString(str).X * TEXT_SCALE;
                 }
             }
             text.SetText(str);
-            text.Left.Set(bar_back.Left.Pixels + ((bar_back.Width.Pixels - string_width) / 2), 0f);
+            text.Left.Set(bar.Left.Pixels + ((bar.Width.Pixels - string_width) / 2), 0f);
 
         }
 
