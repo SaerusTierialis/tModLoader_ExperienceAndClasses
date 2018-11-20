@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Terraria;
 using Terraria.GameContent.UI.Elements;
 
 namespace ExperienceAndClasses.Systems {
@@ -119,6 +120,7 @@ namespace ExperienceAndClasses.Systems {
 
         //per point bonuses
         private const float POWER_DAMAGE = 0.01f;
+        private const float POWER_FISH = 0.2f;
 
         private const float VITALITY_LIFE = 1f;
         private const float VITALITY_LIFE_REGEN = 0.2f;
@@ -137,7 +139,7 @@ namespace ExperienceAndClasses.Systems {
         private const float AGILITY_DODGE = 0.0025f;
         private const float AGILITY_FLY = 0.5f;
 
-        private const float DEXTERITY_ATTACK_CAST_SPEED = 0.0025f;
+        private const float DEXTERITY_USE_SPEED = 0.0025f;
         private const float DEXTERITY_ABILITY_DELAY_REDUCTION = 0.01f;
 
         public void ApplyEffect(MPlayer mplayer, short points) {
@@ -147,47 +149,55 @@ namespace ExperienceAndClasses.Systems {
                 float bf, bpp;
                 int bi;
 
+                float melee_per = Math.Max(mplayer.Class_Primary.Power_Scaling.Melee, mplayer.Class_Secondary.Power_Scaling.Melee / 2);
+                float ranged_per = Math.Max(mplayer.Class_Primary.Power_Scaling.Ranged, mplayer.Class_Secondary.Power_Scaling.Ranged / 2);
+                float magic_per = Math.Max(mplayer.Class_Primary.Power_Scaling.Magic, mplayer.Class_Secondary.Power_Scaling.Magic / 2);
+                float throwing_per = Math.Max(mplayer.Class_Primary.Power_Scaling.Throwing, mplayer.Class_Secondary.Power_Scaling.Throwing / 2);
+                float minion_per = Math.Max(mplayer.Class_Primary.Power_Scaling.Minion, mplayer.Class_Secondary.Power_Scaling.Minion / 2);
+                float tool_per = Math.Max(mplayer.Class_Primary.Power_Scaling.Tool, mplayer.Class_Secondary.Power_Scaling.Tool / 2);
+
                 switch ((ATTRIBUTE_IDS)ID) {
                     case ATTRIBUTE_IDS.Power:
-                        float melee_per = Math.Max(mplayer.Class_Primary.Power_Scaling.Melee, mplayer.Class_Secondary.Power_Scaling.Melee / 2);
-                        float ranged_per = Math.Max(mplayer.Class_Primary.Power_Scaling.Ranged, mplayer.Class_Secondary.Power_Scaling.Ranged / 2);
-                        float magic_per = Math.Max(mplayer.Class_Primary.Power_Scaling.Magic, mplayer.Class_Secondary.Power_Scaling.Magic / 2);
-                        float throwing_per = Math.Max(mplayer.Class_Primary.Power_Scaling.Throwing, mplayer.Class_Secondary.Power_Scaling.Throwing / 2);
-                        float minion_per = Math.Max(mplayer.Class_Primary.Power_Scaling.Minion, mplayer.Class_Secondary.Power_Scaling.Minion / 2);
-
                         bpp = melee_per * POWER_DAMAGE;
                         bf = bpp * points;
                         if(bpp > 0) {
                             mplayer.player.meleeDamage += bf;
-                            if (mplayer.Is_Local_Player) Bonus += "\n+" + Math.Round(bf * 100, 2) + "% melee damage (" + Math.Round(bpp * 100, 2) + " per point)";
+                            if (mplayer.Is_Local_Player) Bonus += "\n+" + Math.Round(bf * 100, 3) + "% melee damage (" + Math.Round(bpp * 100, 3) + " per point)";
                         }
 
                         bpp = ranged_per * POWER_DAMAGE;
                         bf = bpp * points;
                         if (bpp > 0) {
                             mplayer.player.rangedDamage += bf;
-                            if (mplayer.Is_Local_Player) Bonus += "\n+" + Math.Round(bf * 100, 2) + "% ranged damage (" + Math.Round(bpp * 100, 2) + " per point)";
+                            if (mplayer.Is_Local_Player) Bonus += "\n+" + Math.Round(bf * 100, 3) + "% ranged damage (" + Math.Round(bpp * 100, 3) + " per point)";
                         }
 
                         bpp = magic_per * POWER_DAMAGE;
                         bf = bpp * points;
                         if (bpp > 0) {
                             mplayer.player.magicDamage += bf;
-                            if (mplayer.Is_Local_Player) Bonus += "\n+" + Math.Round(bf * 100, 2) + "% magic damage (" + Math.Round(bpp * 100, 2) + " per point)";
+                            if (mplayer.Is_Local_Player) Bonus += "\n+" + Math.Round(bf * 100, 3) + "% magic damage (" + Math.Round(bpp * 100, 3) + " per point)";
                         }
 
                         bpp = throwing_per * POWER_DAMAGE;
                         bf = bpp * points;
                         if (bpp > 0) {
                             mplayer.player.thrownDamage += bf;
-                            if (mplayer.Is_Local_Player) Bonus += "\n+" + Math.Round(bf * 100, 2) + "% throwing damage (" + Math.Round(bpp * 100, 2) + " per point)";
+                            if (mplayer.Is_Local_Player) Bonus += "\n+" + Math.Round(bf * 100, 3) + "% throwing damage (" + Math.Round(bpp * 100, 3) + " per point)";
                         }
 
                         bpp = minion_per * POWER_DAMAGE;
                         bf = bpp * points;
                         if (bpp > 0) {
                             mplayer.player.minionDamage += bf;
-                            if (mplayer.Is_Local_Player) Bonus += "\n+" + Math.Round(bf * 100, 2) + "% minion damage (" + Math.Round(bpp * 100, 2) + " per point)";
+                            if (mplayer.Is_Local_Player) Bonus += "\n+" + Math.Round(bf * 100, 3) + "% minion damage (" + Math.Round(bpp * 100, 3) + " per point)";
+                        }
+
+                        bpp = tool_per * POWER_FISH;
+                        bi = (int)Math.Floor(bpp * points);
+                        if (bpp > 0) {
+                            mplayer.player.fishingSkill += bi;
+                            if (mplayer.Is_Local_Player) Bonus += "\n+" + bi + " fishing power (" + bpp + " per point)";
                         }
 
                         break;
@@ -271,19 +281,19 @@ namespace ExperienceAndClasses.Systems {
                         mplayer.player.maxRunSpeed *= (1f + bf);
                         mplayer.player.runAcceleration *= (1f + bf);
                         mplayer.player.runSlowdown *= (1f / (1f + bf));
-                        if (mplayer.Is_Local_Player) Bonus += "\n+" + Math.Round(bf * 100, 2) + "% movement speed (" + Math.Round(bpp * 100, 2) + " per point)";
+                        if (mplayer.Is_Local_Player) Bonus += "\n+" + Math.Round(bf * 100, 3) + "% movement speed (" + Math.Round(bpp * 100, 3) + " per point)";
 
                         //jump
                         bpp = AGILITY_JUMP;
                         bf = bpp * points;
                         mplayer.player.jumpSpeedBoost += (bf * 5);
-                        if (mplayer.Is_Local_Player) Bonus += "\n+" + Math.Round(bf * 100, 2) + "% increased jump (" + Math.Round(bpp * 100, 2) + " per point)";
+                        if (mplayer.Is_Local_Player) Bonus += "\n+" + Math.Round(bf * 100, 3) + "% increased jump (" + Math.Round(bpp * 100, 3) + " per point)";
 
                         //dodge
                         bpp = AGILITY_DODGE;
                         bf = bpp * points;
                         mplayer.dodge_chance += bf;
-                        if (mplayer.Is_Local_Player) Bonus += "\n+" + Math.Round(bf * 100, 2) + "% dodge chance (" + Math.Round(bpp * 100, 2) + " per point)";
+                        if (mplayer.Is_Local_Player) Bonus += "\n+" + Math.Round(bf * 100, 3) + "% dodge chance (" + Math.Round(bpp * 100, 3) + " per point)";
 
                         //max fly time
                         bpp = AGILITY_FLY;
@@ -294,18 +304,55 @@ namespace ExperienceAndClasses.Systems {
                         break;
 
                     case ATTRIBUTE_IDS.Dexterity:
-                        //attack speed
-                        bpp = DEXTERITY_ATTACK_CAST_SPEED;
-                        bf = bpp * points;
-                        //mplayer.player.meleeSpeed += bf;
-                        mplayer.attack_cast_speed += bf;
-                        if (mplayer.Is_Local_Player) Bonus += "\n+" + Math.Round(bf * 100, 2) + "% all attack and cast speed (" + Math.Round(bpp * 100, 2) + " per point)";
-
                         //ability after use delay
                         bpp = DEXTERITY_ABILITY_DELAY_REDUCTION;
                         bf = bpp * points;
                         mplayer.ability_delay_reduction += bf;
-                        if (mplayer.Is_Local_Player) Bonus += "\n+" + Math.Round(bf * 100, 2) + "% reduced ability delay (" + Math.Round(bpp * 100, 2) + " per point)";
+                        if (mplayer.Is_Local_Player) Bonus += "\n+" + Math.Round(bf * 100, 3) + "% reduced ability delay (" + Math.Round(bpp * 100, 3) + " per point)";
+
+                        //use speeds...
+
+                        bpp = melee_per * DEXTERITY_USE_SPEED;
+                        bf = bpp * points;
+                        if (bpp > 0) {
+                            mplayer.use_speed_melee += bf;
+                            if (mplayer.Is_Local_Player) Bonus += "\n+" + Math.Round(bf * 100, 3) + "% melee speed (" + Math.Round(bpp * 100, 3) + " per point)";
+                        }
+
+                        bpp = ranged_per * DEXTERITY_USE_SPEED;
+                        bf = bpp * points;
+                        if (bpp > 0) {
+                            mplayer.use_speed_ranged += bf;
+                            if (mplayer.Is_Local_Player) Bonus += "\n+" + Math.Round(bf * 100, 3) + "% ranged speed (" + Math.Round(bpp * 100, 3) + " per point)";
+                        }
+
+                        bpp = magic_per * DEXTERITY_USE_SPEED;
+                        bf = bpp * points;
+                        if (bpp > 0) {
+                            mplayer.use_speed_magic += bf;
+                            if (mplayer.Is_Local_Player) Bonus += "\n+" + Math.Round(bf * 100, 3) + "% magic speed (" + Math.Round(bpp * 100, 3) + " per point)";
+                        }
+
+                        bpp = throwing_per * DEXTERITY_USE_SPEED;
+                        bf = bpp * points;
+                        if (bpp > 0) {
+                            mplayer.use_speed_throwing += bf;
+                            if (mplayer.Is_Local_Player) Bonus += "\n+" + Math.Round(bf * 100, 3) + "% throwing speed (" + Math.Round(bpp * 100, 3) + " per point)";
+                        }
+
+                        bpp = minion_per * DEXTERITY_USE_SPEED;
+                        bf = bpp * points;
+                        if (bpp > 0) {
+                            mplayer.use_speed_minion += bf;
+                            if (mplayer.Is_Local_Player) Bonus += "\n+" + Math.Round(bf * 100, 3) + "% minion speed (" + Math.Round(bpp * 100, 3) + " per point)";
+                        }
+
+                        bpp = tool_per * DEXTERITY_USE_SPEED;
+                        bf = bpp * points;
+                        if (bpp > 0) {
+                            mplayer.use_speed_tool += bf;
+                            if (mplayer.Is_Local_Player) Bonus += "\n+" + Math.Round(bf * 100, 3) + "% tool speed (" + Math.Round(bpp * 100, 3) + " per point)";
+                        }
                         
                         break;
                 }
@@ -324,6 +371,7 @@ namespace ExperienceAndClasses.Systems {
             Minion,
             All,
             Rogue,
+            Tool,
 
             //insert here
 
@@ -339,7 +387,7 @@ namespace ExperienceAndClasses.Systems {
 
             byte id_byte;
             string name;
-            float melee, ranged, magic, throwing, minion;
+            float melee, ranged, magic, throwing, minion, tool;
 
             for (POWER_SCALING_TYPES id = 0; id < POWER_SCALING_TYPES.NUMBER_OF_IDs; id++) {
                 id_byte = (byte)id;
@@ -351,6 +399,7 @@ namespace ExperienceAndClasses.Systems {
                 magic = 0f;
                 throwing = 0f;
                 minion = 0f;
+                tool = 0f;
 
                 switch (id) {
                     case POWER_SCALING_TYPES.None:
@@ -396,9 +445,14 @@ namespace ExperienceAndClasses.Systems {
                         melee = 1f;
                         throwing = 1f;
                         break;
+
+                    case POWER_SCALING_TYPES.Tool:
+                        name = "Packaxe, Drill, Axe, Chainsaw, Hammer, Fishing";
+                        tool = 1f;
+                        break;
                 }
 
-                POWER_SCALING_LOOKUP[id_byte] = new PowerScaling(id_byte, name, melee, ranged, magic, throwing, minion);
+                POWER_SCALING_LOOKUP[id_byte] = new PowerScaling(id_byte, name, melee, ranged, magic, throwing, minion, tool);
             }
         }
 
@@ -410,8 +464,9 @@ namespace ExperienceAndClasses.Systems {
         public float Magic { get; private set; }
         public float Throwing { get; private set; }
         public float Minion { get; private set; }
+        public float Tool { get; private set; }
 
-        public PowerScaling(byte id, string name, float melee, float ranged, float magic, float throwing, float minion) {
+        public PowerScaling(byte id, string name, float melee, float ranged, float magic, float throwing, float minion, float tool) {
             ID = id;
             Name = name;
             Melee = melee;
@@ -419,6 +474,7 @@ namespace ExperienceAndClasses.Systems {
             Magic = magic;
             Throwing = throwing;
             Minion = minion;
+            Tool = tool;
         }
     }
 }

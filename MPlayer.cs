@@ -45,8 +45,9 @@ namespace ExperienceAndClasses {
 
         public float heal_damage; //TODO
         public float dodge_chance; //TODO
-        public float attack_cast_speed;
-        public float ability_delay_reduction;
+        public float ability_delay_reduction; //TODO
+        public float use_speed_melee, use_speed_ranged, use_speed_magic, use_speed_throwing, use_speed_minion, use_speed_tool;
+        public float tool_power;
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Instance Vars (syncing) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -103,8 +104,9 @@ namespace ExperienceAndClasses {
             //stats
             heal_damage = 1f;
             dodge_chance = 0f;
-            attack_cast_speed = 1f;
+            use_speed_melee = use_speed_ranged = use_speed_magic = use_speed_throwing = use_speed_minion = use_speed_tool = 1f;
             ability_delay_reduction = 1f;
+            tool_power = 1f;
         }
 
         /// <summary>
@@ -162,8 +164,9 @@ namespace ExperienceAndClasses {
                 //defaults before update
                 heal_damage = 1f;
                 dodge_chance = 0f;
-                attack_cast_speed = 1f;
+                use_speed_melee = use_speed_ranged = use_speed_magic = use_speed_throwing = use_speed_minion = use_speed_tool = 1f;
                 ability_delay_reduction = 1f;
+                tool_power = 1f;
             }
         }
 
@@ -720,8 +723,24 @@ namespace ExperienceAndClasses {
 
         //dexterity
         public override float UseTimeMultiplier(Item item) {
-            if (item.damage > 0 || item.summon || item.sentry)
-                return base.UseTimeMultiplier(item) * attack_cast_speed;
+            if (item.melee)
+                return base.UseTimeMultiplier(item) * use_speed_melee;
+
+            if (item.ranged)
+                return base.UseTimeMultiplier(item) * use_speed_ranged;
+
+            if (item.magic)
+                return base.UseTimeMultiplier(item) * use_speed_magic;
+
+            if (item.thrown)
+                return base.UseTimeMultiplier(item) * use_speed_throwing;
+
+            if (item.summon || item.sentry)
+                return base.UseTimeMultiplier(item) * use_speed_minion;
+
+            else if (item.hammer>0 || item.axe>0 || item.pick>0 || item.fishingPole>0)
+                return base.UseTimeMultiplier(item) * use_speed_tool;
+
             else
                 return base.UseTimeMultiplier(item);
         }
