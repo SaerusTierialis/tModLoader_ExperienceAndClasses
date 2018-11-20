@@ -13,23 +13,31 @@ namespace ExperienceAndClasses.UI {
         public static readonly UIClass Instance = new UIClass();
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Constants ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-        private const float WIDTH = 800f;
-        private const float HEIGHT = 430f;
         private const float CLASS_BUTTON_SIZE = 36f;
         private const float CLASS_ROW_PADDING = 40f;
         private const float CLASS_COL_PADDING = 10f;
+        private static readonly float CLASS_WIDTH = (Constants.UI_PADDING * 4) + ((CLASS_BUTTON_SIZE + CLASS_COL_PADDING) * Systems.Class.class_locations.GetLength(1)) - CLASS_COL_PADDING;
 
         private const float WIDTH_ATTRIBUTES = 230f;
         private const float HEIGHT_ATTRIBUTES = 250f;
         private const float HEIGHT_ATTRIBUTE = 30f;
 
         private const float WIDTH_ABILITY = WIDTH_ATTRIBUTES;
-        private const float HEIGHT_ABILITY = (HEIGHT - HEIGHT_ATTRIBUTES) - (Constants.UI_PADDING * 3);
+        private const float HEIGHT_ABILITY = (HEIGHT - HEIGHT_ATTRIBUTES) - (Constants.UI_PADDING * 2) + 1;
+
+        private const float WIDTH_UNLOCK = 180f;
+        private static readonly float HEIGHT_UNLOCK = HEIGHT - HEIGHT_HELP - Textures.TEXTURE_CORNER_BUTTON_SIZE + 1 - (Constants.UI_PADDING * 2) + 1;
+
+        private const float WIDTH_HELP = WIDTH_UNLOCK;
+        private const float HEIGHT_HELP = 160f;
+
+        private static readonly float WIDTH = CLASS_WIDTH + WIDTH_ATTRIBUTES + WIDTH_UNLOCK + (Constants.UI_PADDING * 2) - 2;
+        private const float HEIGHT = 430f;
 
         private readonly Color COLOR_SUBPANEL = new Color(73, 94, 200);
 
         private const float INDICATOR_WIDTH = CLASS_BUTTON_SIZE + (Constants.UI_PADDING * 2);
-        private const float INDICATOR_HEIGHT = CLASS_BUTTON_SIZE + CLASS_ROW_PADDING - (Constants.UI_PADDING * 2);
+        private const float INDICATOR_HEIGHT = CLASS_BUTTON_SIZE + CLASS_ROW_PADDING - (Constants.UI_PADDING * 2f);
         private const float INDICATOR_OFFSETS = -Constants.UI_PADDING;
         private const byte INDICATOR_ALPHA = 50;
 
@@ -57,7 +65,7 @@ namespace ExperienceAndClasses.UI {
             panel_class.SetPadding(0);
             panel_class.Left.Set(Constants.UI_PADDING, 0f);
             panel_class.Top.Set(Constants.UI_PADDING, 0f);
-            panel_class.Width.Set((Constants.UI_PADDING * 4) + ((CLASS_BUTTON_SIZE + CLASS_COL_PADDING) * Systems.Class.class_locations.GetLength(1)) - CLASS_COL_PADDING, 0f);
+            panel_class.Width.Set(CLASS_WIDTH, 0f);
             panel_class.Height.Set(HEIGHT - (Constants.UI_PADDING * 2), 0f);
             panel_class.BackgroundColor = COLOR_SUBPANEL;
             panel.Append(panel_class);
@@ -171,6 +179,38 @@ namespace ExperienceAndClasses.UI {
             panel_ability_title.BackgroundColor = COLOR_SUBPANEL;
             panel_ability_title.Width.Set(panel_attribute.Width.Pixels, 0f);
             panel_ability.Append(panel_ability_title);
+
+            //unlock panel
+            UIPanel panel_unlock = new UIPanel();
+            panel_unlock.SetPadding(0);
+            panel_unlock.Left.Set(panel_ability.Left.Pixels + panel_ability.Width.Pixels - 1f, 0f);
+            panel_unlock.Top.Set(Constants.UI_PADDING + Textures.TEXTURE_CORNER_BUTTON_SIZE + 1, 0f);
+            panel_unlock.Width.Set(WIDTH_UNLOCK, 0f);
+            panel_unlock.Height.Set(HEIGHT_UNLOCK, 0f);
+            panel_unlock.BackgroundColor = COLOR_SUBPANEL;
+            panel.Append(panel_unlock);
+
+            //unlock title
+            HelpTextPanel panel_unlock_title = new HelpTextPanel("Passives", FONT_SCALE_TITLE, true, "Passive Abilities", "TODO_help_text");
+            panel_unlock_title.BackgroundColor = COLOR_SUBPANEL;
+            panel_unlock_title.Width.Set(panel_unlock.Width.Pixels, 0f);
+            panel_unlock.Append(panel_unlock_title);
+
+            //help panel
+            UIPanel panel_help = new UIPanel();
+            panel_help.SetPadding(0);
+            panel_help.Left.Set(panel_unlock.Left.Pixels, 0f);
+            panel_help.Top.Set(HEIGHT - Constants.UI_PADDING - HEIGHT_HELP, 0f);
+            panel_help.Width.Set(WIDTH_HELP, 0f);
+            panel_help.Height.Set(HEIGHT_HELP, 0f);
+            panel_help.BackgroundColor = COLOR_SUBPANEL;
+            panel.Append(panel_help);
+
+            //help title
+            HelpTextPanel panel_help_title = new HelpTextPanel("Help", FONT_SCALE_TITLE, true, "Help", "TODO_help_text");
+            panel_help_title.BackgroundColor = COLOR_SUBPANEL;
+            panel_help_title.Width.Set(panel_help.Width.Pixels, 0f);
+            panel_help.Append(panel_help_title);
 
             //done adding to main panel
             state.Append(panel);
