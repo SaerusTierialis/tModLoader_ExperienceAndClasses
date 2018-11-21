@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Terraria;
 using Terraria.GameInput;
+using Terraria.ID;
 using Terraria.Localization;
 using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
@@ -49,6 +50,8 @@ namespace ExperienceAndClasses {
         public float use_speed_melee, use_speed_ranged, use_speed_magic, use_speed_throwing, use_speed_minion, use_speed_tool;
         public float tool_power;
 
+        public List<Projectile> minions;
+
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Instance Vars (syncing) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         public Systems.Class Class_Primary { get; private set; }
@@ -75,6 +78,7 @@ namespace ExperienceAndClasses {
             show_xp = true;
             show_xp_value = 0;
             show_xp_when = DateTime.MinValue;
+            minions = new List<Projectile>();
 
             //default level/xp/unlock
             Class_Levels = new byte[(byte)Systems.Class.CLASS_IDS.NUMBER_OF_IDs];
@@ -182,6 +186,9 @@ namespace ExperienceAndClasses {
 
             //local events
             if (Is_Local_Player) {
+                CheckMinions();
+                Main.NewText("" + minions.Count);
+
                 //ui
                 UI.UIStatus.Instance.Update();
 
@@ -295,7 +302,8 @@ namespace ExperienceAndClasses {
                     case CLASS_VALIDITY.VALID:
 
                         //destroy all minions
-                        foreach (Projectile p in Main.projectile) {
+                        CheckMinions();
+                        foreach (Projectile p in minions) {
                             if (p.active && (p.minion || p.sentry) && (p.owner == player.whoAmI)) {
                                 p.Kill();
                             }
@@ -575,6 +583,20 @@ namespace ExperienceAndClasses {
             }
 
             Main.NewText(message, UI.Constants.COLOUR_MESSAGE_ANNOUNCE);
+        }
+
+        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Hotkeys ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+        private static readonly short[] minions_ignore = new short[] { ProjectileID.StardustDragon2 , ProjectileID.StardustDragon3, ProjectileID.StardustDragon4 };
+        public void CheckMinions() {
+            minions = new List<Projectile>();
+            foreach (Projectile p in Main.projectile) {
+                if (p.active && (p.minion || p.sentry) && (p.owner == player.whoAmI)) {
+                    if (Array.IndexOf(minions_ignore, (short)p.type) == -1) {
+                        minions.Add(p);
+                    }
+                }
+            }
         }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Hotkeys ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
