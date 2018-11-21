@@ -175,6 +175,10 @@ namespace ExperienceAndClasses {
             if (initialized) {
                 ApplyAttributes();
             }
+        }
+
+        public override void PostUpdate() {
+            base.PostUpdate();
 
             //local events
             if (Is_Local_Player) {
@@ -203,6 +207,7 @@ namespace ExperienceAndClasses {
             INVALID_LEVEL,
             INVALID_COMBINATION,
             INVALID_NON_LOCAL,
+            INVALID_MINIONS,
         }
         public CLASS_VALIDITY LocalCheckClassValid(byte id, bool is_primary) {
             //local MPlayer only
@@ -288,6 +293,14 @@ namespace ExperienceAndClasses {
                 CLASS_VALIDITY valid = LocalCheckClassValid(id, is_primary);
                 switch (valid) {
                     case CLASS_VALIDITY.VALID:
+
+                        //destroy all minions
+                        foreach (Projectile p in Main.projectile) {
+                            if (p.active && (p.minion || p.sentry) && (p.owner == player.whoAmI)) {
+                                p.Kill();
+                            }
+                        }
+
                         if (is_primary) {
                             Class_Primary = Systems.Class.CLASS_LOOKUP[id];
                         }
