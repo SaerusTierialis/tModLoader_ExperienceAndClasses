@@ -186,9 +186,6 @@ namespace ExperienceAndClasses {
 
             //local events
             if (Is_Local_Player) {
-                CheckMinions();
-                Main.NewText("" + minions.Count);
-
                 //ui
                 UI.UIStatus.Instance.Update();
 
