@@ -471,7 +471,7 @@ namespace ExperienceAndClasses {
             }
             else if (Class_Secondary.Tier == Class_Primary.Tier) {
                 //subclass of same tier limited to half primary
-                Class_Secondary_Level_Effective = (byte)Math.Min(Class_Secondary_Level_Effective, Class_Primary_Level_Effective / 2);
+                Class_Secondary_Level_Effective = (byte)Math.Max(Math.Min(Class_Secondary_Level_Effective, Class_Primary_Level_Effective / 2), 1);
             }//subclass of lower tier has no penalty
 
             //level cap secondary
