@@ -11,9 +11,6 @@ namespace ExperienceAndClasses.Systems {
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Constants ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-        //range for xp, orbs, etc (unless boss or interaction)
-        private const float RANGE_ELIGIBLE = 2500f;
-
         //eater of world multipliers (I don't see a good way to grant all exp/drops from final piece so instead divide based on typical case)
         private const double EATER_HEAD_MULT = 1.801792115f;
         private const double EATER_BODY_MULT = 1.109713024f;
@@ -29,51 +26,6 @@ namespace ExperienceAndClasses.Systems {
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Variables ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
-
-        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ General ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-
-        public static List<int> GetEligiblePlayers(NPC npc) {
-            List<int> eligible_players = new List<int>();
-            Player player;
-            MPlayer mplayer;
-            if (ExperienceAndClasses.IS_SERVER) {
-                bool treat_as_boss = TreatAsBoss(npc);
-                for (int player_index = 0; player_index < 255; player_index++) {
-                    player = Main.player[player_index];
-
-                    //must exist
-                    if (!player.active) continue;
-
-                    mplayer = player.GetModPlayer<MPlayer>(ExperienceAndClasses.MOD);
-                    //must not be afk
-                    if (!mplayer.AFK) {
-                        //must have hit the target or be nearby (unless boss)
-                        if (treat_as_boss || (!player.dead && (npc.playerInteraction[player_index] || (player.Distance(npc.position) <= RANGE_ELIGIBLE) ))) {
-                            eligible_players.Add(player.whoAmI);
-                        }
-                    }
-                }
-            }
-            else {
-                //always eligible in singleplayer
-                eligible_players.Add(Main.LocalPlayer.whoAmI);
-            }
-            return eligible_players;
-        }
-
-        public static bool TreatAsBoss(NPC npc) {
-            bool treat_as_boss = npc.boss;
-
-            switch (npc.netID) {
-                case NPCID.EaterofWorldsHead:
-                case NPCID.EaterofWorldsBody:
-                case NPCID.EaterofWorldsTail:
-                    treat_as_boss = true;
-                    break;
-            }
-
-            return treat_as_boss;
-        }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ XP ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
