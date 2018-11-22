@@ -380,7 +380,7 @@ namespace ExperienceAndClasses.Systems {
                         desc = "TODO_description";
                         tier = 3;
                         texture_path = "ExperienceAndClasses/Textures/Class/Explorer";
-                        class_locations[4, 6] = id_byte;
+                        class_locations[0, 6] = id_byte;
                         id_prereq = CLASS_IDS.Novice;
                         power_scaling = PowerScaling.POWER_SCALING_TYPES.Tool;
                         attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Power] = 2f;
