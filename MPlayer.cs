@@ -485,10 +485,6 @@ namespace ExperienceAndClasses {
 
             //no xp if no class
             if (Class_Primary_Level_Effective > 0) {
-                //5% bonus xp if well fed
-                if (player.wellFed)
-                    xp *= 1.05d;
-
                 //display
                 if (show_xp) {
                     show_xp_value += Math.Max(Math.Floor(xp), 1);
