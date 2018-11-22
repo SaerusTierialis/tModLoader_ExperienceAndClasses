@@ -55,7 +55,7 @@ namespace ExperienceAndClasses {
         /// <summary>
         /// Client request broadcast from server
         /// </summary>
-        public sealed class BROADCAST_TRACE : Base<BROADCAST_TRACE> {
+        public sealed class Broadcast : Base<Broadcast> {
             protected override PACKET_TYPE GetPacketType() { return PACKET_TYPE.BROADCAST_TRACE; }
             public static void Send(int target, int origin, string message) {
                 //get packet containing header
@@ -79,28 +79,28 @@ namespace ExperienceAndClasses {
             }
         }
 
-        public sealed class FORCE_FULL : Base<FORCE_FULL> {
+        public sealed class ForceFull : Base<ForceFull> {
             protected override PACKET_TYPE GetPacketType() { return PACKET_TYPE.FORCE_FULL; }
             public static void Send(int target, int origin, byte primary_id, byte primary_level, byte secondary_id, byte secondary_level, short[] attributes, bool afk_status) {
                 //get packet containing header
                 ModPacket packet = GetPacket(origin);
 
                 //specific content
-                FORCE_CLASS.WritePacketBody(packet, primary_id, primary_level, secondary_id, secondary_level);
-                FORCE_ATTRIBUTE.WritePacketBody(packet, attributes);
+                ForceClass.WritePacketBody(packet, primary_id, primary_level, secondary_id, secondary_level);
+                ForceAttribute.WritePacketBody(packet, attributes);
                 AFK.WritePacketBody(packet, afk_status);
 
                 //send
                 packet.Send(target, origin);
             }
             protected override void RecieveBody(BinaryReader reader, int origin, MPlayer origin_mplayer) {
-                FORCE_CLASS.Recieve(reader, origin);
-                FORCE_ATTRIBUTE.Recieve(reader, origin);
+                ForceClass.Recieve(reader, origin);
+                ForceAttribute.Recieve(reader, origin);
                 AFK.Recieve(reader, origin);
             }
         }
 
-        public sealed class FORCE_CLASS : Base<FORCE_CLASS> {
+        public sealed class ForceClass : Base<ForceClass> {
             protected override PACKET_TYPE GetPacketType() { return PACKET_TYPE.FORCE_CLASS; }
             public static void Send(int target, int origin, byte primary_id, byte primary_level, byte secondary_id, byte secondary_level) {
                 //get packet containing header
@@ -132,7 +132,7 @@ namespace ExperienceAndClasses {
             }
         }
 
-        public sealed class FORCE_ATTRIBUTE : Base<FORCE_ATTRIBUTE> {
+        public sealed class ForceAttribute : Base<ForceAttribute> {
             protected override PACKET_TYPE GetPacketType() { return PACKET_TYPE.FORCE_ATTRIBUTE; }
             public static void Send(int target, int origin, short[] attributes) {
                 //get packet containing header

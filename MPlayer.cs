@@ -638,13 +638,13 @@ namespace ExperienceAndClasses {
                 //class and class levels
                 if ((clone.Class_Primary.ID != Class_Primary.ID) || (clone.Class_Secondary.ID != Class_Secondary.ID) ||
                     (clone.Class_Primary_Level_Effective != Class_Primary_Level_Effective) || (clone.Class_Secondary_Level_Effective != Class_Secondary_Level_Effective)) {
-                    PacketHandler.FORCE_CLASS.Send(-1, me, Class_Primary.ID, Class_Primary_Level_Effective, Class_Secondary.ID, Class_Secondary_Level_Effective);
+                    PacketHandler.ForceClass.Send(-1, me, Class_Primary.ID, Class_Primary_Level_Effective, Class_Secondary.ID, Class_Secondary_Level_Effective);
                 }
 
                 //final attribute
                 for (byte i=0; i<(byte)Systems.Attribute.ATTRIBUTE_IDS.NUMBER_OF_IDs; i++) {
                     if (clone.Attributes_Final[i] != Attributes_Final[i]) {
-                        PacketHandler.FORCE_ATTRIBUTE.Send(-1, me, Attributes_Final);
+                        PacketHandler.ForceAttribute.Send(-1, me, Attributes_Final);
                         break;
                     }
                 }
@@ -673,7 +673,7 @@ namespace ExperienceAndClasses {
         /// </summary>
         private void FullSync() {
             //send one packet with everything needed
-            PacketHandler.FORCE_FULL.Send(-1, (byte)player.whoAmI, Class_Primary.ID, Class_Primary_Level_Effective, Class_Secondary.ID, Class_Secondary_Level_Effective, Attributes_Final, AFK);
+            PacketHandler.ForceFull.Send(-1, (byte)player.whoAmI, Class_Primary.ID, Class_Primary_Level_Effective, Class_Secondary.ID, Class_Secondary_Level_Effective, Attributes_Final, AFK);
         }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Sync Force Commands ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/

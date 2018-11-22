@@ -117,19 +117,19 @@ namespace ExperienceAndClasses {
 
             switch (packet_type) {
                 case PacketHandler.PACKET_TYPE.BROADCAST_TRACE:
-                    PacketHandler.BROADCAST_TRACE.Recieve(reader, origin);
+                    PacketHandler.Broadcast.Recieve(reader, origin);
                     break;
 
                 case PacketHandler.PACKET_TYPE.FORCE_FULL:
-                    PacketHandler.FORCE_FULL.Recieve(reader, origin);
+                    PacketHandler.ForceFull.Recieve(reader, origin);
                     break;
 
                 case PacketHandler.PACKET_TYPE.FORCE_CLASS:
-                    PacketHandler.FORCE_CLASS.Recieve(reader, origin);
+                    PacketHandler.ForceClass.Recieve(reader, origin);
                     break;
 
                 case PacketHandler.PACKET_TYPE.FORCE_ATTRIBUTE:
-                    PacketHandler.FORCE_ATTRIBUTE.Recieve(reader, origin);
+                    PacketHandler.ForceAttribute.Recieve(reader, origin);
                     break;
 
                 case PacketHandler.PACKET_TYPE.HEAL:
