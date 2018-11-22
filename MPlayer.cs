@@ -496,22 +496,9 @@ namespace ExperienceAndClasses {
 
                 //add xp
                 if (Class_Secondary_Level_Effective > 0) {
-                    bool primary_maxed = Class_Levels[Class_Primary.ID] >= Systems.Class.MAX_LEVEL[Class_Primary.Tier];
-                    bool secondary_maxed = Class_Levels[Class_Secondary.ID] >= Systems.Class.MAX_LEVEL[Class_Secondary.Tier];
-
-                    if (!primary_maxed && secondary_maxed) {
-                        //give all xp to primary
-                        AddXP(Class_Primary.ID, (uint)Math.Max(Math.Floor(xp), 1));
-                    }
-                    else if (primary_maxed && !secondary_maxed) {
-                        //give all xp to secondary
-                        AddXP(Class_Secondary.ID, (uint)Math.Max(Math.Floor(xp), 1));
-                    }
-                    else {
-                        //divide xp
-                        AddXP(Class_Primary.ID, (uint)Math.Max(Math.Floor(xp * Systems.XP.SUBCLASS_PENALTY_XP_MULTIPLIER_PRIMARY), 1));
-                        AddXP(Class_Secondary.ID, (uint)Math.Max(Math.Floor(xp * Systems.XP.SUBCLASS_PENALTY_XP_MULTIPLIER_SECONDARY), 1));
-                    }
+                    //subclass penalty
+                    AddXP(Class_Primary.ID, (uint)Math.Max(Math.Floor(xp * Systems.XP.SUBCLASS_PENALTY_XP_MULTIPLIER_PRIMARY), 1));
+                    AddXP(Class_Secondary.ID, (uint)Math.Max(Math.Floor(xp * Systems.XP.SUBCLASS_PENALTY_XP_MULTIPLIER_SECONDARY), 1));
                 }
                 else {
                     //single class
