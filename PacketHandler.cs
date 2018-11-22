@@ -38,13 +38,13 @@ namespace ExperienceAndClasses {
             public static void Recieve(BinaryReader reader, int origin) {
                 //do not read anything from reader here (called multiple times when processing full packet)
 
+                if (ExperienceAndClasses.trace) {
+                    Commons.Trace("Handling " + Instance.GetPacketType() + " originating from " + origin);
+                }
+
                 MPlayer origin_mplayer = null;
                 if ((origin >= 0) && (origin <= Main.maxPlayers)) {
                     origin_mplayer = Main.player[origin].GetModPlayer<MPlayer>(ExperienceAndClasses.MOD);
-                }
-
-                if (ExperienceAndClasses.trace) {
-                    Commons.Trace("Handling " + Instance.GetPacketType() + " originating from " + origin);
                 }
 
                 Instance.RecieveBody(reader, origin, origin_mplayer);
