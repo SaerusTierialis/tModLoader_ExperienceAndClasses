@@ -36,28 +36,37 @@ namespace ExperienceAndClasses.Systems {
             if (npc.SpawnedFromStatue || npc.lifeMax <= 5 || npc.friendly) return 0f;
 
             //calculate
-            double experience = 0;
+            double xp = 0;
             if (npc.defDefense >= 1000)
-                experience = (npc.lifeMax / 100d) * (1d + (npc.defDamage / 25d));
+                xp = (npc.lifeMax / 100d) * (1d + (npc.defDamage / 25d));
             else
-                experience = (npc.lifeMax / 100d) * (1d + (npc.defDefense / 10d)) * (1d + (npc.defDamage / 25d));
+                xp = (npc.lifeMax / 100d) * (1d + (npc.defDefense / 10d)) * (1d + (npc.defDamage / 25d));
 
             //modify if exception
             switch (npc.netID) {
                 case NPCID.EaterofWorldsHead:
-                    experience *= EATER_HEAD_MULT;
+                    xp *= EATER_HEAD_MULT;
                     break;
 
                 case NPCID.EaterofWorldsBody:
-                    experience *= EATER_BODY_MULT;
+                    xp *= EATER_BODY_MULT;
                     break;
 
                 case NPCID.EaterofWorldsTail:
-                    experience *= EATER_TAIL_MULT;
+                    xp *= EATER_TAIL_MULT;
                     break;
             }
 
-            return experience;
+            return xp;
+        }
+
+        public static double ModifyXP(double xp, Player player) {
+            //5% bonus for well fed
+            if (player.wellFed) {
+                xp *= 1.05d;
+            }
+
+            return xp;
         }
 
         /// <summary>

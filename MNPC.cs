@@ -38,12 +38,7 @@ namespace ExperienceAndClasses {
 
                     //give
                     foreach (byte player_index in eligible_players) {
-                        //5% bonus for well fed
-                        if (Main.player[player_index].wellFed) {
-                            xp *= 1.05d; 
-                        }
-                            
-                        PacketHandler.XP.Send(player_index, -1, xp);
+                        PacketHandler.XP.Send(player_index, -1, Systems.XP.ModifyXP(xp, Main.player[player_index]));
                     }
                 }
                 else { //singleplayer
