@@ -109,30 +109,48 @@ namespace ExperienceAndClasses {
         }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Packets ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-
+        
         public override void HandlePacket(BinaryReader reader, int whoAmI) {
             //first 2 bytes are always type and sender
             PacketHandler.PACKET_TYPE packet_type = (PacketHandler.PACKET_TYPE)reader.ReadByte();
-            byte origin_id = reader.ReadByte();
+            int origin = reader.ReadInt32();
 
-            Player origin_player;
-            MPlayer origin_mplayer;
-            if ((origin_id >= 0) && (origin_id <= 255)) {
-                origin_player = Main.player[origin_id];
-                origin_mplayer = origin_player.GetModPlayer<MPlayer>(this);
-            }
-            else {
-                origin_player = null;
-                origin_mplayer = null;
-            }
+            switch (packet_type) {
+                case PacketHandler.PACKET_TYPE.BROADCAST_TRACE:
+                    PacketHandler.BROADCAST_TRACE.Recieve(reader, origin);
+                    break;
 
-            /*
-            if (trace) {
-                Commons.Trace("Recieved " + packet_type + " originating from " + origin_id);
-            }
-            */
+                case PacketHandler.PACKET_TYPE.FORCE_FULL:
+                    PacketHandler.FORCE_FULL.Recieve(reader, origin);
+                    break;
 
-            PacketHandler.HandlePacketContents(origin_id, origin_player, origin_mplayer, packet_type, reader);
+                case PacketHandler.PACKET_TYPE.FORCE_CLASS:
+                    PacketHandler.FORCE_CLASS.Recieve(reader, origin);
+                    break;
+
+                case PacketHandler.PACKET_TYPE.FORCE_ATTRIBUTE:
+                    PacketHandler.FORCE_ATTRIBUTE.Recieve(reader, origin);
+                    break;
+
+                case PacketHandler.PACKET_TYPE.HEAL:
+                    PacketHandler.HEAL.Recieve(reader, origin);
+                    break;
+
+                case PacketHandler.PACKET_TYPE.AFK:
+                    PacketHandler.AFK.Recieve(reader, origin);
+                    break;
+
+                case PacketHandler.PACKET_TYPE.XP:
+                    PacketHandler.XP.Recieve(reader, origin);
+                    break;
+
+                default:
+                    if (trace) {
+
+                        Commons.Trace("Unsupported packet type originating from " + origin);
+                    }
+                    break;
+            }
         }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Other ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/

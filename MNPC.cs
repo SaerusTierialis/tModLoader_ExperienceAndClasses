@@ -31,7 +31,7 @@ namespace ExperienceAndClasses {
 
                     //give
                     foreach (byte player_index in eligible_players) {
-                        PacketHandler.SendXP(player_index, xp);
+                        PacketHandler.XP.Send(player_index, -1, xp);
                     }
                 }
                 else { //singleplayer

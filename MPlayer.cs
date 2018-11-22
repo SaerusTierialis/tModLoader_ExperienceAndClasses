@@ -638,20 +638,20 @@ namespace ExperienceAndClasses {
                 //class and class levels
                 if ((clone.Class_Primary.ID != Class_Primary.ID) || (clone.Class_Secondary.ID != Class_Secondary.ID) ||
                     (clone.Class_Primary_Level_Effective != Class_Primary_Level_Effective) || (clone.Class_Secondary_Level_Effective != Class_Secondary_Level_Effective)) {
-                    PacketHandler.SendForceClass(me, Class_Primary.ID, Class_Primary_Level_Effective, Class_Secondary.ID, Class_Secondary_Level_Effective);
+                    PacketHandler.FORCE_CLASS.Send(-1, me, Class_Primary.ID, Class_Primary_Level_Effective, Class_Secondary.ID, Class_Secondary_Level_Effective);
                 }
 
                 //final attribute
                 for (byte i=0; i<(byte)Systems.Attribute.ATTRIBUTE_IDS.NUMBER_OF_IDs; i++) {
                     if (clone.Attributes_Final[i] != Attributes_Final[i]) {
-                        PacketHandler.SendForceAttribute(me, Attributes_Final);
+                        PacketHandler.FORCE_ATTRIBUTE.Send(-1, me, Attributes_Final);
                         break;
                     }
                 }
 
                 //afk
                 if (clone.AFK != AFK) {
-                    PacketHandler.SendAFK(me, AFK);
+                    PacketHandler.AFK.Send(-1, me, AFK);
                 }
 
             }
@@ -673,7 +673,7 @@ namespace ExperienceAndClasses {
         /// </summary>
         private void FullSync() {
             //send one packet with everything needed
-            PacketHandler.SendForceFull((byte)player.whoAmI, Class_Primary.ID, Class_Primary_Level_Effective, Class_Secondary.ID, Class_Secondary_Level_Effective, Attributes_Final, AFK);
+            PacketHandler.FORCE_FULL.Send(-1, (byte)player.whoAmI, Class_Primary.ID, Class_Primary_Level_Effective, Class_Secondary.ID, Class_Secondary_Level_Effective, Attributes_Final, AFK);
         }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Sync Force Commands ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
@@ -964,7 +964,7 @@ namespace ExperienceAndClasses {
                 }
             }
             else {
-                PacketHandler.SendHeal((byte)Main.LocalPlayer.whoAmI, (byte)player.whoAmI, amount_life, amount_mana);
+                PacketHandler.HEAL.Send((byte)player.whoAmI, (byte)Main.LocalPlayer.whoAmI, amount_life, amount_mana);
             }
         }
 
