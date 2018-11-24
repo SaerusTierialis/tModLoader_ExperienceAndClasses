@@ -967,7 +967,7 @@ namespace ExperienceAndClasses {
                 }
             }
             else {
-                PacketHandler.HEAL.Send((byte)player.whoAmI, (byte)Main.LocalPlayer.whoAmI, amount_life, amount_mana);
+                PacketHandler.Heal.Send((byte)player.whoAmI, (byte)Main.LocalPlayer.whoAmI, amount_life, amount_mana);
             }
         }
 

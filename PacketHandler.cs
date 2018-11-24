@@ -11,13 +11,14 @@ using Terraria.ModLoader;
 
 namespace ExperienceAndClasses {
     public static class PacketHandler {
+
+        //IMPORTANT: each type MUST have a class with the exact same name
         public enum PACKET_TYPE : byte {
-            UNKNOWN,
-            BROADCAST_TRACE,
-            FORCE_FULL,
-            FORCE_CLASS,
-            FORCE_ATTRIBUTE,
-            HEAL,
+            Broadcast,
+            ForceFull,
+            ForceClass,
+            ForceAttribute,
+            Heal,
             AFK,
             XP,
         };
@@ -56,7 +57,7 @@ namespace ExperienceAndClasses {
         /// Client request broadcast from server
         /// </summary>
         public sealed class Broadcast : Base<Broadcast> {
-            protected override PACKET_TYPE GetPacketType() { return PACKET_TYPE.BROADCAST_TRACE; }
+            protected override PACKET_TYPE GetPacketType() { return PACKET_TYPE.Broadcast; }
             public static void Send(int target, int origin, string message) {
                 //get packet containing header
                 ModPacket packet = GetPacket(origin);
@@ -80,7 +81,7 @@ namespace ExperienceAndClasses {
         }
 
         public sealed class ForceFull : Base<ForceFull> {
-            protected override PACKET_TYPE GetPacketType() { return PACKET_TYPE.FORCE_FULL; }
+            protected override PACKET_TYPE GetPacketType() { return PACKET_TYPE.ForceFull; }
             public static void Send(int target, int origin, byte primary_id, byte primary_level, byte secondary_id, byte secondary_level, short[] attributes, bool afk_status) {
                 //get packet containing header
                 ModPacket packet = GetPacket(origin);
@@ -101,7 +102,7 @@ namespace ExperienceAndClasses {
         }
 
         public sealed class ForceClass : Base<ForceClass> {
-            protected override PACKET_TYPE GetPacketType() { return PACKET_TYPE.FORCE_CLASS; }
+            protected override PACKET_TYPE GetPacketType() { return PACKET_TYPE.ForceClass; }
             public static void Send(int target, int origin, byte primary_id, byte primary_level, byte secondary_id, byte secondary_level) {
                 //get packet containing header
                 ModPacket packet = GetPacket(origin);
@@ -133,7 +134,7 @@ namespace ExperienceAndClasses {
         }
 
         public sealed class ForceAttribute : Base<ForceAttribute> {
-            protected override PACKET_TYPE GetPacketType() { return PACKET_TYPE.FORCE_ATTRIBUTE; }
+            protected override PACKET_TYPE GetPacketType() { return PACKET_TYPE.ForceAttribute; }
             public static void Send(int target, int origin, short[] attributes) {
                 //get packet containing header
                 ModPacket packet = GetPacket(origin);
@@ -195,8 +196,8 @@ namespace ExperienceAndClasses {
             }
         }
 
-        public sealed class HEAL : Base<HEAL> {
-            protected override PACKET_TYPE GetPacketType() { return PACKET_TYPE.HEAL; }
+        public sealed class Heal : Base<Heal> {
+            protected override PACKET_TYPE GetPacketType() { return PACKET_TYPE.Heal; }
             public static void Send(int target, int origin, int amount_life, int amount_mana) {
                 //get packet containing header
                 ModPacket packet = GetPacket(origin);

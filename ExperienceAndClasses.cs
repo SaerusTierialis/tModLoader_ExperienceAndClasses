@@ -111,10 +111,26 @@ namespace ExperienceAndClasses {
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Packets ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         
         public override void HandlePacket(BinaryReader reader, int whoAmI) {
-            //first 2 bytes are always type and sender
-            PacketHandler.PACKET_TYPE packet_type = (PacketHandler.PACKET_TYPE)reader.ReadByte();
+            //first 2 bytes are always type and origin
+            byte packet_type = reader.ReadByte();
             int origin = reader.ReadInt32();
 
+            bool success = false;
+            foreach (PacketHandler.PACKET_TYPE type in Enum.GetValues(typeof(PacketHandler.PACKET_TYPE))) {
+                if ((byte)type == packet_type) {
+                    try {
+                        typeof(PacketHandler.Base<>).MakeGenericType(Type.GetType(typeof(PacketHandler).FullName + "+" + type)).GetMethod("Recieve").Invoke(null, new object[] { reader, origin });
+                        success = true;
+                    }
+                    catch {}
+                    break;
+                }
+            }
+            if (!success) {
+                Commons.Error("Cannot handle packet type id " + packet_type + " originating from " + origin);
+            }
+
+            /*
             switch (packet_type) {
                 case PacketHandler.PACKET_TYPE.BROADCAST_TRACE:
                     PacketHandler.Broadcast.Recieve(reader, origin);
@@ -151,6 +167,7 @@ namespace ExperienceAndClasses {
                     }
                     break;
             }
+            */
         }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Other ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
