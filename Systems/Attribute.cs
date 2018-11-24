@@ -30,7 +30,7 @@ namespace ExperienceAndClasses.Systems {
         public const float SUBCLASS_PENALTY_ATTRIBUTE_MULTIPLIER_PRIMARY = 0.8f;
         public const float SUBCLASS_PENALTY_ATTRIBUTE_MULTIPLIER_SECONDARY = 0.6f;
 
-        public const short LEVELS_PER_ATTRIBUTE = 10;
+        public const short LEVELS_PER_ATTRIBUTE = 5;
         public const byte ATTRIBUTE_GROWTH_LEVELS = 10;
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Treated like readonly ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
