@@ -195,7 +195,7 @@ namespace ExperienceAndClasses {
                 if (show_xp && (show_xp_value > 0)) {
                     if (now.CompareTo(show_xp_when) >= 0) {
                         show_xp_when = now.AddTicks(TICKS_PER_XP_MESSAGE);
-                        CombatText.NewText(Main.LocalPlayer.getRect(), UI.Constants.COLOUR_XP, "+" + Math.Max(Math.Floor(show_xp_value), 1) + " XP");
+                        CombatText.NewText(Main.LocalPlayer.getRect(), UI.Constants.COLOUR_XP_BRIGHT, "+" + Math.Max(Math.Floor(show_xp_value), 1) + " XP");
                         show_xp_value = 0;
                     }
                 }
@@ -582,16 +582,19 @@ namespace ExperienceAndClasses {
             Main.NewText(message, UI.Constants.COLOUR_MESSAGE_ANNOUNCE);
         }
 
-        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Hotkeys ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Minions ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-        private static readonly short[] minions_ignore = new short[] { ProjectileID.StardustDragon2 , ProjectileID.StardustDragon3, ProjectileID.StardustDragon4 };
+        //do not count dragon body or tail (only head)
+        //private static readonly short[] minions_ignore = new short[] { ProjectileID.StardustDragon2 , ProjectileID.StardustDragon3, ProjectileID.StardustDragon4 };
+
         public void CheckMinions() {
             minions = new List<Projectile>();
             foreach (Projectile p in Main.projectile) {
                 if (p.active && (p.minion || p.sentry) && (p.owner == player.whoAmI)) {
-                    if (Array.IndexOf(minions_ignore, (short)p.type) == -1) {
-                        minions.Add(p);
-                    }
+                    //must be part of minion that takes slots + not on ignore list
+                    //if ((p.minionSlots > 0f) && (Array.IndexOf(minions_ignore, (short)p.type) == -1)) {
+
+                    minions.Add(p);
                 }
             }
         }

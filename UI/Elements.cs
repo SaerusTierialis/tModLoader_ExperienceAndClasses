@@ -235,7 +235,7 @@ namespace ExperienceAndClasses.UI {
             Append(icon);
 
             float left = icon.Width.Pixels + Constants.UI_PADDING;
-            bar = new ProgressBar(width - left, BAR_HEIGHT, Constants.COLOUR_XP);
+            bar = new ProgressBar(width - left, BAR_HEIGHT, Constants.COLOUR_XP_DIM);
             bar.Left.Set(left, 0f);
             bar.Top.Set((icon.Height.Pixels - bar.Height.Pixels) / 2f, 0f);
             Append(bar);

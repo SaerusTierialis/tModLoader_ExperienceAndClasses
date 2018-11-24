@@ -36,7 +36,7 @@ namespace ExperienceAndClasses.Items {
 
         public override void ModifyTooltips(List<TooltipLine> tooltips) {
             TooltipLine line = new TooltipLine(mod, "desc", "Current XP Value: " + GetValue());
-            line.overrideColor = UI.Constants.COLOUR_XP;
+            line.overrideColor = UI.Constants.COLOUR_XP_BRIGHT;
             tooltips.Add(line);
         }
 
