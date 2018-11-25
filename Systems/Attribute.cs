@@ -30,8 +30,11 @@ namespace ExperienceAndClasses.Systems {
         public const float SUBCLASS_PENALTY_ATTRIBUTE_MULTIPLIER_PRIMARY = 0.8f;
         public const float SUBCLASS_PENALTY_ATTRIBUTE_MULTIPLIER_SECONDARY = 0.6f;
 
-        public const short LEVELS_PER_ATTRIBUTE = 5;
+        //class attribute growth
         public const byte ATTRIBUTE_GROWTH_LEVELS = 10;
+
+        //allocation points
+        public static readonly short[] ALLOCATION_POINTS_PER_LEVEL_TIERS = new short[] { 0, 1, 2, 3 };
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Treated like readonly ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         public static Attribute[] ATTRIBUTE_LOOKUP { get; private set; }
@@ -43,20 +46,53 @@ namespace ExperienceAndClasses.Systems {
         /// </summary>
         /// <param name="new_value"></param>
         /// <returns></returns>
-        public static short PointCost(short current_value) {
+        public static short AllocationPointCost(short current_value) {
             return (short)Math.Ceiling((current_value + 1) / 5d);
         }
 
         /// <summary>
-        /// total allocation points spent on x attribute points (inefficient method)
+        /// total allocation points needed for 1-to-x attribute points
         /// </summary>
         /// <param name="current_value"></param>
         /// <returns></returns>
-        public static short PointCostTotal(short current_value) {
+        public static short AllocationPointCostTotal(short current_value) {
+            //must be updated if AllocationPointCost is changed
+            int number_complete_5s = (int)Math.Floor((current_value - 1) / 5d);
+            int number_partial = current_value - (number_complete_5s * 5);
+            return (short)(((5 + (number_complete_5s * 5)) * number_complete_5s / 2) + ((1 + number_complete_5s) * number_partial));
+        }
+
+        /// <summary>
+        /// total allocation points earned by player
+        /// </summary>
+        /// <param name="mplayer"></param>
+        /// <returns></returns>
+        public static short AllocationPointTotal(MPlayer mplayer) {
             short sum = 0;
-            for (short i = 1; i<= current_value; i++) {
-                sum += PointCost(i);
+
+            for (byte i = 0; i< mplayer.Class_Levels.Length; i++) {
+                if (mplayer.Class_Unlocked[i] && Class.CLASS_LOOKUP[i].Gives_Allocation_Attributes) {
+                    sum += (short)(mplayer.Class_Levels[i] * ALLOCATION_POINTS_PER_LEVEL_TIERS[Class.CLASS_LOOKUP[i].Tier]);
+                }
             }
+
+            return sum;
+        }
+
+        /// <summary>
+        /// total allocation points spent by player
+        /// </summary>
+        /// <param name="mplayer"></param>
+        /// <returns></returns>
+        public static short AllocationPointSpent(MPlayer mplayer) {
+            short sum = 0;
+
+            for (byte i = 0; i< mplayer.Attributes_Allocated.Length; i++) {
+                if (ATTRIBUTE_LOOKUP[i].Active) {
+                    sum += AllocationPointCostTotal(mplayer.Attributes_Allocated[i]);
+                }
+            }
+
             return sum;
         }
 
