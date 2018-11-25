@@ -36,6 +36,30 @@ namespace ExperienceAndClasses.Systems {
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Treated like readonly ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         public static Attribute[] ATTRIBUTE_LOOKUP { get; private set; }
 
+        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Methods ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+        /// <summary>
+        /// allocation points needed to add 1 attribute point
+        /// </summary>
+        /// <param name="new_value"></param>
+        /// <returns></returns>
+        public static short PointCost(short current_value) {
+            return (short)Math.Ceiling((current_value + 1) / 5d);
+        }
+
+        /// <summary>
+        /// total allocation points spent on x attribute points (inefficient method)
+        /// </summary>
+        /// <param name="current_value"></param>
+        /// <returns></returns>
+        public static short PointCostTotal(short current_value) {
+            short sum = 0;
+            for (short i = 1; i<= current_value; i++) {
+                sum += PointCost(i);
+            }
+            return sum;
+        }
+
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Populate Lookup ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         static Attribute() {
             ATTRIBUTE_LOOKUP = new Attribute[(byte)ATTRIBUTE_IDS.NUMBER_OF_IDs];
