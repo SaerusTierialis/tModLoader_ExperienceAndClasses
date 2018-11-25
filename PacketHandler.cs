@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -10,6 +11,17 @@ using Terraria.Localization;
 using Terraria.ModLoader;
 
 namespace ExperienceAndClasses {
+    /// <summary>
+    /// the implementation here is not very elegant, but it should run pretty fast and
+    /// new packet types can be added without making changes anywhere else
+    /// 
+    /// singleton implementation
+    /// 
+    /// to add new packets: add to the enum and define a class with the same name
+    /// 
+    /// Packet sending uses static methods for ease of use
+    /// Packet receiving is standardized and automatic aside from RecieveBody
+    /// </summary>
     public static class PacketHandler {
 
         //IMPORTANT: each type MUST have a class with the exact same name
@@ -21,26 +33,57 @@ namespace ExperienceAndClasses {
             Heal,
             AFK,
             XP,
+
+
+
+            NUMBER_OF_TYPES, //must be last
         };
 
-        //base type
-        public abstract class Base<T> where T : Base<T> {
-            //singleton (need instance for abstract methods)
-            private static readonly ThreadLocal<T> Lazy = new ThreadLocal<T>(() => Activator.CreateInstance(typeof(T), true) as T);
-            protected static T Instance { get { return Lazy.Value; } }
+        //populate lookup for automated receiving of packets (possible because receiving is standardized)
+        public static Handler[] LOOKUP { get; private set; }
+        static PacketHandler() {
+            LOOKUP = new Handler[(byte)PACKET_TYPE.NUMBER_OF_TYPES];
 
-            protected abstract PACKET_TYPE GetPacketType();
-            protected static ModPacket GetPacket(int origin) {
+            string[] packet_names = Enum.GetNames(typeof(PACKET_TYPE));
+
+            for (byte i = 0; i < LOOKUP.Length; i++) {
+                LOOKUP[i] = (Handler)Assembly.GetExecutingAssembly().CreateInstance(typeof(PacketHandler).FullName + "+" + packet_names[i]);
+
+                //set instance vars for inherited methods
+                LOOKUP[i].SetFields(i, packet_names[i]);
+            }
+        }
+
+        //base type
+        public abstract class Handler {
+            public byte packet_byte { get; private set; }
+            public string packet_string { get; private set; }
+            public bool fields_set = false;
+
+            public bool SetFields(byte packet_byte, string packet_string) {
+                if (!fields_set) {
+                    this.packet_byte = packet_byte;
+                    this.packet_string = packet_string;
+                    fields_set = true;
+                    return true;
+                }
+                else {
+                    return false;
+                }
+            }
+
+            public ModPacket GetPacket(int origin) {
                 ModPacket packet = ExperienceAndClasses.MOD.GetPacket();
-                packet.Write((byte)Instance.GetPacketType());
+                packet.Write(packet_byte);
                 packet.Write(origin);
                 return packet;
             }
-            public static void Recieve(BinaryReader reader, int origin) {
+
+            public void Recieve(BinaryReader reader, int origin) {
                 //do not read anything from reader here (called multiple times when processing full packet)
 
                 if (ExperienceAndClasses.trace) {
-                    Commons.Trace("Handling " + Instance.GetPacketType() + " originating from " + origin);
+                    Commons.Trace("Handling " + packet_string + " originating from " + origin);
                 }
 
                 MPlayer origin_mplayer = null;
@@ -48,26 +91,29 @@ namespace ExperienceAndClasses {
                     origin_mplayer = Main.player[origin].GetModPlayer<MPlayer>(ExperienceAndClasses.MOD);
                 }
 
-                Instance.RecieveBody(reader, origin, origin_mplayer);
+                RecieveBody(reader, origin, origin_mplayer);
             }
+
             protected abstract void RecieveBody(BinaryReader reader, int origin, MPlayer origin_mplayer);
         }
 
         /// <summary>
         /// Client request broadcast from server
         /// </summary>
-        public sealed class Broadcast : Base<Broadcast> {
-            protected override PACKET_TYPE GetPacketType() { return PACKET_TYPE.Broadcast; }
+        public sealed class Broadcast : Handler {
+            public static readonly Handler Instance = LOOKUP[(byte)Enum.Parse(typeof(PACKET_TYPE), MethodBase.GetCurrentMethod().DeclaringType.Name)];
+
             public static void Send(int target, int origin, string message) {
                 //get packet containing header
-                ModPacket packet = GetPacket(origin);
-
+                ModPacket packet = Instance.GetPacket(origin);
+                
                 //specific content
                 packet.Write(message);
 
                 //send
                 packet.Send(target, origin);
             }
+
             protected override void RecieveBody(BinaryReader reader, int origin, MPlayer origin_mplayer) {
                 //read
                 string message = reader.ReadString();
@@ -80,11 +126,12 @@ namespace ExperienceAndClasses {
             }
         }
 
-        public sealed class ForceFull : Base<ForceFull> {
-            protected override PACKET_TYPE GetPacketType() { return PACKET_TYPE.ForceFull; }
+        public sealed class ForceFull : Handler {
+            public static readonly Handler Instance = LOOKUP[(byte)Enum.Parse(typeof(PACKET_TYPE), MethodBase.GetCurrentMethod().DeclaringType.Name)];
+
             public static void Send(int target, int origin, byte primary_id, byte primary_level, byte secondary_id, byte secondary_level, short[] attributes, bool afk_status) {
                 //get packet containing header
-                ModPacket packet = GetPacket(origin);
+                ModPacket packet = Instance.GetPacket(origin);
 
                 //specific content
                 ForceClass.WritePacketBody(packet, primary_id, primary_level, secondary_id, secondary_level);
@@ -94,18 +141,20 @@ namespace ExperienceAndClasses {
                 //send
                 packet.Send(target, origin);
             }
+
             protected override void RecieveBody(BinaryReader reader, int origin, MPlayer origin_mplayer) {
-                ForceClass.Recieve(reader, origin);
-                ForceAttribute.Recieve(reader, origin);
-                AFK.Recieve(reader, origin);
+                ForceClass.Instance.Recieve(reader, origin);
+                ForceAttribute.Instance.Recieve(reader, origin);
+                AFK.Instance.Recieve(reader, origin);
             }
         }
 
-        public sealed class ForceClass : Base<ForceClass> {
-            protected override PACKET_TYPE GetPacketType() { return PACKET_TYPE.ForceClass; }
+        public sealed class ForceClass : Handler {
+            public static readonly Handler Instance = LOOKUP[(byte)Enum.Parse(typeof(PACKET_TYPE), MethodBase.GetCurrentMethod().DeclaringType.Name)];
+
             public static void Send(int target, int origin, byte primary_id, byte primary_level, byte secondary_id, byte secondary_level) {
                 //get packet containing header
-                ModPacket packet = GetPacket(origin);
+                ModPacket packet = Instance.GetPacket(origin);
 
                 //specific content
                 WritePacketBody(packet, primary_id, primary_level, secondary_id, secondary_level);
@@ -113,6 +162,7 @@ namespace ExperienceAndClasses {
                 //send
                 packet.Send(target, origin);
             }
+
             protected override void RecieveBody(BinaryReader reader, int origin, MPlayer origin_mplayer) {
                 //read
                 byte[] bytes = reader.ReadBytes(4);
@@ -125,6 +175,7 @@ namespace ExperienceAndClasses {
                     Send(-1, origin, bytes[0], bytes[1], bytes[2], bytes[3]);
                 }
             }
+
             public static void WritePacketBody(ModPacket packet, byte primary_id, byte primary_level, byte secondary_id, byte secondary_level) {
                 packet.Write(primary_id);
                 packet.Write(primary_level);
@@ -133,11 +184,12 @@ namespace ExperienceAndClasses {
             }
         }
 
-        public sealed class ForceAttribute : Base<ForceAttribute> {
-            protected override PACKET_TYPE GetPacketType() { return PACKET_TYPE.ForceAttribute; }
+        public sealed class ForceAttribute : Handler {
+            public static readonly Handler Instance = LOOKUP[(byte)Enum.Parse(typeof(PACKET_TYPE), MethodBase.GetCurrentMethod().DeclaringType.Name)];
+
             public static void Send(int target, int origin, short[] attributes) {
                 //get packet containing header
-                ModPacket packet = GetPacket(origin);
+                ModPacket packet = Instance.GetPacket(origin);
 
                 //specific content
                 WritePacketBody(packet, attributes);
@@ -145,6 +197,7 @@ namespace ExperienceAndClasses {
                 //send
                 packet.Send(target, origin);
             }
+
             protected override void RecieveBody(BinaryReader reader, int origin, MPlayer origin_mplayer) {
                 //read
                 short[] attributes = new short[(byte)Systems.Attribute.ATTRIBUTE_IDS.NUMBER_OF_IDs];
@@ -160,6 +213,7 @@ namespace ExperienceAndClasses {
                     Send(-1, origin, attributes);
                 }
             }
+
             public static void WritePacketBody(ModPacket packet, short[] attributes) {
                 for (byte i = 0; i < (byte)Systems.Attribute.ATTRIBUTE_IDS.NUMBER_OF_IDs; i++) {
                     packet.Write(attributes[i]);
@@ -167,11 +221,12 @@ namespace ExperienceAndClasses {
             }
         }
 
-        public sealed class AFK : Base<AFK> {
-            protected override PACKET_TYPE GetPacketType() { return PACKET_TYPE.AFK; }
+        public sealed class AFK : Handler {
+            public static readonly Handler Instance = LOOKUP[(byte)Enum.Parse(typeof(PACKET_TYPE), MethodBase.GetCurrentMethod().DeclaringType.Name)];
+
             public static void Send(int target, int origin, bool afk_status) {
                 //get packet containing header
-                ModPacket packet = GetPacket(origin);
+                ModPacket packet = Instance.GetPacket(origin);
 
                 //specific content
                 WritePacketBody(packet, afk_status);
@@ -179,6 +234,7 @@ namespace ExperienceAndClasses {
                 //send
                 packet.Send(target, origin);
             }
+
             protected override void RecieveBody(BinaryReader reader, int origin, MPlayer origin_mplayer) {
                 //read
                 bool afk_status = reader.ReadBoolean();
@@ -191,16 +247,18 @@ namespace ExperienceAndClasses {
                     Send(-1, origin, afk_status);
                 }
             }
+
             public static void WritePacketBody(ModPacket packet, bool afk_status) {
                 packet.Write(afk_status);
             }
         }
 
-        public sealed class Heal : Base<Heal> {
-            protected override PACKET_TYPE GetPacketType() { return PACKET_TYPE.Heal; }
+        public sealed class Heal : Handler {
+            public static readonly Handler Instance = LOOKUP[(byte)Enum.Parse(typeof(PACKET_TYPE), MethodBase.GetCurrentMethod().DeclaringType.Name)];
+
             public static void Send(int target, int origin, int amount_life, int amount_mana) {
                 //get packet containing header
-                ModPacket packet = GetPacket(origin);
+                ModPacket packet = Instance.GetPacket(origin);
 
                 //specific content
                 packet.Write(target);
@@ -215,6 +273,7 @@ namespace ExperienceAndClasses {
                     packet.Send(-1, origin);
                 }
             }
+
             protected override void RecieveBody(BinaryReader reader, int origin, MPlayer origin_mplayer) {
                 //read
                 byte target = reader.ReadByte();
@@ -226,11 +285,12 @@ namespace ExperienceAndClasses {
             }
         }
 
-        public sealed class XP : Base<XP> {
-            protected override PACKET_TYPE GetPacketType() { return PACKET_TYPE.XP; }
+        public sealed class XP : Handler {
+            public static readonly Handler Instance = LOOKUP[(byte)Enum.Parse(typeof(PACKET_TYPE), MethodBase.GetCurrentMethod().DeclaringType.Name)];
+
             public static void Send(int target, int origin, double xp) {
                 //get packet containing header
-                ModPacket packet = GetPacket(origin);
+                ModPacket packet = Instance.GetPacket(origin);
 
                 //specific content
                 packet.Write(xp);
@@ -238,6 +298,7 @@ namespace ExperienceAndClasses {
                 //send
                 packet.Send(target, origin);
             }
+
             protected override void RecieveBody(BinaryReader reader, int origin, MPlayer origin_mplayer) {
                 //read
                 double xp = reader.ReadDouble();

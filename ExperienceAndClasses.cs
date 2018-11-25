@@ -115,18 +115,10 @@ namespace ExperienceAndClasses {
             byte packet_type = reader.ReadByte();
             int origin = reader.ReadInt32();
 
-            bool success = false;
-            foreach (PacketHandler.PACKET_TYPE type in Enum.GetValues(typeof(PacketHandler.PACKET_TYPE))) {
-                if ((byte)type == packet_type) {
-                    try {
-                        typeof(PacketHandler.Base<>).MakeGenericType(Type.GetType(typeof(PacketHandler).FullName + "+" + type)).GetMethod("Recieve").Invoke(null, new object[] { reader, origin });
-                        success = true;
-                    }
-                    catch {}
-                    break;
-                }
+            if (packet_type >= 0 && packet_type < (byte)PacketHandler.PACKET_TYPE.NUMBER_OF_TYPES) {
+                PacketHandler.LOOKUP[packet_type].Recieve(reader, origin);
             }
-            if (!success) {
+            else {
                 Commons.Error("Cannot handle packet type id " + packet_type + " originating from " + origin);
             }
 
