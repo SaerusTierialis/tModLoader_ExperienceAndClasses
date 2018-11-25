@@ -58,7 +58,7 @@ namespace ExperienceAndClasses {
         public abstract class Handler {
             public byte packet_byte { get; private set; }
             public string packet_string { get; private set; }
-            public bool fields_set = false;
+            private bool fields_set = false;
 
             public bool SetFields(byte packet_byte, string packet_string) {
                 if (!fields_set) {
