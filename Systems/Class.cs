@@ -51,10 +51,11 @@ namespace ExperienceAndClasses.Systems {
         public static Class[] CLASS_LOOKUP { get; private set; }
 
         //which classes to show in ui and where
-        public static byte[,] Class_Locations { get; private set; } = new byte[5, 7];
+        public static byte[,] Class_Locations { get; private set; }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Populate Lookup ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         static Class() {
+            Class_Locations = new byte[5, 7];
             CLASS_LOOKUP = new Class[(byte)CLASS_IDS.NUMBER_OF_IDs];
 
             string name, desc;
