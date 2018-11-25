@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using Terraria;
 using Terraria.GameInput;
-using Terraria.ID;
-using Terraria.Localization;
 using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
 
@@ -36,13 +34,12 @@ namespace ExperienceAndClasses {
         public uint[] Class_XP { get; private set; }
         public bool[] Class_Unlocked { get; private set; }
 
-        public short[] Attributes_Base { get; private set; }
-        public short[] Attributes_Allocated { get; private set; }
-        public short[] Attributes_Bonus { get; private set; }
-        public short Attribute_Points_Unallocated { get; private set; }
-        private short Attribute_Points_Allocated;
-        private short Attribute_Points_Total;
-        public byte Levels_To_Next_Point { get; private set; }
+        public int[] Attributes_Base { get; private set; }
+        public int[] Attributes_Allocated { get; private set; }
+        public int[] Attributes_Bonus { get; private set; }
+        public int Allocation_Points_Unallocated { get; private set; }
+        private int Allocation_Points_Spent;
+        private int Allocation_Points_Total;
 
         public float heal_damage; //TODO
         public float dodge_chance; //TODO
@@ -59,7 +56,7 @@ namespace ExperienceAndClasses {
         public byte Class_Primary_Level_Effective { get; private set; }
         public byte Class_Secondary_Level_Effective { get; private set; }
 
-        public short[] Attributes_Final { get; private set; }
+        public int[] Attributes_Final { get; private set; }
         public bool AFK { get; private set; }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Initialize ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
@@ -96,14 +93,13 @@ namespace ExperienceAndClasses {
             Class_Secondary = Systems.Class.CLASS_LOOKUP[(byte)Systems.Class.CLASS_IDS.None];
 
             //initialize attributes
-            Attributes_Base = new short[(byte)Systems.Attribute.ATTRIBUTE_IDS.NUMBER_OF_IDs];
-            Attributes_Allocated = new short[(byte)Systems.Attribute.ATTRIBUTE_IDS.NUMBER_OF_IDs];
-            Attributes_Bonus = new short[(byte)Systems.Attribute.ATTRIBUTE_IDS.NUMBER_OF_IDs];
-            Attributes_Final = new short[(byte)Systems.Attribute.ATTRIBUTE_IDS.NUMBER_OF_IDs];
-            Attribute_Points_Unallocated = 0;
-            Attribute_Points_Allocated = 0;
-            Attribute_Points_Total = 0;
-            Levels_To_Next_Point = 0;
+            Attributes_Base = new int[(byte)Systems.Attribute.ATTRIBUTE_IDS.NUMBER_OF_IDs];
+            Attributes_Allocated = new int[(byte)Systems.Attribute.ATTRIBUTE_IDS.NUMBER_OF_IDs];
+            Attributes_Bonus = new int[(byte)Systems.Attribute.ATTRIBUTE_IDS.NUMBER_OF_IDs];
+            Attributes_Final = new int[(byte)Systems.Attribute.ATTRIBUTE_IDS.NUMBER_OF_IDs];
+            Allocation_Points_Unallocated = 0;
+            Allocation_Points_Spent = 0;
+            Allocation_Points_Total = 0;
 
             //stats
             heal_damage = 1f;
@@ -406,21 +402,10 @@ namespace ExperienceAndClasses {
                 }
             }
 
-            //allocated attributes
-            short class_sum = 0;
-            for (byte id = 0; id < (byte)Systems.Class.CLASS_IDS.NUMBER_OF_IDs; id++) {
-                if (Systems.Class.CLASS_LOOKUP[id].Gives_Allocation_Attributes && Class_Unlocked[id]) {
-                    class_sum += Math.Min(Class_Levels[id], Systems.Class.MAX_LEVEL[Systems.Class.CLASS_LOOKUP[id].Tier]);
-                }
-            }
-            int temp;
-            Attribute_Points_Total = (byte)Math.DivRem(class_sum, Systems.Attribute.LEVELS_PER_ATTRIBUTE, out temp);
-            Levels_To_Next_Point = (byte)temp;
-            Attribute_Points_Allocated = 0;
-            foreach (short allocated in Attributes_Allocated) {
-                Attribute_Points_Allocated += allocated;
-            }
-            Attribute_Points_Unallocated = (short)(Attribute_Points_Total - Attribute_Points_Allocated);
+            //allocated attribute points
+            Allocation_Points_Total = Systems.Attribute.AllocationPointTotal(this);
+            Allocation_Points_Spent = Systems.Attribute.AllocationPointSpent(this);
+            Allocation_Points_Unallocated = Allocation_Points_Total - Allocation_Points_Spent;
 
             //sum attributes
             LocalCalculateFinalAttributes();
@@ -699,7 +684,7 @@ namespace ExperienceAndClasses {
             UpdateClassInfo();
         }
 
-        public void ForceAttribute(short[] attributes) {
+        public void ForceAttribute(int[] attributes) {
             if (Is_Local_Player) {
                 Commons.Error("Cannot force attribute packet for local player");
                 return;
@@ -724,13 +709,19 @@ namespace ExperienceAndClasses {
             }
         }
 
-        public void LocalAttributeAllocation(byte id, short adjustment) {
+        public void LocalAttributeAllocation1Point(byte id, bool add) {
             if (!Is_Local_Player) {
                 Commons.Error("Cannot set attribute allocation for non-local player");
                 return;
             }
+            
+            int adjustment = +1;
+            if (!add) {
+                adjustment = -1;
+            }
 
-        if ((Attributes_Allocated[id] < 0 && adjustment > 0) || ((Attribute_Points_Unallocated >= adjustment) && ((Attributes_Allocated[id] + adjustment) >= 0))) {
+            if ((Attributes_Allocated[id] < 0 && adjustment > 0) || (Allocation_Points_Unallocated < 0 && adjustment < 0) || 
+                (((adjustment < 0) || (Allocation_Points_Unallocated >= Systems.Attribute.AllocationPointCost(Attributes_Allocated[id]))) && ((Attributes_Allocated[id] + adjustment) >= 0))) {
                 Attributes_Allocated[id] += adjustment;
                 LocalUpdateClassInfo();
             }
@@ -743,7 +734,7 @@ namespace ExperienceAndClasses {
             }
 
             for (byte id = 0; id < (byte)Systems.Attribute.ATTRIBUTE_IDS.NUMBER_OF_IDs; id++) {
-                Attributes_Final[id] = (short)(Attributes_Base[id] + Attributes_Allocated[id] + Attributes_Bonus[id]);
+                Attributes_Final[id] = Attributes_Base[id] + Attributes_Allocated[id] + Attributes_Bonus[id];
             }
         }
 
@@ -814,8 +805,8 @@ namespace ExperienceAndClasses {
 
         public override TagCompound Save() {
             //must be byte[], int[], or List<>
-            List<short> attributes_allocated = new List<short>();
-            foreach (short value in Attributes_Allocated) {
+            List<int> attributes_allocated = new List<int>();
+            foreach (int value in Attributes_Allocated) {
                 attributes_allocated.Add(value);
             }
             List<bool> class_unlocked = new List<bool>();
@@ -923,7 +914,7 @@ namespace ExperienceAndClasses {
             }
 
             //allocated attributes
-            List<short> attribute_allocation = Commons.TryGet<List<short>>(load_tag, "eac_attribute_allocation", new List<short>());
+            List<int> attribute_allocation = Commons.TryGet<List<int>>(load_tag, "eac_attribute_allocation", new List<int>());
             for(byte i = 0; i < attribute_allocation.Count; i++) {
                 if (Systems.Attribute.ATTRIBUTE_LOOKUP[i].Active) {
                     Attributes_Allocated[i] = attribute_allocation[i];

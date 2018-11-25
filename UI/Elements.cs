@@ -372,11 +372,11 @@ namespace ExperienceAndClasses.UI {
         }
 
         public void ClickAdd(UIMouseEvent evt, UIElement listeningElement) {
-            ExperienceAndClasses.LOCAL_MPLAYER.LocalAttributeAllocation(attribute.ID, +1);
+            ExperienceAndClasses.LOCAL_MPLAYER.LocalAttributeAllocation1Point(attribute.ID, true);
         }
 
         public void ClickSubtract(UIMouseEvent evt, UIElement listeningElement) {
-            ExperienceAndClasses.LOCAL_MPLAYER.LocalAttributeAllocation(attribute.ID, -1);
+            ExperienceAndClasses.LOCAL_MPLAYER.LocalAttributeAllocation1Point(attribute.ID, false);
         }
 
         public override void MouseUp(UIMouseEvent evt) {
@@ -401,7 +401,7 @@ namespace ExperienceAndClasses.UI {
 
             float width_cutoff = final.Left.Pixels - sum.Left.Pixels;
 
-            short bonus = ExperienceAndClasses.LOCAL_MPLAYER.Attributes_Bonus[attribute.ID];
+            int bonus = ExperienceAndClasses.LOCAL_MPLAYER.Attributes_Bonus[attribute.ID];
             str = "(" + ExperienceAndClasses.LOCAL_MPLAYER.Attributes_Base[attribute.ID] + "+" + ExperienceAndClasses.LOCAL_MPLAYER.Attributes_Allocated[attribute.ID];
             if (bonus != 0) {
                 str += "+" + bonus;

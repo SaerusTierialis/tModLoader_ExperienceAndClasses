@@ -250,7 +250,7 @@ namespace ExperienceAndClasses.UI {
         }
 
         private void UpdateAttributePoints() {
-            attribute_point_text.SetText("Available Points: " + ExperienceAndClasses.LOCAL_MPLAYER.Attribute_Points_Unallocated);
+            attribute_point_text.SetText("Available Points: " + ExperienceAndClasses.LOCAL_MPLAYER.Allocation_Points_Unallocated);
         }
 
         //the panel behind the selected buttons prevents their use without this workaround

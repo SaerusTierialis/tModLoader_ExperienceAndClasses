@@ -129,7 +129,7 @@ namespace ExperienceAndClasses {
         public sealed class ForceFull : Handler {
             private static readonly Handler Instance = LOOKUP[(byte)Enum.Parse(typeof(PACKET_TYPE), MethodBase.GetCurrentMethod().DeclaringType.Name)];
 
-            public static void Send(int target, int origin, byte primary_id, byte primary_level, byte secondary_id, byte secondary_level, short[] attributes, bool afk_status) {
+            public static void Send(int target, int origin, byte primary_id, byte primary_level, byte secondary_id, byte secondary_level, int[] attributes, bool afk_status) {
                 //get packet containing header
                 ModPacket packet = Instance.GetPacket(origin);
 
@@ -187,7 +187,7 @@ namespace ExperienceAndClasses {
         public sealed class ForceAttribute : Handler {
             private static readonly Handler Instance = LOOKUP[(byte)Enum.Parse(typeof(PACKET_TYPE), MethodBase.GetCurrentMethod().DeclaringType.Name)];
 
-            public static void Send(int target, int origin, short[] attributes) {
+            public static void Send(int target, int origin, int[] attributes) {
                 //get packet containing header
                 ModPacket packet = Instance.GetPacket(origin);
 
@@ -200,7 +200,7 @@ namespace ExperienceAndClasses {
 
             protected override void RecieveBody(BinaryReader reader, int origin, MPlayer origin_mplayer) {
                 //read
-                short[] attributes = new short[(byte)Systems.Attribute.ATTRIBUTE_IDS.NUMBER_OF_IDs];
+                int[] attributes = new int[(byte)Systems.Attribute.ATTRIBUTE_IDS.NUMBER_OF_IDs];
                 for (byte i = 0; i < (byte)Systems.Attribute.ATTRIBUTE_IDS.NUMBER_OF_IDs; i++) {
                     attributes[i] = reader.ReadInt16();
                 }
@@ -214,7 +214,7 @@ namespace ExperienceAndClasses {
                 }
             }
 
-            public static void WritePacketBody(ModPacket packet, short[] attributes) {
+            public static void WritePacketBody(ModPacket packet, int[] attributes) {
                 for (byte i = 0; i < (byte)Systems.Attribute.ATTRIBUTE_IDS.NUMBER_OF_IDs; i++) {
                     packet.Write(attributes[i]);
                 }

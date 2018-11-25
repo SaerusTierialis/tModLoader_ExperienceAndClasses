@@ -34,7 +34,7 @@ namespace ExperienceAndClasses.Systems {
         public const byte ATTRIBUTE_GROWTH_LEVELS = 10;
 
         //allocation points
-        public static readonly short[] ALLOCATION_POINTS_PER_LEVEL_TIERS = new short[] { 0, 1, 2, 3 };
+        public static readonly int[] ALLOCATION_POINTS_PER_LEVEL_TIERS = new int[] { 0, 1, 2, 3 };
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Treated like readonly ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         public static Attribute[] ATTRIBUTE_LOOKUP { get; private set; }
@@ -46,8 +46,8 @@ namespace ExperienceAndClasses.Systems {
         /// </summary>
         /// <param name="new_value"></param>
         /// <returns></returns>
-        public static short AllocationPointCost(short current_value) {
-            return (short)Math.Ceiling((current_value + 1) / 5d);
+        public static int AllocationPointCost(int current_value) {
+            return (int)Math.Ceiling((current_value + 1) / 5d);
         }
 
         /// <summary>
@@ -55,11 +55,11 @@ namespace ExperienceAndClasses.Systems {
         /// </summary>
         /// <param name="current_value"></param>
         /// <returns></returns>
-        public static short AllocationPointCostTotal(short current_value) {
+        public static int AllocationPointCostTotal(int current_value) {
             //must be updated if AllocationPointCost is changed
             int number_complete_5s = (int)Math.Floor((current_value - 1) / 5d);
             int number_partial = current_value - (number_complete_5s * 5);
-            return (short)(((5 + (number_complete_5s * 5)) * number_complete_5s / 2) + ((1 + number_complete_5s) * number_partial));
+            return ((5 + (number_complete_5s * 5)) * number_complete_5s / 2) + ((1 + number_complete_5s) * number_partial);
         }
 
         /// <summary>
@@ -67,12 +67,12 @@ namespace ExperienceAndClasses.Systems {
         /// </summary>
         /// <param name="mplayer"></param>
         /// <returns></returns>
-        public static short AllocationPointTotal(MPlayer mplayer) {
-            short sum = 0;
+        public static int AllocationPointTotal(MPlayer mplayer) {
+            int sum = 0;
 
             for (byte i = 0; i< mplayer.Class_Levels.Length; i++) {
                 if (mplayer.Class_Unlocked[i] && Class.CLASS_LOOKUP[i].Gives_Allocation_Attributes) {
-                    sum += (short)(mplayer.Class_Levels[i] * ALLOCATION_POINTS_PER_LEVEL_TIERS[Class.CLASS_LOOKUP[i].Tier]);
+                    sum += mplayer.Class_Levels[i] * ALLOCATION_POINTS_PER_LEVEL_TIERS[Class.CLASS_LOOKUP[i].Tier];
                 }
             }
 
@@ -84,8 +84,8 @@ namespace ExperienceAndClasses.Systems {
         /// </summary>
         /// <param name="mplayer"></param>
         /// <returns></returns>
-        public static short AllocationPointSpent(MPlayer mplayer) {
-            short sum = 0;
+        public static int AllocationPointSpent(MPlayer mplayer) {
+            int sum = 0;
 
             for (byte i = 0; i< mplayer.Attributes_Allocated.Length; i++) {
                 if (ATTRIBUTE_LOOKUP[i].Active) {
@@ -202,7 +202,7 @@ namespace ExperienceAndClasses.Systems {
         private const float DEXTERITY_USE_SPEED = 0.0025f;
         private const float DEXTERITY_ABILITY_DELAY_REDUCTION = 0.01f;
 
-        public void ApplyEffect(MPlayer mplayer, short points) {
+        public void ApplyEffect(MPlayer mplayer, int points) {
             if (Active) {
 
                 if (mplayer.Is_Local_Player) Bonus = "";
