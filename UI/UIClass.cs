@@ -16,7 +16,7 @@ namespace ExperienceAndClasses.UI {
         private const float CLASS_BUTTON_SIZE = 36f;
         private const float CLASS_ROW_PADDING = 40f;
         private const float CLASS_COL_PADDING = 10f;
-        private static readonly float CLASS_WIDTH = (Constants.UI_PADDING * 4) + ((CLASS_BUTTON_SIZE + CLASS_COL_PADDING) * Systems.Class.class_locations.GetLength(1)) - CLASS_COL_PADDING;
+        private static readonly float CLASS_WIDTH = (Constants.UI_PADDING * 4) + ((CLASS_BUTTON_SIZE + CLASS_COL_PADDING) * Systems.Class.Class_Locations.GetLength(1)) - CLASS_COL_PADDING;
 
         private const float WIDTH_ATTRIBUTES = 230f;
         private const float HEIGHT_ATTRIBUTES = 250f;
@@ -112,9 +112,9 @@ namespace ExperienceAndClasses.UI {
             class_buttons = new List<ClassButton>();
             ClassButton button;
             byte id;
-            for (byte row = 0; row < Systems.Class.class_locations.GetLength(0); row++) {
-                for (byte col = 0; col < Systems.Class.class_locations.GetLength(1); col++) {
-                    id = Systems.Class.class_locations[row, col];
+            for (byte row = 0; row < Systems.Class.Class_Locations.GetLength(0); row++) {
+                for (byte col = 0; col < Systems.Class.Class_Locations.GetLength(1); col++) {
+                    id = Systems.Class.Class_Locations[row, col];
 
                     if (id != (byte)Systems.Class.CLASS_IDS.New) {
                         button = new ClassButton(Systems.Class.CLASS_LOOKUP[id].Texture, id);
