@@ -101,7 +101,7 @@ namespace ExperienceAndClasses {
         /// Client request broadcast from server
         /// </summary>
         public sealed class Broadcast : Handler {
-            public static readonly Handler Instance = LOOKUP[(byte)Enum.Parse(typeof(PACKET_TYPE), MethodBase.GetCurrentMethod().DeclaringType.Name)];
+            private static readonly Handler Instance = LOOKUP[(byte)Enum.Parse(typeof(PACKET_TYPE), MethodBase.GetCurrentMethod().DeclaringType.Name)];
 
             public static void Send(int target, int origin, string message) {
                 //get packet containing header
@@ -127,7 +127,7 @@ namespace ExperienceAndClasses {
         }
 
         public sealed class ForceFull : Handler {
-            public static readonly Handler Instance = LOOKUP[(byte)Enum.Parse(typeof(PACKET_TYPE), MethodBase.GetCurrentMethod().DeclaringType.Name)];
+            private static readonly Handler Instance = LOOKUP[(byte)Enum.Parse(typeof(PACKET_TYPE), MethodBase.GetCurrentMethod().DeclaringType.Name)];
 
             public static void Send(int target, int origin, byte primary_id, byte primary_level, byte secondary_id, byte secondary_level, short[] attributes, bool afk_status) {
                 //get packet containing header
@@ -143,14 +143,14 @@ namespace ExperienceAndClasses {
             }
 
             protected override void RecieveBody(BinaryReader reader, int origin, MPlayer origin_mplayer) {
-                ForceClass.Instance.Recieve(reader, origin);
-                ForceAttribute.Instance.Recieve(reader, origin);
-                AFK.Instance.Recieve(reader, origin);
+                LOOKUP[(byte)PACKET_TYPE.ForceClass].Recieve(reader, origin);
+                LOOKUP[(byte)PACKET_TYPE.ForceAttribute].Recieve(reader, origin);
+                LOOKUP[(byte)PACKET_TYPE.AFK].Recieve(reader, origin);
             }
         }
 
         public sealed class ForceClass : Handler {
-            public static readonly Handler Instance = LOOKUP[(byte)Enum.Parse(typeof(PACKET_TYPE), MethodBase.GetCurrentMethod().DeclaringType.Name)];
+            private static readonly Handler Instance = LOOKUP[(byte)Enum.Parse(typeof(PACKET_TYPE), MethodBase.GetCurrentMethod().DeclaringType.Name)];
 
             public static void Send(int target, int origin, byte primary_id, byte primary_level, byte secondary_id, byte secondary_level) {
                 //get packet containing header
@@ -185,7 +185,7 @@ namespace ExperienceAndClasses {
         }
 
         public sealed class ForceAttribute : Handler {
-            public static readonly Handler Instance = LOOKUP[(byte)Enum.Parse(typeof(PACKET_TYPE), MethodBase.GetCurrentMethod().DeclaringType.Name)];
+            private static readonly Handler Instance = LOOKUP[(byte)Enum.Parse(typeof(PACKET_TYPE), MethodBase.GetCurrentMethod().DeclaringType.Name)];
 
             public static void Send(int target, int origin, short[] attributes) {
                 //get packet containing header
@@ -222,7 +222,7 @@ namespace ExperienceAndClasses {
         }
 
         public sealed class AFK : Handler {
-            public static readonly Handler Instance = LOOKUP[(byte)Enum.Parse(typeof(PACKET_TYPE), MethodBase.GetCurrentMethod().DeclaringType.Name)];
+            private static readonly Handler Instance = LOOKUP[(byte)Enum.Parse(typeof(PACKET_TYPE), MethodBase.GetCurrentMethod().DeclaringType.Name)];
 
             public static void Send(int target, int origin, bool afk_status) {
                 //get packet containing header
@@ -254,7 +254,7 @@ namespace ExperienceAndClasses {
         }
 
         public sealed class Heal : Handler {
-            public static readonly Handler Instance = LOOKUP[(byte)Enum.Parse(typeof(PACKET_TYPE), MethodBase.GetCurrentMethod().DeclaringType.Name)];
+            private static readonly Handler Instance = LOOKUP[(byte)Enum.Parse(typeof(PACKET_TYPE), MethodBase.GetCurrentMethod().DeclaringType.Name)];
 
             public static void Send(int target, int origin, int amount_life, int amount_mana) {
                 //get packet containing header
@@ -286,7 +286,7 @@ namespace ExperienceAndClasses {
         }
 
         public sealed class XP : Handler {
-            public static readonly Handler Instance = LOOKUP[(byte)Enum.Parse(typeof(PACKET_TYPE), MethodBase.GetCurrentMethod().DeclaringType.Name)];
+            private static readonly Handler Instance = LOOKUP[(byte)Enum.Parse(typeof(PACKET_TYPE), MethodBase.GetCurrentMethod().DeclaringType.Name)];
 
             public static void Send(int target, int origin, double xp) {
                 //get packet containing header
