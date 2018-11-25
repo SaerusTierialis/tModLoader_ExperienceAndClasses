@@ -12,15 +12,15 @@ using Terraria.ModLoader;
 
 namespace ExperienceAndClasses {
     /// <summary>
-    /// the implementation here is not very elegant, but it should run pretty fast and
-    /// new packet types can be added without making changes anywhere else
+    /// Contains handlers for all mod packet types.
     /// 
-    /// singleton implementation
+    /// Packet sending uses static methods for ease of use.
+    /// Packet receiving is standardized and automatic aside from RecieveBody.
     /// 
-    /// to add new packets: add to the enum and define a class with the same name
+    /// The implementation is not very elegant, but it should be pretty fast and
+    /// new packet types can be added without making changes elsewhere.
     /// 
-    /// Packet sending uses static methods for ease of use
-    /// Packet receiving is standardized and automatic aside from RecieveBody
+    /// To add new packets: add to the enum and define a class with the same name
     /// </summary>
     public static class PacketHandler {
 
@@ -80,7 +80,7 @@ namespace ExperienceAndClasses {
             }
 
             public void Recieve(BinaryReader reader, int origin) {
-                //do not read anything from reader here (called multiple times when processing full packet)
+                //do not read anything from reader here (called multiple times when processing full sync packet)
 
                 if (ExperienceAndClasses.trace) {
                     Commons.Trace("Handling " + packet_string + " originating from " + origin);
