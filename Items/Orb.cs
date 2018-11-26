@@ -9,13 +9,30 @@ using Terraria.ID;
 using Terraria.ModLoader;
 
 namespace ExperienceAndClasses.Items {
-    abstract class Orb : ModItem {
+    abstract class MItem : ModItem {
+        public override void SetDefaults() {
+            item.maxStack = 9999999;
+        }
+
+        /* Workaround for MaxStacks mod */
+        public override void OnCraft(Recipe recipe) {
+            item.maxStack = 9999999;
+            base.OnCraft(recipe);
+        }
+        public override void UpdateInventory(Player player) {
+            item.maxStack = 9999999;
+            base.UpdateInventory(player);
+        }
+    }
+
+    abstract class Orb : MItem {
         protected short dust_type = DustID.AmberBolt;
 
         public override void SetDefaults() {
-            item.width = 29;
-            item.height = 30;
-            item.maxStack = 9999999;
+            base.SetDefaults();
+
+            item.width = 20;
+            item.height = 20;
             item.consumable = true;
             item.useAnimation = 10;
             item.useTime = 10;
@@ -41,21 +58,11 @@ namespace ExperienceAndClasses.Items {
         }
 
         abstract protected uint GetValue();
-
-        /* Workaround for MaxStacks mod */
-        public override void OnCraft(Recipe recipe) {
-            item.maxStack = 9999999;
-            base.OnCraft(recipe);
-        }
-        public override void UpdateInventory(Player player) {
-            item.maxStack = 9999999;
-            base.UpdateInventory(player);
-        }
     }
 
     class Monster_Orb : Orb {
         public Monster_Orb() {
-            dust_type = DustID.GreenBlood;
+            dust_type = DustID.ApprenticeStorm;
         }
 
         public override void SetStaticDefaults() {
@@ -92,7 +99,7 @@ namespace ExperienceAndClasses.Items {
 
     class Boss_Orb : Orb {
         public Boss_Orb() {
-            dust_type = DustID.SomethingRed;
+            dust_type = DustID.BlueCrystalShard;
         }
 
         public override void SetStaticDefaults() {
@@ -102,7 +109,8 @@ namespace ExperienceAndClasses.Items {
 
         public override void SetDefaults() {
             base.SetDefaults();
-            item.rare = 10;
+            item.expert = true;
+            item.rare = 11;
         }
 
         public override string Texture {
