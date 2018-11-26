@@ -9,22 +9,6 @@ using Terraria.ID;
 using Terraria.ModLoader;
 
 namespace ExperienceAndClasses.Items {
-    abstract class MItem : ModItem {
-        public override void SetDefaults() {
-            item.maxStack = 9999999;
-        }
-
-        /* Workaround for MaxStacks mod */
-        public override void OnCraft(Recipe recipe) {
-            item.maxStack = 9999999;
-            base.OnCraft(recipe);
-        }
-        public override void UpdateInventory(Player player) {
-            item.maxStack = 9999999;
-            base.UpdateInventory(player);
-        }
-    }
-
     abstract class Orb : MItem {
         protected short dust_type = DustID.AmberBolt;
 
