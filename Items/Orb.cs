@@ -99,7 +99,7 @@ namespace ExperienceAndClasses.Items {
 
     class Boss_Orb : Orb {
         public Boss_Orb() {
-            dust_type = DustID.BlueCrystalShard;
+            dust_type = DustID.PurpleCrystalShard;
         }
 
         public override void SetStaticDefaults() {
@@ -109,7 +109,6 @@ namespace ExperienceAndClasses.Items {
 
         public override void SetDefaults() {
             base.SetDefaults();
-            item.expert = true;
             item.rare = 11;
         }
 
