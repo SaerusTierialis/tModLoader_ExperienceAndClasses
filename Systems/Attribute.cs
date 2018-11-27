@@ -179,8 +179,8 @@ namespace ExperienceAndClasses.Systems {
         }
 
         //per point bonuses
-        private const float POWER_DAMAGE = 0.01f;
-        private const float POWER_FISH = 0.2f;
+        private const float POWER_DAMAGE = 0.005f;
+        private const float POWER_FISH = 0.1f;
 
         private const float VITALITY_LIFE = 1f;
         private const float VITALITY_LIFE_REGEN = 0.2f;
@@ -190,9 +190,9 @@ namespace ExperienceAndClasses.Systems {
         private const float MIND_MANA_REGEN = 0.5f;
         private const float MIND_MANA_DELAY = 0.5f;
 
-        private const float SPIRIT_CRIT = 0.25f;
-        private const float SPIRIT_MINION_CAP = 0.05f;
-        private const float SPIRIT_HEAL = 1f;
+        private const float SPIRIT_CRIT = 0.125f;
+        private const float SPIRIT_MINION_CAP = 0.025f;
+        private const float SPIRIT_HEAL = 0.5f;
 
         private const float AGILITY_MOVEMENT = 0.005f;
         private const float AGILITY_JUMP = 0.01f;
