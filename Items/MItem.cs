@@ -7,11 +7,41 @@ using Terraria;
 using Terraria.ModLoader;
 
 namespace ExperienceAndClasses.Items {
-    abstract class MItem : ModItem {
+    public abstract class MItem : ModItem {
         private const int STACK_SIZE = 99999;
 
+        private readonly string NAME, TOOLTIP, TEXTURE;
+        private readonly bool CONSUMABLE;
+        private readonly int WIDTH, HEIGHT, RARITY;
+
+        protected MItem(string name, string tooltip, string texture, bool consumable, int width, int height, int rarity) {
+            NAME = name;
+            TOOLTIP = tooltip;
+            TEXTURE = texture;
+            CONSUMABLE = consumable;
+            WIDTH = width;
+            HEIGHT = height;
+            RARITY = rarity;
+        }
+
+        public override void SetStaticDefaults() {
+            DisplayName.SetDefault(NAME);
+            base.Tooltip.SetDefault(TOOLTIP);
+        }
         public override void SetDefaults() {
             item.maxStack = STACK_SIZE;
+
+            item.width = WIDTH;
+            item.height = HEIGHT;
+
+            item.rare = RARITY;
+
+            if (CONSUMABLE) {
+                item.consumable = true;
+                item.useAnimation = 10;
+                item.useTime = 10;
+                item.useStyle = 4;
+            }
         }
         public override void OnCraft(Recipe recipe) {
             item.maxStack = STACK_SIZE;
@@ -20,6 +50,11 @@ namespace ExperienceAndClasses.Items {
         public override void UpdateInventory(Player player) {
             item.maxStack = STACK_SIZE;
             base.UpdateInventory(player);
+        }
+        public override string Texture {
+            get {
+                return TEXTURE;
+            }
         }
     }
 }
