@@ -25,9 +25,15 @@ namespace ExperienceAndClasses.Systems {
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Variables ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-
+        public static uint[] TRACK_PLAYER_XP = new uint[Main.maxPlayers];
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ XP ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+        public static void AddXP(byte player_index, double xp) {
+            if (!ExperienceAndClasses.IS_CLIENT) {
+                TRACK_PLAYER_XP[player_index] += ModifyXP(player_index, xp);
+            }
+        }
 
         public static double CalculateXP(NPC npc) {
             //xp is double until it is added to mplayer as uint
@@ -60,13 +66,15 @@ namespace ExperienceAndClasses.Systems {
             return xp;
         }
 
-        public static double ModifyXP(double xp, Player player) {
+        public static uint ModifyXP(byte player_index, double xp) {
+            Player player = Main.player[player_index];
+
             //5% bonus for well fed
             if (player.wellFed) {
                 xp *= 1.05d;
             }
 
-            return xp;
+            return (uint)Math.Ceiling(xp);
         }
 
         /// <summary>

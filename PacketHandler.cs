@@ -288,7 +288,7 @@ namespace ExperienceAndClasses {
         public sealed class XP : Handler {
             private static readonly Handler Instance = LOOKUP[(byte)Enum.Parse(typeof(PACKET_TYPE), MethodBase.GetCurrentMethod().DeclaringType.Name)];
 
-            public static void Send(int target, int origin, double xp) {
+            public static void Send(int target, int origin, uint xp) {
                 //get packet containing header
                 ModPacket packet = Instance.GetPacket(origin);
 
@@ -301,7 +301,7 @@ namespace ExperienceAndClasses {
 
             protected override void RecieveBody(BinaryReader reader, int origin, MPlayer origin_mplayer) {
                 //read
-                double xp = reader.ReadDouble();
+                uint xp = reader.ReadUInt32();
 
                 //set
                 ExperienceAndClasses.LOCAL_MPLAYER.LocalAddXP(xp);

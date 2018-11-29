@@ -27,23 +27,18 @@ namespace ExperienceAndClasses {
 
                 //base orb drop
 
-                //do
-                if (ExperienceAndClasses.IS_SERVER) {
-                    //find eligible player
-                    List<int> eligible_players = GetEligiblePlayers(npc);
+                //divvy up xp...
 
-                    //overall xp increased by 20% per player
-                    xp *= (1 + ((eligible_players.Count - 1) * 0.2));
-                    xp /= eligible_players.Count;
+                //find eligible player
+                List<int> eligible_players = GetEligiblePlayers(npc);
 
-                    //give
-                    foreach (byte player_index in eligible_players) {
-                        PacketHandler.XP.Send(player_index, -1, Systems.XP.ModifyXP(xp, Main.player[player_index]));
-                    }
-                }
-                else { //singleplayer
-                    //directly add
-                    ExperienceAndClasses.LOCAL_MPLAYER.LocalAddXP(xp);
+                //overall xp increased by 20% per player then divided
+                xp *= (1 + ((eligible_players.Count - 1) * 0.2));
+                xp /= eligible_players.Count;
+
+                //give
+                foreach (byte player_index in eligible_players) {
+                    Systems.XP.AddXP(player_index, xp);
                 }
 
             }

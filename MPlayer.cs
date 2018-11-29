@@ -11,7 +11,7 @@ namespace ExperienceAndClasses {
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Constants ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         private const long TICKS_PER_FULL_SYNC = TimeSpan.TicksPerMinute * 2;
-        private const long TICKS_PER_XP_MESSAGE = (long)(TimeSpan.TicksPerSecond * 0.5);
+        private const long TICKS_PER_XP_SEND = (long)(TimeSpan.TicksPerSecond * 0.5);
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Static Vars ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -27,8 +27,7 @@ namespace ExperienceAndClasses {
         public bool Allow_Secondary { get; private set; }
 
         private bool show_xp;
-        private double show_xp_value;
-        private DateTime show_xp_when;
+        private DateTime send_xp_when;
 
         public byte[] Class_Levels { get; private set; }
         public uint[] Class_XP { get; private set; }
@@ -73,8 +72,7 @@ namespace ExperienceAndClasses {
             AFK = false;
             Killed_WOF = false;
             show_xp = true;
-            show_xp_value = 0;
-            show_xp_when = DateTime.MinValue;
+            send_xp_when = DateTime.MinValue;
             minions = new List<Projectile>();
 
             //default level/xp/unlock
@@ -107,6 +105,9 @@ namespace ExperienceAndClasses {
             use_speed_melee = use_speed_ranged = use_speed_magic = use_speed_throwing = use_speed_minion = use_speed_tool = 1f;
             ability_delay_reduction = 1f;
             tool_power = 1f;
+
+            //xp
+            Systems.XP.TRACK_PLAYER_XP[player.whoAmI] = 0;
         }
 
         /// <summary>
@@ -180,21 +181,33 @@ namespace ExperienceAndClasses {
         public override void PostUpdate() {
             base.PostUpdate();
 
+
+            //timed events...
+            DateTime now = DateTime.Now;
+
+            //server/singleplayer
+            if (!ExperienceAndClasses.IS_CLIENT) {
+                uint xp = Systems.XP.TRACK_PLAYER_XP[player.whoAmI];
+
+                if ((xp > 0) && (now.CompareTo(send_xp_when) >= 0)) {
+
+                    send_xp_when = now.AddTicks(TICKS_PER_XP_SEND);
+                    Systems.XP.TRACK_PLAYER_XP[player.whoAmI] = 0;
+
+                    if (ExperienceAndClasses.IS_SERVER) {
+                        PacketHandler.XP.Send(player.whoAmI, -1, xp);
+                    }
+                    else {
+                        LocalAddXP(xp);
+                    }
+                }
+            }
+
             //local events
             if (Is_Local_Player) {
                 //ui
                 UI.UIStatus.Instance.Update();
 
-                //timed events
-                DateTime now = DateTime.Now;
-
-                if (show_xp && (show_xp_value > 0)) {
-                    if (now.CompareTo(show_xp_when) >= 0) {
-                        show_xp_when = now.AddTicks(TICKS_PER_XP_MESSAGE);
-                        CombatText.NewText(Main.LocalPlayer.getRect(), UI.Constants.COLOUR_XP_BRIGHT, "+" + Math.Max(Math.Floor(show_xp_value), 1) + " XP");
-                        show_xp_value = 0;
-                    }
-                }
             }
         }
 
@@ -394,11 +407,11 @@ namespace ExperienceAndClasses {
                 }
 
                 if (Class_Secondary_Level_Effective > 0) {
-                    Attributes_Base[id] = (short)Math.Floor((sum_primary / Systems.Attribute.ATTRIBUTE_GROWTH_LEVELS * Systems.Attribute.SUBCLASS_PENALTY_ATTRIBUTE_MULTIPLIER_PRIMARY) +
+                    Attributes_Base[id] = (int)Math.Floor((sum_primary / Systems.Attribute.ATTRIBUTE_GROWTH_LEVELS * Systems.Attribute.SUBCLASS_PENALTY_ATTRIBUTE_MULTIPLIER_PRIMARY) +
                                                             (sum_secondary / Systems.Attribute.ATTRIBUTE_GROWTH_LEVELS * Systems.Attribute.SUBCLASS_PENALTY_ATTRIBUTE_MULTIPLIER_SECONDARY));
                 }
                 else {
-                    Attributes_Base[id] = (short)Math.Floor(sum_primary / Systems.Attribute.ATTRIBUTE_GROWTH_LEVELS);
+                    Attributes_Base[id] = (int)Math.Floor(sum_primary / Systems.Attribute.ATTRIBUTE_GROWTH_LEVELS);
                 }
             }
 
@@ -469,38 +482,49 @@ namespace ExperienceAndClasses {
             }
         }
 
-        public void LocalAddXP(double xp) {
-            if (!Is_Local_Player) return;
+        public bool CanGainXP() {
+            return (CanGainXPPrimary() || CanGainXPSecondary());
+        }
 
-            //no xp if no class
-            if (Class_Primary_Level_Effective > 0) {
-                //display
+        private bool CanGainXPPrimary() {
+            return (Is_Local_Player && (Class_Primary.Tier > 0) && (Class_Levels[Class_Primary.ID] < Class_Primary.Max_Level));
+        }
+
+        private bool CanGainXPSecondary() {
+            return (Is_Local_Player && Allow_Secondary && (Class_Secondary.Tier > 0) && (Class_Levels[Class_Secondary.ID] < Class_Secondary.Max_Level));
+        }
+
+        public void LocalAddXP(uint xp) {
+            if (CanGainXP()) {
                 if (show_xp) {
-                    show_xp_value += Math.Max(Math.Floor(xp), 1);
+                    CombatText.NewText(Main.LocalPlayer.getRect(), UI.Constants.COLOUR_XP_BRIGHT, "+" + xp + " XP");
                 }
 
-                //store current effective levels
+                bool add_primary = CanGainXPPrimary();
+                bool add_secondary = CanGainXPSecondary();
+
+                if (add_primary && add_secondary) {
+                    AddXP(Class_Primary.ID, (uint)Math.Ceiling(xp * Systems.XP.SUBCLASS_PENALTY_XP_MULTIPLIER_PRIMARY));
+                    AddXP(Class_Secondary.ID, (uint)Math.Ceiling(xp * Systems.XP.SUBCLASS_PENALTY_XP_MULTIPLIER_SECONDARY));
+                }
+                else if (add_primary) {
+                    AddXP(Class_Primary.ID, xp);
+                }
+                else if (add_secondary) {
+                    AddXP(Class_Secondary.ID, xp);
+                }
+
+                //store prior levels to detect level-up
                 byte effective_primary = Class_Primary_Level_Effective;
                 byte effective_secondary = Class_Secondary_Level_Effective;
 
-                //add xp
-                if (Class_Secondary_Level_Effective > 0) {
-                    //subclass penalty
-                    AddXP(Class_Primary.ID, (uint)Math.Max(Math.Floor(xp * Systems.XP.SUBCLASS_PENALTY_XP_MULTIPLIER_PRIMARY), 1));
-                    AddXP(Class_Secondary.ID, (uint)Math.Max(Math.Floor(xp * Systems.XP.SUBCLASS_PENALTY_XP_MULTIPLIER_SECONDARY), 1));
-                }
-                else {
-                    //single class
-                    AddXP(Class_Primary.ID, (uint)Math.Max(Math.Floor(xp), 1));
-                }
-
                 //level up
-                while ((Class_Levels[Class_Primary.ID] < Systems.Class.MAX_LEVEL[Class_Primary.Tier]) && (Class_XP[Class_Primary.ID] >= Systems.XP.GetXPReq(Class_Primary, Class_Levels[Class_Primary.ID]))) {
+                while ((Class_Levels[Class_Primary.ID] < Class_Primary.Max_Level) && (Class_XP[Class_Primary.ID] >= Systems.XP.GetXPReq(Class_Primary, Class_Levels[Class_Primary.ID]))) {
                     SubtractXP(Class_Primary.ID, Systems.XP.GetXPReq(Class_Primary, Class_Levels[Class_Primary.ID]));
                     Class_Levels[Class_Primary.ID]++;
                     AnnounceLevel(Class_Primary);
                 }
-                while ((Class_Levels[Class_Secondary.ID] < Systems.Class.MAX_LEVEL[Class_Secondary.Tier]) && (Class_XP[Class_Secondary.ID] >= Systems.XP.GetXPReq(Class_Secondary, Class_Levels[Class_Secondary.ID]))) {
+                while ((Class_Levels[Class_Secondary.ID] < Class_Secondary.Max_Level) && (Class_XP[Class_Secondary.ID] >= Systems.XP.GetXPReq(Class_Secondary, Class_Levels[Class_Secondary.ID]))) {
                     SubtractXP(Class_Secondary.ID, Systems.XP.GetXPReq(Class_Secondary, Class_Levels[Class_Secondary.ID]));
                     Class_Levels[Class_Secondary.ID]++;
                     AnnounceLevel(Class_Secondary);

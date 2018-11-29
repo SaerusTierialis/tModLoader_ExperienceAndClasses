@@ -417,6 +417,7 @@ namespace ExperienceAndClasses.Systems {
         public PowerScaling Power_Scaling { get; private set; }
         public float[] Attribute_Growth { get; private set; }
         public bool Gives_Allocation_Attributes { get; private set; }
+        public byte Max_Level { get; private set; }
 
         public Class(byte id, string name, string description, byte tier, string texture_path, byte id_prereq, PowerScaling power_scaling, float[] attribute_growth, bool gives_allocation_attributes) {
             ID = id;
@@ -428,6 +429,7 @@ namespace ExperienceAndClasses.Systems {
             Power_Scaling = power_scaling;
             Attribute_Growth = attribute_growth;
             Gives_Allocation_Attributes = gives_allocation_attributes;
+            Max_Level = MAX_LEVEL[Tier];
         }
 
         public void LoadTexture() {
