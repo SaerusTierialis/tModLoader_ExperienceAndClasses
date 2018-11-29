@@ -32,6 +32,7 @@ namespace ExperienceAndClasses {
             ForceAttribute,
             Heal,
             AFK,
+            InCombat,
             XP,
 
 
@@ -240,11 +241,43 @@ namespace ExperienceAndClasses {
                 bool afk_status = reader.ReadBoolean();
 
                 //set
-                origin_mplayer.SetAfk(afk_status);
+                origin_mplayer.SetInCombat(afk_status);
 
                 //relay
                 if (ExperienceAndClasses.IS_SERVER) {
                     Send(-1, origin, afk_status);
+                }
+            }
+
+            public static void WritePacketBody(ModPacket packet, bool afk_status) {
+                packet.Write(afk_status);
+            }
+        }
+
+        public sealed class InCombat : Handler {
+            private static readonly Handler Instance = LOOKUP[(byte)Enum.Parse(typeof(PACKET_TYPE), MethodBase.GetCurrentMethod().DeclaringType.Name)];
+
+            public static void Send(int target, int origin, bool combat_status) {
+                //get packet containing header
+                ModPacket packet = Instance.GetPacket(origin);
+
+                //specific content
+                WritePacketBody(packet, combat_status);
+
+                //send
+                packet.Send(target, origin);
+            }
+
+            protected override void RecieveBody(BinaryReader reader, int origin, MPlayer origin_mplayer) {
+                //read
+                bool combat_status = reader.ReadBoolean();
+
+                //set
+                origin_mplayer.SetInCombat(combat_status);
+
+                //relay
+                if (ExperienceAndClasses.IS_SERVER) {
+                    Send(-1, origin, combat_status);
                 }
             }
 

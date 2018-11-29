@@ -56,7 +56,8 @@ namespace ExperienceAndClasses {
         public byte Class_Secondary_Level_Effective { get; private set; }
 
         public int[] Attributes_Final { get; private set; }
-        public bool AFK { get; private set; }
+        public bool AFK { get; private set; } //TODO
+        public bool IN_COMBAT { get; private set; } //TODO
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Initialize ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -70,6 +71,7 @@ namespace ExperienceAndClasses {
             initialized = false;
             Load_Version = new int[3];
             AFK = false;
+            IN_COMBAT = false;
             Killed_WOF = false;
             show_xp = true;
             send_xp_when = DateTime.MinValue;
@@ -221,13 +223,17 @@ namespace ExperienceAndClasses {
             INVALID_COMBINATION,
             INVALID_NON_LOCAL,
             INVALID_MINIONS,
+            INVALID_COMBAT,
         }
         public CLASS_VALIDITY LocalCheckClassValid(byte id, bool is_primary) {
             //local MPlayer only
             if (!Is_Local_Player) return CLASS_VALIDITY.INVALID_NON_LOCAL;
 
-            if (id == (byte)Systems.Class.CLASS_IDS.None) {
-                return CLASS_VALIDITY.VALID; //setting to no class is always allowed
+            if (IN_COMBAT) {
+                return CLASS_VALIDITY.INVALID_COMBAT;
+            }
+            else if (id == (byte)Systems.Class.CLASS_IDS.None) {
+                return CLASS_VALIDITY.VALID; //setting to no class is always allowed (unless in combat)
             }
             else {
                 if (id >= (byte)Systems.Class.CLASS_IDS.NUMBER_OF_IDs) {
@@ -338,6 +344,10 @@ namespace ExperienceAndClasses {
 
                     case CLASS_VALIDITY.INVALID_NON_LOCAL:
                         Commons.Error("Tried to set non-local player with SetClass! (please report)");
+                        break;
+
+                    case CLASS_VALIDITY.INVALID_COMBAT:
+                        Main.NewText("Failed to set class because you are in combat!", UI.Constants.COLOUR_MESSAGE_ERROR);
                         break;
 
                     default:
@@ -629,6 +639,7 @@ namespace ExperienceAndClasses {
             Attributes_Final.CopyTo(clone.Attributes_Final, 0);
 
             clone.AFK = AFK;
+            clone.IN_COMBAT = IN_COMBAT;
         }
 
         /// <summary>
@@ -664,6 +675,11 @@ namespace ExperienceAndClasses {
                 //afk
                 if (clone.AFK != AFK) {
                     PacketHandler.AFK.Send(-1, me, AFK);
+                }
+
+                //combat
+                if (clone.IN_COMBAT != IN_COMBAT) {
+
                 }
 
             }
@@ -949,7 +965,7 @@ namespace ExperienceAndClasses {
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Misc ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-        public void SetAfk(bool afk) {
+        public void SetAFK(bool afk) {
             AFK = afk;
             if (Is_Local_Player) {
                 if (AFK) {
@@ -959,6 +975,10 @@ namespace ExperienceAndClasses {
                     Main.NewText("You are no longer AFK. You can gain and lose XP again.", UI.Constants.COLOUR_MESSAGE_SUCCESS);
                 }
             }
+        }
+
+        public void SetInCombat(bool in_combat) {
+            IN_COMBAT = in_combat;
         }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Ability & Status ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
