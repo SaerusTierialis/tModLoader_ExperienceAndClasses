@@ -16,7 +16,7 @@ namespace ExperienceAndClasses.Items {
     }
 
     public class Unlock_Tier2 : Unlock {
-        public const string NAME = "Token of Potential";
+        public const string NAME = "Token: Tier II Class";
         private const string TOOLTIP = "TODP_tooltip";
         private const string TEXTURE = "ExperienceAndClasses/Textures/Item/Unlock_Tier2";
         private const int RARITY = 8;
@@ -25,7 +25,7 @@ namespace ExperienceAndClasses.Items {
     }
 
     public class Unlock_Tier3 : Unlock {
-        public const string NAME = "Token of Perfection";
+        public const string NAME = "Token: Tier III Class";
         private const string TOOLTIP = "TODP_tooltip";
         private const string TEXTURE = "ExperienceAndClasses/Textures/Item/Unlock_Tier3";
         private const int RARITY = 10;
@@ -34,7 +34,7 @@ namespace ExperienceAndClasses.Items {
     }
 
     public class Unlock_Subclass : Unlock {
-        public const string NAME = "Token of Possibilities";
+        public const string NAME = "Token: Multiclass";
         private const string TOOLTIP = "TODP_tooltip";
         private const string TEXTURE = "ExperienceAndClasses/Textures/Item/Unlock_Subclass";
         private const int RARITY = -12;
@@ -43,7 +43,7 @@ namespace ExperienceAndClasses.Items {
     }
 
     public class Unlock_Explorer : Unlock {
-        public const string NAME = "Token of Exploration";
+        public const string NAME = "Token: Explorer";
         private const string TOOLTIP = "TODP_tooltip";
         private const string TEXTURE = "ExperienceAndClasses/Textures/Item/Unlock_Explorer";
         private const int RARITY = -11;

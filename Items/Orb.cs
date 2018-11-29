@@ -47,7 +47,7 @@ namespace ExperienceAndClasses.Items {
     }
 
     public class Monster_Orb : Orb {
-        public const string NAME = "Orb of Potential";
+        public const string NAME = "Ascension Orb";
         private const string TOOLTIP = "TODP_tooltip";
         private const string TEXTURE = "ExperienceAndClasses/Textures/Item/Orb_Monster";
         private const int RARITY = 9;
@@ -72,7 +72,7 @@ namespace ExperienceAndClasses.Items {
     }
 
     class Boss_Orb : Orb {
-        public const string NAME = "Orb of Perfection";
+        public const string NAME = "Transcendence Orb";
         private const string TOOLTIP = "TODP_tooltip";
         private const string TEXTURE = "ExperienceAndClasses/Textures/Item/Orb_Boss";
         private const int RARITY = 11;
