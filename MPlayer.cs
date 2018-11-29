@@ -56,8 +56,8 @@ namespace ExperienceAndClasses {
         public byte Class_Secondary_Level_Effective { get; private set; }
 
         public int[] Attributes_Final { get; private set; }
-        public bool AFK { get; private set; } //TODO
-        public bool IN_COMBAT { get; private set; } //TODO
+        public bool AFK { get; private set; } //TODO local set
+        public bool IN_COMBAT { get; private set; } //TODO local set
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Initialize ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
