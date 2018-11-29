@@ -433,23 +433,6 @@ namespace ExperienceAndClasses {
             //sum attributes
             LocalCalculateFinalAttributes();
 
-            //TODO: unlock (temp)
-            byte level_req;
-            for (byte id = 0; id<(byte)Systems.Class.CLASS_IDS.NUMBER_OF_IDs; id++) {
-                if (Class_Unlocked[id])
-                    continue;
-
-                c = Systems.Class.CLASS_LOOKUP[id];
-                level_req = Systems.Class.MAX_LEVEL[Systems.Class.CLASS_LOOKUP[c.ID_Prereq].Tier];
-                if (level_req > 0) {
-                    if (Class_Levels[c.ID_Prereq] >= level_req) {
-                        Class_Unlocked[id] = true;
-                        if (Class_Levels[id] < 1) Class_Levels[id] = 1;
-                        AnnounceClassUnlock(c);
-                    }
-                }
-            }
-
             //update UI
             UI.UIClass.Instance.UpdateClassInfo();
             UI.UIBars.Instance.Update();
