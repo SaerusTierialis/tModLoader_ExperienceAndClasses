@@ -87,7 +87,7 @@ namespace ExperienceAndClasses.Systems {
 
             //tier 1 (predefined)
             //uint[] xp_predef = new uint[] { 0, 0, 10, 25, 50, 75, 100, 125, 150, 200, 350 }; //length+1 must be UI.UI.MAX_LEVEL[1]
-            uint[] xp_predef = new uint[] { 0, 0, 10, 15, 20, 30, 40, 50, 60, 80, 100 }; //length+1 must be UI.UI.MAX_LEVEL[1]
+            uint[] xp_predef = new uint[] { 0, 10, 15, 20, 30, 40, 50, 60, 80, 100 }; //length+1 must be UI.UI.MAX_LEVEL[1]
             int num_predef = xp_predef.Length - 1;
 
             int levels = Class.MAX_LEVEL[1] + Class.MAX_LEVEL[2] + Class.MAX_LEVEL[3];
@@ -95,7 +95,7 @@ namespace ExperienceAndClasses.Systems {
             XP_REQ = new uint[1 + levels];
 
             double adjust;
-            for (int i = 2; i <= levels; i++) {
+            for (int i = 1; i <= levels; i++) {
                 if (i <= num_predef) {
                     XP_REQ[i] = xp_predef[i];
                 }
@@ -106,7 +106,7 @@ namespace ExperienceAndClasses.Systems {
             }
         }
 
-        public static uint GetXPReq(Systems.Class c, byte level) {
+        public static uint GetXPReq(Class c, byte level) {
             if (level >= Class.MAX_LEVEL[c.Tier]) {
                 return 0;
             }
