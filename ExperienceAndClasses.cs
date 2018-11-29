@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using Terraria;
+using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.UI;
 
@@ -21,14 +22,12 @@ namespace ExperienceAndClasses {
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Constants (and readonly) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-        
+
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Treated like readonly after entering map ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         //updated client-side when entering game to detect client vs singleplayer mode
-        public static bool IS_SERVER = (Main.netMode == 2);
-        public static bool IS_CLIENT = (Main.netMode == 1);
-        public static bool IS_SINGLEPLAYER = (Main.netMode == 0);
+        public static bool IS_SERVER, IS_CLIENT, IS_SINGLEPLAYER;
 
         public static MPlayer LOCAL_MPLAYER;
         public static Mod MOD;
@@ -42,7 +41,7 @@ namespace ExperienceAndClasses {
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Constructor ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         public ExperienceAndClasses() {
-            
+            CheckMultiplater();
         }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Load/Unload ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
@@ -164,9 +163,9 @@ namespace ExperienceAndClasses {
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Other ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         public static void CheckMultiplater() {
-            IS_SERVER = (Main.netMode == 2);
-            IS_CLIENT = (Main.netMode == 1);
-            IS_SINGLEPLAYER = (Main.netMode == 0);
+            IS_SERVER = (Main.netMode == NetmodeID.Server);
+            IS_CLIENT = (Main.netMode == NetmodeID.MultiplayerClient);
+            IS_SINGLEPLAYER = (Main.netMode == NetmodeID.SinglePlayer);
         }
     }
 }
