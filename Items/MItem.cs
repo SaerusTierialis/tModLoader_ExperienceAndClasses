@@ -56,5 +56,9 @@ namespace ExperienceAndClasses.Items {
                 return TEXTURE;
             }
         }
+
+        public string GetLocalizedName() {
+            return Commons.GetItemLocalizedName(this);
+        }
     }
 }

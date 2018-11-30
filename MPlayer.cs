@@ -383,10 +383,10 @@ namespace ExperienceAndClasses {
             }
 
             //item requirements
-            if (c.Unlock_Item >= 0) {
-                if (!player.HasItem(c.Unlock_Item)) {
+            if (c.Unlock_Item != null) {
+                if (!player.HasItem(c.Unlock_Item.item.type)) {
                     //item requirement not met
-                    Main.NewText("You require a " + ItemLoader.GetItem(c.Unlock_Item).DisplayName.GetDefault() + " to unlock " + c.Name + "!", UI.Constants.COLOUR_MESSAGE_ERROR);
+                    Main.NewText("You require a " + c.Unlock_Item.GetLocalizedName() + " to unlock " + c.Name + "!", UI.Constants.COLOUR_MESSAGE_ERROR);
                     return false;
                 }
             }

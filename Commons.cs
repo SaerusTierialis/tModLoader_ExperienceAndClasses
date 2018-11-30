@@ -156,5 +156,9 @@ namespace ExperienceAndClasses {
             }
         }
 
+        public static string GetItemLocalizedName(ModItem mitem) {
+            return LanguageManager.Instance.GetText(mitem.DisplayName.Key).Value;
+        }
+
     }
 }

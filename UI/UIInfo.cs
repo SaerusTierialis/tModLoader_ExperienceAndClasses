@@ -207,9 +207,9 @@ namespace ExperienceAndClasses.UI {
 
         public void ShowUnlockClass(UIElement source, byte class_id) {
             Systems.Class c = Systems.Class.CLASS_LOOKUP[class_id];
-            ModItem item = ItemLoader.GetItem(c.Unlock_Item);
+            Items.MItem item = c.Unlock_Item;
 
-            string str = "Requirements:\n" + "Level " + c.Prereq.Max_Level + " " + c.Prereq.Name + "\n" + item.DisplayName.GetDefault();
+            string str = "Requirements:\n" + "Level " + c.Prereq.Max_Level + " " + c.Prereq.Name + "\n" + item.GetLocalizedName();
 
             mode = MODE.FREE;
             ShowText(source, "Unlock " + c.Name, str , WIDTH_UNLOCK, null, 0, ModLoader.GetTexture(item.Texture));
