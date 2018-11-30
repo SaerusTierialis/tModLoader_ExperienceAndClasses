@@ -14,7 +14,7 @@ namespace ExperienceAndClasses.UI {
         private float text_scale;
         private Vector2 text_measure;
 
-        public HelpTextPanel(string title, float text_scale, bool center_text, string help_text_title, string help_text) {
+        public HelpTextPanel(string title, float text_scale, bool center_text=true, string help_text=null, string help_text_title=null) {
             SetPadding(0f);
             this.help_text_title = help_text_title;
             this.help_text = help_text;
@@ -45,7 +45,9 @@ namespace ExperienceAndClasses.UI {
 
         public override void MouseOver(UIMouseEvent evt) {
             base.MouseOver(evt);
-            UIInfo.Instance.ShowHelpText(this, help_text_title, help_text);
+            if (help_text != null) {
+                UIInfo.Instance.ShowHelpText(this, help_text, help_text_title);
+            }
         }
 
         public override void MouseOut(UIMouseEvent evt) {
@@ -560,11 +562,13 @@ namespace ExperienceAndClasses.UI {
     }
 
 
-    // Copied from ExampleMod on GitHub
+    // Copied from ExampleMod on GitHub, changes made:
     // Added locking of drag panel
     // added auto and close
     // added visible
     // switch drag to right click
+    // improved restriction
+    // added argument to prevent drag
 
     // This DragableUIPanel class inherits from UIPanel. 
     // Inheriting is a great tool for UI design. By inheriting, we get the background drawing for free from UIPanel
@@ -579,8 +583,13 @@ namespace ExperienceAndClasses.UI {
         private bool stop_pin = false;
         private UIStateCombo UI;
         private bool buttons_hidden = false;
+        private bool can_drag;
 
         public bool visible = true;
+
+        public float top_space { get; private set; }
+
+        private HelpTextPanel title = null;
 
         private UIHoverImageButton button_pinned = null, button_auto = null, button_close = null;
 
@@ -625,8 +634,11 @@ namespace ExperienceAndClasses.UI {
             }
         }
 
-        public DragableUIPanel(float width, float height, Color color, UIStateCombo ui, bool enable_close, bool enable_auto, bool enable_pin) : base() {
+        public DragableUIPanel(float width, float height, Color color, UIStateCombo ui, bool enable_close, bool enable_auto, bool enable_pin, bool enable_drag=true) : base() {
             UI = ui;
+            can_drag = enable_drag;
+
+            top_space = 0;
 
             BackgroundColor = color;
 
@@ -664,6 +676,25 @@ namespace ExperienceAndClasses.UI {
             }
 
             Recalculate();
+        }
+
+        public void SetTitle(string text, float text_scale=1, bool center=true, string helptext=null, string helptext_title=null) {
+            if (title != null) {
+                RemoveTitle();
+            }
+            title = new HelpTextPanel(text, text_scale, center, helptext, helptext_title);
+            title.Width.Set(Width.Pixels, 0f);
+            title.BackgroundColor = BackgroundColor;
+            title.BorderColor = BorderColor;
+            top_space = title.Height.Pixels;
+            Append(title);
+        }
+
+        public void RemoveTitle() {
+            if (title != null) {
+                title.Remove();
+                top_space = 0f;
+            }
         }
 
         public override void Recalculate() {
@@ -704,12 +735,16 @@ namespace ExperienceAndClasses.UI {
 
         public override void RightMouseDown(UIMouseEvent evt) {
             base.RightMouseDown(evt);
-            DragStart(evt);
+            if (can_drag) {
+                DragStart(evt);
+            }
         }
 
         public override void RightMouseUp(UIMouseEvent evt) {
             base.RightMouseUp(evt);
-            DragEnd(evt);
+            if (can_drag) {
+                DragEnd(evt);
+            }
         }
 
         private void DragStart(UIMouseEvent evt) {
@@ -791,6 +826,7 @@ namespace ExperienceAndClasses.UI {
             //move
             Left.Set(left, 0f);
             Top.Set(top, 0f);
+
             Recalculate();
 
             if (restrict) {
@@ -801,6 +837,10 @@ namespace ExperienceAndClasses.UI {
         public void SetSize(float width, float height) {
             Width.Set(width, 0f);
             Height.Set(height, 0f);
+            if (title != null) {
+                title.Width.Set(Width.Pixels, 0f);
+            }
+
             Recalculate();
         }
 

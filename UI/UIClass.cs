@@ -34,6 +34,8 @@ namespace ExperienceAndClasses.UI {
         private static readonly float WIDTH = CLASS_WIDTH + WIDTH_ATTRIBUTES + WIDTH_UNLOCK + (Constants.UI_PADDING * 2) - 4;
         private const float HEIGHT = 430f;
 
+        private const float WIDTH_CONFIRM = 200f;
+
         private readonly Color COLOR_SUBPANEL = new Color(73, 94, 200);
 
         private const float INDICATOR_WIDTH = CLASS_BUTTON_SIZE + (Constants.UI_PADDING * 2);
@@ -46,6 +48,8 @@ namespace ExperienceAndClasses.UI {
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Variables ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         public DragableUIPanel panel { get; private set; }
+
+        private DragableUIPanel confirm;
 
         private UIPanel indicate_primary, indicate_secondary;
         private ClassButton button_primary, button_secondary;
@@ -61,20 +65,13 @@ namespace ExperienceAndClasses.UI {
             panel = new DragableUIPanel(WIDTH, HEIGHT, Constants.COLOR_UI_PANEL_BACKGROUND, this, true, true, true);
 
             //class panel
-            UIPanel panel_class = new UIPanel();
-            panel_class.SetPadding(0);
+            DragableUIPanel panel_class = new DragableUIPanel(CLASS_WIDTH, (HEIGHT - (Constants.UI_PADDING * 2)), COLOR_SUBPANEL, this, false, false, false, false);
             panel_class.Left.Set(Constants.UI_PADDING, 0f);
             panel_class.Top.Set(Constants.UI_PADDING, 0f);
-            panel_class.Width.Set(CLASS_WIDTH, 0f);
-            panel_class.Height.Set(HEIGHT - (Constants.UI_PADDING * 2), 0f);
-            panel_class.BackgroundColor = COLOR_SUBPANEL;
             panel.Append(panel_class);
 
             //class title
-            HelpTextPanel panel_class_title = new HelpTextPanel("Classes", FONT_SCALE_TITLE, true, "Classes", "TODO_help_text");
-            panel_class_title.BackgroundColor = COLOR_SUBPANEL;
-            panel_class_title.Width.Set(panel_class.Width.Pixels, 0f);
-            panel_class.Append(panel_class_title);
+            panel_class.SetTitle("Classes", FONT_SCALE_TITLE, true, "TODO_help_text", "Classes");
 
             //indicator for primary class
             Color color = Constants.COLOUR_CLASS_PRIMARY;
@@ -119,7 +116,7 @@ namespace ExperienceAndClasses.UI {
                     if (id != (byte)Systems.Class.CLASS_IDS.New) {
                         button = new ClassButton(Systems.Class.CLASS_LOOKUP[id].Texture, id);
                         button.Left.Set((Constants.UI_PADDING * 2) + (col * (CLASS_BUTTON_SIZE + CLASS_COL_PADDING)), 0f);
-                        button.Top.Set(panel_class_title.Height.Pixels + (Constants.UI_PADDING * 2) + (row * (CLASS_BUTTON_SIZE + CLASS_ROW_PADDING)), 0f);
+                        button.Top.Set(panel_class.top_space + (Constants.UI_PADDING * 2) + (row * (CLASS_BUTTON_SIZE + CLASS_ROW_PADDING)), 0f);
                         button.Width.Set(CLASS_BUTTON_SIZE, 0f);
                         button.Height.Set(CLASS_BUTTON_SIZE, 0f);
                         panel_class.Append(button);
@@ -129,23 +126,16 @@ namespace ExperienceAndClasses.UI {
             }
 
             //attribute panel
-            UIPanel panel_attribute = new UIPanel();
-            panel_attribute.SetPadding(0);
+            DragableUIPanel panel_attribute = new DragableUIPanel(WIDTH_ATTRIBUTES, HEIGHT_ATTRIBUTES, COLOR_SUBPANEL, this, false, false, false, false);
             panel_attribute.Left.Set(panel_class.Left.Pixels + panel_class.Width.Pixels - 2f, 0f);
             panel_attribute.Top.Set(HEIGHT - Constants.UI_PADDING - HEIGHT_ATTRIBUTES, 0f);
-            panel_attribute.Width.Set(WIDTH_ATTRIBUTES, 0f);
-            panel_attribute.Height.Set(HEIGHT_ATTRIBUTES, 0f);
-            panel_attribute.BackgroundColor = COLOR_SUBPANEL;
             panel.Append(panel_attribute);
 
             //attribute title
-            HelpTextPanel panel_attribute_title = new HelpTextPanel("Attributes", FONT_SCALE_TITLE, true, "Attribute Points", "TODO_help_text");
-            panel_attribute_title.BackgroundColor = COLOR_SUBPANEL;
-            panel_attribute_title.Width.Set(panel_attribute.Width.Pixels, 0f);
-            panel_attribute.Append(panel_attribute_title);
+            panel_attribute.SetTitle("Attributes", FONT_SCALE_TITLE, true, "TODO_help_text", "Attribute Points");
 
             //attributes
-            float top = panel_attribute_title.Height.Pixels + Constants.UI_PADDING;
+            float top = panel_attribute.top_space + Constants.UI_PADDING;
             AttributeText attribute_text;
             attribute_texts = new List<AttributeText>();
             foreach (Systems.Attribute.ATTRIBUTE_IDS attribute_id in Systems.Attribute.ATTRIBUTES_UI_ORDER) {
@@ -159,7 +149,7 @@ namespace ExperienceAndClasses.UI {
             }
 
             //attribute points
-            attribute_point_text = new HelpTextPanel("Available Points: 0", FONT_SCALE_ATTRIBUTE, false, "Attribute Allocation", "TODO_help_text");
+            attribute_point_text = new HelpTextPanel("Available Points: 0", FONT_SCALE_ATTRIBUTE, false, "TODO_help_text", "Attribute Allocation");
             attribute_point_text.Left.Set(Constants.UI_PADDING, 0f);
             attribute_point_text.Top.Set(top + Constants.UI_PADDING, 0f);
             attribute_point_text.Width.Set(panel_attribute.Width.Pixels - (Constants.UI_PADDING * 2f), 0f);
@@ -168,52 +158,31 @@ namespace ExperienceAndClasses.UI {
             panel_attribute.Append(attribute_point_text);
 
             //ability panel
-            UIPanel panel_ability = new UIPanel();
-            panel_ability.SetPadding(0);
+            DragableUIPanel panel_ability = new DragableUIPanel(WIDTH_ABILITY, HEIGHT_ABILITY, COLOR_SUBPANEL, this, false, false, false, false);
             panel_ability.Left.Set(panel_attribute.Left.Pixels, 0f);
             panel_ability.Top.Set(Constants.UI_PADDING, 0f);
-            panel_ability.Width.Set(WIDTH_ABILITY, 0f);
-            panel_ability.Height.Set(HEIGHT_ABILITY, 0f);
-            panel_ability.BackgroundColor = COLOR_SUBPANEL;
             panel.Append(panel_ability);
 
             //ability title
-            HelpTextPanel panel_ability_title = new HelpTextPanel("Abilities", FONT_SCALE_TITLE, true, "Class Abilities", "TODO_help_text");
-            panel_ability_title.BackgroundColor = COLOR_SUBPANEL;
-            panel_ability_title.Width.Set(panel_attribute.Width.Pixels, 0f);
-            panel_ability.Append(panel_ability_title);
+            panel_ability.SetTitle("Abilities", FONT_SCALE_TITLE, true, "TODO_help_text", "Class Abilities");
 
             //unlock panel
-            UIPanel panel_unlock = new UIPanel();
-            panel_unlock.SetPadding(0);
+            DragableUIPanel panel_unlock = new DragableUIPanel(WIDTH_UNLOCK, HEIGHT_UNLOCK, COLOR_SUBPANEL, this, false, false, false, false);
             panel_unlock.Left.Set(panel_ability.Left.Pixels + panel_ability.Width.Pixels - 2f, 0f);
             panel_unlock.Top.Set(Constants.UI_PADDING + Textures.TEXTURE_CORNER_BUTTON_SIZE + 1, 0f);
-            panel_unlock.Width.Set(WIDTH_UNLOCK, 0f);
-            panel_unlock.Height.Set(HEIGHT_UNLOCK, 0f);
-            panel_unlock.BackgroundColor = COLOR_SUBPANEL;
             panel.Append(panel_unlock);
 
             //unlock title
-            HelpTextPanel panel_unlock_title = new HelpTextPanel("Passives", FONT_SCALE_TITLE, true, "Passive Abilities", "TODO_help_text");
-            panel_unlock_title.BackgroundColor = COLOR_SUBPANEL;
-            panel_unlock_title.Width.Set(panel_unlock.Width.Pixels, 0f);
-            panel_unlock.Append(panel_unlock_title);
+            panel_unlock.SetTitle("Passives", FONT_SCALE_TITLE, true, "TODO_help_text", "Passive Abilities");
 
             //help panel
-            UIPanel panel_help = new UIPanel();
-            panel_help.SetPadding(0);
+            DragableUIPanel panel_help = new DragableUIPanel(WIDTH_HELP, HEIGHT_HELP, COLOR_SUBPANEL, this, false, false, false, false);
             panel_help.Left.Set(panel_unlock.Left.Pixels, 0f);
             panel_help.Top.Set(HEIGHT - Constants.UI_PADDING - HEIGHT_HELP, 0f);
-            panel_help.Width.Set(WIDTH_HELP, 0f);
-            panel_help.Height.Set(HEIGHT_HELP, 0f);
-            panel_help.BackgroundColor = COLOR_SUBPANEL;
             panel.Append(panel_help);
 
             //help title
-            HelpTextPanel panel_help_title = new HelpTextPanel("FAQ", FONT_SCALE_TITLE, true, "FAQ", "TODO_help_text");
-            panel_help_title.BackgroundColor = COLOR_SUBPANEL;
-            panel_help_title.Width.Set(panel_help.Width.Pixels, 0f);
-            panel_help.Append(panel_help_title);
+            panel_help.SetTitle("FAQ", FONT_SCALE_TITLE, true, "TODO_help_text", "FAQ");
 
             //done adding to main panel
             state.Append(panel);

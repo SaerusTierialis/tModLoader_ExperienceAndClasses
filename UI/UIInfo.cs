@@ -26,34 +26,25 @@ namespace ExperienceAndClasses.UI {
         private const float WIDTH_STATUS = 300;
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Variables ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-        private DragableUIPanel panel_title;
-        private DragableUIPanel panel_body;
-        private UIText ui_text_title;
+        private DragableUIPanel panel;
         private UIText ui_text_body, ui_text_extra;
         private UIElement source = null;
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Initialize ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         protected override void InitializeState() {
-            panel_title = new DragableUIPanel(1f, 1f, Constants.COLOR_UI_PANEL_BACKGROUND, this, false, false, false);
-            panel_body = new DragableUIPanel(1f, 1f, Constants.COLOR_UI_PANEL_BACKGROUND, this, false, false, false);
-
-            ui_text_title = new UIText("", TEXT_SCALE_TITLE, false);
-            ui_text_title.Left.Set(0f, 0f);
-            ui_text_title.Top.Set(Constants.UI_PADDING, 0f);
-            panel_title.Append(ui_text_title);
+            panel = new DragableUIPanel(1f, 1f, Constants.COLOR_UI_PANEL_BACKGROUND, this, false, false, false, false);
 
             ui_text_body = new UIText("", TEXT_SCALE_BODY, false);
             ui_text_body.Left.Set(Constants.UI_PADDING, 0f);
             ui_text_body.Top.Set(Constants.UI_PADDING, 0f);
-            panel_body.Append(ui_text_body);
+            panel.Append(ui_text_body);
 
             ui_text_extra = new UIText("", TEXT_SCALE_BODY, false);
             ui_text_extra.Left.Set(Constants.UI_PADDING, 0f);
             ui_text_extra.Top.Set(Constants.UI_PADDING, 0f);
-            panel_body.Append(ui_text_extra);
+            panel.Append(ui_text_extra);
 
-            panel_body.Append(panel_title);
-            state.Append(panel_body);
+            state.Append(panel);
         }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Methods ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
@@ -62,23 +53,25 @@ namespace ExperienceAndClasses.UI {
                 this.source = source;
 
                 //title
-                Vector2 measure_title = Main.fontMouseText.MeasureString(title);
-                panel_title.SetSize(width, measure_title.Y * TEXT_SCALE_TITLE);
-                ui_text_title.Left.Set((width - (measure_title.X*TEXT_SCALE_TITLE)) / 2f, 0f);
-                ui_text_title.SetText(title);
+                if (title == null) {
+                    panel.RemoveTitle();
+                }
+                else {
+                    panel.SetTitle(title, TEXT_SCALE_TITLE);
+                }
 
                 //body
-                panel_body.SetPosition(source.GetDimensions().X + source.Width.Pixels, source.GetDimensions().Y, true);
                 body = Main.fontMouseText.CreateWrappedText(body, (width - Constants.UI_PADDING*2) / TEXT_SCALE_BODY);
-                panel_body.SetSize(width, (Main.fontMouseText.MeasureString(body).Y*TEXT_SCALE_BODY) + panel_title.Height.Pixels + Constants.UI_PADDING);
-                ui_text_body.Top.Set(Constants.UI_PADDING + panel_title.Height.Pixels, 0f);
+                panel.SetSize(width, (Main.fontMouseText.MeasureString(body).Y*TEXT_SCALE_BODY) + panel.top_space + Constants.UI_PADDING);
+                panel.SetPosition(source.GetDimensions().X + source.Width.Pixels, source.GetDimensions().Y, true);
+                ui_text_body.Top.Set(Constants.UI_PADDING + panel.top_space, 0f);
                 ui_text_body.SetText(body);
 
                 //extra
                 if (extra != null) {
                     ui_text_extra.SetText(extra);
                     ui_text_extra.Left.Set(extra_left, 0f);
-                    ui_text_extra.Top.Set(panel_body.Height.Pixels - (Main.fontMouseText.MeasureString(extra).Y * TEXT_SCALE_BODY), 0f);
+                    ui_text_extra.Top.Set(panel.Height.Pixels - (Main.fontMouseText.MeasureString(extra).Y * TEXT_SCALE_BODY), 0f);
                 }
                 else {
                     ui_text_extra.SetText("");
@@ -165,7 +158,10 @@ namespace ExperienceAndClasses.UI {
             ShowText(source, title, text, WIDTH_ATTRIBUTE);
         }
 
-        public void ShowHelpText(UIElement source, string title, string help_text) {
+        public void ShowHelpText(UIElement source, string help_text, string title=null) {
+            if (title == null) {
+                title = "Help";
+            }
             ShowText(source, title, help_text, WIDTH_HELP);
         }
 
