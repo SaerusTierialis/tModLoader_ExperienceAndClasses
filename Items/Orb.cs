@@ -61,7 +61,7 @@ namespace ExperienceAndClasses.Items {
 
         public override void AddRecipes() {
             //convert boss orb to ascension orb
-            Commons.QuckRecipe(mod, new int[,] { { mod.ItemType<Boss_Orb>(), 1 } }, this, 5);
+            recipe = Commons.QuckRecipe(mod, new int[,] { { mod.ItemType<Boss_Orb>(), 1 } }, this, 5);
 
             //alt recipe: gold
             Commons.QuckRecipe(mod, new int[,] { { ItemID.LifeCrystal, 1 }, { ItemID.ManaCrystal, 1 }, { ItemID.GoldBar, 5 } }, this, 1);

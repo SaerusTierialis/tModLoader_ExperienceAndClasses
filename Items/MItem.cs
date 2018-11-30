@@ -14,6 +14,8 @@ namespace ExperienceAndClasses.Items {
         private readonly bool CONSUMABLE;
         private readonly int WIDTH, HEIGHT, RARITY;
 
+        protected Recipe recipe = null;
+
         protected MItem(string name, string tooltip, string texture, bool consumable, int width, int height, int rarity) {
             NAME = name;
             TOOLTIP = tooltip;
@@ -57,8 +59,13 @@ namespace ExperienceAndClasses.Items {
             }
         }
 
-        public string GetLocalizedName() {
-            return Commons.GetItemLocalizedName(this);
+        public string GetRecipeString(bool multiline=false) {
+            if (recipe != null) {
+                return Commons.GetRecipeString(recipe, multiline);
+            }
+            else {
+                return "no recipe";
+            }
         }
     }
 }

@@ -209,7 +209,7 @@ namespace ExperienceAndClasses.UI {
             Systems.Class c = Systems.Class.CLASS_LOOKUP[class_id];
             Items.MItem item = c.Unlock_Item;
 
-            string str = "Requirements:\n" + "Level " + c.Prereq.Max_Level + " " + c.Prereq.Name + "\n" + item.GetLocalizedName();
+            string str = "Requirements:\n" + "Level " + c.Prereq.Max_Level + " " + c.Prereq.Name + "\n" + item.item.Name + "\n\nToken Recipe:\n" + item.GetRecipeString(true) + "\n(Work Bench)";
 
             mode = MODE.FREE;
             ShowText(source, "Unlock " + c.Name, str , WIDTH_UNLOCK, null, 0, ModLoader.GetTexture(item.Texture));

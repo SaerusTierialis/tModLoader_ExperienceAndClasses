@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Terraria;
+using Terraria.ID;
 using Terraria.ModLoader;
 
 namespace ExperienceAndClasses.Items {
@@ -21,7 +22,12 @@ namespace ExperienceAndClasses.Items {
         private const string TEXTURE = "ExperienceAndClasses/Textures/Item/Unlock_Tier2";
         private const int RARITY = 8;
 
-        public Unlock_Tier2() : base(NAME, TOOLTIP, TEXTURE, RARITY) {}
+        public Unlock_Tier2() : base(NAME, TOOLTIP, TEXTURE, RARITY) { }
+
+        public override void AddRecipes() {
+            //convert boss orb to ascension orb
+            recipe = Commons.QuckRecipe(mod, new int[,] { { ItemID.LifeCrystal, 1 } , { ItemID.ManaCrystal, 1 } , { mod.ItemType<Monster_Orb>(), 1 } }, this, 1);
+        }
     }
 
     public class Unlock_Tier3 : Unlock {

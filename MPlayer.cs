@@ -386,7 +386,7 @@ namespace ExperienceAndClasses {
             if (c.Unlock_Item != null) {
                 if (!player.HasItem(c.Unlock_Item.item.type)) {
                     //item requirement not met
-                    Main.NewText("You require a " + c.Unlock_Item.GetLocalizedName() + " to unlock " + c.Name + "!", UI.Constants.COLOUR_MESSAGE_ERROR);
+                    Main.NewText("You require a " + c.Unlock_Item.item.Name + " to unlock " + c.Name + "!", UI.Constants.COLOUR_MESSAGE_ERROR);
                     return false;
                 }
             }

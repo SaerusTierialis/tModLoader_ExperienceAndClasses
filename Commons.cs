@@ -17,7 +17,7 @@ namespace ExperienceAndClasses {
         /// <param name="result"></param>
         /// <param name="numResult"></param>
         /// <param name="where"></param>
-        public static void QuckRecipe(Mod mod, int[,] ingredients, ModItem result, int numResult = 1, ModRecipe buildOn = null, ushort where = TileID.WorkBenches) {
+        public static Recipe QuckRecipe(Mod mod, int[,] ingredients, ModItem result, int numResult = 1, ModRecipe buildOn = null, ushort where = TileID.WorkBenches) {
             //recipe
             ModRecipe recipe;
             if (buildOn == null) recipe = new ModRecipe(mod);
@@ -38,6 +38,7 @@ namespace ExperienceAndClasses {
 
             //complete
             recipe.AddRecipe();
+            return recipe;
         }
 
         /// <summary>
@@ -69,6 +70,30 @@ namespace ExperienceAndClasses {
             }
 
             return true;
+        }
+
+        public static string GetRecipeString(Recipe recipe, bool multiline=false) {
+            string str = "";
+
+            bool first = true;
+            for (uint i = 0; i < recipe.requiredItem.Length; i++) {
+                if (recipe.requiredItem[i].type > 0) {
+                    if (!first) {
+                        if (multiline) {
+                            str += "\n";
+                        }
+                        else {
+                            str += " + ";
+                        }
+                    }
+                    else {
+                        first = false;
+                    }
+                    str += "x" + recipe.requiredItem[i].stack + " " + recipe.requiredItem[i].Name;
+                }
+            }
+
+            return str;
         }
 
         /// <summary>
@@ -154,10 +179,6 @@ namespace ExperienceAndClasses {
                     Main.NewText("TRACE: " + message, UI.Constants.COLOUR_MESSAGE_TRACE);
                 }
             }
-        }
-
-        public static string GetItemLocalizedName(ModItem mitem) {
-            return LanguageManager.Instance.GetText(mitem.DisplayName.Key).Value;
         }
 
     }
