@@ -770,8 +770,7 @@ namespace ExperienceAndClasses.UI {
         }
 
         public void SetPosition(float left, float top, bool restrict=false) {
-            //restrict to screen
-
+            //restrict to inside parents
             if (restrict) {
                 float width = Parent.GetDimensions().Width;
                 float height = Parent.GetDimensions().Height;
@@ -791,6 +790,7 @@ namespace ExperienceAndClasses.UI {
                 }
             }
 
+            //move
             Left.Set(left, 0f);
             Top.Set(top, 0f);
             Recalculate();
