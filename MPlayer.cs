@@ -261,16 +261,16 @@ namespace ExperienceAndClasses {
                                     return CLASS_VALIDITY.INVALID_COMBINATION; //invalid combination (same as other class or one of its prereqs)
                                 }
                                 else {
-                                    id_pre = Systems.Class.CLASS_LOOKUP[id_pre].ID_Prereq;
+                                    id_pre = Systems.Class.CLASS_LOOKUP[id_pre].Prereq.ID;
                                 }
                             }
-                            id_pre = Systems.Class.CLASS_LOOKUP[id].ID_Prereq;
+                            id_pre = Systems.Class.CLASS_LOOKUP[id].Prereq.ID;
                             while (id_pre != (byte)Systems.Class.CLASS_IDS.New) {
                                 if (id_other == id_pre) {
                                     return CLASS_VALIDITY.INVALID_COMBINATION; //invalid combination (same as other class or one of its prereqs)
                                 }
                                 else {
-                                    id_pre = Systems.Class.CLASS_LOOKUP[id_pre].ID_Prereq;
+                                    id_pre = Systems.Class.CLASS_LOOKUP[id_pre].Prereq.ID;
                                 }
                             }
 
@@ -368,7 +368,7 @@ namespace ExperienceAndClasses {
 
         public bool CanUnlock(byte id) {
             Systems.Class c = Systems.Class.CLASS_LOOKUP[id];
-            Systems.Class pre = Systems.Class.CLASS_LOOKUP[c.ID_Prereq];
+            Systems.Class pre = c.Prereq;
 
             //level requirements
             while (pre.ID != (byte)Systems.Class.CLASS_IDS.New) {
@@ -378,7 +378,7 @@ namespace ExperienceAndClasses {
                     return false;
                 }
                 else {
-                    pre = Systems.Class.CLASS_LOOKUP[pre.ID_Prereq];
+                    pre = pre.Prereq;
                 }
             }
 
@@ -442,13 +442,13 @@ namespace ExperienceAndClasses {
                 c = Class_Primary;
                 while (c.Tier > 0) {
                     sum_primary += (c.Attribute_Growth[id] * Math.Min(Class_Levels[c.ID], Systems.Class.MAX_LEVEL[c.Tier]));
-                    c = Systems.Class.CLASS_LOOKUP[c.ID_Prereq];
+                    c = c.Prereq;
                 }
 
                 c = Class_Secondary;
                 while (c.Tier > 0) {
                     sum_secondary += (c.Attribute_Growth[id] * Math.Min(Class_Levels[c.ID], Systems.Class.MAX_LEVEL[c.Tier]));
-                    c = Systems.Class.CLASS_LOOKUP[c.ID_Prereq];
+                    c = c.Prereq;
                 }
 
                 if (Class_Secondary_Level_Effective > 0) {

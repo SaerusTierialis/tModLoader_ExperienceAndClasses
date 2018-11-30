@@ -145,8 +145,8 @@ namespace ExperienceAndClasses.UI {
             string text = c.Description + "\n\n";
             if (ExperienceAndClasses.LOCAL_MPLAYER.Class_Levels[class_id] <= 0) {
                 title += " (locked)";
-                text += "REQUIREMENT: " + Systems.Class.CLASS_LOOKUP[c.ID_Prereq].Name;
-                byte level_req = Systems.Class.MAX_LEVEL[Systems.Class.CLASS_LOOKUP[c.ID_Prereq].Tier];
+                text += "REQUIREMENT: " + c.Prereq.Name;
+                byte level_req = c.Prereq.Max_Level;
                 if (level_req > 0) {
                     text += " Lv." + level_req;
                 }
@@ -207,10 +207,9 @@ namespace ExperienceAndClasses.UI {
 
         public void ShowUnlockClass(UIElement source, byte class_id) {
             Systems.Class c = Systems.Class.CLASS_LOOKUP[class_id];
-            Systems.Class pre = Systems.Class.CLASS_LOOKUP[c.ID_Prereq];
             ModItem item = ItemLoader.GetItem(c.Unlock_Item);
 
-            string str = "Requirements:\n" + "Level " + pre.Max_Level + " " + pre.Name + "\n" + item.DisplayName.GetDefault();
+            string str = "Requirements:\n" + "Level " + c.Prereq.Max_Level + " " + c.Prereq.Name + "\n" + item.DisplayName.GetDefault();
 
             mode = MODE.FREE;
             ShowText(source, "Unlock " + c.Name, str , WIDTH_UNLOCK, null, 0, ModLoader.GetTexture(item.Texture));

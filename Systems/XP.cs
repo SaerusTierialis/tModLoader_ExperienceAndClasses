@@ -111,10 +111,10 @@ namespace ExperienceAndClasses.Systems {
                 return 0;
             }
 
-            byte id = c.ID_Prereq;
-            while (id != (byte)Class.CLASS_IDS.New) {
-                level += Class.MAX_LEVEL[Class.CLASS_LOOKUP[id].Tier];
-                id = Class.CLASS_LOOKUP[id].ID_Prereq;
+            Class pre = c.Prereq;
+            while (pre.ID != (byte)Class.CLASS_IDS.New) {
+                level += pre.Max_Level;
+                pre = pre.Prereq;
             }
 
             if (level >= XP_REQ.Length) {

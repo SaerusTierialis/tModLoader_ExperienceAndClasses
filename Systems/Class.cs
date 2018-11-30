@@ -437,7 +437,7 @@ namespace ExperienceAndClasses.Systems {
         public byte Tier { get; private set; }
         public Texture2D Texture { get; private set; }
         public string Texture_Path { get; private set; }
-        public byte ID_Prereq { get; private set; }
+        public Class Prereq { get; private set; }
         public PowerScaling Power_Scaling { get; private set; }
         public float[] Attribute_Growth { get; private set; }
         public bool Gives_Allocation_Attributes { get; private set; }
@@ -450,7 +450,7 @@ namespace ExperienceAndClasses.Systems {
             Description = description;
             Tier = tier;
             Texture_Path = texture_path;
-            ID_Prereq = id_prereq;
+            Prereq = CLASS_LOOKUP[id_prereq];
             Power_Scaling = power_scaling;
             Attribute_Growth = attribute_growth;
             Gives_Allocation_Attributes = gives_allocation_attributes;
