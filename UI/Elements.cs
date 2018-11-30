@@ -756,44 +756,46 @@ namespace ExperienceAndClasses.UI {
                 Recalculate();
             }
 
-            // Here we check if the DragableUIPanel is outside the Parent UIElement rectangle. 
-            // (In our example, the parent would be ExampleUI, a UIState. This means that we are checking that the DragableUIPanel is outside the whole screen)
-            // By doing this and some simple math, we can snap the panel back on screen if the user resizes his window or otherwise changes resolution.
+            Restrict();
+        }
+
+        private void Restrict() {
             Parent.Recalculate();
-            var parentSpace = Parent.GetDimensions().ToRectangle();
-            if (!GetDimensions().ToRectangle().Intersects(parentSpace)) {
-                Left.Pixels = Utils.Clamp(Left.Pixels, 0, parentSpace.Right - Width.Pixels);
-                Top.Pixels = Utils.Clamp(Top.Pixels, 0, parentSpace.Bottom - Height.Pixels);
-                // Recalculate forces the UI system to do the positioning math again.
-                Recalculate();
+
+            float width = Parent.GetDimensions().Width;
+            float height = Parent.GetDimensions().Height;
+
+            float left = Left.Pixels;
+            float top = Top.Pixels;
+
+            if ((left + Width.Pixels) > width) {
+                left = width - Width.Pixels;
             }
+            if (left < 0f) {
+                left = 0f;
+            }
+
+            if ((top + Height.Pixels) > height) {
+                top = height - Height.Pixels;
+            }
+            if (top < 0f) {
+                top = 0f;
+            }
+
+            Left.Set(left, 0f);
+            Top.Set(top, 0f);
+            Recalculate();
         }
 
         public void SetPosition(float left, float top, bool restrict=false) {
-            //restrict to inside parents
-            if (restrict) {
-                float width = Parent.GetDimensions().Width;
-                float height = Parent.GetDimensions().Height;
-
-                if ((left + Width.Pixels) > width) {
-                    left = width - Width.Pixels;
-                }
-                if (left < 0f) {
-                    left = 0f;
-                }
-
-                if ((top + Height.Pixels) > height) {
-                    top = height - Height.Pixels;
-                }
-                if (top < 0f) {
-                    top = 0f;
-                }
-            }
-
             //move
             Left.Set(left, 0f);
             Top.Set(top, 0f);
             Recalculate();
+
+            if (restrict) {
+                Restrict();
+            }
         }
 
         public void SetSize(float width, float height) {
