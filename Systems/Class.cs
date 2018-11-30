@@ -65,6 +65,7 @@ namespace ExperienceAndClasses.Systems {
             PowerScaling.POWER_SCALING_TYPES power_scaling;
             float[] attribute_growth;
             bool gives_allocation_attributes;
+            int unlock_item;
 
             for (CLASS_IDS id = 0; id < CLASS_IDS.NUMBER_OF_IDs; id++) {
                 id_byte = (byte)id;
@@ -77,6 +78,7 @@ namespace ExperienceAndClasses.Systems {
                 texture_path = "ExperienceAndClasses/Textures/Class/Novice";
                 power_scaling = PowerScaling.POWER_SCALING_TYPES.None;
                 gives_allocation_attributes = true;
+                unlock_item = -1;
 
                 //default attribute growth of active attributes to 1 (per 10 levels)
                 attribute_growth = new float[(byte)Attribute.ATTRIBUTE_IDS.NUMBER_OF_IDs];
@@ -109,6 +111,7 @@ namespace ExperienceAndClasses.Systems {
                         name = "Warrior";
                         desc = "TODO_description";
                         tier = 2;
+                        unlock_item = ExperienceAndClasses.MOD.ItemType<Items.Unlock_Tier2>();
                         texture_path = "ExperienceAndClasses/Textures/Class/Warrior";
                         Class_Locations[1, 0] = id_byte;
                         id_prereq = CLASS_IDS.Novice;
@@ -122,6 +125,7 @@ namespace ExperienceAndClasses.Systems {
                         name = "Ranger";
                         desc = "TODO_description";
                         tier = 2;
+                        unlock_item = ExperienceAndClasses.MOD.ItemType<Items.Unlock_Tier2>();
                         texture_path = "ExperienceAndClasses/Textures/Class/Ranger";
                         Class_Locations[1, 1] = id_byte;
                         id_prereq = CLASS_IDS.Novice;
@@ -135,6 +139,7 @@ namespace ExperienceAndClasses.Systems {
                         name = "Mage";
                         desc = "TODO_description";
                         tier = 2;
+                        unlock_item = ExperienceAndClasses.MOD.ItemType<Items.Unlock_Tier2>();
                         texture_path = "ExperienceAndClasses/Textures/Class/Mage";
                         Class_Locations[1, 2] = id_byte;
                         id_prereq = CLASS_IDS.Novice;
@@ -147,6 +152,7 @@ namespace ExperienceAndClasses.Systems {
                         name = "Rogue";
                         desc = "TODO_description";
                         tier = 2;
+                        unlock_item = ExperienceAndClasses.MOD.ItemType<Items.Unlock_Tier2>();
                         texture_path = "ExperienceAndClasses/Textures/Class/Rogue";
                         Class_Locations[1, 3] = id_byte;
                         id_prereq = CLASS_IDS.Novice;
@@ -159,6 +165,7 @@ namespace ExperienceAndClasses.Systems {
                         name = "Summoner";
                         desc = "TODO_description";
                         tier = 2;
+                        unlock_item = ExperienceAndClasses.MOD.ItemType<Items.Unlock_Tier2>();
                         texture_path = "ExperienceAndClasses/Textures/Class/Summoner";
                         Class_Locations[1, 4] = id_byte;
                         id_prereq = CLASS_IDS.Novice;
@@ -171,6 +178,7 @@ namespace ExperienceAndClasses.Systems {
                         name = "Cleric";
                         desc = "TODO_description";
                         tier = 2;
+                        unlock_item = ExperienceAndClasses.MOD.ItemType<Items.Unlock_Tier2>();
                         texture_path = "ExperienceAndClasses/Textures/Class/Cleric";
                         Class_Locations[1, 5] = id_byte;
                         id_prereq = CLASS_IDS.Novice;
@@ -183,6 +191,7 @@ namespace ExperienceAndClasses.Systems {
                         name = "Hybrid";
                         desc = "TODO_description";
                         tier = 2;
+                        unlock_item = ExperienceAndClasses.MOD.ItemType<Items.Unlock_Tier2>();
                         texture_path = "ExperienceAndClasses/Textures/Class/Hybrid";
                         Class_Locations[1, 6] = id_byte;
                         id_prereq = CLASS_IDS.Novice;
@@ -199,6 +208,7 @@ namespace ExperienceAndClasses.Systems {
                         name = "Unnamed1";
                         desc = "TODO_description";
                         tier = 3;
+                        unlock_item = ExperienceAndClasses.MOD.ItemType<Items.Unlock_Tier3>();
                         texture_path = "ExperienceAndClasses/Textures/Class/Unnamed1";
                         Class_Locations[2, 0] = id_byte;
                         id_prereq = CLASS_IDS.Warrior;
@@ -211,6 +221,7 @@ namespace ExperienceAndClasses.Systems {
                         name = "Berserker";
                         desc = "TODO_description";
                         tier = 3;
+                        unlock_item = ExperienceAndClasses.MOD.ItemType<Items.Unlock_Tier3>();
                         texture_path = "ExperienceAndClasses/Textures/Class/Berserker";
                         Class_Locations[3, 0] = id_byte;
                         id_prereq = CLASS_IDS.Warrior;
@@ -225,6 +236,7 @@ namespace ExperienceAndClasses.Systems {
                         name = "Guardian";
                         desc = "TODO_description";
                         tier = 3;
+                        unlock_item = ExperienceAndClasses.MOD.ItemType<Items.Unlock_Tier3>();
                         texture_path = "ExperienceAndClasses/Textures/Class/Guardian";
                         Class_Locations[4, 0] = id_byte;
                         id_prereq = CLASS_IDS.Warrior;
@@ -237,6 +249,7 @@ namespace ExperienceAndClasses.Systems {
                         name = "Sniper";
                         desc = "TODO_description";
                         tier = 3;
+                        unlock_item = ExperienceAndClasses.MOD.ItemType<Items.Unlock_Tier3>();
                         texture_path = "ExperienceAndClasses/Textures/Class/Sniper";
                         Class_Locations[2, 1] = id_byte;
                         id_prereq = CLASS_IDS.Ranger;
@@ -249,6 +262,7 @@ namespace ExperienceAndClasses.Systems {
                         name = "Engineer";
                         desc = "TODO_description";
                         tier = 3;
+                        unlock_item = ExperienceAndClasses.MOD.ItemType<Items.Unlock_Tier3>();
                         texture_path = "ExperienceAndClasses/Textures/Class/Engineer";
                         Class_Locations[3, 1] = id_byte;
                         id_prereq = CLASS_IDS.Ranger;
@@ -263,6 +277,7 @@ namespace ExperienceAndClasses.Systems {
                         name = "Elementalist";
                         desc = "TODO_description";
                         tier = 3;
+                        unlock_item = ExperienceAndClasses.MOD.ItemType<Items.Unlock_Tier3>();
                         texture_path = "ExperienceAndClasses/Textures/Class/Elementalist";
                         Class_Locations[2, 2] = id_byte;
                         id_prereq = CLASS_IDS.Mage;
@@ -275,6 +290,7 @@ namespace ExperienceAndClasses.Systems {
                         name = "Sage";
                         desc = "TODO_description";
                         tier = 3;
+                        unlock_item = ExperienceAndClasses.MOD.ItemType<Items.Unlock_Tier3>();
                         texture_path = "ExperienceAndClasses/Textures/Class/Sage";
                         Class_Locations[3, 2] = id_byte;
                         id_prereq = CLASS_IDS.Mage;
@@ -288,6 +304,7 @@ namespace ExperienceAndClasses.Systems {
                         name = "Assassin";
                         desc = "TODO_description";
                         tier = 3;
+                        unlock_item = ExperienceAndClasses.MOD.ItemType<Items.Unlock_Tier3>();
                         texture_path = "ExperienceAndClasses/Textures/Class/Assassin";
                         Class_Locations[2, 3] = id_byte;
                         id_prereq = CLASS_IDS.Rogue;
@@ -301,6 +318,7 @@ namespace ExperienceAndClasses.Systems {
                         name = "Unnamed2";
                         desc = "TODO_description";
                         tier = 3;
+                        unlock_item = ExperienceAndClasses.MOD.ItemType<Items.Unlock_Tier3>();
                         texture_path = "ExperienceAndClasses/Textures/Class/Unnamed2";
                         Class_Locations[3, 3] = id_byte;
                         id_prereq = CLASS_IDS.Rogue;
@@ -314,6 +332,7 @@ namespace ExperienceAndClasses.Systems {
                         name = "Ninja";
                         desc = "TODO_description";
                         tier = 3;
+                        unlock_item = ExperienceAndClasses.MOD.ItemType<Items.Unlock_Tier3>();
                         texture_path = "ExperienceAndClasses/Textures/Class/Ninja";
                         Class_Locations[4, 3] = id_byte;
                         id_prereq = CLASS_IDS.Rogue;
@@ -327,6 +346,7 @@ namespace ExperienceAndClasses.Systems {
                         name = "Hivemind";
                         desc = "TODO_description";
                         tier = 3;
+                        unlock_item = ExperienceAndClasses.MOD.ItemType<Items.Unlock_Tier3>();
                         texture_path = "ExperienceAndClasses/Textures/Class/Hivemind";
                         Class_Locations[3, 4] = id_byte;
                         id_prereq = CLASS_IDS.Summoner;
@@ -340,6 +360,7 @@ namespace ExperienceAndClasses.Systems {
                         name = "Soul Binder";
                         desc = "TODO_description";
                         tier = 3;
+                        unlock_item = ExperienceAndClasses.MOD.ItemType<Items.Unlock_Tier3>();
                         texture_path = "ExperienceAndClasses/Textures/Class/SoulBinder";
                         Class_Locations[2, 4] = id_byte;
                         id_prereq = CLASS_IDS.Summoner;
@@ -353,6 +374,7 @@ namespace ExperienceAndClasses.Systems {
                         name = "Saint";
                         desc = "TODO_description";
                         tier = 3;
+                        unlock_item = ExperienceAndClasses.MOD.ItemType<Items.Unlock_Tier3>();
                         texture_path = "ExperienceAndClasses/Textures/Class/Saint";
                         Class_Locations[2, 5] = id_byte;
                         id_prereq = CLASS_IDS.Cleric;
@@ -365,6 +387,7 @@ namespace ExperienceAndClasses.Systems {
                         name = "Hybrid Prime";
                         desc = "TODO_description";
                         tier = 3;
+                        unlock_item = ExperienceAndClasses.MOD.ItemType<Items.Unlock_Tier3>();
                         texture_path = "ExperienceAndClasses/Textures/Class/HybridPrime";
                         Class_Locations[2, 6] = id_byte;
                         id_prereq = CLASS_IDS.Hybrid;
@@ -381,6 +404,7 @@ namespace ExperienceAndClasses.Systems {
                         name = "Explorer";
                         desc = "TODO_description";
                         tier = 3;
+                        unlock_item = ExperienceAndClasses.MOD.ItemType<Items.Unlock_Explorer>();
                         texture_path = "ExperienceAndClasses/Textures/Class/Explorer";
                         Class_Locations[0, 6] = id_byte;
                         id_prereq = CLASS_IDS.Novice;
@@ -402,7 +426,7 @@ namespace ExperienceAndClasses.Systems {
                 }
 
                 //add
-                CLASS_LOOKUP[id_byte] = new Class(id_byte, name, desc, tier, texture_path, (byte)id_prereq, PowerScaling.POWER_SCALING_LOOKUP[(byte)power_scaling], attribute_growth, gives_allocation_attributes);
+                CLASS_LOOKUP[id_byte] = new Class(id_byte, name, desc, tier, texture_path, (byte)id_prereq, PowerScaling.POWER_SCALING_LOOKUP[(byte)power_scaling], attribute_growth, gives_allocation_attributes, unlock_item);
             }
         }
 
@@ -418,8 +442,9 @@ namespace ExperienceAndClasses.Systems {
         public float[] Attribute_Growth { get; private set; }
         public bool Gives_Allocation_Attributes { get; private set; }
         public byte Max_Level { get; private set; }
+        public int Unlock_Item { get; private set; }
 
-        public Class(byte id, string name, string description, byte tier, string texture_path, byte id_prereq, PowerScaling power_scaling, float[] attribute_growth, bool gives_allocation_attributes) {
+        public Class(byte id, string name, string description, byte tier, string texture_path, byte id_prereq, PowerScaling power_scaling, float[] attribute_growth, bool gives_allocation_attributes, int unlock_item) {
             ID = id;
             Name = name;
             Description = description;
@@ -430,6 +455,7 @@ namespace ExperienceAndClasses.Systems {
             Attribute_Growth = attribute_growth;
             Gives_Allocation_Attributes = gives_allocation_attributes;
             Max_Level = MAX_LEVEL[Tier];
+            Unlock_Item = unlock_item;
         }
 
         public void LoadTexture() {

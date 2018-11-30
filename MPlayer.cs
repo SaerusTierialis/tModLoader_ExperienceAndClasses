@@ -219,7 +219,7 @@ namespace ExperienceAndClasses {
             VALID,
             INVALID_UNKNOWN,
             INVALID_ID,
-            INVALID_LEVEL,
+            INVALID_LOCKED,
             INVALID_COMBINATION,
             INVALID_NON_LOCAL,
             INVALID_MINIONS,
@@ -251,7 +251,7 @@ namespace ExperienceAndClasses {
                     }
 
                     if (((Class_Levels[id] <= 0) || !Class_Unlocked[id]) && (id != (byte)Systems.Class.CLASS_IDS.None)) {
-                        return CLASS_VALIDITY.INVALID_LEVEL; //locked class
+                        return CLASS_VALIDITY.INVALID_LOCKED; //locked class
                     }
                     else {
                         if (id != id_same) {
@@ -293,74 +293,109 @@ namespace ExperienceAndClasses {
 
             //fail if secondary not allowed
             if (!is_primary && !Allow_Secondary) {
-                Main.NewText("Failed to set class because secondary class feature is locked!", UI.Constants.COLOUR_MESSAGE_ERROR);
+                Main.NewText("Failed to set class because multiclassing is locked!", UI.Constants.COLOUR_MESSAGE_ERROR);
                 return false;
             }
 
-            byte id_other;
-            if (is_primary) {
-                id_other = Class_Secondary.ID;
+            //if locked, try unlock
+            if (!Class_Unlocked[id]) {
+                return CanUnlock(id);
             }
             else {
-                id_other = Class_Primary.ID;
-            }
-            if ((id == id_other) && (id != (byte)Systems.Class.CLASS_IDS.None)) {
-                //if setting to other set class, just swap
-                return LocalSwapClass();
-            }
-            else {
-                CLASS_VALIDITY valid = LocalCheckClassValid(id, is_primary);
-                switch (valid) {
-                    case CLASS_VALIDITY.VALID:
+                byte id_other;
+                if (is_primary) {
+                    id_other = Class_Secondary.ID;
+                }
+                else {
+                    id_other = Class_Primary.ID;
+                }
+                if ((id == id_other) && (id != (byte)Systems.Class.CLASS_IDS.None)) {
+                    //if setting to other set class, just swap
+                    return LocalSwapClass();
+                }
+                else {
+                    CLASS_VALIDITY valid = LocalCheckClassValid(id, is_primary);
+                    switch (valid) {
+                        case CLASS_VALIDITY.VALID:
 
-                        //destroy all minions
-                        CheckMinions();
-                        foreach (Projectile p in minions) {
-                            if (p.active && (p.minion || p.sentry) && (p.owner == player.whoAmI)) {
-                                p.Kill();
+                            //destroy all minions
+                            CheckMinions();
+                            foreach (Projectile p in minions) {
+                                if (p.active && (p.minion || p.sentry) && (p.owner == player.whoAmI)) {
+                                    p.Kill();
+                                }
                             }
-                        }
 
-                        if (is_primary) {
-                            Class_Primary = Systems.Class.CLASS_LOOKUP[id];
-                        }
-                        else {
-                            Class_Secondary = Systems.Class.CLASS_LOOKUP[id];
-                        }
-                        LocalUpdateClassInfo();
-                        return true;
+                            if (is_primary) {
+                                Class_Primary = Systems.Class.CLASS_LOOKUP[id];
+                            }
+                            else {
+                                Class_Secondary = Systems.Class.CLASS_LOOKUP[id];
+                            }
+                            LocalUpdateClassInfo();
+                            return true;
 
-                    case CLASS_VALIDITY.INVALID_COMBINATION:
-                        Main.NewText("Failed to set class because combination is invalid!", UI.Constants.COLOUR_MESSAGE_ERROR);
-                        break;
+                        case CLASS_VALIDITY.INVALID_COMBINATION:
+                            Main.NewText("Failed to set class because combination is invalid!", UI.Constants.COLOUR_MESSAGE_ERROR);
+                            break;
 
-                    case CLASS_VALIDITY.INVALID_ID:
-                        Main.NewText("Failed to set class because class id is invalid!", UI.Constants.COLOUR_MESSAGE_ERROR);
-                        break;
+                        case CLASS_VALIDITY.INVALID_ID:
+                            Main.NewText("Failed to set class because class id is invalid!", UI.Constants.COLOUR_MESSAGE_ERROR);
+                            break;
 
-                    case CLASS_VALIDITY.INVALID_LEVEL:
-                        Main.NewText("Failed to set class because it is locked!", UI.Constants.COLOUR_MESSAGE_ERROR);
-                        break;
+                        case CLASS_VALIDITY.INVALID_LOCKED:
+                            Main.NewText("Failed to set class because it is locked!", UI.Constants.COLOUR_MESSAGE_ERROR);
+                            break;
 
-                    case CLASS_VALIDITY.INVALID_NON_LOCAL:
-                        Commons.Error("Tried to set non-local player with SetClass! (please report)");
-                        break;
+                        case CLASS_VALIDITY.INVALID_NON_LOCAL:
+                            Commons.Error("Tried to set non-local player with SetClass! (please report)");
+                            break;
 
-                    case CLASS_VALIDITY.INVALID_COMBAT:
-                        Main.NewText("Failed to set class because you are in combat!", UI.Constants.COLOUR_MESSAGE_ERROR);
-                        break;
+                        case CLASS_VALIDITY.INVALID_COMBAT:
+                            Main.NewText("Failed to set class because you are in combat!", UI.Constants.COLOUR_MESSAGE_ERROR);
+                            break;
 
-                    default:
-                        Commons.Error("Failed to set class for unknown reasons! (please report)");
-                        break;
+                        default:
+                            Commons.Error("Failed to set class for unknown reasons! (please report)");
+                            break;
+                    }
+                }
+
+                //default
+                return false;
+            }
+        }
+
+        private bool CanUnlock(byte id) {
+            Systems.Class c = Systems.Class.CLASS_LOOKUP[id];
+            Systems.Class pre = Systems.Class.CLASS_LOOKUP[c.ID_Prereq];
+
+            //level requirements
+            while (pre.ID != (byte)Systems.Class.CLASS_IDS.New) {
+                if (Class_Levels[pre.ID] < pre.Max_Level) {
+                    //level requirement not met
+                    Main.NewText("You must reach level " + pre.Max_Level + " " + pre.Name + " to unlock " + c.Name + "!", UI.Constants.COLOUR_MESSAGE_ERROR);
+                    return false;
+                }
+                else {
+                    pre = Systems.Class.CLASS_LOOKUP[pre.ID_Prereq];
                 }
             }
 
-            //default
-            return false;
+            //item requirements
+            if (c.Unlock_Item >= 0) {
+                if (!player.HasItem(c.Unlock_Item)) {
+                    //item requirement not met
+                    Main.NewText("You require a " + ItemLoader.GetItem(c.Unlock_Item).DisplayName.GetDefault() + " to unlock " + c.Name + "!", UI.Constants.COLOUR_MESSAGE_ERROR);
+                    return false;
+                }
+            }
+
+            //requirements met
+            return true;
         }
 
-        public bool LocalSwapClass() {
+        private bool LocalSwapClass() {
             //local MPlayer only
             if (!Is_Local_Player) return false;
 
