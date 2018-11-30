@@ -769,7 +769,28 @@ namespace ExperienceAndClasses.UI {
             }
         }
 
-        public void SetPosition(float left, float top) {
+        public void SetPosition(float left, float top, bool restrict=false) {
+            //restrict to screen
+
+            if (restrict) {
+                float width = Parent.GetDimensions().Width;
+                float height = Parent.GetDimensions().Height;
+
+                if ((left + Width.Pixels) > width) {
+                    left = width - Width.Pixels;
+                }
+                if (left < 0f) {
+                    left = 0f;
+                }
+
+                if ((top + Height.Pixels) > height) {
+                    top = height - Height.Pixels;
+                }
+                if (top < 0f) {
+                    top = 0f;
+                }
+            }
+
             Left.Set(left, 0f);
             Top.Set(top, 0f);
             Recalculate();

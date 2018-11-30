@@ -52,8 +52,8 @@ namespace ExperienceAndClasses.UI {
             ui_text_extra.Top.Set(Constants.UI_PADDING, 0f);
             panel_body.Append(ui_text_extra);
 
+            panel_body.Append(panel_title);
             state.Append(panel_body);
-            state.Append(panel_title);
         }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Methods ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
@@ -61,22 +61,14 @@ namespace ExperienceAndClasses.UI {
             //if ((this.source == null) || !this.source.Equals(source)) {
                 this.source = source;
 
-                //left position
-                float screen_width = state.GetDimensions().Width;
-                float left = source.GetDimensions().X + source.Width.Pixels;
-                if (screen_width < (left + width)) {
-                    left -= ((left + width) - screen_width);
-                }
-
                 //title
-                panel_title.SetPosition(left, source.GetDimensions().Y);
                 Vector2 measure_title = Main.fontMouseText.MeasureString(title);
                 panel_title.SetSize(width, measure_title.Y * TEXT_SCALE_TITLE);
                 ui_text_title.Left.Set((width - (measure_title.X*TEXT_SCALE_TITLE)) / 2f, 0f);
                 ui_text_title.SetText(title);
 
                 //body
-                panel_body.SetPosition(panel_title.Left.Pixels, panel_title.Top.Pixels);
+                panel_body.SetPosition(source.GetDimensions().X + source.Width.Pixels, source.GetDimensions().Y, true);
                 body = Main.fontMouseText.CreateWrappedText(body, (width - Constants.UI_PADDING*2) / TEXT_SCALE_BODY);
                 panel_body.SetSize(width, (Main.fontMouseText.MeasureString(body).Y*TEXT_SCALE_BODY) + panel_title.Height.Pixels + Constants.UI_PADDING);
                 ui_text_body.Top.Set(Constants.UI_PADDING + panel_title.Height.Pixels, 0f);
@@ -90,14 +82,6 @@ namespace ExperienceAndClasses.UI {
                 }
                 else {
                     ui_text_extra.SetText("");
-                }
-
-                //adjust vertical position
-                float screen_height = state.GetDimensions().Height;
-                if (screen_height < (panel_body.Top.Pixels + panel_body.Height.Pixels)) {
-                    float adjust = (panel_body.Top.Pixels + panel_body.Height.Pixels) - screen_height;
-                    panel_title.Top.Set(panel_title.Top.Pixels - adjust, 0f);
-                    panel_body.Top.Set(panel_body.Top.Pixels - adjust, 0f);
                 }
 
                 //show
