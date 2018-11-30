@@ -455,11 +455,16 @@ namespace ExperienceAndClasses.UI {
         public override void Click(UIMouseEvent evt) {
             base.Click(evt);
 
-            if (ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary.ID == class_id) {
-                ExperienceAndClasses.LOCAL_MPLAYER.LocalSetClass((byte)Systems.Class.CLASS_IDS.None, true);
+            if (!ExperienceAndClasses.LOCAL_MPLAYER.Class_Unlocked[class_id]) {
+                UIInfo.Instance.ShowUnlockClass(this, class_id);
             }
             else {
-                ExperienceAndClasses.LOCAL_MPLAYER.LocalSetClass(class_id, true);
+                if (ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary.ID == class_id) {
+                    ExperienceAndClasses.LOCAL_MPLAYER.LocalSetClass((byte)Systems.Class.CLASS_IDS.None, true);
+                }
+                else {
+                    ExperienceAndClasses.LOCAL_MPLAYER.LocalSetClass(class_id, true);
+                }
             }
         }
 

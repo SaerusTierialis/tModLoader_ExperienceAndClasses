@@ -366,7 +366,7 @@ namespace ExperienceAndClasses {
             }
         }
 
-        private bool CanUnlock(byte id) {
+        public bool CanUnlock(byte id) {
             Systems.Class c = Systems.Class.CLASS_LOOKUP[id];
             Systems.Class pre = Systems.Class.CLASS_LOOKUP[c.ID_Prereq];
 

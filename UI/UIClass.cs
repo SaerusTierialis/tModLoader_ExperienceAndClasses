@@ -49,8 +49,6 @@ namespace ExperienceAndClasses.UI {
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Variables ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         public DragableUIPanel panel { get; private set; }
 
-        private DragableUIPanel confirm;
-
         private UIPanel indicate_primary, indicate_secondary;
         private ClassButton button_primary, button_secondary;
 
