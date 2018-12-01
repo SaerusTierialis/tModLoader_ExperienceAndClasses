@@ -48,7 +48,7 @@ namespace ExperienceAndClasses {
 
         public List<Projectile> minions;
 
-        public double old_xp; //pre-revamp xp
+        public double old_xp, old_xp_spent; //pre-revamp xp
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Instance Vars (syncing) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -79,6 +79,7 @@ namespace ExperienceAndClasses {
             send_xp_when = DateTime.MinValue;
             minions = new List<Projectile>();
             old_xp = 0;
+            old_xp_spent = 0;
 
             //default level/xp/unlock
             Class_Levels = new byte[(byte)Systems.Class.CLASS_IDS.NUMBER_OF_IDs];
@@ -160,10 +161,8 @@ namespace ExperienceAndClasses {
                 //initialized
                 initialized = true;
 
-                //get old xp if loading version before 2.0
-                if (Load_Version[0] < 2) {
-                    old_xp += player.GetModPlayer<Legacy.MyPlayer>(mod).old_xp;
-                }
+                //get old xp
+                old_xp += player.GetModPlayer<Legacy.MyPlayer>(mod).old_xp;
 
                 //convert old items (call twice in case inventory is pretty full and first call makes room)
                 Legacy.ConvertItems(player);
@@ -631,6 +630,10 @@ namespace ExperienceAndClasses {
             Main.NewText(message, UI.Constants.COLOUR_MESSAGE_ANNOUNCE);
         }
 
+        public double GetAvailableOldXP() {
+            return (old_xp - old_xp_spent);
+        }
+
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Minions ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         //do not count dragon body or tail (only head)
@@ -915,7 +918,7 @@ namespace ExperienceAndClasses {
                 {"eac_attribute_allocation", attributes_allocated },
                 {"eac_wof", Killed_WOF },
                 {"eac_settings_show_xp", show_xp},
-                {"old_experience", old_xp},
+                {"old_experience_spent", old_xp_spent},
             };
         }
 
@@ -923,8 +926,8 @@ namespace ExperienceAndClasses {
             //some settings must be applied after init
             load_tag = tag;
 
-            //old xp
-            old_xp = Commons.TryGet<double>(load_tag, "old_experience", 0);
+            //old xp spent
+            old_xp_spent = Commons.TryGet<double>(load_tag, "old_experience_spent", 0);
 
             //get version in case needed
             Load_Version = Commons.TryGet<int[]>(load_tag, "eac_version", new int[3]);
