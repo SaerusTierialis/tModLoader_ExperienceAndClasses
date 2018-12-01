@@ -214,7 +214,7 @@ namespace ExperienceAndClasses.UI {
             Systems.Class c = Systems.Class.CLASS_LOOKUP[class_id];
             Items.MItem item = c.Unlock_Item;
 
-            string str = "Requirements:\n" + "Level " + c.Prereq.Max_Level + " " + c.Prereq.Name + "\n" + item.item.Name + "\n\nToken Recipe:\n" + item.GetRecipeString(true) + "\n(Work Bench)";
+            string str = "Requirements:\n" + "Level " + c.Prereq.Max_Level + " " + c.Prereq.Name + "\nx1 " + item.item.Name + "\n\nToken Recipe:\n" + item.GetRecipeString(true) + "\n(Work Bench)";
 
             mode = MODE.FREE;
             ShowText(source, "Unlock " + c.Name, str , WIDTH_UNLOCK, null, 0, ModLoader.GetTexture(item.Texture));
@@ -226,7 +226,7 @@ namespace ExperienceAndClasses.UI {
         public void ShowUnlockSubclass(UIElement source) {
             Items.MItem item = ExperienceAndClasses.MOD.GetItem<Items.Unlock_Subclass>();
 
-            string str = "Unlocking multiclass will allow you to freely set any class as your subclass. Requirements:\n" + item.item.Name + "\n\nToken Recipe:\n" + item.GetRecipeString(true) + "\n(Work Bench)";
+            string str = "Unlocking multiclassing will allow you to freely set any class as your subclass.\n\nRequirements:\nx1 " + item.item.Name + "\n\nToken Recipe:\n" + item.GetRecipeString(true) + "\n(Work Bench)";
 
             mode = MODE.FREE;
             ShowText(source, "Unlock Multiclassing", str, WIDTH_UNLOCK, null, 0, ModLoader.GetTexture(item.Texture));

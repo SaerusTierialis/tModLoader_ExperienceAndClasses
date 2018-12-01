@@ -471,7 +471,10 @@ namespace ExperienceAndClasses.UI {
         public override void RightClick(UIMouseEvent evt) {
             base.RightClick(evt);
 
-            if (ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary.ID == class_id) {
+            if(!ExperienceAndClasses.LOCAL_MPLAYER.Allow_Secondary) {
+                UIInfo.Instance.ShowUnlockSubclass(this);
+            }
+            else if (ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary.ID == class_id) {
                 ExperienceAndClasses.LOCAL_MPLAYER.LocalSetClass((byte)Systems.Class.CLASS_IDS.None, false);
             }
             else {
