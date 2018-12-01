@@ -936,7 +936,7 @@ namespace ExperienceAndClasses {
             Killed_WOF = Commons.TryGet<bool>(load_tag, "eac_wof", Killed_WOF);
 
             //subclass unlocked
-            Allow_Secondary = Commons.TryGet<bool>(load_tag, "eac_class_current_primary", Allow_Secondary);
+            Allow_Secondary = Commons.TryGet<bool>(load_tag, "eac_class_subclass_unlocked", Allow_Secondary);
 
             //settings
             show_xp = Commons.TryGet<bool>(load_tag, "eac_settings_show_xp", show_xp);

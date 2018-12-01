@@ -145,11 +145,11 @@ namespace ExperienceAndClasses.UI {
             string text = "";
             if (!ExperienceAndClasses.LOCAL_MPLAYER.Class_Unlocked[class_id]) {
                 title += " (locked)";
-                text += "Left click for class-specific unlock requirements.\n";
+                text += "Left click for class unlock requirements.\n";
             }
 
             if (!ExperienceAndClasses.LOCAL_MPLAYER.Allow_Secondary) {
-                text += "Right click for universal multiclassing unlock requirements.\n";
+                text += "Right click for multiclass unlock requirements.\n";
             }
 
             if (text.Length > 0) {
