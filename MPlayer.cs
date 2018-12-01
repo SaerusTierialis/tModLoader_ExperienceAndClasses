@@ -161,7 +161,7 @@ namespace ExperienceAndClasses {
                 initialized = true;
 
                 //get old xp one time if loaded old save
-                if (Load_Version[0] < 2) {
+                if (Commons.VersionIsOlder(Load_Version, new int[] { 2, 0, 0 })) {
                     old_xp += player.GetModPlayer<Legacy.MyPlayer>(mod).old_xp;
                 }
 

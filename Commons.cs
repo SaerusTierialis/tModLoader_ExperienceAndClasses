@@ -181,5 +181,38 @@ namespace ExperienceAndClasses {
             }
         }
 
+        public static bool VersionIsOlder(int[] target, int[] reference) {
+            int max_length = Math.Max(target.Length, reference.Length);
+            int t, r;
+            for (int i=0; i<max_length; i++) {
+                if (target.Length > i) {
+                    t = target[i];
+                }
+                else {
+                    t = 0;
+                }
+
+                if (reference.Length > i) {
+                    r = reference[i];
+                }
+                else {
+                    r = 0;
+                }
+
+                if (t < r) {
+                    //older
+                    return true;
+                }
+                else if (t > r) {
+                    //newer
+                    return false;
+                }
+                //else this digit is the same, continue
+            }
+
+            //default to false (target is equal or more recent)
+            return false;
+        }
+
     }
 }
