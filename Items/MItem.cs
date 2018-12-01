@@ -15,6 +15,7 @@ namespace ExperienceAndClasses.Items {
         private readonly int WIDTH, HEIGHT, RARITY;
 
         protected Recipe recipe = null;
+        private bool recipe_searched = false;
 
         protected MItem(string name, string tooltip, string texture, bool consumable, int width, int height, int rarity) {
             NAME = name;
@@ -64,6 +65,18 @@ namespace ExperienceAndClasses.Items {
                 return Commons.GetRecipeString(recipe, multiline);
             }
             else {
+                //one-time runtime search for recipe if not set manually
+                if (!recipe_searched) {
+                    recipe_searched = true;
+                    foreach (Recipe r in Main.recipe) {
+                        if (r.createItem.type == item.type) {
+                            recipe = r;
+                            return Commons.GetRecipeString(recipe, multiline);
+                        }
+                    }
+                }
+
+                //no recipe found
                 return "no recipe";
             }
         }

@@ -25,8 +25,7 @@ namespace ExperienceAndClasses.Items {
         public Unlock_Tier2() : base(NAME, TOOLTIP, TEXTURE, RARITY) { }
 
         public override void AddRecipes() {
-            //convert boss orb to ascension orb
-            recipe = Commons.QuckRecipe(mod, new int[,] { { ItemID.LifeCrystal, 1 } , { ItemID.ManaCrystal, 1 } , { mod.ItemType<Monster_Orb>(), 1 } }, this, 1);
+            Commons.QuckRecipe(mod, new int[,] { { ItemID.LifeCrystal, 1 } , { ItemID.ManaCrystal, 1 } , { mod.ItemType<Orb_Monster>(), 1 } }, this, 1);
         }
     }
 
@@ -37,6 +36,10 @@ namespace ExperienceAndClasses.Items {
         private const int RARITY = 10;
 
         public Unlock_Tier3() : base(NAME, TOOLTIP, TEXTURE, RARITY) { }
+
+        public override void AddRecipes() {
+            Commons.QuckRecipe(mod, new int[,] { { mod.ItemType<Orb_Monster>(), 50 } , { mod.ItemType<Orb_Boss>(), 5 } }, this, 1);
+        }
     }
 
     public class Unlock_Subclass : Unlock {
@@ -46,6 +49,10 @@ namespace ExperienceAndClasses.Items {
         private const int RARITY = -12;
 
         public Unlock_Subclass() : base(NAME, TOOLTIP, TEXTURE, RARITY) { }
+
+        public override void AddRecipes() {
+            Commons.QuckRecipe(mod, new int[,] { { mod.ItemType<Orb_Boss>(), 20 } }, this, 1);
+        }
     }
 
     public class Unlock_Explorer : Unlock {
@@ -55,5 +62,13 @@ namespace ExperienceAndClasses.Items {
         private const int RARITY = -11;
 
         public Unlock_Explorer() : base(NAME, TOOLTIP, TEXTURE, RARITY) { }
+
+        public override void AddRecipes() {
+            ModRecipe recipe = new ModRecipe(ExperienceAndClasses.MOD);
+            recipe.AddRecipeGroup("Wood", 50); //any wood
+            recipe.AddRecipeGroup("IronBar", 1); //iron or tin
+            recipe.SetResult(this, 1);
+            recipe.AddRecipe();
+        }
     }
 }

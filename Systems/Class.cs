@@ -66,6 +66,7 @@ namespace ExperienceAndClasses.Systems {
             float[] attribute_growth;
             bool gives_allocation_attributes;
             Items.Unlock unlock_item;
+            byte max_level_override;
 
             for (CLASS_IDS id = 0; id < CLASS_IDS.NUMBER_OF_IDs; id++) {
                 id_byte = (byte)id;
@@ -79,6 +80,7 @@ namespace ExperienceAndClasses.Systems {
                 power_scaling = PowerScaling.POWER_SCALING_TYPES.None;
                 gives_allocation_attributes = true;
                 unlock_item = null;
+                max_level_override = 0;
 
                 //default attribute growth of active attributes to 1 (per 10 levels)
                 attribute_growth = new float[(byte)Attribute.ATTRIBUTE_IDS.NUMBER_OF_IDs];
@@ -403,7 +405,8 @@ namespace ExperienceAndClasses.Systems {
                     case CLASS_IDS.Explorer:
                         name = "Explorer";
                         desc = "TODO_description";
-                        tier = 3;
+                        tier = 2;
+                        max_level_override = MAX_LEVEL[3];
                         unlock_item = ExperienceAndClasses.MOD.GetItem<Items.Unlock_Explorer>();
                         texture_path = "ExperienceAndClasses/Textures/Class/Explorer";
                         Class_Locations[0, 6] = id_byte;
@@ -426,7 +429,7 @@ namespace ExperienceAndClasses.Systems {
                 }
 
                 //add
-                CLASS_LOOKUP[id_byte] = new Class(id_byte, name, desc, tier, texture_path, (byte)id_prereq, PowerScaling.POWER_SCALING_LOOKUP[(byte)power_scaling], attribute_growth, gives_allocation_attributes, unlock_item);
+                CLASS_LOOKUP[id_byte] = new Class(id_byte, name, desc, tier, texture_path, (byte)id_prereq, PowerScaling.POWER_SCALING_LOOKUP[(byte)power_scaling], attribute_growth, gives_allocation_attributes, unlock_item, max_level_override);
             }
         }
 
@@ -444,7 +447,7 @@ namespace ExperienceAndClasses.Systems {
         public byte Max_Level { get; private set; }
         public Items.Unlock Unlock_Item { get; private set; }
 
-        public Class(byte id, string name, string description, byte tier, string texture_path, byte id_prereq, PowerScaling power_scaling, float[] attribute_growth, bool gives_allocation_attributes, Items.Unlock unlock_item) {
+        public Class(byte id, string name, string description, byte tier, string texture_path, byte id_prereq, PowerScaling power_scaling, float[] attribute_growth, bool gives_allocation_attributes, Items.Unlock unlock_item, byte max_level_override=0) {
             ID = id;
             Name = name;
             Description = description;
@@ -454,8 +457,14 @@ namespace ExperienceAndClasses.Systems {
             Power_Scaling = power_scaling;
             Attribute_Growth = attribute_growth;
             Gives_Allocation_Attributes = gives_allocation_attributes;
-            Max_Level = MAX_LEVEL[Tier];
             Unlock_Item = unlock_item;
+
+            if (max_level_override > 0) {
+                Max_Level = max_level_override;
+            }
+            else {
+                Max_Level = MAX_LEVEL[Tier];
+            }
         }
 
         public void LoadTexture() {

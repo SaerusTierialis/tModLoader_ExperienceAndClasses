@@ -46,14 +46,14 @@ namespace ExperienceAndClasses.Items {
         abstract protected uint GetValue();
     }
 
-    public class Monster_Orb : Orb {
+    public class Orb_Monster : Orb {
         public const string NAME = "Ascension Orb";
         private const string TOOLTIP = "TODP_tooltip";
         private const string TEXTURE = "ExperienceAndClasses/Textures/Item/Orb_Monster";
         private const int RARITY = 9;
         private const short DUST = DustID.ApprenticeStorm;
 
-        public Monster_Orb() : base(NAME, TOOLTIP, TEXTURE, RARITY, DUST) {}
+        public Orb_Monster() : base(NAME, TOOLTIP, TEXTURE, RARITY, DUST) {}
 
         protected override uint GetValue() {
             return 0; //TODO
@@ -61,7 +61,7 @@ namespace ExperienceAndClasses.Items {
 
         public override void AddRecipes() {
             //convert boss orb to ascension orb
-            recipe = Commons.QuckRecipe(mod, new int[,] { { mod.ItemType<Boss_Orb>(), 1 } }, this, 5);
+            recipe = Commons.QuckRecipe(mod, new int[,] { { mod.ItemType<Orb_Boss>(), 1 } }, this, 5);
 
             //alt recipe: gold
             Commons.QuckRecipe(mod, new int[,] { { ItemID.LifeCrystal, 1 }, { ItemID.ManaCrystal, 1 }, { ItemID.GoldBar, 5 } }, this, 1);
@@ -71,14 +71,14 @@ namespace ExperienceAndClasses.Items {
         }
     }
 
-    class Boss_Orb : Orb {
+    class Orb_Boss : Orb {
         public const string NAME = "Transcendence Orb";
         private const string TOOLTIP = "TODP_tooltip";
         private const string TEXTURE = "ExperienceAndClasses/Textures/Item/Orb_Boss";
         private const int RARITY = 11;
         private const short DUST = DustID.PurpleCrystalShard;
 
-        public Boss_Orb() : base(NAME, TOOLTIP, TEXTURE, RARITY, DUST) { }
+        public Orb_Boss() : base(NAME, TOOLTIP, TEXTURE, RARITY, DUST) { }
 
         protected override uint GetValue() {
             return 0; //TODO

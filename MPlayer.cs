@@ -48,6 +48,8 @@ namespace ExperienceAndClasses {
 
         public List<Projectile> minions;
 
+        private double old_xp; //pre-revamp xp
+
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Instance Vars (syncing) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         public Systems.Class Class_Primary { get; private set; }
@@ -76,6 +78,7 @@ namespace ExperienceAndClasses {
             show_xp = true;
             send_xp_when = DateTime.MinValue;
             minions = new List<Projectile>();
+            old_xp = 0;
 
             //default level/xp/unlock
             Class_Levels = new byte[(byte)Systems.Class.CLASS_IDS.NUMBER_OF_IDs];
@@ -156,6 +159,14 @@ namespace ExperienceAndClasses {
 
                 //initialized
                 initialized = true;
+
+                //get old xp if loading version before 2.0
+                if (Load_Version[0] < 2) {
+                    old_xp = player.GetModPlayer<MyPlayer>(mod).old_xp;
+                }
+
+                //convert old items
+                //TODO
             }
         }
 
@@ -183,14 +194,16 @@ namespace ExperienceAndClasses {
         public override void PostUpdate() {
             base.PostUpdate();
 
+            Main.NewText("" + old_xp);
 
             //timed events...
             DateTime now = DateTime.Now;
 
             //server/singleplayer
             if (!ExperienceAndClasses.IS_CLIENT) {
-                uint xp = Systems.XP.TRACK_PLAYER_XP[player.whoAmI];
 
+                //sending xp packets (or handle locally in chunks)
+                uint xp = Systems.XP.TRACK_PLAYER_XP[player.whoAmI];
                 if ((xp > 0) && (now.CompareTo(send_xp_when) >= 0)) {
 
                     send_xp_when = now.AddTicks(TICKS_PER_XP_SEND);
@@ -203,6 +216,7 @@ namespace ExperienceAndClasses {
                         LocalAddXP(xp);
                     }
                 }
+
             }
 
             //local events
@@ -903,12 +917,16 @@ namespace ExperienceAndClasses {
                 {"eac_attribute_allocation", attributes_allocated },
                 {"eac_wof", Killed_WOF },
                 {"eac_settings_show_xp", show_xp},
+                {"old_experience", old_xp},
             };
         }
 
         public override void Load(TagCompound tag) {
             //some settings must be applied after init
             load_tag = tag;
+
+            //old xp
+            old_xp = Commons.TryGet<double>(load_tag, "old_experience", 0);
 
             //get version in case needed
             Load_Version = Commons.TryGet<int[]>(load_tag, "eac_version", new int[3]);
@@ -1024,5 +1042,19 @@ namespace ExperienceAndClasses {
             }
         }
 
+    }
+
+    /// <summary>
+    /// legacy load xp (had to use exact old class name)
+    /// loads pre-revamp xp
+    /// </summary>
+    class MyPlayer : ModPlayer {
+        public double old_xp { get; private set; }
+        public override void Initialize() {
+            old_xp = 0;
+        }
+        public override void Load(TagCompound tag) {
+            old_xp = Commons.TryGet<double>(tag, "experience", 0);
+        }
     }
 }

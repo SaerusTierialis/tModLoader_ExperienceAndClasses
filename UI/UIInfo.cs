@@ -22,7 +22,7 @@ namespace ExperienceAndClasses.UI {
         private const float TEXT_SCALE_TITLE = 1.1f;
         private const float TEXT_SCALE_BODY = 0.9f;
 
-        private const float WIDTH_CLASS = 300;
+        private const float WIDTH_CLASS = 400;
         private const float WIDTH_ATTRIBUTE = 350;
         private const float WIDTH_HELP = 300;
         private const float WIDTH_STATUS = 300;
@@ -141,18 +141,22 @@ namespace ExperienceAndClasses.UI {
         public void ShowTextClass(UIElement source, byte class_id) {
             Systems.Class c = Systems.Class.CLASS_LOOKUP[class_id];
 
-            string title = c.Name;
-            string text = c.Description + "\n\n";
-            if (ExperienceAndClasses.LOCAL_MPLAYER.Class_Levels[class_id] <= 0) {
+            string title = c.Name + " (Tier " + c.Tier + ")";
+            string text = "";
+            if (!ExperienceAndClasses.LOCAL_MPLAYER.Class_Unlocked[class_id]) {
                 title += " (locked)";
-                text += "REQUIREMENT: " + c.Prereq.Name;
-                byte level_req = c.Prereq.Max_Level;
-                if (level_req > 0) {
-                    text += " Lv." + level_req;
-                }
-                text += "\n\n";
+                text += "Left click for class-specific unlock requirements.\n";
             }
-            text += "DAMAGE TYPE: " + c.Power_Scaling.Name + "\n\nATTRIBUTES:";
+
+            if (!ExperienceAndClasses.LOCAL_MPLAYER.Allow_Secondary) {
+                text += "Right click for universal multiclassing unlock requirements.\n";
+            }
+
+            if (text.Length > 0) {
+                text += "\n";
+            }
+
+            text += c.Description + "\n\n" + "DAMAGE TYPE: " + c.Power_Scaling.Name + "\n\nATTRIBUTES:";
 
             //attributes
             bool first = true;
