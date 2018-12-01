@@ -162,7 +162,7 @@ namespace ExperienceAndClasses {
 
                 //get old xp if loading version before 2.0
                 if (Load_Version[0] < 2) {
-                    old_xp = player.GetModPlayer<Legacy.MyPlayer>(mod).old_xp;
+                    old_xp += player.GetModPlayer<Legacy.MyPlayer>(mod).old_xp;
                 }
 
                 //convert old items (call twice in case inventory is pretty full and first call makes room)
