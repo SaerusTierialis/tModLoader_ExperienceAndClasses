@@ -48,7 +48,7 @@ namespace ExperienceAndClasses {
 
         public List<Projectile> minions;
 
-        private double old_xp; //pre-revamp xp
+        public double old_xp; //pre-revamp xp
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Instance Vars (syncing) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -162,11 +162,12 @@ namespace ExperienceAndClasses {
 
                 //get old xp if loading version before 2.0
                 if (Load_Version[0] < 2) {
-                    old_xp = player.GetModPlayer<MyPlayer>(mod).old_xp;
+                    old_xp = player.GetModPlayer<Legacy.MyPlayer>(mod).old_xp;
                 }
 
-                //convert old items
-                //TODO
+                //convert old items (call twice in case inventory is pretty full and first call makes room)
+                Legacy.ConvertItems(player);
+                Legacy.ConvertItems(player);
             }
         }
 
@@ -193,8 +194,6 @@ namespace ExperienceAndClasses {
 
         public override void PostUpdate() {
             base.PostUpdate();
-
-            Main.NewText("" + old_xp);
 
             //timed events...
             DateTime now = DateTime.Now;
@@ -223,7 +222,6 @@ namespace ExperienceAndClasses {
             if (Is_Local_Player) {
                 //ui
                 UI.UIStatus.Instance.Update();
-
             }
         }
 
@@ -1042,19 +1040,5 @@ namespace ExperienceAndClasses {
             }
         }
 
-    }
-
-    /// <summary>
-    /// legacy load xp (had to use exact old class name)
-    /// loads pre-revamp xp
-    /// </summary>
-    class MyPlayer : ModPlayer {
-        public double old_xp { get; private set; }
-        public override void Initialize() {
-            old_xp = 0;
-        }
-        public override void Load(TagCompound tag) {
-            old_xp = Commons.TryGet<double>(tag, "experience", 0);
-        }
     }
 }
