@@ -24,7 +24,7 @@ namespace ExperienceAndClasses {
             }
         }
 
-        public static void ConvertItems(Player player) {
+        public static void ConvertLegacyItems(Player player) {
             foreach (Item item in player.inventory) {
                 if (item.type > 0 && item.Name.Equals("Unloaded Item")) {
 
@@ -198,8 +198,12 @@ namespace ExperienceAndClasses {
                                     player.ConsumeItem(item.type);
                                 }
 
-                                //add xp
+                                //add xp (check for overflow)
+                                double prior_old_xp = ExperienceAndClasses.LOCAL_MPLAYER.old_xp;
                                 ExperienceAndClasses.LOCAL_MPLAYER.old_xp += (xp * num);
+                                if (ExperienceAndClasses.LOCAL_MPLAYER.old_xp < prior_old_xp) {
+                                    ExperienceAndClasses.LOCAL_MPLAYER.old_xp = double.MaxValue;
+                                }
 
                                 //add item
                                 foreach (ModItem i in items) {

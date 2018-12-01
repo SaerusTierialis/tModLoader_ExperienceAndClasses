@@ -31,6 +31,7 @@ namespace ExperienceAndClasses.UI {
         private enum MODE : byte {
             FREE,
             UNLOCK_CLASS,
+            UNLOCK_SUBCLASS,
         }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Variables ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
@@ -220,6 +221,16 @@ namespace ExperienceAndClasses.UI {
             mode = MODE.UNLOCK_CLASS;
 
             mode_data = class_id;
+        }
+
+        public void ShowUnlockSubclass(UIElement source) {
+            Items.MItem item = ExperienceAndClasses.MOD.GetItem<Items.Unlock_Subclass>();
+
+            string str = "Unlocking multiclass will allow you to freely set any class as your subclass. Requirements:\n" + item.item.Name + "\n\nToken Recipe:\n" + item.GetRecipeString(true) + "\n(Work Bench)";
+
+            mode = MODE.FREE;
+            ShowText(source, "Unlock Multiclassing", str, WIDTH_UNLOCK, null, 0, ModLoader.GetTexture(item.Texture));
+            mode = MODE.UNLOCK_SUBCLASS;
         }
 
     }
