@@ -20,6 +20,7 @@ namespace ExperienceAndClasses.UI {
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Constants ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         private const float TEXT_SCALE_TITLE = 1.1f;
+        private const float TEXT_SCALE_BUTTON = 1f;
         private const float TEXT_SCALE_BODY = 0.9f;
 
         private const float WIDTH_CLASS = 400;
@@ -29,9 +30,13 @@ namespace ExperienceAndClasses.UI {
         private const float WIDTH_UNLOCK = 300;
 
         private enum MODE : byte {
-            FREE,
-            UNLOCK_CLASS,
-            UNLOCK_SUBCLASS,
+            HOVER,
+            INPUT,
+        }
+
+        private enum UNLOCK_MODE : byte {
+            CLASS,
+            SUBCLASS,
         }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Variables ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
@@ -39,13 +44,16 @@ namespace ExperienceAndClasses.UI {
         private UIText ui_text_body, ui_text_extra;
         private UIElement source = null;
         private UIImage image;
-        private MODE mode;
-        private byte mode_data;
+        private static MODE mode;
+        private UNLOCK_MODE unlock_mode;
+        private byte unlock_class;
+        private TextButton button_yes, button_no;
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Initialize ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         protected override void InitializeState() {
-            mode = MODE.FREE;
-            mode_data = 0;
+            mode = MODE.HOVER;
+            unlock_mode = UNLOCK_MODE.SUBCLASS;
+            unlock_class = 0;
 
             panel = new DragableUIPanel(1f, 1f, Constants.COLOR_UI_PANEL_BACKGROUND, this, false, false, false, false);
 
@@ -63,12 +71,38 @@ namespace ExperienceAndClasses.UI {
             image.Left.Set(Constants.UI_PADDING, 0f);
             panel.Append(image);
 
+            button_yes = new TextButton("CONFIRM", TEXT_SCALE_BUTTON);
+            button_yes.OnClick += new UIElement.MouseEvent(ClickYes);
+            panel.Append(button_yes);
+            
+            button_no = new TextButton("CANCEL", TEXT_SCALE_BUTTON);
+            button_no.OnClick += new UIElement.MouseEvent(ClickNo);
+            panel.Append(button_no);
+
             state.Append(panel);
         }
 
+        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Events ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+        public void ClickYes(UIMouseEvent evt, UIElement listeningElement) {
+            if (button_yes.visible) {
+                Main.NewText("YES");
+            }
+        }
+
+        public void ClickNo(UIMouseEvent evt, UIElement listeningElement) {
+            if (button_no.visible) {
+                Main.NewText("NO");
+            }
+        }
+
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Methods ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-        private void ShowText(UIElement source, string title, string body, float width, string extra=null, float extra_left=0f, Texture2D texture=null) {
-            if (mode == MODE.FREE) {
+        public static bool AllowClicks() {
+            return mode == MODE.HOVER;
+        }
+
+        private void ShowText(UIElement source, string title, string body, float width, string extra=null, float extra_left=0f, Texture2D texture=null, bool force=false) {
+            if (mode == MODE.HOVER || force) {
 
                 this.source = source;
 
@@ -94,9 +128,27 @@ namespace ExperienceAndClasses.UI {
                     min_height_body = texture.Height + Constants.UI_PADDING;
                 }
 
-                //body
                 body = Main.fontMouseText.CreateWrappedText(body, (width - Constants.UI_PADDING * 2 - add_left) / TEXT_SCALE_BODY);
-                panel.SetSize(width, Math.Max((Main.fontMouseText.MeasureString(body).Y * TEXT_SCALE_BODY), min_height_body) + panel.top_space + Constants.UI_PADDING);
+                float height = Math.Max((Main.fontMouseText.MeasureString(body).Y * TEXT_SCALE_BODY), min_height_body) + panel.top_space + Constants.UI_PADDING;
+
+                //buttons
+                if (mode == MODE.INPUT) {
+                    button_yes.visible = true;
+                    button_no.visible = true;
+
+                    height += button_yes.Height.Pixels + Constants.UI_PADDING*3;
+                    float height_button_center = height - Constants.UI_PADDING - (button_yes.Height.Pixels / 2f);
+
+                    Commons.CenterUIElement(button_yes, width * 0.33f, height_button_center);
+                    Commons.CenterUIElement(button_no, width * 0.66f, height_button_center);
+                }
+                else {
+                    button_yes.visible = false;
+                    button_no.visible = false;
+                }
+
+                //body
+                panel.SetSize(width, height);
                 panel.SetPosition(source.GetDimensions().X + source.Width.Pixels, source.GetDimensions().Y, true);
                 ui_text_body.Left.Set(Constants.UI_PADDING + add_left, 0f);
                 ui_text_body.Top.Set(Constants.UI_PADDING + panel.top_space, 0f);
@@ -118,14 +170,14 @@ namespace ExperienceAndClasses.UI {
         }
 
         public void EndText(UIElement source) {
-            if ((this.source != null) && this.source.Equals(source) && (mode == MODE.FREE)) {
+            if ((this.source != null) && this.source.Equals(source) && (mode == MODE.HOVER)) {
                 this.source = null;
                 Visibility = false;
             }
         }
 
         public void EndTextChildren(UIState state) {
-            mode = MODE.FREE;
+            mode = MODE.HOVER;
             if (source != null) {
                 UIElement parent = source.Parent;
                 while (parent != null) {
@@ -216,11 +268,11 @@ namespace ExperienceAndClasses.UI {
 
             string str = "Requirements:\n" + "Level " + c.Prereq.Max_Level + " " + c.Prereq.Name + "\nx1 " + item.item.Name + "\n\nToken Recipe:\n" + item.GetRecipeString(true) + "\n(Work Bench)";
 
-            mode = MODE.FREE;
-            ShowText(source, "Unlock " + c.Name, str , WIDTH_UNLOCK, null, 0, ModLoader.GetTexture(item.Texture));
-            mode = MODE.UNLOCK_CLASS;
+            mode = MODE.INPUT;
+            unlock_mode = UNLOCK_MODE.CLASS;
+            unlock_class = class_id;
 
-            mode_data = class_id;
+            ShowText(source, "Unlock " + c.Name, str , WIDTH_UNLOCK, null, 0, ModLoader.GetTexture(item.Texture), true);
         }
 
         public void ShowUnlockSubclass(UIElement source) {
@@ -228,9 +280,10 @@ namespace ExperienceAndClasses.UI {
 
             string str = "Unlocking multiclassing will allow you to freely set any class as your subclass.\n\nRequirements:\nx1 " + item.item.Name + "\n\nToken Recipe:\n" + item.GetRecipeString(true) + "\n(Work Bench)";
 
-            mode = MODE.FREE;
-            ShowText(source, "Unlock Multiclassing", str, WIDTH_UNLOCK, null, 0, ModLoader.GetTexture(item.Texture));
-            mode = MODE.UNLOCK_SUBCLASS;
+            mode = MODE.INPUT;
+            unlock_mode = UNLOCK_MODE.SUBCLASS;
+
+            ShowText(source, "Unlock Multiclassing", str, WIDTH_UNLOCK, null, 0, ModLoader.GetTexture(item.Texture), true);
         }
 
     }

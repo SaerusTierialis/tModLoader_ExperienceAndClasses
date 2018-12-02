@@ -5,6 +5,7 @@ using Terraria.ID;
 using Terraria.Localization;
 using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
+using Terraria.UI;
 
 namespace ExperienceAndClasses {
     public static class Commons {
@@ -212,6 +213,11 @@ namespace ExperienceAndClasses {
 
             //default to false (target is equal or more recent)
             return false;
+        }
+
+        public static void CenterUIElement(UIElement element, float x, float y) {
+            element.Left.Set(x - (element.Width.Pixels / 2f), 0f);
+            element.Top.Set(y - (element.Height.Pixels / 2f), 0f);
         }
 
     }

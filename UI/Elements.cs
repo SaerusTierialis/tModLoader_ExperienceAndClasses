@@ -7,6 +7,52 @@ using Terraria.UI;
 
 namespace ExperienceAndClasses.UI {
 
+    public class TextButton : UIPanel {
+        public bool visible = true;
+
+        private static readonly Color BORDER = Color.Transparent;
+        private static readonly Color BORDER_HIGHLIGHT = Color.Black;
+
+        public TextButton(string text, float text_size) {
+            SetPadding(0f);
+
+            BackgroundColor = Color.Transparent;
+            BorderColor = BORDER;
+
+            UIText uitext = new UIText(text, text_size);
+            Vector2 text_measure = Main.fontMouseText.MeasureString(uitext.Text);
+
+            float width = (text_measure.X * text_size);
+            float height = (text_measure.Y * text_size) / 2f;
+
+            float width_panel = width + (Constants.UI_PADDING * 2);
+            float height_panel = height + (Constants.UI_PADDING * 2);
+
+            Width.Set(width_panel, 0f);
+            Height.Set(height_panel, 0f);
+
+            uitext.Left.Set((width_panel - width) / 2f, 0f);
+            uitext.Top.Set((height_panel - height) / 2f, 0f);
+            Append(uitext);
+        }
+
+        public override void MouseOut(UIMouseEvent evt) {
+            base.MouseOut(evt);
+            BorderColor = BORDER;
+        }
+
+        public override void MouseOver(UIMouseEvent evt) {
+            base.MouseOver(evt);
+            BorderColor = BORDER_HIGHLIGHT;
+        }
+
+        public override void Draw(SpriteBatch spriteBatch) {
+            if (visible) {
+                base.Draw(spriteBatch);
+            }
+        }
+    }
+
     public class HelpTextPanel : UIPanel {
         private UIText text;
         private string help_text_title, help_text;
@@ -374,10 +420,14 @@ namespace ExperienceAndClasses.UI {
         }
 
         public void ClickAdd(UIMouseEvent evt, UIElement listeningElement) {
+            if (!UIInfo.AllowClicks()) return;
+
             ExperienceAndClasses.LOCAL_MPLAYER.LocalAttributeAllocation1Point(attribute.ID, true);
         }
 
         public void ClickSubtract(UIMouseEvent evt, UIElement listeningElement) {
+            if (!UIInfo.AllowClicks()) return;
+
             ExperienceAndClasses.LOCAL_MPLAYER.LocalAttributeAllocation1Point(attribute.ID, false);
         }
 
@@ -453,6 +503,8 @@ namespace ExperienceAndClasses.UI {
         }
 
         public override void Click(UIMouseEvent evt) {
+            if (!UIInfo.AllowClicks()) return;
+
             base.Click(evt);
 
             if (!ExperienceAndClasses.LOCAL_MPLAYER.Class_Unlocked[class_id]) {
@@ -469,6 +521,8 @@ namespace ExperienceAndClasses.UI {
         }
 
         public override void RightClick(UIMouseEvent evt) {
+            if (!UIInfo.AllowClicks()) return;
+
             base.RightClick(evt);
 
             if(!ExperienceAndClasses.LOCAL_MPLAYER.Allow_Secondary) {
@@ -912,6 +966,11 @@ namespace ExperienceAndClasses.UI {
             if (IsMouseHovering) {
                 Main.hoverItemName = hoverText;
             }
+        }
+
+        public override void Click(UIMouseEvent evt) {
+            if (!UIInfo.AllowClicks()) return;
+            base.Click(evt);
         }
     }
 }
