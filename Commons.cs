@@ -215,6 +215,10 @@ namespace ExperienceAndClasses {
             return false;
         }
 
+        public static void CenterUIElement(UIElement element, UIElement target) {
+            CenterUIElement(element, target.Left.Pixels + (target.Width.Pixels / 2f), target.Top.Pixels + (target.Height.Pixels / 2f));
+        }
+
         public static void CenterUIElement(UIElement element, float x, float y) {
             element.Left.Set(x - (element.Width.Pixels / 2f), 0f);
             element.Top.Set(y - (element.Height.Pixels / 2f), 0f);

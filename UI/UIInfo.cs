@@ -21,13 +21,16 @@ namespace ExperienceAndClasses.UI {
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Constants ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         private const float TEXT_SCALE_TITLE = 1.1f;
         private const float TEXT_SCALE_BUTTON = 1f;
+        private const float TEXT_SCALE_BUTTON_HOVER = 1.1f;
         private const float TEXT_SCALE_BODY = 0.9f;
 
-        private const float WIDTH_CLASS = 400;
-        private const float WIDTH_ATTRIBUTE = 350;
-        private const float WIDTH_HELP = 300;
-        private const float WIDTH_STATUS = 300;
-        private const float WIDTH_UNLOCK = 300;
+        private const float WIDTH_CLASS = 400f;
+        private const float WIDTH_ATTRIBUTE = 350f;
+        private const float WIDTH_HELP = 300f;
+        private const float WIDTH_STATUS = 300f;
+        private const float WIDTH_UNLOCK = 300f;
+
+        private const float BUTTON_SEPARATION = 100f;
 
         private enum MODE : byte {
             HOVER,
@@ -71,11 +74,11 @@ namespace ExperienceAndClasses.UI {
             image.Left.Set(Constants.UI_PADDING, 0f);
             panel.Append(image);
 
-            button_yes = new TextButton("CONFIRM", TEXT_SCALE_BUTTON);
+            button_yes = new TextButton("Confirm", TEXT_SCALE_BUTTON, TEXT_SCALE_BUTTON_HOVER);
             button_yes.OnClick += new UIElement.MouseEvent(ClickYes);
             panel.Append(button_yes);
             
-            button_no = new TextButton("CANCEL", TEXT_SCALE_BUTTON);
+            button_no = new TextButton("Cancel", TEXT_SCALE_BUTTON, TEXT_SCALE_BUTTON_HOVER);
             button_no.OnClick += new UIElement.MouseEvent(ClickNo);
             panel.Append(button_no);
 
@@ -87,18 +90,24 @@ namespace ExperienceAndClasses.UI {
         public void ClickYes(UIMouseEvent evt, UIElement listeningElement) {
             if (button_yes.visible) {
                 Main.NewText("YES");
+                ResetState();
             }
         }
 
         public void ClickNo(UIMouseEvent evt, UIElement listeningElement) {
             if (button_no.visible) {
-                Main.NewText("NO");
+                ResetState();
             }
         }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Methods ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         public static bool AllowClicks() {
             return mode == MODE.HOVER;
+        }
+
+        private void ResetState() {
+            mode = MODE.HOVER;
+            EndText(source);
         }
 
         private void ShowText(UIElement source, string title, string body, float width, string extra=null, float extra_left=0f, Texture2D texture=null, bool force=false) {
@@ -137,10 +146,10 @@ namespace ExperienceAndClasses.UI {
                     button_no.visible = true;
 
                     height += button_yes.Height.Pixels + Constants.UI_PADDING*3;
-                    float height_button_center = height - Constants.UI_PADDING - (button_yes.Height.Pixels / 2f);
+                    float height_button_center = height - Constants.UI_PADDING*2 - (button_yes.Height.Pixels / 2f);
 
-                    Commons.CenterUIElement(button_yes, width * 0.33f, height_button_center);
-                    Commons.CenterUIElement(button_no, width * 0.66f, height_button_center);
+                    Commons.CenterUIElement(button_yes, (width - BUTTON_SEPARATION) / 2f, height_button_center);
+                    Commons.CenterUIElement(button_no, (width + BUTTON_SEPARATION) / 2f, height_button_center);
                 }
                 else {
                     button_yes.visible = false;

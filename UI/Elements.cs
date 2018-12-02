@@ -7,43 +7,58 @@ using Terraria.UI;
 
 namespace ExperienceAndClasses.UI {
 
-    public class TextButton : UIPanel {
+    public class HidableText : UIText {
+        public bool visible = true;
+        public HidableText(string text, float text_size) : base(text, text_size) {}
+        public override void Draw(SpriteBatch spriteBatch) {
+            if (visible) {
+                base.Draw(spriteBatch);
+            }
+        }
+    }
+
+    public class TextButton : UIElement {
+        private static readonly Color COLOUR_SELECT = Color.Yellow;
+        private static readonly Color COLOUR_STANDARD = Color.DarkGray;
+
         public bool visible = true;
 
-        private static readonly Color BORDER = Color.Transparent;
-        private static readonly Color BORDER_HIGHLIGHT = Color.Black;
+        private HidableText text_standard, text_select;
 
-        public TextButton(string text, float text_size) {
+        public TextButton(string text, float text_size, float text_size_hover) {
             SetPadding(0f);
 
-            BackgroundColor = Color.Transparent;
-            BorderColor = BORDER;
+            text_standard = new HidableText(text, text_size);
+            text_standard.TextColor = COLOUR_STANDARD;
+            Append(text_standard);
 
-            UIText uitext = new UIText(text, text_size);
-            Vector2 text_measure = Main.fontMouseText.MeasureString(uitext.Text);
+            Vector2 text_measure = Main.fontMouseText.MeasureString(text_standard.Text);
 
-            float width = (text_measure.X * text_size);
-            float height = (text_measure.Y * text_size) / 2f;
+            Width.Set(text_measure.X * text_size, 0f);
+            Height.Set(text_measure.Y / 2f * text_size, 0f);
 
-            float width_panel = width + (Constants.UI_PADDING * 2);
-            float height_panel = height + (Constants.UI_PADDING * 2);
+            text_select = new HidableText(text, text_size_hover);
+            text_measure = Main.fontMouseText.MeasureString(text_select.Text);
+            text_select.Width.Set(text_measure.X * text_size_hover, 0f);
+            text_select.Height.Set(text_measure.Y / 2f * text_size_hover, 0f);
+            Commons.CenterUIElement(text_select, this);
+            text_select.TextColor = COLOUR_SELECT;
+            Append(text_select);
 
-            Width.Set(width_panel, 0f);
-            Height.Set(height_panel, 0f);
-
-            uitext.Left.Set((width_panel - width) / 2f, 0f);
-            uitext.Top.Set((height_panel - height) / 2f, 0f);
-            Append(uitext);
+            text_standard.visible = true;
+            text_select.visible = false;
         }
 
         public override void MouseOut(UIMouseEvent evt) {
             base.MouseOut(evt);
-            BorderColor = BORDER;
+            text_standard.visible = true;
+            text_select.visible = false;
         }
 
         public override void MouseOver(UIMouseEvent evt) {
             base.MouseOver(evt);
-            BorderColor = BORDER_HIGHLIGHT;
+            text_standard.visible = false;
+            text_select.visible = true;
         }
 
         public override void Draw(SpriteBatch spriteBatch) {
