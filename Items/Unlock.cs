@@ -25,7 +25,7 @@ namespace ExperienceAndClasses.Items {
         public Unlock_Tier2() : base(NAME, TOOLTIP, TEXTURE, RARITY) { }
 
         public override void AddRecipes() {
-            Commons.QuckRecipe(mod, new int[,] { { ItemID.Gel, 10 } , { ItemID.FallenStar, 1 } , { mod.ItemType<Orb_Monster>(), 1 } }, this, 1);
+            Commons.QuckRecipe(mod, new int[,] { { ItemID.Gel, 50 } , { mod.ItemType<Orb_Monster>(), 1 } }, this, 1);
         }
     }
 

@@ -95,6 +95,7 @@ namespace ExperienceAndClasses.UI {
                         break;
 
                     case UNLOCK_MODE.SUBCLASS:
+                        ExperienceAndClasses.LOCAL_MPLAYER.UnlockSubclass();
                         break;
 
                     default:

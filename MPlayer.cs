@@ -421,7 +421,38 @@ namespace ExperienceAndClasses {
             LocalUpdateClassInfo();
 
             //success
-            AnnounceClassUnlock(c);
+            Main.NewText("You have unlocked " + c.Name + "!", UI.Constants.COLOUR_MESSAGE_ANNOUNCE);
+            return true;
+        }
+
+        public bool UnlockSubclass() {
+            //check locked
+            if (Allow_Secondary) {
+                Commons.Error("Trying to unlock multiclassing when already unlocked");
+                return false;
+            }
+
+            //item requirements
+            Item item = ExperienceAndClasses.MOD.GetItem<Items.Unlock_Subclass>().item;
+            if (!player.HasItem(item.type)) {
+                //item requirement not met
+                Main.NewText("You require a " + item.Name + " to unlock multiclassing!", UI.Constants.COLOUR_MESSAGE_ERROR);
+                return false;
+            }
+
+            //requirements met..
+
+            //take item
+            player.ConsumeItem(item.type);
+
+            //unlock class
+            Allow_Secondary = true;
+
+            //update
+            LocalUpdateClassInfo();
+
+            //success
+            Main.NewText("You can now multiclass! Right click a class to set it as your subclass.", UI.Constants.COLOUR_MESSAGE_ANNOUNCE);
             return true;
         }
 
@@ -622,14 +653,6 @@ namespace ExperienceAndClasses {
         
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Announce ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-
-        public void AnnounceClassUnlock(Systems.Class c) {
-            //client/singleplayer only
-            if (ExperienceAndClasses.IS_SERVER)
-                return;
-
-            Main.NewText("You have unlocked " + c.Name + "!", UI.Constants.COLOUR_MESSAGE_ANNOUNCE);
-        }
 
         public void AnnounceLevel(Systems.Class c) {
             //client/singleplayer only
