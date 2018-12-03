@@ -8,7 +8,7 @@ namespace ExperienceAndClasses.UI {
 
     //UI for class selection, attributes, and ability info
 
-    class UIClass : UIStateCombo {
+    public class UIClass : UIStateCombo {
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Singleton ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         public static readonly UIClass Instance = new UIClass();
 

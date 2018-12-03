@@ -10,7 +10,7 @@ namespace ExperienceAndClasses.UI {
 
     //UI for displaying XP and cooldown bars
 
-    class UIBars : UIStateCombo {
+    public class UIBars : UIStateCombo {
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Singleton ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         public static readonly UIBars Instance = new UIBars();
 

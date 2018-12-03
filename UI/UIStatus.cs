@@ -4,7 +4,7 @@ namespace ExperienceAndClasses.UI {
 
     //UI for displaying statuses
 
-    class UIStatus : UIStateCombo {
+    public class UIStatus : UIStateCombo {
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Singleton ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         public static readonly UIStatus Instance = new UIStatus();
 

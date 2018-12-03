@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace ExperienceAndClasses.Systems {
-    class Status {
+    public class Status {
 
     }
 }

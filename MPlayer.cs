@@ -154,6 +154,9 @@ namespace ExperienceAndClasses {
                 //apply ui auto
                 ExperienceAndClasses.SetUIAutoStates();
 
+                //grab UI-state combos to display
+                ExperienceAndClasses.UIs = new UI.UIStateCombo[] { UI.UIStatus.Instance, UI.UIBars.Instance, UI.UIClass.Instance, UI.UIInfo.Instance };
+
                 //update class info
                 LocalUpdateClassInfo();
 
@@ -309,68 +312,62 @@ namespace ExperienceAndClasses {
                 return false;
             }
 
-            //if locked, try unlock
-            if (!Class_Unlocked[id]) {
-                return CanUnlock(id);
+            byte id_other;
+            if (is_primary) {
+                id_other = Class_Secondary.ID;
             }
             else {
-                byte id_other;
-                if (is_primary) {
-                    id_other = Class_Secondary.ID;
-                }
-                else {
-                    id_other = Class_Primary.ID;
-                }
-                if ((id == id_other) && (id != (byte)Systems.Class.CLASS_IDS.None)) {
-                    //if setting to other set class, just swap
-                    return LocalSwapClass();
-                }
-                else {
-                    CLASS_VALIDITY valid = LocalCheckClassValid(id, is_primary);
-                    switch (valid) {
-                        case CLASS_VALIDITY.VALID:
+                id_other = Class_Primary.ID;
+            }
+            if ((id == id_other) && (id != (byte)Systems.Class.CLASS_IDS.None)) {
+                //if setting to other set class, just swap
+                return LocalSwapClass();
+            }
+            else {
+                CLASS_VALIDITY valid = LocalCheckClassValid(id, is_primary);
+                switch (valid) {
+                    case CLASS_VALIDITY.VALID:
 
-                            //destroy all minions
-                            CheckMinions();
-                            foreach (Projectile p in minions) {
-                                if (p.active && (p.minion || p.sentry) && (p.owner == player.whoAmI)) {
-                                    p.Kill();
-                                }
+                        //destroy all minions
+                        CheckMinions();
+                        foreach (Projectile p in minions) {
+                            if (p.active && (p.minion || p.sentry) && (p.owner == player.whoAmI)) {
+                                p.Kill();
                             }
+                        }
 
-                            if (is_primary) {
-                                Class_Primary = Systems.Class.CLASS_LOOKUP[id];
-                            }
-                            else {
-                                Class_Secondary = Systems.Class.CLASS_LOOKUP[id];
-                            }
-                            LocalUpdateClassInfo();
-                            return true;
+                        if (is_primary) {
+                            Class_Primary = Systems.Class.CLASS_LOOKUP[id];
+                        }
+                        else {
+                            Class_Secondary = Systems.Class.CLASS_LOOKUP[id];
+                        }
+                        LocalUpdateClassInfo();
+                        return true;
 
-                        case CLASS_VALIDITY.INVALID_COMBINATION:
-                            Main.NewText("Failed to set class because combination is invalid!", UI.Constants.COLOUR_MESSAGE_ERROR);
-                            break;
+                    case CLASS_VALIDITY.INVALID_COMBINATION:
+                        Main.NewText("Failed to set class because combination is invalid!", UI.Constants.COLOUR_MESSAGE_ERROR);
+                        break;
 
-                        case CLASS_VALIDITY.INVALID_ID:
-                            Main.NewText("Failed to set class because class id is invalid!", UI.Constants.COLOUR_MESSAGE_ERROR);
-                            break;
+                    case CLASS_VALIDITY.INVALID_ID:
+                        Main.NewText("Failed to set class because class id is invalid!", UI.Constants.COLOUR_MESSAGE_ERROR);
+                        break;
 
-                        case CLASS_VALIDITY.INVALID_LOCKED:
-                            Main.NewText("Failed to set class because it is locked!", UI.Constants.COLOUR_MESSAGE_ERROR);
-                            break;
+                    case CLASS_VALIDITY.INVALID_LOCKED:
+                        Main.NewText("Failed to set class because it is locked!", UI.Constants.COLOUR_MESSAGE_ERROR);
+                        break;
 
-                        case CLASS_VALIDITY.INVALID_NON_LOCAL:
-                            Commons.Error("Tried to set non-local player with SetClass! (please report)");
-                            break;
+                    case CLASS_VALIDITY.INVALID_NON_LOCAL:
+                        Commons.Error("Tried to set non-local player with SetClass! (please report)");
+                        break;
 
-                        case CLASS_VALIDITY.INVALID_COMBAT:
-                            Main.NewText("Failed to set class because you are in combat!", UI.Constants.COLOUR_MESSAGE_ERROR);
-                            break;
+                    case CLASS_VALIDITY.INVALID_COMBAT:
+                        Main.NewText("Failed to set class because you are in combat!", UI.Constants.COLOUR_MESSAGE_ERROR);
+                        break;
 
-                        default:
-                            Commons.Error("Failed to set class for unknown reasons! (please report)");
-                            break;
-                    }
+                    default:
+                        Commons.Error("Failed to set class for unknown reasons! (please report)");
+                        break;
                 }
 
                 //default
@@ -378,7 +375,13 @@ namespace ExperienceAndClasses {
             }
         }
 
-        public bool CanUnlock(byte id) {
+        public bool UnlockClass(byte id) {
+            //check locked
+            if (Class_Unlocked[id]) {
+                Commons.Error("Trying to unlock already unlocked class " + id);
+                return false;
+            }
+
             Systems.Class c = Systems.Class.CLASS_LOOKUP[id];
             Systems.Class pre = c.Prereq;
 
@@ -403,7 +406,22 @@ namespace ExperienceAndClasses {
                 }
             }
 
-            //requirements met
+            //requirements met..
+
+            //take item
+            player.ConsumeItem(c.Unlock_Item.item.type);
+
+            //unlock class
+            Class_Unlocked[id] = true;
+            if (Class_Levels[id] < 1) {
+                Class_Levels[id] = 1;
+            }
+
+            //update
+            LocalUpdateClassInfo();
+
+            //success
+            AnnounceClassUnlock(c);
             return true;
         }
 

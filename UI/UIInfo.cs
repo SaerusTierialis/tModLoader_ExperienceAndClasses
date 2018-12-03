@@ -14,7 +14,7 @@ namespace ExperienceAndClasses.UI {
 
     //UI for displaying info for mouse-hovered UI elements
 
-    class UIInfo : UIStateCombo {
+    public class UIInfo : UIStateCombo {
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Singleton ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         public static readonly UIInfo Instance = new UIInfo();
 
@@ -89,7 +89,18 @@ namespace ExperienceAndClasses.UI {
 
         public void ClickYes(UIMouseEvent evt, UIElement listeningElement) {
             if (button_yes.visible) {
-                Main.NewText("YES");
+                switch (unlock_mode) {
+                    case UNLOCK_MODE.CLASS:
+                        ExperienceAndClasses.LOCAL_MPLAYER.UnlockClass(unlock_class);
+                        break;
+
+                    case UNLOCK_MODE.SUBCLASS:
+                        break;
+
+                    default:
+                        Commons.Error("Unsupported unlock action " + unlock_mode);
+                        break;
+                }
                 ResetState();
             }
         }

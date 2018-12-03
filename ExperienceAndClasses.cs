@@ -22,8 +22,6 @@ namespace ExperienceAndClasses {
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Constants (and readonly) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-
-
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Treated like readonly after entering map ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         //updated client-side when entering game to detect client vs singleplayer mode
@@ -33,6 +31,8 @@ namespace ExperienceAndClasses {
         public static Mod MOD;
 
         public static ModHotKey HOTKEY_UI;
+
+        public static UI.UIStateCombo[] UIs = new UI.UIStateCombo[0]; //set on entering world
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Variables ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -85,10 +85,9 @@ namespace ExperienceAndClasses {
                 SetUIAutoStates();
             }
 
-            if (UI.UIStatus.Instance.Visibility) UI.UIStatus.Instance.UI.Update(gameTime);
-            if (UI.UIBars.Instance.Visibility) UI.UIBars.Instance.UI.Update(gameTime);
-            if (UI.UIClass.Instance.Visibility) UI.UIClass.Instance.UI.Update(gameTime);
-            if (UI.UIInfo.Instance.Visibility) UI.UIInfo.Instance.UI.Update(gameTime);
+            foreach (UI.UIStateCombo ui in UIs) {
+                ui.Update(gameTime);
+            }
         }
 
         public override void ModifyInterfaceLayers(List<GameInterfaceLayer> layers) {
@@ -96,10 +95,9 @@ namespace ExperienceAndClasses {
             if (MouseTextIndex != -1) {
                 layers.Insert(MouseTextIndex, new LegacyGameInterfaceLayer("EAC_UIMain",
                     delegate {
-                        if (UI.UIStatus.Instance.Visibility) UI.UIStatus.Instance.state.Draw(Main.spriteBatch);
-                        if (UI.UIBars.Instance.Visibility) UI.UIBars.Instance.state.Draw(Main.spriteBatch);
-                        if (UI.UIClass.Instance.Visibility) UI.UIClass.Instance.state.Draw(Main.spriteBatch);
-                        if (UI.UIInfo.Instance.Visibility) UI.UIInfo.Instance.state.Draw(Main.spriteBatch);
+                        foreach (UI.UIStateCombo ui in UIs) {
+                            ui.Draw();
+                        }
                         return true;
                     },
                     InterfaceScaleType.UI)
