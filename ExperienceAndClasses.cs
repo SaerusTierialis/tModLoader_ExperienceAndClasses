@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using Terraria;
 using Terraria.ID;
+using Terraria.Localization;
 using Terraria.ModLoader;
 using Terraria.UI;
 
@@ -21,6 +22,8 @@ namespace ExperienceAndClasses {
         public static bool trace = true;
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Constants (and readonly) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+        public const string RECIPE_GROUP_MECHANICAL_SOUL = "ExperienceAndClasses:MechanicalSoul";
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Treated like readonly after entering map ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -118,45 +121,22 @@ namespace ExperienceAndClasses {
             else {
                 Commons.Error("Cannot handle packet type id " + packet_type + " originating from " + origin);
             }
+        }
 
-            /*
-            switch (packet_type) {
-                case PacketHandler.PACKET_TYPE.BROADCAST_TRACE:
-                    PacketHandler.Broadcast.Recieve(reader, origin);
-                    break;
+        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ RecipeGroup ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-                case PacketHandler.PACKET_TYPE.FORCE_FULL:
-                    PacketHandler.ForceFull.Recieve(reader, origin);
-                    break;
+        public override void AddRecipeGroups() {
+            base.AddRecipeGroups();
 
-                case PacketHandler.PACKET_TYPE.FORCE_CLASS:
-                    PacketHandler.ForceClass.Recieve(reader, origin);
-                    break;
-
-                case PacketHandler.PACKET_TYPE.FORCE_ATTRIBUTE:
-                    PacketHandler.ForceAttribute.Recieve(reader, origin);
-                    break;
-
-                case PacketHandler.PACKET_TYPE.HEAL:
-                    PacketHandler.HEAL.Recieve(reader, origin);
-                    break;
-
-                case PacketHandler.PACKET_TYPE.AFK:
-                    PacketHandler.AFK.Recieve(reader, origin);
-                    break;
-
-                case PacketHandler.PACKET_TYPE.XP:
-                    PacketHandler.XP.Recieve(reader, origin);
-                    break;
-
-                default:
-                    if (trace) {
-
-                        Commons.Trace("Unsupported packet type originating from " + origin);
-                    }
-                    break;
-            }
-            */
+            // Creates a new recipe group
+            RecipeGroup mechanical_soul = new RecipeGroup(() => Language.GetTextValue("LegacyMisc.37") + " Mechanical Boss Soul", new int[]
+            {
+                ItemID.SoulofFright,
+                ItemID.SoulofMight,
+                ItemID.SoulofSight
+            });
+            // Registers the new recipe group with the specified name
+            RecipeGroup.RegisterGroup(RECIPE_GROUP_MECHANICAL_SOUL, mechanical_soul);
         }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Other ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/

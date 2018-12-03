@@ -38,7 +38,9 @@ namespace ExperienceAndClasses.Items {
         public Unlock_Tier3() : base(NAME, TOOLTIP, TEXTURE, RARITY) { }
 
         public override void AddRecipes() {
-            Commons.QuckRecipe(mod, new int[,] { { mod.ItemType<Orb_Monster>(), 50 } , { mod.ItemType<Orb_Boss>(), 5 } }, this, 1);
+            ModRecipe recipe = new ModRecipe(ExperienceAndClasses.MOD);
+            recipe.AddRecipeGroup(ExperienceAndClasses.RECIPE_GROUP_MECHANICAL_SOUL, 50); //any mechanical boss soul
+            Commons.QuckRecipe(mod, new int[,] { { mod.ItemType<Orb_Monster>(), 50 } , { mod.ItemType<Orb_Boss>(), 5 } }, this, 1, recipe);
         }
     }
 
@@ -51,7 +53,9 @@ namespace ExperienceAndClasses.Items {
         public Unlock_Subclass() : base(NAME, TOOLTIP, TEXTURE, RARITY) { }
 
         public override void AddRecipes() {
-            Commons.QuckRecipe(mod, new int[,] { { mod.ItemType<Orb_Boss>(), 20 } }, this, 1);
+            ModRecipe recipe = new ModRecipe(ExperienceAndClasses.MOD);
+            recipe.AddRecipeGroup(ExperienceAndClasses.RECIPE_GROUP_MECHANICAL_SOUL, 100); //any mechanical boss soul
+            Commons.QuckRecipe(mod, new int[,] { { ItemID.SoulofLight, 100 }, { ItemID.SoulofNight, 100 } , { mod.ItemType<Orb_Boss>(), 20 } }, this, 1, recipe);
         }
     }
 

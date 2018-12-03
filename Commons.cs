@@ -76,7 +76,10 @@ namespace ExperienceAndClasses {
         public static string GetRecipeString(Recipe recipe, bool multiline=false) {
             string str = "";
 
+            RecipeGroup group;
             bool first = true;
+            string name;
+
             for (uint i = 0; i < recipe.requiredItem.Length; i++) {
                 if (recipe.requiredItem[i].type > 0) {
                     if (!first) {
@@ -90,7 +93,18 @@ namespace ExperienceAndClasses {
                     else {
                         first = false;
                     }
-                    str += "x" + recipe.requiredItem[i].stack + " " + recipe.requiredItem[i].Name;
+
+                    //get group name if applicable
+                    name = recipe.requiredItem[i].Name;
+                    foreach (int group_id in recipe.acceptedGroups) {
+                        if (RecipeGroup.recipeGroups.TryGetValue(group_id, out group)) {
+                            if (group.ContainsItem(recipe.requiredItem[i].type)) {
+                                name = group.GetText.Invoke();
+                            }
+                        }
+                    }
+
+                    str += "x" + recipe.requiredItem[i].stack + " " + name;
                 }
             }
 
