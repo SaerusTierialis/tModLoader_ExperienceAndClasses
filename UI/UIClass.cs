@@ -49,7 +49,7 @@ namespace ExperienceAndClasses.UI {
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Variables ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         public DragableUIPanel panel { get; private set; }
 
-        private UIPanel indicate_primary, indicate_secondary;
+        private DragableUIPanel indicate_primary, indicate_secondary;
         private ClassButton button_primary, button_secondary;
 
         private List<ClassButton> class_buttons;
@@ -74,13 +74,7 @@ namespace ExperienceAndClasses.UI {
             //indicator for primary class
             Color color = Constants.COLOUR_CLASS_PRIMARY;
             color.A = INDICATOR_ALPHA;
-            indicate_primary = new UIPanel();
-            indicate_primary.SetPadding(0);
-            indicate_primary.Left.Set(0f, 0f);
-            indicate_primary.Top.Set(0f, 0f);
-            indicate_primary.Width.Set(INDICATOR_WIDTH, 0f);
-            indicate_primary.Height.Set(INDICATOR_HEIGHT, 0f);
-            indicate_primary.BackgroundColor = color;
+            indicate_primary = new DragableUIPanel(INDICATOR_WIDTH, INDICATOR_HEIGHT, color, this, false, false, false, false);
             indicate_primary.OnClick += new UIElement.MouseEvent(PrimaryButtonLeft);
             indicate_primary.OnRightClick += new UIElement.MouseEvent(PrimaryButtonRight);
             indicate_primary.OnMouseOver += new UIElement.MouseEvent(PrimaryButtonHover);
@@ -90,13 +84,7 @@ namespace ExperienceAndClasses.UI {
             //indicator for secondary class
             color = Constants.COLOUR_CLASS_SECONDARY;
             color.A = INDICATOR_ALPHA;
-            indicate_secondary = new UIPanel();
-            indicate_secondary.SetPadding(0);
-            indicate_secondary.Left.Set(0f, 0f);
-            indicate_secondary.Top.Set(0f, 0f);
-            indicate_secondary.Width.Set(INDICATOR_WIDTH, 0f);
-            indicate_secondary.Height.Set(INDICATOR_HEIGHT, 0f);
-            indicate_secondary.BackgroundColor = color;
+            indicate_secondary = new DragableUIPanel(INDICATOR_WIDTH, INDICATOR_HEIGHT, color, this, false, false, false, false);
             indicate_secondary.OnClick += new UIElement.MouseEvent(SecondaryButtonLeft);
             indicate_secondary.OnRightClick += new UIElement.MouseEvent(SecondaryButtonRight);
             indicate_secondary.OnMouseOver += new UIElement.MouseEvent(SecondaryButtonHover);
@@ -189,23 +177,21 @@ namespace ExperienceAndClasses.UI {
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Methods ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         public void UpdateClassInfo() {
             //class buttons
-            indicate_primary.Left.Set(-10000f, 0f);
-            indicate_secondary.Left.Set(-10000f, 0f);
+            indicate_primary.visible = false;
+            indicate_secondary.visible = false;
             foreach (ClassButton button in class_buttons) {
                 if (button.Class.ID == ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary.ID) {
-                    indicate_primary.Left.Set(button.Left.Pixels + INDICATOR_OFFSETS, 0f);
-                    indicate_primary.Top.Set(button.Top.Pixels + INDICATOR_OFFSETS, 0f);
+                    indicate_primary.SetPosition(button.Left.Pixels + INDICATOR_OFFSETS, button.Top.Pixels + INDICATOR_OFFSETS);
                     button_primary = button;
+                    indicate_primary.visible = true;
                 }
                 else if (button.Class.ID == ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary.ID) {
-                    indicate_secondary.Left.Set(button.Left.Pixels + INDICATOR_OFFSETS, 0f);
-                    indicate_secondary.Top.Set(button.Top.Pixels + INDICATOR_OFFSETS, 0f);
+                    indicate_secondary.SetPosition(button.Left.Pixels + INDICATOR_OFFSETS, button.Top.Pixels + INDICATOR_OFFSETS);
                     button_secondary = button;
+                    indicate_secondary.visible = true;
                 }
                 button.Update();
             }
-            indicate_primary.Recalculate();
-            indicate_secondary.Recalculate();
 
             //attribute
             foreach (AttributeText button in attribute_texts) {
