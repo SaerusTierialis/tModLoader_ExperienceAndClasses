@@ -60,10 +60,10 @@ namespace ExperienceAndClasses.UI {
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Initialize ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         protected override void InitializeState() {
             //main panel
-            panel = new DragableUIPanel(WIDTH, HEIGHT, Constants.COLOR_UI_PANEL_BACKGROUND, this, true, true, true);
+            panel = new DragableUIPanel(WIDTH, HEIGHT, Constants.COLOR_UI_PANEL_BACKGROUND, this, true, true);
 
             //class panel
-            DragableUIPanel panel_class = new DragableUIPanel(CLASS_WIDTH, (HEIGHT - (Constants.UI_PADDING * 2)), COLOR_SUBPANEL, this, false, false, false, false);
+            DragableUIPanel panel_class = new DragableUIPanel(CLASS_WIDTH, (HEIGHT - (Constants.UI_PADDING * 2)), COLOR_SUBPANEL, this, false, false, false);
             panel_class.Left.Set(Constants.UI_PADDING, 0f);
             panel_class.Top.Set(Constants.UI_PADDING, 0f);
             panel.Append(panel_class);
@@ -74,7 +74,7 @@ namespace ExperienceAndClasses.UI {
             //indicator for primary class
             Color color = Constants.COLOUR_CLASS_PRIMARY;
             color.A = INDICATOR_ALPHA;
-            indicate_primary = new DragableUIPanel(INDICATOR_WIDTH, INDICATOR_HEIGHT, color, this, false, false, false, false);
+            indicate_primary = new DragableUIPanel(INDICATOR_WIDTH, INDICATOR_HEIGHT, color, this, false, false);
             indicate_primary.OnClick += new UIElement.MouseEvent(PrimaryButtonLeft);
             indicate_primary.OnRightClick += new UIElement.MouseEvent(PrimaryButtonRight);
             indicate_primary.OnMouseOver += new UIElement.MouseEvent(PrimaryButtonHover);
@@ -84,7 +84,7 @@ namespace ExperienceAndClasses.UI {
             //indicator for secondary class
             color = Constants.COLOUR_CLASS_SECONDARY;
             color.A = INDICATOR_ALPHA;
-            indicate_secondary = new DragableUIPanel(INDICATOR_WIDTH, INDICATOR_HEIGHT, color, this, false, false, false, false);
+            indicate_secondary = new DragableUIPanel(INDICATOR_WIDTH, INDICATOR_HEIGHT, color, this, false, false);
             indicate_secondary.OnClick += new UIElement.MouseEvent(SecondaryButtonLeft);
             indicate_secondary.OnRightClick += new UIElement.MouseEvent(SecondaryButtonRight);
             indicate_secondary.OnMouseOver += new UIElement.MouseEvent(SecondaryButtonHover);
@@ -112,7 +112,7 @@ namespace ExperienceAndClasses.UI {
             }
 
             //attribute panel
-            DragableUIPanel panel_attribute = new DragableUIPanel(WIDTH_ATTRIBUTES, HEIGHT_ATTRIBUTES, COLOR_SUBPANEL, this, false, false, false, false);
+            DragableUIPanel panel_attribute = new DragableUIPanel(WIDTH_ATTRIBUTES, HEIGHT_ATTRIBUTES, COLOR_SUBPANEL, this, false, false, false);
             panel_attribute.Left.Set(panel_class.Left.Pixels + panel_class.Width.Pixels - 2f, 0f);
             panel_attribute.Top.Set(HEIGHT - Constants.UI_PADDING - HEIGHT_ATTRIBUTES, 0f);
             panel.Append(panel_attribute);
@@ -144,7 +144,7 @@ namespace ExperienceAndClasses.UI {
             panel_attribute.Append(attribute_point_text);
 
             //ability panel
-            DragableUIPanel panel_ability = new DragableUIPanel(WIDTH_ABILITY, HEIGHT_ABILITY, COLOR_SUBPANEL, this, false, false, false, false);
+            DragableUIPanel panel_ability = new DragableUIPanel(WIDTH_ABILITY, HEIGHT_ABILITY, COLOR_SUBPANEL, this, false, false, false);
             panel_ability.Left.Set(panel_attribute.Left.Pixels, 0f);
             panel_ability.Top.Set(Constants.UI_PADDING, 0f);
             panel.Append(panel_ability);
@@ -153,7 +153,7 @@ namespace ExperienceAndClasses.UI {
             panel_ability.SetTitle("Abilities", FONT_SCALE_TITLE, true, "TODO_help_text", "Class Abilities");
 
             //unlock panel
-            DragableUIPanel panel_unlock = new DragableUIPanel(WIDTH_UNLOCK, HEIGHT_UNLOCK, COLOR_SUBPANEL, this, false, false, false, false);
+            DragableUIPanel panel_unlock = new DragableUIPanel(WIDTH_UNLOCK, HEIGHT_UNLOCK, COLOR_SUBPANEL, this, false, false, false);
             panel_unlock.Left.Set(panel_ability.Left.Pixels + panel_ability.Width.Pixels - 2f, 0f);
             panel_unlock.Top.Set(Constants.UI_PADDING + Textures.TEXTURE_CORNER_BUTTON_SIZE + 1, 0f);
             panel.Append(panel_unlock);
@@ -162,7 +162,7 @@ namespace ExperienceAndClasses.UI {
             panel_unlock.SetTitle("Passives", FONT_SCALE_TITLE, true, "TODO_help_text", "Passive Abilities");
 
             //help panel
-            DragableUIPanel panel_help = new DragableUIPanel(WIDTH_HELP, HEIGHT_HELP, COLOR_SUBPANEL, this, false, false, false, false);
+            DragableUIPanel panel_help = new DragableUIPanel(WIDTH_HELP, HEIGHT_HELP, COLOR_SUBPANEL, this, false, false, false);
             panel_help.Left.Set(panel_unlock.Left.Pixels, 0f);
             panel_help.Top.Set(HEIGHT - Constants.UI_PADDING - HEIGHT_HELP, 0f);
             panel.Append(panel_help);

@@ -13,8 +13,6 @@ namespace ExperienceAndClasses {
         public static float TEXTURE_BUTTON_SIZE { get; private set; }
 
         public static Texture2D TEXTURE_CORNER_BUTTON_CLOSE { get; private set; }
-        public static Texture2D TEXTURE_CORNER_BUTTON_PINNED { get; private set; }
-        public static Texture2D TEXTURE_CORNER_BUTTON_UNPINNED { get; private set; }
         public static Texture2D TEXTURE_CORNER_BUTTON_AUTO { get; private set; }
         public static Texture2D TEXTURE_CORNER_BUTTON_NO_AUTO { get; private set; }
         public static float TEXTURE_CORNER_BUTTON_SIZE { get; private set; }
@@ -35,11 +33,9 @@ namespace ExperienceAndClasses {
             TEXTURE_BUTTON_MINUS = ModLoader.GetTexture("ExperienceAndClasses/Textures/UI/ButtonMinus");
             TEXTURE_BUTTON_SIZE = TEXTURE_BUTTON_PLUS.Width;
 
-            TEXTURE_CORNER_BUTTON_CLOSE = ModLoader.GetTexture("ExperienceAndClasses/Textures/UI/ButtonClose");
-            TEXTURE_CORNER_BUTTON_PINNED = ModLoader.GetTexture("ExperienceAndClasses/Textures/UI/ButtonPinned");
-            TEXTURE_CORNER_BUTTON_UNPINNED = ModLoader.GetTexture("ExperienceAndClasses/Textures/UI/ButtonUnpinned");
-            TEXTURE_CORNER_BUTTON_AUTO = ModLoader.GetTexture("ExperienceAndClasses/Textures/UI/ButtonAuto");
-            TEXTURE_CORNER_BUTTON_NO_AUTO = ModLoader.GetTexture("ExperienceAndClasses/Textures/UI/ButtonUnauto");
+            TEXTURE_CORNER_BUTTON_CLOSE = ModLoader.GetTexture("Terraria/UI/ButtonDelete");
+            TEXTURE_CORNER_BUTTON_AUTO = ModLoader.GetTexture("Terraria/UI/ButtonFavoriteActive");
+            TEXTURE_CORNER_BUTTON_NO_AUTO = ModLoader.GetTexture("Terraria/UI/ButtonFavoriteInactive");
             TEXTURE_CORNER_BUTTON_SIZE = TEXTURE_CORNER_BUTTON_CLOSE.Width;
 
             TEXTURE_LOCK_BROWN = ModLoader.GetTexture("ExperienceAndClasses/Textures/UI/Lock_Brown");

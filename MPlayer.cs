@@ -143,11 +143,9 @@ namespace ExperienceAndClasses {
                 //apply saved ui settings
                 UI.UIClass.Instance.panel.SetPosition(Commons.TryGet<float>(load_tag, "eac_ui_class_left", 300f), Commons.TryGet<float>(load_tag, "eac_ui_class_top", 300f));
                 UI.UIClass.Instance.panel.Auto =Commons.TryGet<bool>(load_tag, "eac_ui_class_auto", true);
-                UI.UIClass.Instance.panel.Pinned = Commons.TryGet<bool>(load_tag, "eac_ui_class_pinned", false);
 
                 UI.UIBars.Instance.panel.SetPosition(Commons.TryGet<float>(load_tag, "eac_ui_bars_left", 480f), Commons.TryGet<float>(load_tag, "eac_ui_bars_top", 10f));
                 UI.UIBars.Instance.panel.Auto = Commons.TryGet<bool>(load_tag, "eac_ui_bars_auto", true);
-                UI.UIBars.Instance.panel.Pinned = Commons.TryGet<bool>(load_tag, "eac_ui_bars_pinned", false);
 
                 //temp: show bars and status
                 UI.UIBars.Instance.Visibility = true;
@@ -946,11 +944,9 @@ namespace ExperienceAndClasses {
                 {"eac_ui_class_left", UI.UIClass.Instance.panel.GetLeft() },
                 {"eac_ui_class_top", UI.UIClass.Instance.panel.GetTop() },
                 {"eac_ui_class_auto", UI.UIClass.Instance.panel.Auto },
-                {"eac_ui_class_pinned", UI.UIClass.Instance.panel.Pinned },
                 {"eac_ui_bars_left", UI.UIBars.Instance.panel.GetLeft() },
                 {"eac_ui_bars_top", UI.UIBars.Instance.panel.GetTop() },
                 {"eac_ui_bars_auto", UI.UIBars.Instance.panel.Auto },
-                {"eac_ui_bars_pinned", UI.UIBars.Instance.panel.Pinned },
                 {"eac_class_unlock", class_unlocked },
                 {"eac_class_xp", class_xp },
                 {"eac_class_level", class_level },

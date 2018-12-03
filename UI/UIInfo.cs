@@ -58,7 +58,7 @@ namespace ExperienceAndClasses.UI {
             unlock_mode = UNLOCK_MODE.SUBCLASS;
             unlock_class = null;
 
-            panel = new DragableUIPanel(1f, 1f, Constants.COLOR_UI_PANEL_BACKGROUND, this, false, false, false, false);
+            panel = new DragableUIPanel(1f, 1f, Constants.COLOR_UI_PANEL_BACKGROUND, this, false, false, false);
 
             ui_text_body = new UIText("", TEXT_SCALE_BODY, false);
             ui_text_body.Left.Set(Constants.UI_PADDING, 0f);

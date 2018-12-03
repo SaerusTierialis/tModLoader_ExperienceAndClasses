@@ -656,7 +656,6 @@ namespace ExperienceAndClasses.UI {
     }
 
     // Copied from ExampleMod on GitHub, changes made:
-    // Added locking of drag panel
     // added auto and close
     // added visible
     // switch drag to right click
@@ -673,7 +672,6 @@ namespace ExperienceAndClasses.UI {
         private Vector2 offset;
 
         private bool dragging = false;
-        private bool stop_pin = false;
         private UIStateCombo UI;
         private bool buttons_hidden = false;
         private bool can_drag;
@@ -684,7 +682,7 @@ namespace ExperienceAndClasses.UI {
 
         private HelpTextPanel title = null;
 
-        private UIHoverImageButton button_pinned = null, button_auto = null, button_close = null;
+        private UIHoverImageButton button_auto = null, button_close = null;
 
         private bool auto = false;
         public bool Auto {
@@ -696,38 +694,17 @@ namespace ExperienceAndClasses.UI {
                 if (button_auto != null) {
                     if (auto) {
                         button_auto.SetImage(Textures.TEXTURE_CORNER_BUTTON_AUTO);
-                        button_auto.hoverText = "Don't Show Menu In Inventory Screen";
+                        button_auto.hoverText = "Hide In Inventory";
                     }
                     else {
                         button_auto.SetImage(Textures.TEXTURE_CORNER_BUTTON_NO_AUTO);
-                        button_auto.hoverText = "Show Menu In Inventory Screen";
+                        button_auto.hoverText = "Always Show";
                     }
                 }
             }
         }
 
-        private bool pinned = false;
-        public bool Pinned {
-            get {
-                return pinned;
-            }
-            set {
-                pinned = value;
-                if (button_pinned != null) {
-                    if (pinned) {
-                        button_pinned.SetImage(Textures.TEXTURE_CORNER_BUTTON_PINNED);
-                        button_pinned.hoverText = "Allow Dragging";
-                    }
-                    else {
-                        stop_pin = true;
-                        button_pinned.SetImage(Textures.TEXTURE_CORNER_BUTTON_UNPINNED);
-                        button_pinned.hoverText = "Prevent Dragging";
-                    }
-                }
-            }
-        }
-
-        public DragableUIPanel(float width, float height, Color color, UIStateCombo ui, bool enable_close, bool enable_auto, bool enable_pin, bool enable_drag=true) : base() {
+        public DragableUIPanel(float width, float height, Color color, UIStateCombo ui, bool enable_close, bool enable_auto, bool enable_drag=true) : base() {
             UI = ui;
             can_drag = enable_drag;
 
@@ -757,15 +734,6 @@ namespace ExperienceAndClasses.UI {
                 button_auto.OnClick += new MouseEvent(ButtonClickAuto);
                 Append(button_auto);
                 Auto = true; //defaults to true if enabled
-            }
-
-            if (enable_pin) {
-                button_pinned = new UIHoverImageButton(Textures.TEXTURE_BLANK, "");
-                button_pinned.Width.Set(Textures.TEXTURE_CORNER_BUTTON_SIZE, 0f);
-                button_pinned.Height.Set(Textures.TEXTURE_CORNER_BUTTON_SIZE, 0f);
-                button_pinned.OnClick += new MouseEvent(ButtonClickPin);
-                Append(button_pinned);
-                Pinned = pinned;
             }
 
             Recalculate();
@@ -800,18 +768,8 @@ namespace ExperienceAndClasses.UI {
                 button_auto.Left.Set(left -= Textures.TEXTURE_CORNER_BUTTON_SIZE, 0f);
                 button_auto.Top.Set(Constants.UI_PADDING, 0f);
             }
-            if (button_pinned != null) {
-                button_pinned.Left.Set(left -= Textures.TEXTURE_CORNER_BUTTON_SIZE, 0f);
-                button_pinned.Top.Set(Constants.UI_PADDING, 0f);
-            }
 
             base.Recalculate();
-        }
-
-        private void ButtonClickPin(UIMouseEvent evt, UIElement listeningElement) {
-            if (!buttons_hidden) {
-                Pinned = !Pinned;
-            }
         }
 
         private void ButtonClickAuto(UIMouseEvent evt, UIElement listeningElement) {
@@ -841,33 +799,20 @@ namespace ExperienceAndClasses.UI {
         }
 
         private void DragStart(UIMouseEvent evt) {
-            if (!Pinned) {
-                offset = new Vector2(evt.MousePosition.X - Left.Pixels, evt.MousePosition.Y - Top.Pixels);
-                dragging = true;
-                stop_pin = false;
-            }
-            else {
-                dragging = false;
-            }
+            offset = new Vector2(evt.MousePosition.X - Left.Pixels, evt.MousePosition.Y - Top.Pixels);
+            dragging = true;
         }
 
         private void DragEnd(UIMouseEvent evt) {
-            if (stop_pin) {
-                Pinned = false;
-                stop_pin = false;
-            }
-            else if (!Pinned && dragging) {
+            if (dragging) {
                 Vector2 end = evt.MousePosition;
-                dragging = false;
 
                 Left.Set(end.X - offset.X, 0f);
                 Top.Set(end.Y - offset.Y, 0f);
 
                 Recalculate();
             }
-            else {
-                dragging = false;
-            }
+            dragging = false;
         }
 
         public override void Update(GameTime gameTime) {
@@ -947,9 +892,6 @@ namespace ExperienceAndClasses.UI {
 
         public void HideButtons() {
             buttons_hidden = true;
-            if (button_pinned != null) {
-                button_pinned.SetImage(Textures.TEXTURE_BLANK);
-            }
             if (button_auto != null) {
                 button_auto.SetImage(Textures.TEXTURE_BLANK);
             }
@@ -960,9 +902,6 @@ namespace ExperienceAndClasses.UI {
 
         public void ShowButtons() {
             buttons_hidden = false;
-            if (button_pinned != null) {
-                Pinned = pinned;
-            }
             if (button_auto != null) {
                 Auto = auto;
             }
