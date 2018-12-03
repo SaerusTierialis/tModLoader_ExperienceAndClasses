@@ -132,11 +132,13 @@ namespace ExperienceAndClasses {
                 //start timer for next full sync
                 time_next_full_sync = DateTime.Now.AddTicks(TICKS_PER_FULL_SYNC);
 
+                //grab UI-state combos to display
+                ExperienceAndClasses.UIs = new UI.UIStateCombo[] { UI.UIStatus.Instance, UI.UIBars.Instance, UI.UIClass.Instance, UI.UIInfo.Instance };
+
                 //(re)initialize ui
-                UI.UIInfo.Instance.Initialize();
-                UI.UIClass.Instance.Initialize();
-                UI.UIBars.Instance.Initialize();
-                UI.UIStatus.Instance.Initialize();
+                foreach (UI.UIStateCombo ui in ExperienceAndClasses.UIs) {
+                    ui.Initialize();
+                }
 
                 //apply saved ui settings
                 UI.UIClass.Instance.panel.SetPosition(Commons.TryGet<float>(load_tag, "eac_ui_class_left", 300f), Commons.TryGet<float>(load_tag, "eac_ui_class_top", 300f));
@@ -153,9 +155,6 @@ namespace ExperienceAndClasses {
 
                 //apply ui auto
                 ExperienceAndClasses.SetUIAutoStates();
-
-                //grab UI-state combos to display
-                ExperienceAndClasses.UIs = new UI.UIStateCombo[] { UI.UIStatus.Instance, UI.UIBars.Instance, UI.UIClass.Instance, UI.UIInfo.Instance };
 
                 //update class info
                 LocalUpdateClassInfo();
@@ -375,26 +374,17 @@ namespace ExperienceAndClasses {
             }
         }
 
-        public bool UnlockClass(byte id) {
+        public bool UnlockClass(Systems.Class c) {
             //check locked
-            if (Class_Unlocked[id]) {
-                Commons.Error("Trying to unlock already unlocked class " + id);
+            if (Class_Unlocked[c.ID]) {
+                Commons.Error("Trying to unlock already unlocked class " + c.Name);
                 return false;
             }
 
-            Systems.Class c = Systems.Class.CLASS_LOOKUP[id];
-            Systems.Class pre = c.Prereq;
-
             //level requirements
-            while (pre.ID != (byte)Systems.Class.CLASS_IDS.New) {
-                if (Class_Levels[pre.ID] < pre.Max_Level) {
-                    //level requirement not met
-                    Main.NewText("You must reach level " + pre.Max_Level + " " + pre.Name + " to unlock " + c.Name + "!", UI.Constants.COLOUR_MESSAGE_ERROR);
-                    return false;
-                }
-                else {
-                    pre = pre.Prereq;
-                }
+            if (!HasClassPrereq(c)) {
+                Main.NewText("You must reach level " + c.Prereq.Max_Level + " " + c.Prereq.Name + " to unlock " + c.Name + "!", UI.Constants.COLOUR_MESSAGE_ERROR);
+                return false;
             }
 
             //item requirements
@@ -412,9 +402,9 @@ namespace ExperienceAndClasses {
             player.ConsumeItem(c.Unlock_Item.item.type);
 
             //unlock class
-            Class_Unlocked[id] = true;
-            if (Class_Levels[id] < 1) {
-                Class_Levels[id] = 1;
+            Class_Unlocked[c.ID] = true;
+            if (Class_Levels[c.ID] < 1) {
+                Class_Levels[c.ID] = 1;
             }
 
             //update
@@ -422,6 +412,20 @@ namespace ExperienceAndClasses {
 
             //success
             Main.NewText("You have unlocked " + c.Name + "!", UI.Constants.COLOUR_MESSAGE_ANNOUNCE);
+            return true;
+        }
+
+        public bool HasClassPrereq(Systems.Class c) {
+            Systems.Class pre = c.Prereq;
+            while (pre.ID != (byte)Systems.Class.CLASS_IDS.New) {
+                if (Class_Levels[pre.ID] < pre.Max_Level) {
+                    //level requirement not met
+                    return false;
+                }
+                else {
+                    pre = pre.Prereq;
+                }
+            }
             return true;
         }
 

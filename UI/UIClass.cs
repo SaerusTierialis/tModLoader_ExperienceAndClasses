@@ -112,7 +112,7 @@ namespace ExperienceAndClasses.UI {
                     id = Systems.Class.Class_Locations[row, col];
 
                     if (id != (byte)Systems.Class.CLASS_IDS.New) {
-                        button = new ClassButton(Systems.Class.CLASS_LOOKUP[id].Texture, id);
+                        button = new ClassButton(Systems.Class.CLASS_LOOKUP[id]);
                         button.Left.Set((Constants.UI_PADDING * 2) + (col * (CLASS_BUTTON_SIZE + CLASS_COL_PADDING)), 0f);
                         button.Top.Set(panel_class.top_space + (Constants.UI_PADDING * 2) + (row * (CLASS_BUTTON_SIZE + CLASS_ROW_PADDING)), 0f);
                         button.Width.Set(CLASS_BUTTON_SIZE, 0f);
@@ -192,12 +192,12 @@ namespace ExperienceAndClasses.UI {
             indicate_primary.Left.Set(-10000f, 0f);
             indicate_secondary.Left.Set(-10000f, 0f);
             foreach (ClassButton button in class_buttons) {
-                if (button.class_id == ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary.ID) {
+                if (button.Class.ID == ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary.ID) {
                     indicate_primary.Left.Set(button.Left.Pixels + INDICATOR_OFFSETS, 0f);
                     indicate_primary.Top.Set(button.Top.Pixels + INDICATOR_OFFSETS, 0f);
                     button_primary = button;
                 }
-                else if (button.class_id == ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary.ID) {
+                else if (button.Class.ID == ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary.ID) {
                     indicate_secondary.Left.Set(button.Left.Pixels + INDICATOR_OFFSETS, 0f);
                     indicate_secondary.Top.Set(button.Top.Pixels + INDICATOR_OFFSETS, 0f);
                     button_secondary = button;

@@ -49,14 +49,14 @@ namespace ExperienceAndClasses.UI {
         private UIImage image;
         private static MODE mode;
         private UNLOCK_MODE unlock_mode;
-        private byte unlock_class;
+        private Systems.Class unlock_class;
         private TextButton button_yes, button_no;
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Initialize ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         protected override void InitializeState() {
             mode = MODE.HOVER;
             unlock_mode = UNLOCK_MODE.SUBCLASS;
-            unlock_class = 0;
+            unlock_class = null;
 
             panel = new DragableUIPanel(1f, 1f, Constants.COLOR_UI_PANEL_BACKGROUND, this, false, false, false, false);
 
@@ -212,12 +212,10 @@ namespace ExperienceAndClasses.UI {
             }
         }
 
-        public void ShowTextClass(UIElement source, byte class_id) {
-            Systems.Class c = Systems.Class.CLASS_LOOKUP[class_id];
-
+        public void ShowTextClass(UIElement source, Systems.Class c) {
             string title = c.Name + " (Tier " + c.Tier + ")";
             string text = "";
-            if (!ExperienceAndClasses.LOCAL_MPLAYER.Class_Unlocked[class_id]) {
+            if (!ExperienceAndClasses.LOCAL_MPLAYER.Class_Unlocked[c.ID]) {
                 title += " (locked)";
                 text += "Left click for class unlock requirements.\n";
             }
@@ -283,15 +281,14 @@ namespace ExperienceAndClasses.UI {
             ShowText(source, "TODO_status", "TODO_description", WIDTH_STATUS);
         }
 
-        public void ShowUnlockClass(UIElement source, byte class_id) {
-            Systems.Class c = Systems.Class.CLASS_LOOKUP[class_id];
+        public void ShowUnlockClass(UIElement source, Systems.Class c) {
             Items.MItem item = c.Unlock_Item;
 
             string str = "Requirements:\n" + "Level " + c.Prereq.Max_Level + " " + c.Prereq.Name + "\nx1 " + item.item.Name + "\n\nToken Recipe:\n" + item.GetRecipeString(true) + "\n(Work Bench)";
 
             mode = MODE.INPUT;
             unlock_mode = UNLOCK_MODE.CLASS;
-            unlock_class = class_id;
+            unlock_class = c;
 
             ShowText(source, "Unlock " + c.Name, str , WIDTH_UNLOCK, null, 0, ModLoader.GetTexture(item.Texture), true);
         }

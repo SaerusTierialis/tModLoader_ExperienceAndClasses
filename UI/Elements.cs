@@ -492,20 +492,20 @@ namespace ExperienceAndClasses.UI {
         private const float LOW_VISIBILITY = 0.4f;
         private float button_size = 0f;
 
-        public byte class_id { get; private set; }
+        public Systems.Class Class { get; private set; }
         UIText text;
         UIImage image_lock;
 
-        public ClassButton(Texture2D texture, byte class_id) : base(texture) {
-            Width.Set(texture.Width, 0f);
-            Height.Set(texture.Height, 0f);
+        public ClassButton(Systems.Class Class) : base(Class.Texture) {
+            this.Class = Class;
 
-            this.class_id = class_id;
+            Width.Set(Class.Texture.Width, 0f);
+            Height.Set(Class.Texture.Height, 0f);
             
             text = new UIText("", TEXT_SCALE);
             Append(text);
 
-            button_size = texture.Width;
+            button_size = Class.Texture.Width;
 
             image_lock = new UIImage(Textures.TEXTURE_BLANK);
             image_lock.Width.Set(Textures.TEXTURE_LOCK_WIDTH, 0f);
@@ -522,15 +522,15 @@ namespace ExperienceAndClasses.UI {
 
             base.Click(evt);
 
-            if (!ExperienceAndClasses.LOCAL_MPLAYER.Class_Unlocked[class_id]) {
-                UIInfo.Instance.ShowUnlockClass(this, class_id);
+            if (!ExperienceAndClasses.LOCAL_MPLAYER.Class_Unlocked[Class.ID]) {
+                UIInfo.Instance.ShowUnlockClass(this, Class);
             }
             else {
-                if (ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary.ID == class_id) {
+                if (ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary.ID == Class.ID) {
                     ExperienceAndClasses.LOCAL_MPLAYER.LocalSetClass((byte)Systems.Class.CLASS_IDS.None, true);
                 }
                 else {
-                    ExperienceAndClasses.LOCAL_MPLAYER.LocalSetClass(class_id, true);
+                    ExperienceAndClasses.LOCAL_MPLAYER.LocalSetClass(Class.ID, true);
                 }
             }
         }
@@ -543,16 +543,16 @@ namespace ExperienceAndClasses.UI {
             if(!ExperienceAndClasses.LOCAL_MPLAYER.Allow_Secondary) {
                 UIInfo.Instance.ShowUnlockSubclass(this);
             }
-            else if (ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary.ID == class_id) {
+            else if (ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary.ID == Class.ID) {
                 ExperienceAndClasses.LOCAL_MPLAYER.LocalSetClass((byte)Systems.Class.CLASS_IDS.None, false);
             }
             else {
-                ExperienceAndClasses.LOCAL_MPLAYER.LocalSetClass(class_id, false);
+                ExperienceAndClasses.LOCAL_MPLAYER.LocalSetClass(Class.ID, false);
             }
         }
 
         public override void MouseOver(UIMouseEvent evt) {
-            UIInfo.Instance.ShowTextClass(this, class_id);
+            UIInfo.Instance.ShowTextClass(this, Class);
             base.MouseOver(evt);
         }
 
@@ -562,14 +562,14 @@ namespace ExperienceAndClasses.UI {
         }
 
         public void Update() {
-            byte level = ExperienceAndClasses.LOCAL_MPLAYER.Class_Levels[class_id];
-            if (ExperienceAndClasses.LOCAL_MPLAYER.Class_Unlocked[class_id]) {
+            byte level = ExperienceAndClasses.LOCAL_MPLAYER.Class_Levels[Class.ID];
+            if (ExperienceAndClasses.LOCAL_MPLAYER.Class_Unlocked[Class.ID]) {
                 //not locked
                 image_lock.SetImage(Textures.TEXTURE_BLANK);
 
                 //text level
                 string str = "";
-                if (level >= Systems.Class.MAX_LEVEL[Systems.Class.CLASS_LOOKUP[class_id].Tier]) {
+                if (level >= Class.Max_Level) {
                     str = "MAX";
                 }
                 else {
@@ -581,7 +581,7 @@ namespace ExperienceAndClasses.UI {
                 text.Top.Set(button_size + TEXT_OFFSET, 0F);
                 text.Recalculate();
 
-                if ((ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary.ID == class_id) || (ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary.ID == class_id)) {
+                if ((ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary.ID == Class.ID) || (ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary.ID == Class.ID)) {
                     //selected
                     SetVisibility(LOW_VISIBILITY, 1f);
                 }
@@ -592,7 +592,12 @@ namespace ExperienceAndClasses.UI {
             }
             else {
                 //locked
-                image_lock.SetImage(Textures.TEXTURE_LOCK);
+                if (ExperienceAndClasses.LOCAL_MPLAYER.HasClassPrereq(Class)) {
+                    image_lock.SetImage(Textures.TEXTURE_LOCK_BROWN);
+                }
+                else {
+                    image_lock.SetImage(Textures.TEXTURE_LOCK_RED);
+                }
                 SetVisibility(1f, LOW_VISIBILITY);
 
                 //no text
