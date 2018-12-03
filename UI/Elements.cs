@@ -828,7 +828,7 @@ namespace ExperienceAndClasses.UI {
 
         public override void RightMouseDown(UIMouseEvent evt) {
             base.RightMouseDown(evt);
-            if (can_drag) {
+            if (can_drag && UIInfo.AllowClicks()) {
                 DragStart(evt);
             }
         }
@@ -856,7 +856,7 @@ namespace ExperienceAndClasses.UI {
                 Pinned = false;
                 stop_pin = false;
             }
-            else if (!Pinned) {
+            else if (!Pinned && dragging) {
                 Vector2 end = evt.MousePosition;
                 dragging = false;
 
