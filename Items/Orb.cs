@@ -74,7 +74,7 @@ namespace ExperienceAndClasses.Items {
             }
 
             if (!can_use) {
-                TooltipLine line = new TooltipLine(mod, "desc2", "Cannot be consumed because you cannot currently gain XP!");
+                TooltipLine line = new TooltipLine(mod, "desc2", "Use is currently prevented because you cannot gain XP!");
                 line.overrideColor = UI.Constants.COLOUR_MESSAGE_ERROR;
                 tooltips.Add(line);
             }
