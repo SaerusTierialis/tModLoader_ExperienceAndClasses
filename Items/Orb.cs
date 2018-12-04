@@ -129,7 +129,7 @@ namespace ExperienceAndClasses.Items {
 
     public class Orb_Monster : Orb {
         public const string NAME = "Ascension Orb";
-        private const string TOOLTIP = "TODP_tooltip";
+        private const string TOOLTIP = "TODO_tooltip";
         private const string TEXTURE = "ExperienceAndClasses/Textures/Item/Orb_Monster";
         private const int RARITY = 9;
         private const short DUST = DustID.ApprenticeStorm;
@@ -148,7 +148,7 @@ namespace ExperienceAndClasses.Items {
 
     class Orb_Boss : Orb {
         public const string NAME = "Transcendence Orb";
-        private const string TOOLTIP = "TODP_tooltip";
+        private const string TOOLTIP = "TODO_tooltip";
         private const string TEXTURE = "ExperienceAndClasses/Textures/Item/Orb_Boss";
         private const int RARITY = 11;
         private const short DUST = DustID.PurpleCrystalShard;
