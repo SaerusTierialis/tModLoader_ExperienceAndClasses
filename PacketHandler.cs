@@ -337,7 +337,7 @@ namespace ExperienceAndClasses {
                 uint xp = reader.ReadUInt32();
 
                 //set
-                ExperienceAndClasses.LOCAL_MPLAYER.LocalAddXP(xp);
+                ExperienceAndClasses.LOCAL_MPLAYER.AddXP(xp);
             }
         }
     }

@@ -125,5 +125,21 @@ namespace ExperienceAndClasses.Systems {
             }
         }
 
+        public static uint GetBossOrbXP(Class c, byte level) {
+            Class pre = c.Prereq;
+            uint level_sum = level;
+            while (pre.ID != (byte)Class.CLASS_IDS.New) {
+                level_sum += pre.Max_Level;
+                pre = pre.Prereq;
+            }
+
+            uint xp = 195 + (5 * (uint)Math.Pow(level_sum, 1.76));
+            uint xp_min = (uint)(0.005 * GetXPReq(c, level));
+            if (xp < xp_min)
+                xp = xp_min;
+
+            return xp;
+        }
+
     }
 }

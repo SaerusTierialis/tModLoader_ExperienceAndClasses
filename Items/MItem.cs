@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Terraria;
+using Terraria.ID;
 using Terraria.ModLoader;
 
 namespace ExperienceAndClasses.Items {
@@ -11,17 +12,18 @@ namespace ExperienceAndClasses.Items {
         private const int STACK_SIZE = 99999;
 
         private readonly string NAME, TOOLTIP, TEXTURE;
-        private readonly bool CONSUMABLE;
+        private readonly bool CONSUMABLE, CONSUMABLE_AUTO;
         private readonly int WIDTH, HEIGHT, RARITY;
 
         protected Recipe recipe = null;
         private bool recipe_searched = false;
 
-        protected MItem(string name, string tooltip, string texture, bool consumable, int width, int height, int rarity) {
+        protected MItem(string name, string tooltip, string texture, bool consumable, int width, int height, int rarity, bool consumable_auto=false) {
             NAME = name;
             TOOLTIP = tooltip;
             TEXTURE = texture;
             CONSUMABLE = consumable;
+            CONSUMABLE_AUTO = consumable_auto;
             WIDTH = width;
             HEIGHT = height;
             RARITY = rarity;
@@ -29,7 +31,7 @@ namespace ExperienceAndClasses.Items {
 
         public override void SetStaticDefaults() {
             DisplayName.SetDefault(NAME);
-            base.Tooltip.SetDefault(TOOLTIP);
+            Tooltip.SetDefault(TOOLTIP);
         }
         public override void SetDefaults() {
             item.maxStack = STACK_SIZE;
@@ -44,6 +46,9 @@ namespace ExperienceAndClasses.Items {
                 item.useAnimation = 10;
                 item.useTime = 10;
                 item.useStyle = 4;
+                item.autoReuse = CONSUMABLE_AUTO;
+                item.UseSound = SoundID.Item4;
+                item.useTurn = true;
             }
         }
         public override void OnCraft(Recipe recipe) {

@@ -212,7 +212,7 @@ namespace ExperienceAndClasses {
                         PacketHandler.XP.Send(player.whoAmI, -1, xp);
                     }
                     else {
-                        LocalAddXP(xp);
+                        AddXP(xp);
                     }
                 }
 
@@ -577,15 +577,21 @@ namespace ExperienceAndClasses {
             return (CanGainXPPrimary() || CanGainXPSecondary());
         }
 
-        private bool CanGainXPPrimary() {
+        public bool CanGainXPPrimary() {
             return (Is_Local_Player && (Class_Primary.Tier > 0) && (Class_Levels[Class_Primary.ID] < Class_Primary.Max_Level));
         }
 
-        private bool CanGainXPSecondary() {
+        public bool CanGainXPSecondary() {
             return (Is_Local_Player && Allow_Secondary && (Class_Secondary.Tier > 0) && (Class_Levels[Class_Secondary.ID] < Class_Secondary.Max_Level));
         }
 
-        public void LocalAddXP(uint xp) {
+        public void ForceAddXP(uint xp_primary, uint xp_secondary) {
+            AddXP(Class_Primary.ID, xp_primary);
+            AddXP(Class_Secondary.ID, xp_secondary);
+            CheckForLevel();
+        }
+
+        public void AddXP(uint xp) {
             if (CanGainXP()) {
                 if (show_xp) {
                     CombatText.NewText(Main.LocalPlayer.getRect(), UI.Constants.COLOUR_XP_BRIGHT, "+" + xp + " XP");
@@ -604,34 +610,42 @@ namespace ExperienceAndClasses {
                 else if (add_secondary) {
                     AddXP(Class_Secondary.ID, xp);
                 }
-
-                //store prior levels to detect level-up
-                byte effective_primary = Class_Primary_Level_Effective;
-                byte effective_secondary = Class_Secondary_Level_Effective;
-
-                //level up
-                while ((Class_Levels[Class_Primary.ID] < Class_Primary.Max_Level) && (Class_XP[Class_Primary.ID] >= Systems.XP.GetXPReq(Class_Primary, Class_Levels[Class_Primary.ID]))) {
-                    SubtractXP(Class_Primary.ID, Systems.XP.GetXPReq(Class_Primary, Class_Levels[Class_Primary.ID]));
-                    Class_Levels[Class_Primary.ID]++;
-                    AnnounceLevel(Class_Primary);
-                }
-                while ((Class_Levels[Class_Secondary.ID] < Class_Secondary.Max_Level) && (Class_XP[Class_Secondary.ID] >= Systems.XP.GetXPReq(Class_Secondary, Class_Levels[Class_Secondary.ID]))) {
-                    SubtractXP(Class_Secondary.ID, Systems.XP.GetXPReq(Class_Secondary, Class_Levels[Class_Secondary.ID]));
-                    Class_Levels[Class_Secondary.ID]++;
-                    AnnounceLevel(Class_Secondary);
-                }
-
-                //adjust effective levels
-                SetEffectiveLevels();
-
-                //update class info if needed
-                if ((effective_primary != Class_Primary_Level_Effective) || (effective_secondary != Class_Secondary_Level_Effective)) {
-                    LocalUpdateClassInfo();
-                }
                 else {
-                    //otherwise just update xp bars
-                    UI.UIBars.Instance.Update();
+                    //can't gain xp (max level, etc.)
+                    return;
                 }
+
+                CheckForLevel();
+            }
+        }
+
+        private void CheckForLevel() {
+            //store prior levels to detect level-up
+            byte effective_primary = Class_Primary_Level_Effective;
+            byte effective_secondary = Class_Secondary_Level_Effective;
+
+            //level up
+            while ((Class_Levels[Class_Primary.ID] < Class_Primary.Max_Level) && (Class_XP[Class_Primary.ID] >= Systems.XP.GetXPReq(Class_Primary, Class_Levels[Class_Primary.ID]))) {
+                SubtractXP(Class_Primary.ID, Systems.XP.GetXPReq(Class_Primary, Class_Levels[Class_Primary.ID]));
+                Class_Levels[Class_Primary.ID]++;
+                AnnounceLevel(Class_Primary);
+            }
+            while ((Class_Levels[Class_Secondary.ID] < Class_Secondary.Max_Level) && (Class_XP[Class_Secondary.ID] >= Systems.XP.GetXPReq(Class_Secondary, Class_Levels[Class_Secondary.ID]))) {
+                SubtractXP(Class_Secondary.ID, Systems.XP.GetXPReq(Class_Secondary, Class_Levels[Class_Secondary.ID]));
+                Class_Levels[Class_Secondary.ID]++;
+                AnnounceLevel(Class_Secondary);
+            }
+
+            //adjust effective levels
+            SetEffectiveLevels();
+
+            //update class info if needed
+            if ((effective_primary != Class_Primary_Level_Effective) || (effective_secondary != Class_Secondary_Level_Effective)) {
+                LocalUpdateClassInfo();
+            }
+            else {
+                //otherwise just update xp bars
+                UI.UIBars.Instance.Update();
             }
         }
 
