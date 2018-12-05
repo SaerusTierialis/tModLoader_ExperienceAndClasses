@@ -669,6 +669,8 @@ namespace ExperienceAndClasses.UI {
     // UIPanel does not prevent the player from using items when the mouse is clicked, so we've added that as well.
     public class DragableUIPanel : UIPanel {
         // Stores the offset from the top left of the UIPanel while dragging.
+        private const float BUTTON_PANEL_EDGE_SPACE = 1f;
+
         private Vector2 offset;
 
         private bool dragging = false;
@@ -684,6 +686,7 @@ namespace ExperienceAndClasses.UI {
         private HelpTextPanel title = null;
 
         private UIHoverImageButton button_auto = null, button_close = null;
+        private DragableUIPanel button_panel = null;
 
         private bool auto = false;
         public bool Auto {
@@ -721,21 +724,34 @@ namespace ExperienceAndClasses.UI {
             Width.Set(width, 0f);
             Height.Set(height, 0f);
 
+            bool any_buttons = false;
+
             if (enable_close) {
                 button_close = new UIHoverImageButton(Textures.TEXTURE_CORNER_BUTTON_CLOSE, "Close");
                 button_close.Width.Set(Textures.TEXTURE_CORNER_BUTTON_SIZE, 0f);
                 button_close.Height.Set(Textures.TEXTURE_CORNER_BUTTON_SIZE, 0f);
+                button_close.Top.Set(Constants.UI_PADDING, 0f);
                 button_close.OnClick += new MouseEvent(ButtonClickClose);
                 Append(button_close);
+                any_buttons = true;
             }
 
             if (enable_auto) {
                 button_auto = new UIHoverImageButton(Textures.TEXTURE_BLANK, "");
                 button_auto.Width.Set(Textures.TEXTURE_CORNER_BUTTON_SIZE, 0f);
                 button_auto.Height.Set(Textures.TEXTURE_CORNER_BUTTON_SIZE, 0f);
+                button_auto.Top.Set(Constants.UI_PADDING, 0f);
                 button_auto.OnClick += new MouseEvent(ButtonClickAuto);
                 Append(button_auto);
                 Auto = true; //defaults to true if enabled
+                any_buttons = true;
+            }
+
+            if (any_buttons) {
+                button_panel = new DragableUIPanel(1, Textures.TEXTURE_CORNER_BUTTON_SIZE + Constants.UI_PADDING * 2f - BUTTON_PANEL_EDGE_SPACE, Constants.COLOR_UI_PANEL_BACKGROUND, UI, false, false, false, false);
+                button_panel.Top.Set(BUTTON_PANEL_EDGE_SPACE, 0f);
+                button_panel.BorderColor = Color.Transparent;
+                Append(button_panel);
             }
 
             Recalculate();
@@ -768,13 +784,14 @@ namespace ExperienceAndClasses.UI {
             float left = Width.Pixels - Constants.UI_PADDING;
             if (button_close != null) {
                 button_close.Left.Set(left -= Textures.TEXTURE_CORNER_BUTTON_SIZE, 0f);
-                button_close.Top.Set(Constants.UI_PADDING, 0f);
             }
             if (button_auto != null) {
                 button_auto.Left.Set(left -= Textures.TEXTURE_CORNER_BUTTON_SIZE, 0f);
-                button_auto.Top.Set(Constants.UI_PADDING, 0f);
             }
-
+            if (button_panel != null) {
+                button_panel.Left.Set(left -= Constants.UI_PADDING, 0f);
+                button_panel.Width.Set(Width.Pixels - button_panel.Left.Pixels - BUTTON_PANEL_EDGE_SPACE, 0f);
+            }
             base.Recalculate();
         }
 
@@ -904,6 +921,9 @@ namespace ExperienceAndClasses.UI {
             if (button_close != null) {
                 button_close.visible = false;
             }
+            if (button_panel != null) {
+                button_panel.visible = false;
+            }
         }
 
         public void ShowButtons() {
@@ -913,6 +933,9 @@ namespace ExperienceAndClasses.UI {
             }
             if (button_close != null) {
                 button_close.visible = true;
+            }
+            if (button_panel != null) {
+                button_panel.visible = true;
             }
         }
 
@@ -933,6 +956,9 @@ namespace ExperienceAndClasses.UI {
         public override void Draw(SpriteBatch spriteBatch) {
             if (visible) {
                 base.Draw(spriteBatch);
+                if (button_panel != null) {
+                    button_panel.Draw(spriteBatch); //draw panel first
+                }
                 if (button_auto != null) {
                     button_auto.Draw(spriteBatch);
                 }
