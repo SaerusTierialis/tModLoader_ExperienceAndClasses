@@ -26,7 +26,7 @@ namespace ExperienceAndClasses.UI {
         private const float HEIGHT_ABILITY = (HEIGHT - HEIGHT_ATTRIBUTES) - (Constants.UI_PADDING * 2) + 1;
 
         private const float WIDTH_UNLOCK = 180f;
-        private static readonly float HEIGHT_UNLOCK = HEIGHT - HEIGHT_HELP - Textures.TEXTURE_CORNER_BUTTON_SIZE + 1 - (Constants.UI_PADDING * 2) + 1;
+        private static readonly float HEIGHT_UNLOCK = HEIGHT - HEIGHT_HELP + 1 - (Constants.UI_PADDING * 2) + 1;
 
         private const float WIDTH_HELP = WIDTH_UNLOCK;
         private const float HEIGHT_HELP = 120f;
@@ -155,7 +155,7 @@ namespace ExperienceAndClasses.UI {
             //unlock panel
             DragableUIPanel panel_unlock = new DragableUIPanel(WIDTH_UNLOCK, HEIGHT_UNLOCK, COLOR_SUBPANEL, this, false, false, false);
             panel_unlock.Left.Set(panel_ability.Left.Pixels + panel_ability.Width.Pixels - 2f, 0f);
-            panel_unlock.Top.Set(Constants.UI_PADDING + Textures.TEXTURE_CORNER_BUTTON_SIZE + 1, 0f);
+            panel_unlock.Top.Set(Constants.UI_PADDING, 0f);
             panel.Append(panel_unlock);
 
             //unlock title

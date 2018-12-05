@@ -75,7 +75,7 @@ namespace ExperienceAndClasses.UI {
                 xp_bar_secondary.Update();
 
                 if (needs_rearrangement) {
-                    float y = Constants.UI_PADDING + Textures.TEXTURE_CORNER_BUTTON_SIZE;
+                    float y = Constants.UI_PADDING;
 
                     if (ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary.Tier > 0) {
                         xp_bar_primary.Top.Set(y, 0f);
