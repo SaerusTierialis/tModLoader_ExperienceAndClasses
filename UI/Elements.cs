@@ -931,11 +931,19 @@ namespace ExperienceAndClasses.UI {
         }
 
         public override void Draw(SpriteBatch spriteBatch) {
-            if (visible)
+            if (visible) {
                 base.Draw(spriteBatch);
+                if (button_auto != null) {
+                    button_auto.Draw(spriteBatch);
+                }
+                if (button_close != null) {
+                    button_close.Draw(spriteBatch);
+                }
+            }
             else
                 return;
         }
+
     }
 
     // Copied from ExampleMod on GitHub
