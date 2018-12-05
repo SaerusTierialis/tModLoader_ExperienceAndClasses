@@ -675,6 +675,7 @@ namespace ExperienceAndClasses.UI {
         private UIStateCombo UI;
         private bool buttons_hidden = false;
         private bool can_drag;
+        private bool auto_hide_buttons;
 
         public bool visible = true;
 
@@ -704,9 +705,10 @@ namespace ExperienceAndClasses.UI {
             }
         }
 
-        public DragableUIPanel(float width, float height, Color color, UIStateCombo ui, bool enable_close, bool enable_auto, bool enable_drag=true) : base() {
+        public DragableUIPanel(float width, float height, Color color, UIStateCombo ui, bool enable_close, bool enable_auto, bool enable_drag = true, bool auto_hide_buttons = true) : base() {
             UI = ui;
             can_drag = enable_drag;
+            this.auto_hide_buttons = auto_hide_buttons;
 
             top_space = 0;
 
@@ -737,6 +739,10 @@ namespace ExperienceAndClasses.UI {
             }
 
             Recalculate();
+
+            if (auto_hide_buttons) {
+                HideButtons();
+            }
         }
 
         public void SetTitle(string text, float text_scale=1, bool center=true, string helptext=null, string helptext_title=null) {
@@ -893,20 +899,34 @@ namespace ExperienceAndClasses.UI {
         public void HideButtons() {
             buttons_hidden = true;
             if (button_auto != null) {
-                button_auto.SetImage(Textures.TEXTURE_BLANK);
+                button_auto.visible = false;
             }
             if (button_close != null) {
-                button_close.SetImage(Textures.TEXTURE_BLANK);
+                button_close.visible = false;
             }
         }
 
         public void ShowButtons() {
             buttons_hidden = false;
             if (button_auto != null) {
-                Auto = auto;
+                button_auto.visible = true;
             }
             if (button_close != null) {
-                button_close.SetImage(Textures.TEXTURE_CORNER_BUTTON_CLOSE);
+                button_close.visible = true;
+            }
+        }
+
+        public override void MouseOver(UIMouseEvent evt) {
+            base.MouseOver(evt);
+            if (auto_hide_buttons) {
+                ShowButtons();
+            }
+        }
+
+        public override void MouseOut(UIMouseEvent evt) {
+            base.MouseOut(evt);
+            if (auto_hide_buttons) {
+                HideButtons();
             }
         }
 
@@ -927,6 +947,8 @@ namespace ExperienceAndClasses.UI {
     internal class UIHoverImageButton : UIImageButton {
         internal string hoverText;
 
+        public bool visible = true;
+
         public UIHoverImageButton(Texture2D texture, string hoverText) : base(texture) {
             this.hoverText = hoverText;
         }
@@ -941,6 +963,12 @@ namespace ExperienceAndClasses.UI {
         public override void Click(UIMouseEvent evt) {
             if (!UIInfo.AllowClicks()) return;
             base.Click(evt);
+        }
+
+        public override void Draw(SpriteBatch spriteBatch) {
+            if (visible) {
+                base.Draw(spriteBatch);
+            }
         }
     }
 }
