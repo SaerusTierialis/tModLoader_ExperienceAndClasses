@@ -162,7 +162,7 @@ namespace ExperienceAndClasses {
 
                 //get old xp one time if loaded old save
                 if (Commons.VersionIsOlder(Load_Version, new int[] { 2, 0, 0 })) {
-                    old_xp += player.GetModPlayer<Legacy.MyPlayer>(mod).old_xp;
+                    old_xp = player.GetModPlayer<Legacy.MyPlayer>(mod).old_xp;
                 }
 
                 //convert old items (call twice in case inventory is pretty full and first call makes room)

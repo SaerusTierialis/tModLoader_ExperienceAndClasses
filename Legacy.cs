@@ -15,16 +15,22 @@ namespace ExperienceAndClasses {
         /// loads pre-revamp xp
         /// </summary>
         public class MyPlayer : ModPlayer {
-            public double old_xp { get; private set; }
+            public double old_xp;
             public override void Initialize() {
                 old_xp = 0;
             }
             public override void Load(TagCompound tag) {
                 old_xp = Commons.TryGet<double>(tag, "experience", 0);
             }
+            public override TagCompound Save() {
+                return new TagCompound {
+                    {"experience", old_xp },
+                };
+            }
         }
 
         public static void ConvertLegacyItems(Player player) {
+            MyPlayer lagacy_player = Main.LocalPlayer.GetModPlayer<MyPlayer>(ExperienceAndClasses.MOD);
             foreach (Item item in player.inventory) {
                 if (item.type > 0 && item.Name.Equals("Unloaded Item")) {
 
@@ -198,8 +204,15 @@ namespace ExperienceAndClasses {
                                     player.ConsumeItem(item.type);
                                 }
 
-                                //add xp (check for overflow)
-                                double prior_old_xp = ExperienceAndClasses.LOCAL_MPLAYER.old_xp;
+                                //add xp (check for overflow) for use in legacy versions
+                                double prior_old_xp = lagacy_player.old_xp;
+                                lagacy_player.old_xp += (xp * num);
+                                if (lagacy_player.old_xp < prior_old_xp) {
+                                    lagacy_player.old_xp = double.MaxValue;
+                                }
+
+                                //add xp (check for overflow) for use in revamp versions
+                                prior_old_xp = ExperienceAndClasses.LOCAL_MPLAYER.old_xp;
                                 ExperienceAndClasses.LOCAL_MPLAYER.old_xp += (xp * num);
                                 if (ExperienceAndClasses.LOCAL_MPLAYER.old_xp < prior_old_xp) {
                                     ExperienceAndClasses.LOCAL_MPLAYER.old_xp = double.MaxValue;
@@ -217,6 +230,8 @@ namespace ExperienceAndClasses {
                     }
                 }
             }
+
+            //apply 
         }
     }
 }
