@@ -93,7 +93,7 @@ namespace ExperienceAndClasses.Items {
                 return false;
             }
             else {
-                ExperienceAndClasses.LOCAL_MPLAYER.ForceAddXP(xp_primary, xp_secondary);
+                ExperienceAndClasses.LOCAL_MPLAYER.AddOrbXP(xp_primary, xp_secondary);
                 return true;
             }
         }

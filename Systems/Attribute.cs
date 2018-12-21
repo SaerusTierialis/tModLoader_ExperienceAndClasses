@@ -72,7 +72,7 @@ namespace ExperienceAndClasses.Systems {
 
             for (byte i = 0; i< mplayer.Class_Levels.Length; i++) {
                 if (mplayer.Class_Unlocked[i] && Class.CLASS_LOOKUP[i].Gives_Allocation_Attributes && Class.CLASS_LOOKUP[i].Tier > 0) {
-                    sum += Math.Min(mplayer.Class_Levels[i], Class.MAX_LEVEL[Class.CLASS_LOOKUP[i].Tier]) * ALLOCATION_POINTS_PER_LEVEL_TIERS[Class.CLASS_LOOKUP[i].Tier];
+                    sum += Math.Min(mplayer.Class_Levels[i], Class.CLASS_LOOKUP[i].Max_Level) * ALLOCATION_POINTS_PER_LEVEL_TIERS[Class.CLASS_LOOKUP[i].Tier];
                 }
             }
 

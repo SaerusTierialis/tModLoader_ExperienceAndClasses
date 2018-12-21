@@ -252,37 +252,37 @@ namespace ExperienceAndClasses {
                     return CLASS_VALIDITY.INVALID_ID; //invalid idsss
                 }
                 else {
-                    byte id_same, id_other;
+                    Systems.Class class_same_slot, class_other_slot;
                     if (is_primary) {
-                        id_same = Class_Primary.ID;
-                        id_other = Class_Secondary.ID;
+                        class_same_slot = Class_Primary;
+                        class_other_slot = Class_Secondary;
                     }
                     else {
-                        id_same = Class_Secondary.ID;
-                        id_other = Class_Primary.ID;
+                        class_same_slot = Class_Secondary;
+                        class_other_slot = Class_Primary;
                     }
 
                     if (((Class_Levels[id] <= 0) || !Class_Unlocked[id]) && (id != (byte)Systems.Class.CLASS_IDS.None)) {
                         return CLASS_VALIDITY.INVALID_LOCKED; //locked class
                     }
                     else {
-                        if (id != id_same) {
-                            byte id_pre = id_other;
-                            while (id_pre != (byte)Systems.Class.CLASS_IDS.New) {
-                                if (id == id_pre) {
+                        if (id != class_same_slot.ID) {
+                            Systems.Class pre = class_other_slot;
+                            while (pre != null) {
+                                if (id == pre.ID) {
                                     return CLASS_VALIDITY.INVALID_COMBINATION; //invalid combination (same as other class or one of its prereqs)
                                 }
                                 else {
-                                    id_pre = Systems.Class.CLASS_LOOKUP[id_pre].Prereq.ID;
+                                    pre = pre.Prereq;
                                 }
                             }
-                            id_pre = Systems.Class.CLASS_LOOKUP[id].Prereq.ID;
-                            while (id_pre != (byte)Systems.Class.CLASS_IDS.New) {
-                                if (id_other == id_pre) {
+                            pre = Systems.Class.CLASS_LOOKUP[id].Prereq;
+                            while (pre != null) {
+                                if (class_other_slot.ID == pre.ID) {
                                     return CLASS_VALIDITY.INVALID_COMBINATION; //invalid combination (same as other class or one of its prereqs)
                                 }
                                 else {
-                                    id_pre = Systems.Class.CLASS_LOOKUP[id_pre].Prereq.ID;
+                                    pre = pre.Prereq;
                                 }
                             }
 
@@ -415,7 +415,7 @@ namespace ExperienceAndClasses {
 
         public bool HasClassPrereq(Systems.Class c) {
             Systems.Class pre = c.Prereq;
-            while (pre.ID != (byte)Systems.Class.CLASS_IDS.New) {
+            while (pre != null) {
                 if (Class_Levels[pre.ID] < pre.Max_Level) {
                     //level requirement not met
                     return false;
@@ -503,14 +503,14 @@ namespace ExperienceAndClasses {
                 sum_secondary = 0;
 
                 c = Class_Primary;
-                while (c.Tier > 0) {
-                    sum_primary += (c.Attribute_Growth[id] * Math.Min(Class_Levels[c.ID], Systems.Class.MAX_LEVEL[c.Tier]));
+                while ((c != null) && (c.Tier > 0)) {
+                    sum_primary += (c.Attribute_Growth[id] * Math.Min(Class_Levels[c.ID], c.Max_Level));
                     c = c.Prereq;
                 }
 
                 c = Class_Secondary;
-                while (c.Tier > 0) {
-                    sum_secondary += (c.Attribute_Growth[id] * Math.Min(Class_Levels[c.ID], Systems.Class.MAX_LEVEL[c.Tier]));
+                while ((c != null) && (c.Tier > 0)) {
+                    sum_secondary += (c.Attribute_Growth[id] * Math.Min(Class_Levels[c.ID], c.Max_Level));
                     c = c.Prereq;
                 }
 
@@ -549,8 +549,8 @@ namespace ExperienceAndClasses {
             Class_Secondary_Level_Effective = Class_Levels[Class_Secondary.ID];
 
             //level cap primary
-            if (Class_Primary_Level_Effective > Systems.Class.MAX_LEVEL[Class_Primary.Tier]) {
-                Class_Primary_Level_Effective = Systems.Class.MAX_LEVEL[Class_Primary.Tier];
+            if (Class_Primary_Level_Effective > Class_Primary.Max_Level) {
+                Class_Primary_Level_Effective = Class_Primary.Max_Level;
             }
 
             //subclass secondary effective level penalty
@@ -568,8 +568,8 @@ namespace ExperienceAndClasses {
             }//subclass of lower tier has no penalty
 
             //level cap secondary
-            if (Class_Secondary_Level_Effective > Systems.Class.MAX_LEVEL[Class_Secondary.Tier]) {
-                Class_Secondary_Level_Effective = Systems.Class.MAX_LEVEL[Class_Secondary.Tier];
+            if (Class_Secondary_Level_Effective > Class_Secondary.Max_Level) {
+                Class_Secondary_Level_Effective = Class_Secondary.Max_Level;
             }
         }
 
@@ -585,7 +585,7 @@ namespace ExperienceAndClasses {
             return (Is_Local_Player && Allow_Secondary && (Class_Secondary.Tier > 0) && (Class_Levels[Class_Secondary.ID] < Class_Secondary.Max_Level));
         }
 
-        public void ForceAddXP(uint xp_primary, uint xp_secondary) {
+        public void AddOrbXP(uint xp_primary, uint xp_secondary) {
             AddXP(Class_Primary.ID, xp_primary);
             AddXP(Class_Secondary.ID, xp_secondary);
             CheckForLevel();
@@ -678,7 +678,7 @@ namespace ExperienceAndClasses {
             byte level = Class_Levels[c.ID];
 
             string message = "";
-            if (level == Systems.Class.MAX_LEVEL[c.Tier]) {
+            if (level == c.Max_Level) {
                 message = "You are now a MAX level " + c.Name + "!";
             }
             else {
@@ -1019,7 +1019,7 @@ namespace ExperienceAndClasses {
             for (byte id = 0; id < (byte)Systems.Class.CLASS_IDS.NUMBER_OF_IDs; id++) {
 
                 //level up if required xp changed
-                while ((Class_Levels[id] < Systems.Class.MAX_LEVEL[Systems.Class.CLASS_LOOKUP[id].Tier]) && (Class_XP[id] >= Systems.XP.GetXPReq(Systems.Class.CLASS_LOOKUP[id], Class_Levels[id]))) {
+                while ((Class_Levels[id] < Systems.Class.CLASS_LOOKUP[id].Max_Level) && (Class_XP[id] >= Systems.XP.GetXPReq(Systems.Class.CLASS_LOOKUP[id], Class_Levels[id]))) {
                     SubtractXP(id, Systems.XP.GetXPReq(Systems.Class.CLASS_LOOKUP[id], Class_Levels[id]));
                     Class_Levels[id]++;
                 }

@@ -90,7 +90,7 @@ namespace ExperienceAndClasses.Systems {
             uint[] xp_predef = new uint[] { 0, 10, 15, 20, 30, 40, 50, 60, 80, 100 }; //length+1 must be UI.UI.MAX_LEVEL[1]
             int num_predef = xp_predef.Length - 1;
 
-            int levels = Class.MAX_LEVEL[1] + Class.MAX_LEVEL[2] + Class.MAX_LEVEL[3];
+            int levels = Class.TIER_MAX_LEVELS[1] + Class.TIER_MAX_LEVELS[2] + Class.TIER_MAX_LEVELS[3];
 
             XP_REQ = new uint[1 + levels];
 
@@ -107,12 +107,12 @@ namespace ExperienceAndClasses.Systems {
         }
 
         public static uint GetXPReq(Class c, byte level) {
-            if (level >= Class.MAX_LEVEL[c.Tier]) {
+            if (level >= c.Max_Level) {
                 return 0;
             }
 
             Class pre = c.Prereq;
-            while (pre.ID != (byte)Class.CLASS_IDS.New) {
+            while (pre != null) {
                 level += pre.Max_Level;
                 pre = pre.Prereq;
             }
@@ -128,7 +128,7 @@ namespace ExperienceAndClasses.Systems {
         public static uint GetBossOrbXP(Class c, byte level) {
             Class pre = c.Prereq;
             uint level_sum = level;
-            while (pre.ID != (byte)Class.CLASS_IDS.New) {
+            while (pre != null) {
                 level_sum += pre.Max_Level;
                 pre = pre.Prereq;
             }

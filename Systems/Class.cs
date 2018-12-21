@@ -8,7 +8,7 @@ using Terraria;
 using Terraria.ModLoader;
 
 namespace ExperienceAndClasses.Systems {
-    public class Class {
+    public abstract class Class {
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Constants (and readonly) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         //DO NOT CHANGE THE ORDER OF IDs
@@ -44,7 +44,7 @@ namespace ExperienceAndClasses.Systems {
             NUMBER_OF_IDs, //leave this last
         }
 
-        public static readonly byte[] MAX_LEVEL = new byte[] { 0, 10, 50, 100 };
+        public static readonly byte[] TIER_MAX_LEVELS = new byte[] {0, 10, 50, 100};
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Treated like readonly ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -53,422 +53,365 @@ namespace ExperienceAndClasses.Systems {
         //which classes to show in ui and where
         public static byte[,] Class_Locations { get; private set; }
 
-        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Populate Lookup ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Auto-Populate Lookup ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
         static Class() {
             Class_Locations = new byte[5, 7];
             CLASS_LOOKUP = new Class[(byte)CLASS_IDS.NUMBER_OF_IDs];
-
-            string name, desc;
-            byte tier, id_byte;
-            string texture_path;
-            CLASS_IDS id_prereq;
-            PowerScaling.POWER_SCALING_TYPES power_scaling;
-            float[] attribute_growth;
-            bool gives_allocation_attributes;
-            Items.Unlock unlock_item;
-            byte max_level_override;
-
-            for (CLASS_IDS id = 0; id < CLASS_IDS.NUMBER_OF_IDs; id++) {
-                id_byte = (byte)id;
-
-                //defaults
-                name = "Unknown" + id;
-                desc = "";
-                tier = 0;
-                id_prereq = CLASS_IDS.New;
-                texture_path = "ExperienceAndClasses/Textures/Class/Novice";
-                power_scaling = PowerScaling.POWER_SCALING_TYPES.None;
-                gives_allocation_attributes = true;
-                unlock_item = null;
-                max_level_override = 0;
-
-                //default attribute growth of active attributes to 1 (per 10 levels)
-                attribute_growth = new float[(byte)Attribute.ATTRIBUTE_IDS.NUMBER_OF_IDs];
-                for (byte i = 0; i< attribute_growth.Length; i++) {
-                    if (Attribute.ATTRIBUTE_LOOKUP[i].Active) {
-                        attribute_growth[i] = 1;
-                    }
-                }
-
-                //specifics
-                switch (id) {
-                    case CLASS_IDS.None:
-                        name = "None";
-                        gives_allocation_attributes = false;
-                        for (byte i = 0; i < attribute_growth.Length; i++) {
-                            attribute_growth[i] = 0;
-                        }
-                        break;
-
-                    case CLASS_IDS.Novice:
-                        name = "Novice";
-                        desc = "TODO_description";
-                        tier = 1;
-                        texture_path = "ExperienceAndClasses/Textures/Class/Novice";
-                        Class_Locations[0, 3] = id_byte;
-                        power_scaling = PowerScaling.POWER_SCALING_TYPES.All;
-                        break;
-
-                    case CLASS_IDS.Warrior:
-                        name = "Warrior";
-                        desc = "TODO_description";
-                        tier = 2;
-                        unlock_item = ExperienceAndClasses.MOD.GetItem<Items.Unlock_Tier2>();
-                        texture_path = "ExperienceAndClasses/Textures/Class/Warrior";
-                        Class_Locations[1, 0] = id_byte;
-                        id_prereq = CLASS_IDS.Novice;
-                        power_scaling = PowerScaling.POWER_SCALING_TYPES.Melee;
-                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Power] = 2;
-                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Vitality] = 3;
-                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Dexterity] = 2;
-                        break;
-
-                    case CLASS_IDS.Ranger:
-                        name = "Ranger";
-                        desc = "TODO_description";
-                        tier = 2;
-                        unlock_item = ExperienceAndClasses.MOD.GetItem<Items.Unlock_Tier2>();
-                        texture_path = "ExperienceAndClasses/Textures/Class/Ranger";
-                        Class_Locations[1, 1] = id_byte;
-                        id_prereq = CLASS_IDS.Novice;
-                        power_scaling = PowerScaling.POWER_SCALING_TYPES.Ranged;
-                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Power] = 3;
-                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Spirit] = 2;
-                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Dexterity] = 2;
-                        break;
-
-                    case CLASS_IDS.Mage:
-                        name = "Mage";
-                        desc = "TODO_description";
-                        tier = 2;
-                        unlock_item = ExperienceAndClasses.MOD.GetItem<Items.Unlock_Tier2>();
-                        texture_path = "ExperienceAndClasses/Textures/Class/Mage";
-                        Class_Locations[1, 2] = id_byte;
-                        id_prereq = CLASS_IDS.Novice;
-                        power_scaling = PowerScaling.POWER_SCALING_TYPES.Magic;
-                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Power] = 3;
-                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Mind] = 3;
-                        break;
-
-                    case CLASS_IDS.Rogue:
-                        name = "Rogue";
-                        desc = "TODO_description";
-                        tier = 2;
-                        unlock_item = ExperienceAndClasses.MOD.GetItem<Items.Unlock_Tier2>();
-                        texture_path = "ExperienceAndClasses/Textures/Class/Rogue";
-                        Class_Locations[1, 3] = id_byte;
-                        id_prereq = CLASS_IDS.Novice;
-                        power_scaling = PowerScaling.POWER_SCALING_TYPES.Rogue;
-                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Spirit] = 3;
-                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Agility] = 3;
-                        break;
-
-                    case CLASS_IDS.Summoner:
-                        name = "Summoner";
-                        desc = "TODO_description";
-                        tier = 2;
-                        unlock_item = ExperienceAndClasses.MOD.GetItem<Items.Unlock_Tier2>();
-                        texture_path = "ExperienceAndClasses/Textures/Class/Summoner";
-                        Class_Locations[1, 4] = id_byte;
-                        id_prereq = CLASS_IDS.Novice;
-                        power_scaling = PowerScaling.POWER_SCALING_TYPES.Minion;
-                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Power] = 3;
-                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Spirit] = 3;
-                        break;
-
-                    case CLASS_IDS.Cleric:
-                        name = "Cleric";
-                        desc = "TODO_description";
-                        tier = 2;
-                        unlock_item = ExperienceAndClasses.MOD.GetItem<Items.Unlock_Tier2>();
-                        texture_path = "ExperienceAndClasses/Textures/Class/Cleric";
-                        Class_Locations[1, 5] = id_byte;
-                        id_prereq = CLASS_IDS.Novice;
-                        power_scaling = PowerScaling.POWER_SCALING_TYPES.All;
-                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Mind] = 3;
-                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Spirit] = 3;
-                        break;
-
-                    case CLASS_IDS.Hybrid:
-                        name = "Hybrid";
-                        desc = "TODO_description";
-                        tier = 2;
-                        unlock_item = ExperienceAndClasses.MOD.GetItem<Items.Unlock_Tier2>();
-                        texture_path = "ExperienceAndClasses/Textures/Class/Hybrid";
-                        Class_Locations[1, 6] = id_byte;
-                        id_prereq = CLASS_IDS.Novice;
-                        power_scaling = PowerScaling.POWER_SCALING_TYPES.All;
-                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Power] = 2;
-                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Vitality] = 2;
-                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Mind] = 2;
-                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Spirit] = 2;
-                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Agility] = 2;
-                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Dexterity] = 2;
-                        break;
-
-                    case CLASS_IDS.Unnamed1:
-                        name = "Unnamed1";
-                        desc = "TODO_description";
-                        tier = 3;
-                        unlock_item = ExperienceAndClasses.MOD.GetItem<Items.Unlock_Tier3>();
-                        texture_path = "ExperienceAndClasses/Textures/Class/Unnamed1";
-                        Class_Locations[2, 0] = id_byte;
-                        id_prereq = CLASS_IDS.Warrior;
-                        power_scaling = PowerScaling.POWER_SCALING_TYPES.Melee;
-                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Power] = 5;
-                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Vitality] = 3;
-                        break;
-
-                    case CLASS_IDS.Berserker:
-                        name = "Berserker";
-                        desc = "TODO_description";
-                        tier = 3;
-                        unlock_item = ExperienceAndClasses.MOD.GetItem<Items.Unlock_Tier3>();
-                        texture_path = "ExperienceAndClasses/Textures/Class/Berserker";
-                        Class_Locations[3, 0] = id_byte;
-                        id_prereq = CLASS_IDS.Warrior;
-                        power_scaling = PowerScaling.POWER_SCALING_TYPES.Melee;
-                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Power] = 2;
-                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Vitality] = 2;
-                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Agility] = 2;
-                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Dexterity] = 4;
-                        break;
-
-                    case CLASS_IDS.Guardian:
-                        name = "Guardian";
-                        desc = "TODO_description";
-                        tier = 3;
-                        unlock_item = ExperienceAndClasses.MOD.GetItem<Items.Unlock_Tier3>();
-                        texture_path = "ExperienceAndClasses/Textures/Class/Guardian";
-                        Class_Locations[4, 0] = id_byte;
-                        id_prereq = CLASS_IDS.Warrior;
-                        power_scaling = PowerScaling.POWER_SCALING_TYPES.Melee;
-                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Power] = 3;
-                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Vitality] = 5;
-                        break;
-
-                    case CLASS_IDS.Sniper:
-                        name = "Sniper";
-                        desc = "TODO_description";
-                        tier = 3;
-                        unlock_item = ExperienceAndClasses.MOD.GetItem<Items.Unlock_Tier3>();
-                        texture_path = "ExperienceAndClasses/Textures/Class/Sniper";
-                        Class_Locations[2, 1] = id_byte;
-                        id_prereq = CLASS_IDS.Ranger;
-                        power_scaling = PowerScaling.POWER_SCALING_TYPES.Ranged;
-                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Power] = 4;
-                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Spirit] = 4;
-                        break;
-
-                    case CLASS_IDS.Engineer:
-                        name = "Engineer";
-                        desc = "TODO_description";
-                        tier = 3;
-                        unlock_item = ExperienceAndClasses.MOD.GetItem<Items.Unlock_Tier3>();
-                        texture_path = "ExperienceAndClasses/Textures/Class/Engineer";
-                        Class_Locations[3, 1] = id_byte;
-                        id_prereq = CLASS_IDS.Ranger;
-                        power_scaling = PowerScaling.POWER_SCALING_TYPES.Ranged;
-                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Power] = 3;
-                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Vitality] = 3;
-                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Spirit] = 2;
-                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Dexterity] = 2;
-                        break;
-
-                    case CLASS_IDS.Elementalist:
-                        name = "Elementalist";
-                        desc = "TODO_description";
-                        tier = 3;
-                        unlock_item = ExperienceAndClasses.MOD.GetItem<Items.Unlock_Tier3>();
-                        texture_path = "ExperienceAndClasses/Textures/Class/Elementalist";
-                        Class_Locations[2, 2] = id_byte;
-                        id_prereq = CLASS_IDS.Mage;
-                        power_scaling = PowerScaling.POWER_SCALING_TYPES.Magic;
-                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Power] = 5;
-                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Mind] = 3;
-                        break;
-
-                    case CLASS_IDS.Sage:
-                        name = "Sage";
-                        desc = "TODO_description";
-                        tier = 3;
-                        unlock_item = ExperienceAndClasses.MOD.GetItem<Items.Unlock_Tier3>();
-                        texture_path = "ExperienceAndClasses/Textures/Class/Sage";
-                        Class_Locations[3, 2] = id_byte;
-                        id_prereq = CLASS_IDS.Mage;
-                        power_scaling = PowerScaling.POWER_SCALING_TYPES.Magic;
-                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Power] = 3;
-                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Vitality] = 2;
-                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Mind] = 4;
-                        break;
-
-                    case CLASS_IDS.Assassin:
-                        name = "Assassin";
-                        desc = "TODO_description";
-                        tier = 3;
-                        unlock_item = ExperienceAndClasses.MOD.GetItem<Items.Unlock_Tier3>();
-                        texture_path = "ExperienceAndClasses/Textures/Class/Assassin";
-                        Class_Locations[2, 3] = id_byte;
-                        id_prereq = CLASS_IDS.Rogue;
-                        power_scaling = PowerScaling.POWER_SCALING_TYPES.Rogue;
-                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Power] = 2;
-                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Spirit] = 4;
-                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Agility] = 3;
-                        break;
-
-                    case CLASS_IDS.Unnamed2:
-                        name = "Unnamed2";
-                        desc = "TODO_description";
-                        tier = 3;
-                        unlock_item = ExperienceAndClasses.MOD.GetItem<Items.Unlock_Tier3>();
-                        texture_path = "ExperienceAndClasses/Textures/Class/Unnamed2";
-                        Class_Locations[3, 3] = id_byte;
-                        id_prereq = CLASS_IDS.Rogue;
-                        power_scaling = PowerScaling.POWER_SCALING_TYPES.Rogue;
-                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Power] = 2;
-                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Spirit] = 2;
-                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Dexterity] = 5;
-                        break;
-
-                    case CLASS_IDS.Ninja:
-                        name = "Ninja";
-                        desc = "TODO_description";
-                        tier = 3;
-                        unlock_item = ExperienceAndClasses.MOD.GetItem<Items.Unlock_Tier3>();
-                        texture_path = "ExperienceAndClasses/Textures/Class/Ninja";
-                        Class_Locations[4, 3] = id_byte;
-                        id_prereq = CLASS_IDS.Rogue;
-                        power_scaling = PowerScaling.POWER_SCALING_TYPES.Throwing;
-                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Power] = 3;
-                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Spirit] = 3;
-                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Agility] = 3;
-                        break;
-
-                    case CLASS_IDS.Hivemind:
-                        name = "Hivemind";
-                        desc = "TODO_description";
-                        tier = 3;
-                        unlock_item = ExperienceAndClasses.MOD.GetItem<Items.Unlock_Tier3>();
-                        texture_path = "ExperienceAndClasses/Textures/Class/Hivemind";
-                        Class_Locations[3, 4] = id_byte;
-                        id_prereq = CLASS_IDS.Summoner;
-                        power_scaling = PowerScaling.POWER_SCALING_TYPES.Minion;
-                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Power] = 3;
-                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Mind] = 2;
-                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Spirit] = 4;
-                        break;
-
-                    case CLASS_IDS.SoulBinder:
-                        name = "Soul Binder";
-                        desc = "TODO_description";
-                        tier = 3;
-                        unlock_item = ExperienceAndClasses.MOD.GetItem<Items.Unlock_Tier3>();
-                        texture_path = "ExperienceAndClasses/Textures/Class/SoulBinder";
-                        Class_Locations[2, 4] = id_byte;
-                        id_prereq = CLASS_IDS.Summoner;
-                        power_scaling = PowerScaling.POWER_SCALING_TYPES.Minion;
-                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Power] = 5;
-                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Mind] = 2;
-                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Spirit] = 2;
-                        break;
-
-                    case CLASS_IDS.Saint:
-                        name = "Saint";
-                        desc = "TODO_description";
-                        tier = 3;
-                        unlock_item = ExperienceAndClasses.MOD.GetItem<Items.Unlock_Tier3>();
-                        texture_path = "ExperienceAndClasses/Textures/Class/Saint";
-                        Class_Locations[2, 5] = id_byte;
-                        id_prereq = CLASS_IDS.Cleric;
-                        power_scaling = PowerScaling.POWER_SCALING_TYPES.All;
-                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Mind] = 3;
-                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Spirit] = 5;
-                        break;
-
-                    case CLASS_IDS.HybridPrime:
-                        name = "Hybrid Prime";
-                        desc = "TODO_description";
-                        tier = 3;
-                        unlock_item = ExperienceAndClasses.MOD.GetItem<Items.Unlock_Tier3>();
-                        texture_path = "ExperienceAndClasses/Textures/Class/HybridPrime";
-                        Class_Locations[2, 6] = id_byte;
-                        id_prereq = CLASS_IDS.Hybrid;
-                        power_scaling = PowerScaling.POWER_SCALING_TYPES.All;
-                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Power] = 2.5f;
-                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Vitality] = 2.5f;
-                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Mind] = 2.5f;
-                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Spirit] = 2.5f;
-                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Agility] = 2.5f;
-                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Dexterity] = 2.5f;
-                        break;
-
-                    case CLASS_IDS.Explorer:
-                        name = "Explorer";
-                        desc = "TODO_description";
-                        tier = 2;
-                        max_level_override = MAX_LEVEL[3];
-                        unlock_item = ExperienceAndClasses.MOD.GetItem<Items.Unlock_Explorer>();
-                        texture_path = "ExperienceAndClasses/Textures/Class/Explorer";
-                        Class_Locations[0, 6] = id_byte;
-                        id_prereq = CLASS_IDS.Novice;
-                        power_scaling = PowerScaling.POWER_SCALING_TYPES.Tool;
-                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Power] = 2f;
-                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Vitality] = 2f;
-                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Mind] = 2f;
-                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Spirit] = 2f;
-                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Agility] = 2f;
-                        attribute_growth[(byte)Attribute.ATTRIBUTE_IDS.Dexterity] = 2f;
-                        break;
-
-                    default:
-                        gives_allocation_attributes = false;
-                        for (byte i = 0; i < attribute_growth.Length; i++) {
-                            attribute_growth[i] = 0;
-                        }
-                        break;
-                }
-
-                //add
-                CLASS_LOOKUP[id_byte] = new Class(id_byte, name, desc, tier, texture_path, (byte)id_prereq, PowerScaling.POWER_SCALING_LOOKUP[(byte)power_scaling], attribute_growth, gives_allocation_attributes, unlock_item, max_level_override);
+            string[] IDs = Enum.GetNames(typeof(CLASS_IDS));
+            for (byte i = 0; i < CLASS_LOOKUP.Length; i++) {
+                CLASS_LOOKUP[i] = (Class)(Assembly.GetExecutingAssembly().CreateInstance(typeof(Class).FullName + "+" + IDs[i]));
             }
         }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Instance ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-        public byte ID { get; private set; }
-        public string Name { get; private set; }
-        public string Description { get; private set; }
-        public byte Tier { get; private set; }
-        public Texture2D Texture { get; private set; }
-        public string Texture_Path { get; private set; }
-        public Class Prereq { get; private set; }
-        public PowerScaling Power_Scaling { get; private set; }
-        public float[] Attribute_Growth { get; private set; }
-        public bool Gives_Allocation_Attributes { get; private set; }
-        public byte Max_Level { get; private set; }
-        public Items.Unlock Unlock_Item { get; private set; }
 
-        public Class(byte id, string name, string description, byte tier, string texture_path, byte id_prereq, PowerScaling power_scaling, float[] attribute_growth, bool gives_allocation_attributes, Items.Unlock unlock_item, byte max_level_override=0) {
-            ID = id;
-            Name = name;
-            Description = description;
-            Tier = tier;
-            Texture_Path = texture_path;
-            Prereq = CLASS_LOOKUP[id_prereq];
-            Power_Scaling = power_scaling;
-            Attribute_Growth = attribute_growth;
-            Gives_Allocation_Attributes = gives_allocation_attributes;
-            Unlock_Item = unlock_item;
+        public byte ID { get; protected set; }
+        public string Name { get; protected set; }
+        public string Description { get; protected set; }
+        public byte Tier { get; protected set; }
+        public Texture2D Texture { get; protected set; }
+        public Class Prereq { get; protected set; }
+        public PowerScaling Power_Scaling { get; protected set; }
+        public float[] Attribute_Growth { get; protected set; }
+        public bool Gives_Allocation_Attributes { get; protected set; }
+        public byte Max_Level { get; protected set; }
+        public Items.Unlock Unlock_Item { get; protected set; }
 
-            if (max_level_override > 0) {
-                Max_Level = max_level_override;
-            }
-            else {
-                Max_Level = MAX_LEVEL[Tier];
+        public Class(CLASS_IDS id = CLASS_IDS.New) {
+            //defaults
+            ID = (byte)id;
+            Name = "Undefined_Name";
+            Description = "Undefined_Desc";
+            Tier = 0;
+            Prereq = null;
+            Power_Scaling = PowerScaling.POWER_SCALING_LOOKUP[(byte)PowerScaling.POWER_SCALING_TYPES.None];
+            Gives_Allocation_Attributes = false;
+            Max_Level = 0;
+            Unlock_Item = null;
+
+            Attribute_Growth = new float[(byte)Attribute.ATTRIBUTE_IDS.NUMBER_OF_IDs];
+            for (byte i = 0; i < Attribute_Growth.Length; i++) {
+                Attribute_Growth[i] = 1f;
             }
         }
 
         public void LoadTexture() {
-            Texture = ModLoader.GetTexture(Texture_Path);
+            try {
+                Texture = ModLoader.GetTexture("ExperienceAndClasses/Textures/Class/" + Name);
+            }
+            catch {
+                //no texture loaded, set blank to prevent crash
+                Texture = Textures.TEXTURE_BLANK;
+            }
         }
+
+        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Subtypes ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+        public abstract class RealClass : Class {
+            public RealClass(CLASS_IDS id, PowerScaling.POWER_SCALING_TYPES power_scaling) : base(id) {
+                Gives_Allocation_Attributes = true;
+                Power_Scaling = PowerScaling.POWER_SCALING_LOOKUP[(byte)power_scaling];
+            }
+        }
+
+        public abstract class Tier1 : RealClass {
+            public Tier1(CLASS_IDS id, PowerScaling.POWER_SCALING_TYPES power_scaling) : base(id, power_scaling) {
+                Tier = 1;
+                Max_Level = TIER_MAX_LEVELS[Tier];
+            }
+        }
+
+        public abstract class Tier2 : RealClass {
+            public Tier2(CLASS_IDS id, PowerScaling.POWER_SCALING_TYPES power_scaling) : base(id, power_scaling) {
+                Tier = 2;
+                Unlock_Item = ExperienceAndClasses.MOD.GetItem<Items.Unlock_Tier2>();
+                Max_Level = TIER_MAX_LEVELS[Tier];
+                Prereq = CLASS_LOOKUP[(byte)CLASS_IDS.Novice];
+            }
+        }
+
+        public abstract class Tier3 : RealClass {
+            public Tier3(CLASS_IDS id, PowerScaling.POWER_SCALING_TYPES power_scaling, CLASS_IDS prereq) : base(id, power_scaling) {
+                Tier = 3;
+                Unlock_Item = ExperienceAndClasses.MOD.GetItem<Items.Unlock_Tier3>();
+                Max_Level = TIER_MAX_LEVELS[Tier];
+                Prereq = CLASS_LOOKUP[(byte)prereq];
+            }
+        }
+
+        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Special Classes ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+        public class New : Class {
+            public New() : base(CLASS_IDS.New) {
+            }
+        }
+
+        public class None : Class {
+            public None() : base(CLASS_IDS.None) {
+                Name = "None";
+                Description = "";
+            }
+        }
+
+        public class Explorer : Tier2 {
+            public Explorer() : base(CLASS_IDS.Explorer, PowerScaling.POWER_SCALING_TYPES.Tool) {
+                Name = "Explorer";
+                Description = "TODO_desc";
+                Max_Level = 100;
+                Unlock_Item = ExperienceAndClasses.MOD.GetItem<Items.Unlock_Explorer>();
+                Class_Locations[0, 6] = ID;
+                Attribute_Growth[(byte)Attribute.ATTRIBUTE_IDS.Power] = 2f;
+                Attribute_Growth[(byte)Attribute.ATTRIBUTE_IDS.Vitality] = 2f;
+                Attribute_Growth[(byte)Attribute.ATTRIBUTE_IDS.Mind] = 2f;
+                Attribute_Growth[(byte)Attribute.ATTRIBUTE_IDS.Spirit] = 2f;
+                Attribute_Growth[(byte)Attribute.ATTRIBUTE_IDS.Agility] = 2f;
+                Attribute_Growth[(byte)Attribute.ATTRIBUTE_IDS.Dexterity] = 2f;
+            }
+        }
+
+        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Tier 1 Classes ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+        public class Novice : Tier1 {
+            public Novice() : base(CLASS_IDS.Novice, PowerScaling.POWER_SCALING_TYPES.All) {
+                Name = "Novice";
+                Description = "TODO_desc";
+                Class_Locations[0, 3] = ID;
+            }
+        }
+
+        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Tier 2 Classes ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+        public class Warrior : Tier2 {
+            public Warrior() : base(CLASS_IDS.Warrior, PowerScaling.POWER_SCALING_TYPES.Melee) {
+                Name = "Warrior";
+                Description = "TODO_desc";
+                Class_Locations[1, 0] = ID;
+                Attribute_Growth[(byte)Attribute.ATTRIBUTE_IDS.Power] = 2;
+                Attribute_Growth[(byte)Attribute.ATTRIBUTE_IDS.Vitality] = 3;
+                Attribute_Growth[(byte)Attribute.ATTRIBUTE_IDS.Dexterity] = 2;
+            }
+        }
+
+        public class Ranger : Tier2 {
+            public Ranger() : base(CLASS_IDS.Ranger, PowerScaling.POWER_SCALING_TYPES.Ranged) {
+                Name = "Ranger";
+                Description = "TODO_desc";
+                Class_Locations[1, 1] = ID;
+                Attribute_Growth[(byte)Attribute.ATTRIBUTE_IDS.Power] = 3;
+                Attribute_Growth[(byte)Attribute.ATTRIBUTE_IDS.Spirit] = 2;
+                Attribute_Growth[(byte)Attribute.ATTRIBUTE_IDS.Dexterity] = 2;
+            }
+        }
+
+        public class Mage : Tier2 {
+            public Mage() : base(CLASS_IDS.Mage, PowerScaling.POWER_SCALING_TYPES.Magic) {
+                Name = "Mage";
+                Description = "TODO_desc";
+                Class_Locations[1, 2] = ID;
+                Attribute_Growth[(byte)Attribute.ATTRIBUTE_IDS.Power] = 3;
+                Attribute_Growth[(byte)Attribute.ATTRIBUTE_IDS.Mind] = 3;
+            }
+        }
+
+        public class Rogue : Tier2 {
+            public Rogue() : base(CLASS_IDS.Rogue, PowerScaling.POWER_SCALING_TYPES.Rogue) {
+                Name = "Rogue";
+                Description = "TODO_desc";
+                Class_Locations[1, 3] = ID;
+                Attribute_Growth[(byte)Attribute.ATTRIBUTE_IDS.Spirit] = 3;
+                Attribute_Growth[(byte)Attribute.ATTRIBUTE_IDS.Agility] = 3;
+            }
+        }
+
+        public class Summoner : Tier2 {
+            public Summoner() : base(CLASS_IDS.Summoner, PowerScaling.POWER_SCALING_TYPES.Minion) {
+                Name = "Summoner";
+                Description = "TODO_desc";
+                Class_Locations[1, 4] = ID;
+                Attribute_Growth[(byte)Attribute.ATTRIBUTE_IDS.Power] = 3;
+                Attribute_Growth[(byte)Attribute.ATTRIBUTE_IDS.Spirit] = 3;
+            }
+        }
+
+        public class Cleric : Tier2 {
+            public Cleric() : base(CLASS_IDS.Cleric, PowerScaling.POWER_SCALING_TYPES.All) {
+                Name = "Cleric";
+                Description = "TODO_desc";
+                Class_Locations[1, 5] = ID;
+                Attribute_Growth[(byte)Attribute.ATTRIBUTE_IDS.Mind] = 3;
+                Attribute_Growth[(byte)Attribute.ATTRIBUTE_IDS.Spirit] = 3;
+            }
+        }
+
+        public class Hybrid : Tier2 {
+            public Hybrid() : base(CLASS_IDS.Hybrid, PowerScaling.POWER_SCALING_TYPES.All) {
+                Name = "Hybrid";
+                Description = "TODO_desc";
+                Class_Locations[1, 6] = ID;
+                Attribute_Growth[(byte)Attribute.ATTRIBUTE_IDS.Power] = 2;
+                Attribute_Growth[(byte)Attribute.ATTRIBUTE_IDS.Vitality] = 2;
+                Attribute_Growth[(byte)Attribute.ATTRIBUTE_IDS.Mind] = 2;
+                Attribute_Growth[(byte)Attribute.ATTRIBUTE_IDS.Spirit] = 2;
+                Attribute_Growth[(byte)Attribute.ATTRIBUTE_IDS.Agility] = 2;
+                Attribute_Growth[(byte)Attribute.ATTRIBUTE_IDS.Dexterity] = 2;
+            }
+        }
+
+        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Tier 3 Classes ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+        public class Unnamed1 : Tier3 {
+            public Unnamed1() : base(CLASS_IDS.Unnamed1, PowerScaling.POWER_SCALING_TYPES.Melee, CLASS_IDS.Warrior) {
+                Name = "Unnamed1";
+                Description = "TODO_desc";
+                Class_Locations[2, 0] = ID;
+                Attribute_Growth[(byte)Attribute.ATTRIBUTE_IDS.Power] = 5;
+                Attribute_Growth[(byte)Attribute.ATTRIBUTE_IDS.Vitality] = 3;
+            }
+        }
+
+        public class Berserker : Tier3 {
+            public Berserker() : base(CLASS_IDS.Berserker, PowerScaling.POWER_SCALING_TYPES.Melee, CLASS_IDS.Warrior) {
+                Name = "Berserker";
+                Description = "TODO_desc";
+                Class_Locations[3, 0] = ID;
+                Attribute_Growth[(byte)Attribute.ATTRIBUTE_IDS.Power] = 2;
+                Attribute_Growth[(byte)Attribute.ATTRIBUTE_IDS.Vitality] = 2;
+                Attribute_Growth[(byte)Attribute.ATTRIBUTE_IDS.Agility] = 2;
+                Attribute_Growth[(byte)Attribute.ATTRIBUTE_IDS.Dexterity] = 4;
+            }
+        }
+
+        public class Guardian : Tier3 {
+            public Guardian() : base(CLASS_IDS.Guardian, PowerScaling.POWER_SCALING_TYPES.Melee, CLASS_IDS.Warrior) {
+                Name = "Guardian";
+                Description = "TODO_desc";
+                Class_Locations[4, 0] = ID;
+                Attribute_Growth[(byte)Attribute.ATTRIBUTE_IDS.Power] = 3;
+                Attribute_Growth[(byte)Attribute.ATTRIBUTE_IDS.Vitality] = 5;
+            }
+        }
+
+        public class Sniper : Tier3 {
+            public Sniper() : base(CLASS_IDS.Sniper, PowerScaling.POWER_SCALING_TYPES.Ranged, CLASS_IDS.Ranger) {
+                Name = "Sniper";
+                Description = "TODO_desc";
+                Class_Locations[2, 1] = ID;
+                Attribute_Growth[(byte)Attribute.ATTRIBUTE_IDS.Power] = 4;
+                Attribute_Growth[(byte)Attribute.ATTRIBUTE_IDS.Spirit] = 4;
+            }
+        }
+
+        public class Engineer : Tier3 {
+            public Engineer() : base(CLASS_IDS.Engineer, PowerScaling.POWER_SCALING_TYPES.Ranged, CLASS_IDS.Ranger) {
+                Name = "Engineer";
+                Description = "TODO_desc";
+                Class_Locations[3, 1] = ID;
+                Attribute_Growth[(byte)Attribute.ATTRIBUTE_IDS.Power] = 3;
+                Attribute_Growth[(byte)Attribute.ATTRIBUTE_IDS.Vitality] = 3;
+                Attribute_Growth[(byte)Attribute.ATTRIBUTE_IDS.Spirit] = 2;
+                Attribute_Growth[(byte)Attribute.ATTRIBUTE_IDS.Dexterity] = 2;
+            }
+        }
+
+        public class Elementalist : Tier3 {
+            public Elementalist() : base(CLASS_IDS.Elementalist, PowerScaling.POWER_SCALING_TYPES.Magic, CLASS_IDS.Mage) {
+                Name = "Elementalist";
+                Description = "TODO_desc";
+                Class_Locations[2, 2] = ID;
+                Attribute_Growth[(byte)Attribute.ATTRIBUTE_IDS.Power] = 5;
+                Attribute_Growth[(byte)Attribute.ATTRIBUTE_IDS.Mind] = 3;
+            }
+        }
+
+        public class Sage : Tier3 {
+            public Sage() : base(CLASS_IDS.Sage, PowerScaling.POWER_SCALING_TYPES.Magic, CLASS_IDS.Mage) {
+                Name = "Sage";
+                Description = "TODO_desc";
+                Class_Locations[3, 2] = ID;
+                Attribute_Growth[(byte)Attribute.ATTRIBUTE_IDS.Power] = 3;
+                Attribute_Growth[(byte)Attribute.ATTRIBUTE_IDS.Vitality] = 2;
+                Attribute_Growth[(byte)Attribute.ATTRIBUTE_IDS.Mind] = 4;
+            }
+        }
+
+        public class Assassin : Tier3 {
+            public Assassin() : base(CLASS_IDS.Assassin, PowerScaling.POWER_SCALING_TYPES.Rogue, CLASS_IDS.Rogue) {
+                Name = "Assassin";
+                Description = "TODO_desc";
+                Class_Locations[2, 3] = ID;
+                Attribute_Growth[(byte)Attribute.ATTRIBUTE_IDS.Power] = 2;
+                Attribute_Growth[(byte)Attribute.ATTRIBUTE_IDS.Spirit] = 4;
+                Attribute_Growth[(byte)Attribute.ATTRIBUTE_IDS.Agility] = 3;
+            }
+        }
+
+        public class Unnamed2 : Tier3 {
+            public Unnamed2() : base(CLASS_IDS.Unnamed2, PowerScaling.POWER_SCALING_TYPES.Rogue, CLASS_IDS.Rogue) {
+                Name = "Unnamed2";
+                Description = "TODO_desc";
+                Class_Locations[3, 3] = ID;
+                Attribute_Growth[(byte)Attribute.ATTRIBUTE_IDS.Power] = 2;
+                Attribute_Growth[(byte)Attribute.ATTRIBUTE_IDS.Spirit] = 2;
+                Attribute_Growth[(byte)Attribute.ATTRIBUTE_IDS.Dexterity] = 5;
+            }
+        }
+
+        public class Ninja : Tier3 {
+            public Ninja() : base(CLASS_IDS.Ninja, PowerScaling.POWER_SCALING_TYPES.Throwing, CLASS_IDS.Rogue) {
+                Name = "Ninja";
+                Description = "TODO_desc";
+                Class_Locations[4, 3] = ID;
+                Attribute_Growth[(byte)Attribute.ATTRIBUTE_IDS.Power] = 3;
+                Attribute_Growth[(byte)Attribute.ATTRIBUTE_IDS.Spirit] = 3;
+                Attribute_Growth[(byte)Attribute.ATTRIBUTE_IDS.Agility] = 3;
+            }
+        }
+
+        public class SoulBinder : Tier3 {
+            public SoulBinder() : base(CLASS_IDS.SoulBinder, PowerScaling.POWER_SCALING_TYPES.Minion, CLASS_IDS.Summoner) {
+                Name = "Soul Binder";
+                Description = "TODO_desc";
+                Class_Locations[2, 4] = ID;
+                Attribute_Growth[(byte)Attribute.ATTRIBUTE_IDS.Power] = 5;
+                Attribute_Growth[(byte)Attribute.ATTRIBUTE_IDS.Mind] = 2;
+                Attribute_Growth[(byte)Attribute.ATTRIBUTE_IDS.Spirit] = 2;
+            }
+        }
+
+        public class Hivemind : Tier3 {
+            public Hivemind() : base(CLASS_IDS.Hivemind, PowerScaling.POWER_SCALING_TYPES.Minion, CLASS_IDS.Summoner) {
+                Name = "Hivemind";
+                Description = "TODO_desc";
+                Class_Locations[3, 4] = ID;
+                Attribute_Growth[(byte)Attribute.ATTRIBUTE_IDS.Power] = 3;
+                Attribute_Growth[(byte)Attribute.ATTRIBUTE_IDS.Mind] = 2;
+                Attribute_Growth[(byte)Attribute.ATTRIBUTE_IDS.Spirit] = 4;
+            }
+        }
+
+        public class Saint : Tier3 {
+            public Saint() : base(CLASS_IDS.Saint, PowerScaling.POWER_SCALING_TYPES.All, CLASS_IDS.Cleric) {
+                Name = "Saint";
+                Description = "TODO_desc";
+                Class_Locations[2, 5] = ID;
+                Attribute_Growth[(byte)Attribute.ATTRIBUTE_IDS.Mind] = 3;
+                Attribute_Growth[(byte)Attribute.ATTRIBUTE_IDS.Spirit] = 5;
+            }
+        }
+
+        public class HybridPrime : Tier3 {
+            public HybridPrime() : base(CLASS_IDS.HybridPrime, PowerScaling.POWER_SCALING_TYPES.All, CLASS_IDS.Hybrid) {
+                Name = "Hybrid Prime";
+                Description = "TODO_desc";
+                Class_Locations[2, 6] = ID;
+                Attribute_Growth[(byte)Attribute.ATTRIBUTE_IDS.Power] = 2.5f;
+                Attribute_Growth[(byte)Attribute.ATTRIBUTE_IDS.Vitality] = 2.5f;
+                Attribute_Growth[(byte)Attribute.ATTRIBUTE_IDS.Mind] = 2.5f;
+                Attribute_Growth[(byte)Attribute.ATTRIBUTE_IDS.Spirit] = 2.5f;
+                Attribute_Growth[(byte)Attribute.ATTRIBUTE_IDS.Agility] = 2.5f;
+                Attribute_Growth[(byte)Attribute.ATTRIBUTE_IDS.Dexterity] = 2.5f;
+            }
+        }
+
     }
 }
