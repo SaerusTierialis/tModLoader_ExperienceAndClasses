@@ -133,7 +133,7 @@ namespace ExperienceAndClasses {
                 time_next_full_sync = DateTime.Now.AddTicks(TICKS_PER_FULL_SYNC);
 
                 //grab UI-state combos to display
-                ExperienceAndClasses.UIs = new UI.UIStateCombo[] { UI.UIStatus.Instance, UI.UIAbility.Instance, UI.UIClass.Instance, UI.UIInfo.Instance };
+                ExperienceAndClasses.UIs = new UI.UIStateCombo[] { UI.UIStatus.Instance, UI.UIAbility.Instance, UI.UIMain.Instance, UI.UIInfo.Instance };
 
                 //(re)initialize ui
                 foreach (UI.UIStateCombo ui in ExperienceAndClasses.UIs) {
@@ -141,8 +141,8 @@ namespace ExperienceAndClasses {
                 }
 
                 //apply saved ui settings
-                UI.UIClass.Instance.panel.SetPosition(Commons.TryGet<float>(load_tag, "eac_ui_class_left", 300f), Commons.TryGet<float>(load_tag, "eac_ui_class_top", 300f));
-                UI.UIClass.Instance.panel.Auto =Commons.TryGet<bool>(load_tag, "eac_ui_class_auto", true);
+                UI.UIMain.Instance.panel.SetPosition(Commons.TryGet<float>(load_tag, "eac_ui_class_left", 300f), Commons.TryGet<float>(load_tag, "eac_ui_class_top", 300f));
+                UI.UIMain.Instance.panel.Auto =Commons.TryGet<bool>(load_tag, "eac_ui_class_auto", true);
 
                 UI.UIAbility.Instance.panel.SetPosition(Commons.TryGet<float>(load_tag, "eac_ui_bars_left", 480f), Commons.TryGet<float>(load_tag, "eac_ui_bars_top", 10f));
                 UI.UIAbility.Instance.panel.Auto = Commons.TryGet<bool>(load_tag, "eac_ui_bars_auto", true);
@@ -532,7 +532,7 @@ namespace ExperienceAndClasses {
             LocalCalculateFinalAttributes();
 
             //update UI
-            UI.UIClass.Instance.UpdateClassInfo();
+            UI.UIMain.Instance.UpdateClassInfo();
             UI.UIAbility.Instance.Update();
 
             //update class features
@@ -709,7 +709,7 @@ namespace ExperienceAndClasses {
 
         public override void ProcessTriggers(TriggersSet triggersSet) {
             if (ExperienceAndClasses.HOTKEY_UI.JustPressed) {
-                UI.UIClass.Instance.Visibility = !UI.UIClass.Instance.Visibility;
+                UI.UIMain.Instance.Visibility = !UI.UIMain.Instance.Visibility;
             }
         }
 
@@ -955,9 +955,9 @@ namespace ExperienceAndClasses {
 
             return new TagCompound {
                 {"eac_version", version_array },
-                {"eac_ui_class_left", UI.UIClass.Instance.panel.GetLeft() },
-                {"eac_ui_class_top", UI.UIClass.Instance.panel.GetTop() },
-                {"eac_ui_class_auto", UI.UIClass.Instance.panel.Auto },
+                {"eac_ui_class_left", UI.UIMain.Instance.panel.GetLeft() },
+                {"eac_ui_class_top", UI.UIMain.Instance.panel.GetTop() },
+                {"eac_ui_class_auto", UI.UIMain.Instance.panel.Auto },
                 {"eac_ui_bars_left", UI.UIAbility.Instance.panel.GetLeft() },
                 {"eac_ui_bars_top", UI.UIAbility.Instance.panel.GetTop() },
                 {"eac_ui_bars_auto", UI.UIAbility.Instance.panel.Auto },

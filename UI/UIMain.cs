@@ -8,9 +8,9 @@ namespace ExperienceAndClasses.UI {
 
     //UI for class selection, attributes, and ability info
 
-    public class UIClass : UIStateCombo {
+    public class UIMain : UIStateCombo {
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Singleton ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-        public static readonly UIClass Instance = new UIClass();
+        public static readonly UIMain Instance = new UIMain();
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Constants ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         private const float CLASS_BUTTON_SIZE = 36f;
