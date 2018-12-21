@@ -14,8 +14,8 @@ namespace ExperienceAndClasses.UI {
         public const float BUFF_HORIZONTAL_SPACING = 6f;
         public const float BUFF_VERTICAL_SPACING = 20f;
 
-        private const byte COLUMNS = 11;
-        private const byte ROWS = 5; //max number of statuses displayed is (ROWS-2)*COLUMNS
+        private const byte COLUMNS = 11; //don't change this
+        private const byte ROWS = 5; //max number of statuses displayed is ((ROWS*COLUMNS) - #buffs)
         private const byte SLOTS = ROWS * COLUMNS;
 
         private const float LEFT = 32;
