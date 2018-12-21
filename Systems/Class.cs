@@ -158,7 +158,7 @@ namespace ExperienceAndClasses.Systems {
             public Explorer() : base(CLASS_IDS.Explorer, PowerScaling.POWER_SCALING_TYPES.Tool) {
                 Name = "Explorer";
                 Description = "TODO_desc";
-                Max_Level = 100;
+                Max_Level = TIER_MAX_LEVELS[3]; //tier 2 class with tier 3 level cap
                 Unlock_Item = ExperienceAndClasses.MOD.GetItem<Items.Unlock_Explorer>();
                 Class_Locations[0, 6] = ID;
                 Attribute_Growth[(byte)Attribute.ATTRIBUTE_IDS.Power] = 2f;
