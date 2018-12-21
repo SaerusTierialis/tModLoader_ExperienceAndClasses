@@ -10,16 +10,16 @@ namespace ExperienceAndClasses.UI {
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Constants ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-        public const float BUFF_SIZE = 32f;
-        public const float BUFF_HORIZONTAL_SPACING = 6f;
-        public const float BUFF_VERTICAL_SPACING = 20f;
-
+        //Terraria buff positions
+        private const float LEFT = 32; //don't change this
+        private const float TOP = 76; //don't change this
+        public const float BUFF_SIZE = 32f; //don't change this
+        public const float BUFF_HORIZONTAL_SPACING = 6f; //don't change this
+        public const float BUFF_VERTICAL_SPACING = 20f; //don't change this
         private const byte COLUMNS = 11; //don't change this
+
         private const byte ROWS = 5; //max number of statuses displayed is ((ROWS*COLUMNS) - #buffs)
         private const byte SLOTS = ROWS * COLUMNS;
-
-        private const float LEFT = 32;
-        private const float TOP = 76;
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Variables ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         private StatusIcon[] icons;
