@@ -31,7 +31,7 @@ namespace ExperienceAndClasses.Systems {
             Elementalist,
             Sage,
             Assassin,
-            Unnamed2,
+            Chrono,
             Ninja,
             Hivemind,
             SoulBinder,
@@ -345,9 +345,9 @@ namespace ExperienceAndClasses.Systems {
             }
         }
 
-        public class Unnamed2 : Tier3 {
-            public Unnamed2() : base(CLASS_IDS.Unnamed2, PowerScaling.POWER_SCALING_TYPES.Rogue, CLASS_IDS.Rogue) {
-                Name = "Unnamed2";
+        public class Chrono : Tier3 {
+            public Chrono() : base(CLASS_IDS.Chrono, PowerScaling.POWER_SCALING_TYPES.Rogue, CLASS_IDS.Rogue) {
+                Name = "Chrono";
                 Description = "TODO_desc";
                 Class_Locations[3, 3] = ID;
                 Attribute_Growth[(byte)Attribute.ATTRIBUTE_IDS.Power] = 2;
