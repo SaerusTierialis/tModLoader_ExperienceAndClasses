@@ -133,7 +133,7 @@ namespace ExperienceAndClasses {
                 time_next_full_sync = DateTime.Now.AddTicks(TICKS_PER_FULL_SYNC);
 
                 //grab UI-state combos to display
-                ExperienceAndClasses.UIs = new UI.UIStateCombo[] { UI.UIStatus.Instance, UI.UIBars.Instance, UI.UIClass.Instance, UI.UIInfo.Instance };
+                ExperienceAndClasses.UIs = new UI.UIStateCombo[] { UI.UIStatus.Instance, UI.UIAbility.Instance, UI.UIClass.Instance, UI.UIInfo.Instance };
 
                 //(re)initialize ui
                 foreach (UI.UIStateCombo ui in ExperienceAndClasses.UIs) {
@@ -144,11 +144,11 @@ namespace ExperienceAndClasses {
                 UI.UIClass.Instance.panel.SetPosition(Commons.TryGet<float>(load_tag, "eac_ui_class_left", 300f), Commons.TryGet<float>(load_tag, "eac_ui_class_top", 300f));
                 UI.UIClass.Instance.panel.Auto =Commons.TryGet<bool>(load_tag, "eac_ui_class_auto", true);
 
-                UI.UIBars.Instance.panel.SetPosition(Commons.TryGet<float>(load_tag, "eac_ui_bars_left", 480f), Commons.TryGet<float>(load_tag, "eac_ui_bars_top", 10f));
-                UI.UIBars.Instance.panel.Auto = Commons.TryGet<bool>(load_tag, "eac_ui_bars_auto", true);
+                UI.UIAbility.Instance.panel.SetPosition(Commons.TryGet<float>(load_tag, "eac_ui_bars_left", 480f), Commons.TryGet<float>(load_tag, "eac_ui_bars_top", 10f));
+                UI.UIAbility.Instance.panel.Auto = Commons.TryGet<bool>(load_tag, "eac_ui_bars_auto", true);
 
                 //temp: show bars and status
-                UI.UIBars.Instance.Visibility = true;
+                UI.UIAbility.Instance.Visibility = true;
                 UI.UIStatus.Instance.Visibility = true;
 
                 //apply ui auto
@@ -533,7 +533,7 @@ namespace ExperienceAndClasses {
 
             //update UI
             UI.UIClass.Instance.UpdateClassInfo();
-            UI.UIBars.Instance.Update();
+            UI.UIAbility.Instance.Update();
 
             //update class features
             UpdateClassInfo();
@@ -645,7 +645,7 @@ namespace ExperienceAndClasses {
             }
             else {
                 //otherwise just update xp bars
-                UI.UIBars.Instance.Update();
+                UI.UIAbility.Instance.Update();
             }
         }
 
@@ -958,9 +958,9 @@ namespace ExperienceAndClasses {
                 {"eac_ui_class_left", UI.UIClass.Instance.panel.GetLeft() },
                 {"eac_ui_class_top", UI.UIClass.Instance.panel.GetTop() },
                 {"eac_ui_class_auto", UI.UIClass.Instance.panel.Auto },
-                {"eac_ui_bars_left", UI.UIBars.Instance.panel.GetLeft() },
-                {"eac_ui_bars_top", UI.UIBars.Instance.panel.GetTop() },
-                {"eac_ui_bars_auto", UI.UIBars.Instance.panel.Auto },
+                {"eac_ui_bars_left", UI.UIAbility.Instance.panel.GetLeft() },
+                {"eac_ui_bars_top", UI.UIAbility.Instance.panel.GetTop() },
+                {"eac_ui_bars_auto", UI.UIAbility.Instance.panel.Auto },
                 {"eac_class_unlock", class_unlocked },
                 {"eac_class_xp", class_xp },
                 {"eac_class_level", class_level },

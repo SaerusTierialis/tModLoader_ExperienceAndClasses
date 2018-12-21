@@ -78,7 +78,7 @@ namespace ExperienceAndClasses {
         public static void SetUIAutoStates() {
             inventory_state = Main.playerInventory;
             if (UI.UIClass.Instance.panel.Auto) UI.UIClass.Instance.Visibility = inventory_state;
-            if (UI.UIBars.Instance.panel.Auto) UI.UIBars.Instance.Visibility = !inventory_state;
+            if (UI.UIAbility.Instance.panel.Auto) UI.UIAbility.Instance.Visibility = !inventory_state;
             UI.UIStatus.Instance.Visibility = !inventory_state;
         }
 
