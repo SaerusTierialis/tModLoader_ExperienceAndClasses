@@ -78,7 +78,7 @@ namespace ExperienceAndClasses.Systems {
         public byte Max_Level { get; protected set; }
         public Items.Unlock Unlock_Item { get; protected set; }
 
-        public Class(CLASS_IDS id = CLASS_IDS.New) {
+        public Class(CLASS_IDS id) {
             //defaults
             ID = (byte)id;
             Name = "Undefined_Name";
