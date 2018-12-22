@@ -1,5 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System;
+using System.Reflection;
 using Terraria;
 using Terraria.ModLoader;
 
@@ -22,6 +24,8 @@ namespace ExperienceAndClasses {
         public static float TEXTURE_LOCK_WIDTH { get; private set; }
         public static float TEXTURE_LOCK_HEIGHT { get; private set; }
 
+       public static Texture2D TEXTURE_STATUS_DEFAULT { get; private set; }
+
         /// <summary>
         /// (Re)Load all textures
         /// Autoload does not seem to work if loading is done in static variable declarations or in static constructors (because these are not recreated on reload)
@@ -43,9 +47,16 @@ namespace ExperienceAndClasses {
             TEXTURE_LOCK_WIDTH = TEXTURE_LOCK_BROWN.Width;
             TEXTURE_LOCK_HEIGHT = TEXTURE_LOCK_BROWN.Height;
 
+            TEXTURE_STATUS_DEFAULT = ModLoader.GetTexture("ExperienceAndClasses/Textures/Status/Default");
+
             foreach (Systems.Class c in Systems.Class.CLASS_LOOKUP) {
                 c.LoadTexture();
             }
+
+            foreach (Systems.Status s in Systems.Status.LOOKUP) {
+                s.LoadTexture();
+            }
+
         }
 
     }
