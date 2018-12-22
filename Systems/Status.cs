@@ -11,13 +11,15 @@ namespace ExperienceAndClasses.Systems {
     public abstract class Status {
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ IDs (order does not matter) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-        public enum STATUS_ID : uint {
+        public enum IDs : uint {
             Heal,
 
             //insert here
 
             NUMBER_OF_IDs, //leave this last
         }
+
+
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Treated like readonly ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -26,8 +28,8 @@ namespace ExperienceAndClasses.Systems {
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Auto-Populate Lookup ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         static Status() {
-            LOOKUP = new Status[(uint)STATUS_ID.NUMBER_OF_IDs];
-            string[] IDs = Enum.GetNames(typeof(STATUS_ID));
+            LOOKUP = new Status[(uint)Status.IDs.NUMBER_OF_IDs];
+            string[] IDs = Enum.GetNames(typeof(IDs));
             for (byte i = 0; i < LOOKUP.Length; i++) {
                 LOOKUP[i] = (Status)(Assembly.GetExecutingAssembly().CreateInstance(typeof(Status).FullName + "+" + IDs[i]));
             }
@@ -39,7 +41,7 @@ namespace ExperienceAndClasses.Systems {
         public Texture2D Texture { get; protected set; }
         private string texture_path;
 
-        public Status(STATUS_ID id) {
+        public Status(IDs id) {
             ID = (uint)id;
         }
 
@@ -55,7 +57,7 @@ namespace ExperienceAndClasses.Systems {
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Statuses ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         public class Heal : Status {
-            public Heal() : base(STATUS_ID.Heal) {
+            public Heal() : base(IDs.Heal) {
                 texture_path = "ExperienceAndClasses/Textures/Status/Heal";
             }
         }
