@@ -242,7 +242,7 @@ namespace ExperienceAndClasses.UI {
                     attribute_names += "\n";
                     attribute_growth += "\n";
                 }
-                attribute_names += Systems.Attribute.ATTRIBUTE_LOOKUP[id].Name + ":";
+                attribute_names += Systems.Attribute.LOOKUP[id].Name + ":";
 
                 for (byte i = 0; i < 5; i++) {
                     if (c.Attribute_Growth[id] >= (i + 1)) {

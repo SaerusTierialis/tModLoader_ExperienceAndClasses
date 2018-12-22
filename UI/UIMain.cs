@@ -97,8 +97,8 @@ namespace ExperienceAndClasses.UI {
                 for (byte col = 0; col < Systems.Class.Class_Locations.GetLength(1); col++) {
                     id = Systems.Class.Class_Locations[row, col];
 
-                    if (id != (byte)Systems.Class.CLASS_IDS.New) {
-                        button = new ClassButton(Systems.Class.CLASS_LOOKUP[id]);
+                    if (id != (byte)Systems.Class.IDs.New) {
+                        button = new ClassButton(Systems.Class.LOOKUP[id]);
                         button.Left.Set((Constants.UI_PADDING * 2) + (col * (CLASS_BUTTON_SIZE + CLASS_COL_PADDING)), 0f);
                         button.Top.Set(panel_class.top_space + (Constants.UI_PADDING * 2) + (row * (CLASS_BUTTON_SIZE + CLASS_ROW_PADDING)), 0f);
                         button.Width.Set(CLASS_BUTTON_SIZE, 0f);
@@ -122,8 +122,8 @@ namespace ExperienceAndClasses.UI {
             float top = panel_attribute.top_space + Constants.UI_PADDING;
             AttributeText attribute_text;
             attribute_texts = new List<AttributeText>();
-            foreach (Systems.Attribute.ATTRIBUTE_IDS attribute_id in Systems.Attribute.ATTRIBUTES_UI_ORDER) {
-                attribute_text = new AttributeText(WIDTH_ATTRIBUTES - (Constants.UI_PADDING * 2), HEIGHT_ATTRIBUTE, FONT_SCALE_ATTRIBUTE, Systems.Attribute.ATTRIBUTE_LOOKUP[(byte)attribute_id]);
+            foreach (Systems.Attribute.IDs attribute_id in Systems.Attribute.ATTRIBUTES_UI_ORDER) {
+                attribute_text = new AttributeText(WIDTH_ATTRIBUTES - (Constants.UI_PADDING * 2), HEIGHT_ATTRIBUTE, FONT_SCALE_ATTRIBUTE, Systems.Attribute.LOOKUP[(byte)attribute_id]);
                 attribute_text.Left.Set(Constants.UI_PADDING, 0f);
                 attribute_text.Top.Set(top, 0f);
                 top += HEIGHT_ATTRIBUTE;

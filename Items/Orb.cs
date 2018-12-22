@@ -40,7 +40,7 @@ namespace ExperienceAndClasses.Items {
             uint value;
             bool can_use = false;
 
-            if (ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary.ID != (byte)Systems.Class.CLASS_IDS.None) {
+            if (ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary.ID != (byte)Systems.Class.IDs.None) {
                 str += ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary.Name;
                 value = GetPrimaryValue();
                 if (value > 0) {
@@ -52,7 +52,7 @@ namespace ExperienceAndClasses.Items {
                 }
             }
 
-            if (ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary.ID != (byte)Systems.Class.CLASS_IDS.None) {
+            if (ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary.ID != (byte)Systems.Class.IDs.None) {
                 if (str.Length > 0) {
                     str += "\n";
                 }

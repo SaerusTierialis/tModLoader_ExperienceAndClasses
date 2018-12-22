@@ -11,7 +11,7 @@ namespace ExperienceAndClasses.Systems {
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Constants (and readonly) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         //DO NOT CHANGE THE ORDER OF IDs
-        public enum ATTRIBUTE_IDS : byte {
+        public enum IDs : byte {
             Power,
             Vitality,
             Mind,
@@ -25,7 +25,7 @@ namespace ExperienceAndClasses.Systems {
         }
 
         //this may be reordered, UI uses this order
-        public static ATTRIBUTE_IDS[] ATTRIBUTES_UI_ORDER = new ATTRIBUTE_IDS[] { ATTRIBUTE_IDS.Power, ATTRIBUTE_IDS.Vitality, ATTRIBUTE_IDS.Mind, ATTRIBUTE_IDS.Spirit, ATTRIBUTE_IDS.Agility, ATTRIBUTE_IDS.Dexterity };
+        public static IDs[] ATTRIBUTES_UI_ORDER = new IDs[] { IDs.Power, IDs.Vitality, IDs.Mind, IDs.Spirit, IDs.Agility, IDs.Dexterity };
 
         public const float SUBCLASS_PENALTY_ATTRIBUTE_MULTIPLIER_PRIMARY = 0.8f;
         public const float SUBCLASS_PENALTY_ATTRIBUTE_MULTIPLIER_SECONDARY = 0.6f;
@@ -37,7 +37,7 @@ namespace ExperienceAndClasses.Systems {
         public static readonly int[] ALLOCATION_POINTS_PER_LEVEL_TIERS = new int[] { 0, 1, 2, 3 };
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Treated like readonly ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-        public static Attribute[] ATTRIBUTE_LOOKUP { get; private set; }
+        public static Attribute[] LOOKUP { get; private set; }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Methods ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -71,8 +71,8 @@ namespace ExperienceAndClasses.Systems {
             int sum = 0;
 
             for (byte i = 0; i< mplayer.Class_Levels.Length; i++) {
-                if (mplayer.Class_Unlocked[i] && Class.CLASS_LOOKUP[i].Gives_Allocation_Attributes && Class.CLASS_LOOKUP[i].Tier > 0) {
-                    sum += Math.Min(mplayer.Class_Levels[i], Class.CLASS_LOOKUP[i].Max_Level) * ALLOCATION_POINTS_PER_LEVEL_TIERS[Class.CLASS_LOOKUP[i].Tier];
+                if (mplayer.Class_Unlocked[i] && Class.LOOKUP[i].Gives_Allocation_Attributes && Class.LOOKUP[i].Tier > 0) {
+                    sum += Math.Min(mplayer.Class_Levels[i], Class.LOOKUP[i].Max_Level) * ALLOCATION_POINTS_PER_LEVEL_TIERS[Class.LOOKUP[i].Tier];
                 }
             }
 
@@ -88,7 +88,7 @@ namespace ExperienceAndClasses.Systems {
             int sum = 0;
 
             for (byte i = 0; i< mplayer.Attributes_Allocated.Length; i++) {
-                if (ATTRIBUTE_LOOKUP[i].Active) {
+                if (LOOKUP[i].Active) {
                     sum += AllocationPointCostTotal(mplayer.Attributes_Allocated[i]);
                 }
             }
@@ -98,13 +98,13 @@ namespace ExperienceAndClasses.Systems {
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Populate Lookup ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         static Attribute() {
-            ATTRIBUTE_LOOKUP = new Attribute[(byte)ATTRIBUTE_IDS.NUMBER_OF_IDs];
+            LOOKUP = new Attribute[(byte)IDs.NUMBER_OF_IDs];
 
             byte id_byte;
             string name, name_short, desc;
             bool active;
 
-            for (ATTRIBUTE_IDS id = 0; id < ATTRIBUTE_IDS.NUMBER_OF_IDs; id++) {
+            for (IDs id = 0; id < IDs.NUMBER_OF_IDs; id++) {
                 id_byte = (byte)id;
 
                 //bonuses are defined in the instance because it would be a lot to pass to constructor
@@ -116,37 +116,37 @@ namespace ExperienceAndClasses.Systems {
                 active = true;
 
                 switch (id) {
-                    case ATTRIBUTE_IDS.Power:
+                    case IDs.Power:
                         name = "Power";
                         name_short = "PWR";
                         desc = "TODO_description";
                         break;
 
-                    case ATTRIBUTE_IDS.Vitality:
+                    case IDs.Vitality:
                         name = "Vitality";
                         name_short = "VIT";
                         desc = "TODO_description";
                         break;
 
-                    case ATTRIBUTE_IDS.Mind:
+                    case IDs.Mind:
                         name = "Mind";
                         name_short = "MND";
                         desc = "TODO_description";
                         break;
 
-                    case ATTRIBUTE_IDS.Spirit:
+                    case IDs.Spirit:
                         name = "Spirit";
                         name_short = "SPT";
                         desc = "TODO_description";
                         break;
 
-                    case ATTRIBUTE_IDS.Agility:
+                    case IDs.Agility:
                         name = "Agility";
                         name_short = "AGI";
                         desc = "TODO_description";
                         break;
 
-                    case ATTRIBUTE_IDS.Dexterity:
+                    case IDs.Dexterity:
                         name = "Dexterity";
                         name_short = "DEX";
                         desc = "TODO_description";
@@ -157,7 +157,7 @@ namespace ExperienceAndClasses.Systems {
                         break;
                 }
 
-                ATTRIBUTE_LOOKUP[id_byte] = new Attribute(id_byte, name, name_short, desc, active);
+                LOOKUP[id_byte] = new Attribute(id_byte, name, name_short, desc, active);
             }
         }
 
@@ -216,8 +216,8 @@ namespace ExperienceAndClasses.Systems {
                 float minion_per = Math.Max(mplayer.Class_Primary.Power_Scaling.Minion, mplayer.Class_Secondary.Power_Scaling.Minion / 2);
                 float tool_per = Math.Max(mplayer.Class_Primary.Power_Scaling.Tool, mplayer.Class_Secondary.Power_Scaling.Tool / 2);
 
-                switch ((ATTRIBUTE_IDS)ID) {
-                    case ATTRIBUTE_IDS.Power:
+                switch ((IDs)ID) {
+                    case IDs.Power:
                         bpp = melee_per * POWER_DAMAGE;
                         bf = bpp * points;
                         if(bpp > 0) {
@@ -262,7 +262,7 @@ namespace ExperienceAndClasses.Systems {
 
                         break;
 
-                    case ATTRIBUTE_IDS.Vitality:
+                    case IDs.Vitality:
                         //life
                         bpp = VITALITY_LIFE;
                         bi = (int)Math.Floor(bpp * points);
@@ -283,7 +283,7 @@ namespace ExperienceAndClasses.Systems {
 
                         break;
 
-                    case ATTRIBUTE_IDS.Mind:
+                    case IDs.Mind:
                         //mana
                         bpp = MIND_MANA;
                         bi = (int)Math.Floor(bpp * points);
@@ -307,7 +307,7 @@ namespace ExperienceAndClasses.Systems {
 
                         break;
 
-                    case ATTRIBUTE_IDS.Spirit:
+                    case IDs.Spirit:
                         //crit
                         bpp = SPIRIT_CRIT;
                         bi = (int)Math.Floor(bpp * points);
@@ -334,7 +334,7 @@ namespace ExperienceAndClasses.Systems {
 
                         break;
 
-                    case ATTRIBUTE_IDS.Agility:
+                    case IDs.Agility:
                         //run
                         bpp = AGILITY_MOVEMENT;
                         bf = bpp * points;
@@ -363,7 +363,7 @@ namespace ExperienceAndClasses.Systems {
 
                         break;
 
-                    case ATTRIBUTE_IDS.Dexterity:
+                    case IDs.Dexterity:
                         //ability after use delay
                         bpp = DEXTERITY_ABILITY_DELAY_REDUCTION;
                         bf = bpp * points;
@@ -439,11 +439,11 @@ namespace ExperienceAndClasses.Systems {
         }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Treated like readonly ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-        public static PowerScaling[] POWER_SCALING_LOOKUP { get; private set; }
+        public static PowerScaling[] LOOKUP { get; private set; }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Populate Lookup ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         static PowerScaling() {
-            POWER_SCALING_LOOKUP = new PowerScaling[(byte)POWER_SCALING_TYPES.NUMBER_OF_IDs];
+            LOOKUP = new PowerScaling[(byte)POWER_SCALING_TYPES.NUMBER_OF_IDs];
 
             byte id_byte;
             string name;
@@ -514,7 +514,7 @@ namespace ExperienceAndClasses.Systems {
                         break;
                 }
 
-                POWER_SCALING_LOOKUP[id_byte] = new PowerScaling(id_byte, name, melee, ranged, magic, throwing, minion, tool);
+                LOOKUP[id_byte] = new PowerScaling(id_byte, name, melee, ranged, magic, throwing, minion, tool);
             }
         }
 

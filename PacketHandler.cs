@@ -201,8 +201,8 @@ namespace ExperienceAndClasses {
 
             protected override void RecieveBody(BinaryReader reader, int origin, MPlayer origin_mplayer) {
                 //read
-                int[] attributes = new int[(byte)Systems.Attribute.ATTRIBUTE_IDS.NUMBER_OF_IDs];
-                for (byte i = 0; i < (byte)Systems.Attribute.ATTRIBUTE_IDS.NUMBER_OF_IDs; i++) {
+                int[] attributes = new int[(byte)Systems.Attribute.IDs.NUMBER_OF_IDs];
+                for (byte i = 0; i < (byte)Systems.Attribute.IDs.NUMBER_OF_IDs; i++) {
                     attributes[i] = reader.ReadInt16();
                 }
 
@@ -216,7 +216,7 @@ namespace ExperienceAndClasses {
             }
 
             public static void WritePacketBody(ModPacket packet, int[] attributes) {
-                for (byte i = 0; i < (byte)Systems.Attribute.ATTRIBUTE_IDS.NUMBER_OF_IDs; i++) {
+                for (byte i = 0; i < (byte)Systems.Attribute.IDs.NUMBER_OF_IDs; i++) {
                     packet.Write(attributes[i]);
                 }
             }

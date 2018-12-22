@@ -49,7 +49,7 @@ namespace ExperienceAndClasses {
 
             TEXTURE_STATUS_DEFAULT = ModLoader.GetTexture("ExperienceAndClasses/Textures/Status/Default");
 
-            foreach (Systems.Class c in Systems.Class.CLASS_LOOKUP) {
+            foreach (Systems.Class c in Systems.Class.LOOKUP) {
                 c.LoadTexture();
             }
 

@@ -29,11 +29,11 @@ namespace ExperienceAndClasses.UI {
 
             panel = new DragableUIPanel(WIDTH, HEIGHT, Constants.COLOR_BAR_UI, this, false, true);
 
-            xp_bar_primary = new XPBar(WIDTH - (Constants.UI_PADDING * 2), Systems.Class.CLASS_LOOKUP[(byte)Systems.Class.CLASS_IDS.Novice]);
+            xp_bar_primary = new XPBar(WIDTH - (Constants.UI_PADDING * 2), Systems.Class.LOOKUP[(byte)Systems.Class.IDs.Novice]);
             xp_bar_primary.Left.Set(Constants.UI_PADDING, 0f);
             panel.Append(xp_bar_primary);
 
-            xp_bar_secondary = new XPBar(WIDTH - (Constants.UI_PADDING * 2), Systems.Class.CLASS_LOOKUP[(byte)Systems.Class.CLASS_IDS.Novice]);
+            xp_bar_secondary = new XPBar(WIDTH - (Constants.UI_PADDING * 2), Systems.Class.LOOKUP[(byte)Systems.Class.IDs.Novice]);
             xp_bar_secondary.Left.Set(Constants.UI_PADDING, 0f);
             panel.Append(xp_bar_secondary);
 

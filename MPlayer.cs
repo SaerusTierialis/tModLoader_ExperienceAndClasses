@@ -81,25 +81,25 @@ namespace ExperienceAndClasses {
             old_xp = 0;
 
             //default level/xp/unlock
-            Class_Levels = new byte[(byte)Systems.Class.CLASS_IDS.NUMBER_OF_IDs];
-            Class_XP = new uint[(byte)Systems.Class.CLASS_IDS.NUMBER_OF_IDs];
-            Class_Unlocked = new bool[(byte)Systems.Class.CLASS_IDS.NUMBER_OF_IDs];
+            Class_Levels = new byte[(byte)Systems.Class.IDs.NUMBER_OF_IDs];
+            Class_XP = new uint[(byte)Systems.Class.IDs.NUMBER_OF_IDs];
+            Class_Unlocked = new bool[(byte)Systems.Class.IDs.NUMBER_OF_IDs];
 
             //default unlocks
-            Class_Levels[(byte)Systems.Class.CLASS_IDS.Novice] = 1;
-            Class_Unlocked[(byte)Systems.Class.CLASS_IDS.New] = true;
-            Class_Unlocked[(byte)Systems.Class.CLASS_IDS.None] = true;
-            Class_Unlocked[(byte)Systems.Class.CLASS_IDS.Novice] = true;
+            Class_Levels[(byte)Systems.Class.IDs.Novice] = 1;
+            Class_Unlocked[(byte)Systems.Class.IDs.New] = true;
+            Class_Unlocked[(byte)Systems.Class.IDs.None] = true;
+            Class_Unlocked[(byte)Systems.Class.IDs.Novice] = true;
 
             //default class selection
-            Class_Primary = Systems.Class.CLASS_LOOKUP[(byte)Systems.Class.CLASS_IDS.Novice];
-            Class_Secondary = Systems.Class.CLASS_LOOKUP[(byte)Systems.Class.CLASS_IDS.None];
+            Class_Primary = Systems.Class.LOOKUP[(byte)Systems.Class.IDs.Novice];
+            Class_Secondary = Systems.Class.LOOKUP[(byte)Systems.Class.IDs.None];
 
             //initialize attributes
-            Attributes_Base = new int[(byte)Systems.Attribute.ATTRIBUTE_IDS.NUMBER_OF_IDs];
-            Attributes_Allocated = new int[(byte)Systems.Attribute.ATTRIBUTE_IDS.NUMBER_OF_IDs];
-            Attributes_Bonus = new int[(byte)Systems.Attribute.ATTRIBUTE_IDS.NUMBER_OF_IDs];
-            Attributes_Final = new int[(byte)Systems.Attribute.ATTRIBUTE_IDS.NUMBER_OF_IDs];
+            Attributes_Base = new int[(byte)Systems.Attribute.IDs.NUMBER_OF_IDs];
+            Attributes_Allocated = new int[(byte)Systems.Attribute.IDs.NUMBER_OF_IDs];
+            Attributes_Bonus = new int[(byte)Systems.Attribute.IDs.NUMBER_OF_IDs];
+            Attributes_Final = new int[(byte)Systems.Attribute.IDs.NUMBER_OF_IDs];
             Allocation_Points_Unallocated = 0;
             Allocation_Points_Spent = 0;
             Allocation_Points_Total = 0;
@@ -244,11 +244,11 @@ namespace ExperienceAndClasses {
             if (IN_COMBAT) {
                 return CLASS_VALIDITY.INVALID_COMBAT;
             }
-            else if (id == (byte)Systems.Class.CLASS_IDS.None) {
+            else if (id == (byte)Systems.Class.IDs.None) {
                 return CLASS_VALIDITY.VALID; //setting to no class is always allowed (unless in combat)
             }
             else {
-                if (id >= (byte)Systems.Class.CLASS_IDS.NUMBER_OF_IDs) {
+                if (id >= (byte)Systems.Class.IDs.NUMBER_OF_IDs) {
                     return CLASS_VALIDITY.INVALID_ID; //invalid idsss
                 }
                 else {
@@ -262,7 +262,7 @@ namespace ExperienceAndClasses {
                         class_other_slot = Class_Primary;
                     }
 
-                    if (((Class_Levels[id] <= 0) || !Class_Unlocked[id]) && (id != (byte)Systems.Class.CLASS_IDS.None)) {
+                    if (((Class_Levels[id] <= 0) || !Class_Unlocked[id]) && (id != (byte)Systems.Class.IDs.None)) {
                         return CLASS_VALIDITY.INVALID_LOCKED; //locked class
                     }
                     else {
@@ -276,7 +276,7 @@ namespace ExperienceAndClasses {
                                     pre = pre.Prereq;
                                 }
                             }
-                            pre = Systems.Class.CLASS_LOOKUP[id].Prereq;
+                            pre = Systems.Class.LOOKUP[id].Prereq;
                             while (pre != null) {
                                 if (class_other_slot.ID == pre.ID) {
                                     return CLASS_VALIDITY.INVALID_COMBINATION; //invalid combination (same as other class or one of its prereqs)
@@ -316,7 +316,7 @@ namespace ExperienceAndClasses {
             else {
                 id_other = Class_Primary.ID;
             }
-            if ((id == id_other) && (id != (byte)Systems.Class.CLASS_IDS.None)) {
+            if ((id == id_other) && (id != (byte)Systems.Class.IDs.None)) {
                 //if setting to other set class, just swap
                 return LocalSwapClass();
             }
@@ -334,10 +334,10 @@ namespace ExperienceAndClasses {
                         }
 
                         if (is_primary) {
-                            Class_Primary = Systems.Class.CLASS_LOOKUP[id];
+                            Class_Primary = Systems.Class.LOOKUP[id];
                         }
                         else {
-                            Class_Secondary = Systems.Class.CLASS_LOOKUP[id];
+                            Class_Secondary = Systems.Class.LOOKUP[id];
                         }
                         LocalUpdateClassInfo();
                         return true;
@@ -474,22 +474,22 @@ namespace ExperienceAndClasses {
             if (!Is_Local_Player) return;
 
             //prevent secondary without primary class (move secondary to primary)
-            if ((Class_Primary.ID == (byte)Systems.Class.CLASS_IDS.New) || (Class_Primary.ID == (byte)Systems.Class.CLASS_IDS.None)) {
+            if ((Class_Primary.ID == (byte)Systems.Class.IDs.New) || (Class_Primary.ID == (byte)Systems.Class.IDs.None)) {
                 Class_Primary = Class_Secondary;
-                Class_Secondary = Systems.Class.CLASS_LOOKUP[(byte)Systems.Class.CLASS_IDS.None];
+                Class_Secondary = Systems.Class.LOOKUP[(byte)Systems.Class.IDs.None];
             }
 
             //any "new" class should be set
-            if (Class_Primary.ID == (byte)Systems.Class.CLASS_IDS.New) {
-                Class_Primary = Systems.Class.CLASS_LOOKUP[(byte)Systems.Class.CLASS_IDS.Novice];
+            if (Class_Primary.ID == (byte)Systems.Class.IDs.New) {
+                Class_Primary = Systems.Class.LOOKUP[(byte)Systems.Class.IDs.Novice];
             }
-            if (Class_Secondary.ID == (byte)Systems.Class.CLASS_IDS.New) {
-                Class_Secondary = Systems.Class.CLASS_LOOKUP[(byte)Systems.Class.CLASS_IDS.None];
+            if (Class_Secondary.ID == (byte)Systems.Class.IDs.New) {
+                Class_Secondary = Systems.Class.LOOKUP[(byte)Systems.Class.IDs.None];
             }
 
             //clear secondary if not allowed
             if (!Allow_Secondary) {
-                Class_Secondary = Systems.Class.CLASS_LOOKUP[(byte)Systems.Class.CLASS_IDS.None];
+                Class_Secondary = Systems.Class.LOOKUP[(byte)Systems.Class.IDs.None];
             }
 
             //effective levels
@@ -498,7 +498,7 @@ namespace ExperienceAndClasses {
             //base class attributes
             float sum_primary, sum_secondary;
             Systems.Class c;
-            for (byte id = 0; id < (byte)Systems.Attribute.ATTRIBUTE_IDS.NUMBER_OF_IDs; id++) {
+            for (byte id = 0; id < (byte)Systems.Attribute.IDs.NUMBER_OF_IDs; id++) {
                 sum_primary = 0;
                 sum_secondary = 0;
 
@@ -752,7 +752,7 @@ namespace ExperienceAndClasses {
                 }
 
                 //final attribute
-                for (byte i=0; i<(byte)Systems.Attribute.ATTRIBUTE_IDS.NUMBER_OF_IDs; i++) {
+                for (byte i=0; i<(byte)Systems.Attribute.IDs.NUMBER_OF_IDs; i++) {
                     if (clone.Attributes_Final[i] != Attributes_Final[i]) {
                         PacketHandler.ForceAttribute.Send(-1, me, Attributes_Final);
                         break;
@@ -803,9 +803,9 @@ namespace ExperienceAndClasses {
                 initialized = true;
             }
 
-            Class_Primary = Systems.Class.CLASS_LOOKUP[primary_id];
+            Class_Primary = Systems.Class.LOOKUP[primary_id];
             Class_Primary_Level_Effective = primary_level;
-            Class_Secondary = Systems.Class.CLASS_LOOKUP[secondary_id];
+            Class_Secondary = Systems.Class.LOOKUP[secondary_id];
             Class_Secondary_Level_Effective = secondary_level;
 
             UpdateClassInfo();
@@ -831,8 +831,8 @@ namespace ExperienceAndClasses {
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Attributes ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         private void ApplyAttributes() {
-            for (byte i=0; i<(byte)Systems.Attribute.ATTRIBUTE_IDS.NUMBER_OF_IDs; i++) {
-                Systems.Attribute.ATTRIBUTE_LOOKUP[i].ApplyEffect(this, Attributes_Final[i]);
+            for (byte i=0; i<(byte)Systems.Attribute.IDs.NUMBER_OF_IDs; i++) {
+                Systems.Attribute.LOOKUP[i].ApplyEffect(this, Attributes_Final[i]);
             }
         }
 
@@ -860,7 +860,7 @@ namespace ExperienceAndClasses {
                 return;
             }
 
-            for (byte id = 0; id < (byte)Systems.Attribute.ATTRIBUTE_IDS.NUMBER_OF_IDs; id++) {
+            for (byte id = 0; id < (byte)Systems.Attribute.IDs.NUMBER_OF_IDs; id++) {
                 Attributes_Final[id] = Attributes_Base[id] + Attributes_Allocated[id] + Attributes_Bonus[id];
             }
         }
@@ -994,8 +994,8 @@ namespace ExperienceAndClasses {
             show_xp = Commons.TryGet<bool>(load_tag, "eac_settings_show_xp", show_xp);
 
             //current classes
-            Class_Primary = Systems.Class.CLASS_LOOKUP[Commons.TryGet<byte>(load_tag, "eac_class_current_primary", Class_Primary.ID)];
-            Class_Secondary = Systems.Class.CLASS_LOOKUP[Commons.TryGet<byte>(load_tag, "eac_class_current_secondary", Class_Secondary.ID)];
+            Class_Primary = Systems.Class.LOOKUP[Commons.TryGet<byte>(load_tag, "eac_class_current_primary", Class_Primary.ID)];
+            Class_Secondary = Systems.Class.LOOKUP[Commons.TryGet<byte>(load_tag, "eac_class_current_secondary", Class_Secondary.ID)];
 
             //class unlocked
             List<bool> class_unlock_loaded = Commons.TryGet<List<bool>>(load_tag, "eac_class_unlock", new List<bool>());
@@ -1016,11 +1016,11 @@ namespace ExperienceAndClasses {
             }
 
             //fix any potential issues...
-            for (byte id = 0; id < (byte)Systems.Class.CLASS_IDS.NUMBER_OF_IDs; id++) {
+            for (byte id = 0; id < (byte)Systems.Class.IDs.NUMBER_OF_IDs; id++) {
 
                 //level up if required xp changed
-                while ((Class_Levels[id] < Systems.Class.CLASS_LOOKUP[id].Max_Level) && (Class_XP[id] >= Systems.XP.GetXPReq(Systems.Class.CLASS_LOOKUP[id], Class_Levels[id]))) {
-                    SubtractXP(id, Systems.XP.GetXPReq(Systems.Class.CLASS_LOOKUP[id], Class_Levels[id]));
+                while ((Class_Levels[id] < Systems.Class.LOOKUP[id].Max_Level) && (Class_XP[id] >= Systems.XP.GetXPReq(Systems.Class.LOOKUP[id], Class_Levels[id]))) {
+                    SubtractXP(id, Systems.XP.GetXPReq(Systems.Class.LOOKUP[id], Class_Levels[id]));
                     Class_Levels[id]++;
                 }
 
@@ -1033,19 +1033,19 @@ namespace ExperienceAndClasses {
 
             //if not allowed secondary, set none
             if (!Allow_Secondary) {
-                Class_Secondary = Systems.Class.CLASS_LOOKUP[(byte)Systems.Class.CLASS_IDS.None];
+                Class_Secondary = Systems.Class.LOOKUP[(byte)Systems.Class.IDs.None];
             }
 
             //if selected class is now locked for some reason, select no class
             if ((!Class_Unlocked[Class_Primary.ID]) || (!Class_Unlocked[Class_Secondary.ID])) {
-                Class_Primary = Systems.Class.CLASS_LOOKUP[(byte)Systems.Class.CLASS_IDS.None];
-                Class_Secondary = Systems.Class.CLASS_LOOKUP[(byte)Systems.Class.CLASS_IDS.None];
+                Class_Primary = Systems.Class.LOOKUP[(byte)Systems.Class.IDs.None];
+                Class_Secondary = Systems.Class.LOOKUP[(byte)Systems.Class.IDs.None];
             }
 
             //allocated attributes
             List<int> attribute_allocation = Commons.TryGet<List<int>>(load_tag, "eac_attribute_allocation", new List<int>());
             for(byte i = 0; i < attribute_allocation.Count; i++) {
-                if (Systems.Attribute.ATTRIBUTE_LOOKUP[i].Active) {
+                if (Systems.Attribute.LOOKUP[i].Active) {
                     Attributes_Allocated[i] = attribute_allocation[i];
                 }
             }

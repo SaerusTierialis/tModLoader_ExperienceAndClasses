@@ -527,7 +527,7 @@ namespace ExperienceAndClasses.UI {
             }
             else {
                 if (ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary.ID == Class.ID) {
-                    ExperienceAndClasses.LOCAL_MPLAYER.LocalSetClass((byte)Systems.Class.CLASS_IDS.None, true);
+                    ExperienceAndClasses.LOCAL_MPLAYER.LocalSetClass((byte)Systems.Class.IDs.None, true);
                 }
                 else {
                     ExperienceAndClasses.LOCAL_MPLAYER.LocalSetClass(Class.ID, true);
@@ -544,7 +544,7 @@ namespace ExperienceAndClasses.UI {
                 UIInfo.Instance.ShowUnlockSubclass(this);
             }
             else if (ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary.ID == Class.ID) {
-                ExperienceAndClasses.LOCAL_MPLAYER.LocalSetClass((byte)Systems.Class.CLASS_IDS.None, false);
+                ExperienceAndClasses.LOCAL_MPLAYER.LocalSetClass((byte)Systems.Class.IDs.None, false);
             }
             else {
                 ExperienceAndClasses.LOCAL_MPLAYER.LocalSetClass(Class.ID, false);
