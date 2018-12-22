@@ -85,7 +85,7 @@ namespace ExperienceAndClasses.Systems {
             Description = "Undefined_Desc";
             Tier = 0;
             Prereq = null;
-            Power_Scaling = PowerScaling.LOOKUP[(byte)PowerScaling.POWER_SCALING_TYPES.None];
+            Power_Scaling = PowerScaling.LOOKUP[(byte)PowerScaling.IDs.None];
             Gives_Allocation_Attributes = false;
             Max_Level = 0;
             Unlock_Item = null;
@@ -109,21 +109,21 @@ namespace ExperienceAndClasses.Systems {
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Subtypes ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         public abstract class RealClass : Class {
-            public RealClass(IDs id, PowerScaling.POWER_SCALING_TYPES power_scaling) : base(id) {
+            public RealClass(IDs id, PowerScaling.IDs power_scaling) : base(id) {
                 Gives_Allocation_Attributes = true;
                 Power_Scaling = PowerScaling.LOOKUP[(byte)power_scaling];
             }
         }
 
         public abstract class Tier1 : RealClass {
-            public Tier1(IDs id, PowerScaling.POWER_SCALING_TYPES power_scaling) : base(id, power_scaling) {
+            public Tier1(IDs id, PowerScaling.IDs power_scaling) : base(id, power_scaling) {
                 Tier = 1;
                 Max_Level = TIER_MAX_LEVELS[Tier];
             }
         }
 
         public abstract class Tier2 : RealClass {
-            public Tier2(IDs id, PowerScaling.POWER_SCALING_TYPES power_scaling) : base(id, power_scaling) {
+            public Tier2(IDs id, PowerScaling.IDs power_scaling) : base(id, power_scaling) {
                 Tier = 2;
                 Unlock_Item = ExperienceAndClasses.MOD.GetItem<Items.Unlock_Tier2>();
                 Max_Level = TIER_MAX_LEVELS[Tier];
@@ -132,7 +132,7 @@ namespace ExperienceAndClasses.Systems {
         }
 
         public abstract class Tier3 : RealClass {
-            public Tier3(IDs id, PowerScaling.POWER_SCALING_TYPES power_scaling, IDs prereq) : base(id, power_scaling) {
+            public Tier3(IDs id, PowerScaling.IDs power_scaling, IDs prereq) : base(id, power_scaling) {
                 Tier = 3;
                 Unlock_Item = ExperienceAndClasses.MOD.GetItem<Items.Unlock_Tier3>();
                 Max_Level = TIER_MAX_LEVELS[Tier];
@@ -155,7 +155,7 @@ namespace ExperienceAndClasses.Systems {
         }
 
         public class Explorer : Tier2 {
-            public Explorer() : base(IDs.Explorer, PowerScaling.POWER_SCALING_TYPES.Tool) {
+            public Explorer() : base(IDs.Explorer, PowerScaling.IDs.Tool) {
                 Name = "Explorer";
                 Description = "TODO_desc";
                 Max_Level = TIER_MAX_LEVELS[3]; //tier 2 class with tier 3 level cap
@@ -172,7 +172,7 @@ namespace ExperienceAndClasses.Systems {
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Tier 1 Classes ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         public class Novice : Tier1 {
-            public Novice() : base(IDs.Novice, PowerScaling.POWER_SCALING_TYPES.All) {
+            public Novice() : base(IDs.Novice, PowerScaling.IDs.All) {
                 Name = "Novice";
                 Description = "TODO_desc";
                 Class_Locations[0, 3] = ID;
@@ -182,7 +182,7 @@ namespace ExperienceAndClasses.Systems {
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Tier 2 Classes ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         public class Warrior : Tier2 {
-            public Warrior() : base(IDs.Warrior, PowerScaling.POWER_SCALING_TYPES.Melee) {
+            public Warrior() : base(IDs.Warrior, PowerScaling.IDs.Melee) {
                 Name = "Warrior";
                 Description = "TODO_desc";
                 Class_Locations[1, 0] = ID;
@@ -193,7 +193,7 @@ namespace ExperienceAndClasses.Systems {
         }
 
         public class Ranger : Tier2 {
-            public Ranger() : base(IDs.Ranger, PowerScaling.POWER_SCALING_TYPES.Ranged) {
+            public Ranger() : base(IDs.Ranger, PowerScaling.IDs.Ranged) {
                 Name = "Ranger";
                 Description = "TODO_desc";
                 Class_Locations[1, 1] = ID;
@@ -204,7 +204,7 @@ namespace ExperienceAndClasses.Systems {
         }
 
         public class Mage : Tier2 {
-            public Mage() : base(IDs.Mage, PowerScaling.POWER_SCALING_TYPES.Magic) {
+            public Mage() : base(IDs.Mage, PowerScaling.IDs.Magic) {
                 Name = "Mage";
                 Description = "TODO_desc";
                 Class_Locations[1, 2] = ID;
@@ -214,7 +214,7 @@ namespace ExperienceAndClasses.Systems {
         }
 
         public class Rogue : Tier2 {
-            public Rogue() : base(IDs.Rogue, PowerScaling.POWER_SCALING_TYPES.Rogue) {
+            public Rogue() : base(IDs.Rogue, PowerScaling.IDs.Rogue) {
                 Name = "Rogue";
                 Description = "TODO_desc";
                 Class_Locations[1, 3] = ID;
@@ -224,7 +224,7 @@ namespace ExperienceAndClasses.Systems {
         }
 
         public class Summoner : Tier2 {
-            public Summoner() : base(IDs.Summoner, PowerScaling.POWER_SCALING_TYPES.Minion) {
+            public Summoner() : base(IDs.Summoner, PowerScaling.IDs.Minion) {
                 Name = "Summoner";
                 Description = "TODO_desc";
                 Class_Locations[1, 4] = ID;
@@ -234,7 +234,7 @@ namespace ExperienceAndClasses.Systems {
         }
 
         public class Cleric : Tier2 {
-            public Cleric() : base(IDs.Cleric, PowerScaling.POWER_SCALING_TYPES.All) {
+            public Cleric() : base(IDs.Cleric, PowerScaling.IDs.All) {
                 Name = "Cleric";
                 Description = "TODO_desc";
                 Class_Locations[1, 5] = ID;
@@ -244,7 +244,7 @@ namespace ExperienceAndClasses.Systems {
         }
 
         public class Hybrid : Tier2 {
-            public Hybrid() : base(IDs.Hybrid, PowerScaling.POWER_SCALING_TYPES.All) {
+            public Hybrid() : base(IDs.Hybrid, PowerScaling.IDs.All) {
                 Name = "Hybrid";
                 Description = "TODO_desc";
                 Class_Locations[1, 6] = ID;
@@ -260,7 +260,7 @@ namespace ExperienceAndClasses.Systems {
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Tier 3 Classes ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         public class Unnamed1 : Tier3 {
-            public Unnamed1() : base(IDs.Unnamed1, PowerScaling.POWER_SCALING_TYPES.Melee, IDs.Warrior) {
+            public Unnamed1() : base(IDs.Unnamed1, PowerScaling.IDs.Melee, IDs.Warrior) {
                 Name = "Unnamed1";
                 Description = "TODO_desc";
                 Class_Locations[2, 0] = ID;
@@ -270,7 +270,7 @@ namespace ExperienceAndClasses.Systems {
         }
 
         public class Berserker : Tier3 {
-            public Berserker() : base(IDs.Berserker, PowerScaling.POWER_SCALING_TYPES.Melee, IDs.Warrior) {
+            public Berserker() : base(IDs.Berserker, PowerScaling.IDs.Melee, IDs.Warrior) {
                 Name = "Berserker";
                 Description = "TODO_desc";
                 Class_Locations[3, 0] = ID;
@@ -282,7 +282,7 @@ namespace ExperienceAndClasses.Systems {
         }
 
         public class Guardian : Tier3 {
-            public Guardian() : base(IDs.Guardian, PowerScaling.POWER_SCALING_TYPES.Melee, IDs.Warrior) {
+            public Guardian() : base(IDs.Guardian, PowerScaling.IDs.Melee, IDs.Warrior) {
                 Name = "Guardian";
                 Description = "TODO_desc";
                 Class_Locations[4, 0] = ID;
@@ -292,7 +292,7 @@ namespace ExperienceAndClasses.Systems {
         }
 
         public class Sniper : Tier3 {
-            public Sniper() : base(IDs.Sniper, PowerScaling.POWER_SCALING_TYPES.Ranged, IDs.Ranger) {
+            public Sniper() : base(IDs.Sniper, PowerScaling.IDs.Ranged, IDs.Ranger) {
                 Name = "Sniper";
                 Description = "TODO_desc";
                 Class_Locations[2, 1] = ID;
@@ -302,7 +302,7 @@ namespace ExperienceAndClasses.Systems {
         }
 
         public class Engineer : Tier3 {
-            public Engineer() : base(IDs.Engineer, PowerScaling.POWER_SCALING_TYPES.Ranged, IDs.Ranger) {
+            public Engineer() : base(IDs.Engineer, PowerScaling.IDs.Ranged, IDs.Ranger) {
                 Name = "Engineer";
                 Description = "TODO_desc";
                 Class_Locations[3, 1] = ID;
@@ -314,7 +314,7 @@ namespace ExperienceAndClasses.Systems {
         }
 
         public class Elementalist : Tier3 {
-            public Elementalist() : base(IDs.Elementalist, PowerScaling.POWER_SCALING_TYPES.Magic, IDs.Mage) {
+            public Elementalist() : base(IDs.Elementalist, PowerScaling.IDs.Magic, IDs.Mage) {
                 Name = "Elementalist";
                 Description = "TODO_desc";
                 Class_Locations[2, 2] = ID;
@@ -324,7 +324,7 @@ namespace ExperienceAndClasses.Systems {
         }
 
         public class Sage : Tier3 {
-            public Sage() : base(IDs.Sage, PowerScaling.POWER_SCALING_TYPES.Magic, IDs.Mage) {
+            public Sage() : base(IDs.Sage, PowerScaling.IDs.Magic, IDs.Mage) {
                 Name = "Sage";
                 Description = "TODO_desc";
                 Class_Locations[3, 2] = ID;
@@ -335,7 +335,7 @@ namespace ExperienceAndClasses.Systems {
         }
 
         public class Assassin : Tier3 {
-            public Assassin() : base(IDs.Assassin, PowerScaling.POWER_SCALING_TYPES.Rogue, IDs.Rogue) {
+            public Assassin() : base(IDs.Assassin, PowerScaling.IDs.Rogue, IDs.Rogue) {
                 Name = "Assassin";
                 Description = "TODO_desc";
                 Class_Locations[2, 3] = ID;
@@ -346,7 +346,7 @@ namespace ExperienceAndClasses.Systems {
         }
 
         public class Chrono : Tier3 {
-            public Chrono() : base(IDs.Chrono, PowerScaling.POWER_SCALING_TYPES.Rogue, IDs.Rogue) {
+            public Chrono() : base(IDs.Chrono, PowerScaling.IDs.Rogue, IDs.Rogue) {
                 Name = "Chrono";
                 Description = "TODO_desc";
                 Class_Locations[3, 3] = ID;
@@ -357,7 +357,7 @@ namespace ExperienceAndClasses.Systems {
         }
 
         public class Ninja : Tier3 {
-            public Ninja() : base(IDs.Ninja, PowerScaling.POWER_SCALING_TYPES.Throwing, IDs.Rogue) {
+            public Ninja() : base(IDs.Ninja, PowerScaling.IDs.Throwing, IDs.Rogue) {
                 Name = "Ninja";
                 Description = "TODO_desc";
                 Class_Locations[4, 3] = ID;
@@ -368,7 +368,7 @@ namespace ExperienceAndClasses.Systems {
         }
 
         public class SoulBinder : Tier3 {
-            public SoulBinder() : base(IDs.SoulBinder, PowerScaling.POWER_SCALING_TYPES.Minion, IDs.Summoner) {
+            public SoulBinder() : base(IDs.SoulBinder, PowerScaling.IDs.Minion, IDs.Summoner) {
                 Name = "Soul Binder";
                 Description = "TODO_desc";
                 Class_Locations[2, 4] = ID;
@@ -379,7 +379,7 @@ namespace ExperienceAndClasses.Systems {
         }
 
         public class Hivemind : Tier3 {
-            public Hivemind() : base(IDs.Hivemind, PowerScaling.POWER_SCALING_TYPES.Minion, IDs.Summoner) {
+            public Hivemind() : base(IDs.Hivemind, PowerScaling.IDs.Minion, IDs.Summoner) {
                 Name = "Hivemind";
                 Description = "TODO_desc";
                 Class_Locations[3, 4] = ID;
@@ -390,7 +390,7 @@ namespace ExperienceAndClasses.Systems {
         }
 
         public class Saint : Tier3 {
-            public Saint() : base(IDs.Saint, PowerScaling.POWER_SCALING_TYPES.All, IDs.Cleric) {
+            public Saint() : base(IDs.Saint, PowerScaling.IDs.All, IDs.Cleric) {
                 Name = "Saint";
                 Description = "TODO_desc";
                 Class_Locations[2, 5] = ID;
@@ -400,7 +400,7 @@ namespace ExperienceAndClasses.Systems {
         }
 
         public class HybridPrime : Tier3 {
-            public HybridPrime() : base(IDs.HybridPrime, PowerScaling.POWER_SCALING_TYPES.All, IDs.Hybrid) {
+            public HybridPrime() : base(IDs.HybridPrime, PowerScaling.IDs.All, IDs.Hybrid) {
                 Name = "Hybrid Prime";
                 Description = "TODO_desc";
                 Class_Locations[2, 6] = ID;

@@ -422,7 +422,7 @@ namespace ExperienceAndClasses.Systems {
 
     public class PowerScaling {
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Constants (and readonly) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-        public enum POWER_SCALING_TYPES : byte {
+        public enum IDs : byte {
             None,
             Melee,
             Ranged,
@@ -443,13 +443,13 @@ namespace ExperienceAndClasses.Systems {
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Populate Lookup ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         static PowerScaling() {
-            LOOKUP = new PowerScaling[(byte)POWER_SCALING_TYPES.NUMBER_OF_IDs];
+            LOOKUP = new PowerScaling[(byte)IDs.NUMBER_OF_IDs];
 
             byte id_byte;
             string name;
             float melee, ranged, magic, throwing, minion, tool;
 
-            for (POWER_SCALING_TYPES id = 0; id < POWER_SCALING_TYPES.NUMBER_OF_IDs; id++) {
+            for (IDs id = 0; id < IDs.NUMBER_OF_IDs; id++) {
                 id_byte = (byte)id;
 
                 //defaults
@@ -462,36 +462,36 @@ namespace ExperienceAndClasses.Systems {
                 tool = 0f;
 
                 switch (id) {
-                    case POWER_SCALING_TYPES.None:
+                    case IDs.None:
                         name = "None";
                         break;
 
-                    case POWER_SCALING_TYPES.Melee:
+                    case IDs.Melee:
                         name = "Melee";
                         melee = 1f;
                         break;
 
-                    case POWER_SCALING_TYPES.Ranged:
+                    case IDs.Ranged:
                         name = "Ranged";
                         ranged = 1f;
                         break;
 
-                    case POWER_SCALING_TYPES.Magic:
+                    case IDs.Magic:
                         name = "Magic";
                         magic = 1f;
                         break;
 
-                    case POWER_SCALING_TYPES.Throwing:
+                    case IDs.Throwing:
                         name = "Throwing";
                         throwing = 1f;
                         break;
 
-                    case POWER_SCALING_TYPES.Minion:
+                    case IDs.Minion:
                         name = "Minion";
                         minion = 1f;
                         break;
 
-                    case POWER_SCALING_TYPES.All:
+                    case IDs.All:
                         name = "Melee, Ranged, Magic, Throwing, Minion";
                         melee = 1f;
                         ranged = 1f;
@@ -500,7 +500,7 @@ namespace ExperienceAndClasses.Systems {
                         minion = 1f;
                         break;
 
-                    case POWER_SCALING_TYPES.Rogue:
+                    case IDs.Rogue:
                         name = "Melee, Ranged, Magic, Throwing";
                         melee = 1f;
                         ranged = 1f;
@@ -508,7 +508,7 @@ namespace ExperienceAndClasses.Systems {
                         throwing = 1f;
                         break;
 
-                    case POWER_SCALING_TYPES.Tool:
+                    case IDs.Tool:
                         name = "Packaxe, Axe, Hammer, Fishing";
                         tool = 1f;
                         break;
