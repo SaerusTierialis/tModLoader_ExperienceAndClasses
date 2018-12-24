@@ -30,7 +30,7 @@ namespace ExperienceAndClasses {
             ForceFull,
             ForceClass,
             ForceAttribute,
-            Heal,
+            //Heal,
             AFK,
             InCombat,
             XP,
@@ -286,6 +286,7 @@ namespace ExperienceAndClasses {
             }
         }
 
+        /*
         public sealed class Heal : Handler {
             private static readonly Handler Instance = LOOKUP[(byte)Enum.Parse(typeof(PACKET_TYPE), MethodBase.GetCurrentMethod().DeclaringType.Name)];
 
@@ -317,6 +318,7 @@ namespace ExperienceAndClasses {
                 Main.player[target].GetModPlayer<MPlayer>(ExperienceAndClasses.MOD).Heal(amount_life, amount_mana);
             }
         }
+        */
 
         public sealed class XP : Handler {
             private static readonly Handler Instance = LOOKUP[(byte)Enum.Parse(typeof(PACKET_TYPE), MethodBase.GetCurrentMethod().DeclaringType.Name)];

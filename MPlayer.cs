@@ -50,6 +50,8 @@ namespace ExperienceAndClasses {
 
         public double old_xp; //pre-revamp xp
 
+        public Systems.Status[] Status { get; private set; }
+
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Instance Vars (syncing) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         public Systems.Class Class_Primary { get; private set; }
@@ -79,6 +81,7 @@ namespace ExperienceAndClasses {
             send_xp_when = DateTime.MinValue;
             minions = new List<Projectile>();
             old_xp = 0;
+            Status = new Systems.Status[(uint)Systems.Status.IDs.NUMBER_OF_IDs];
 
             //default level/xp/unlock
             Class_Levels = new byte[(byte)Systems.Class.IDs.NUMBER_OF_IDs];
@@ -183,12 +186,15 @@ namespace ExperienceAndClasses {
                 ability_delay_reduction = 1f;
                 tool_power = 1f;
             }
+
+            Systems.Status.Heal.Add(player, this, 10);
         }
 
         public override void PostUpdateEquips() {
             base.PostUpdateEquips();
             if (initialized) {
                 ApplyAttributes();
+                UpdateStatus();
             }
         }
 
@@ -1070,8 +1076,23 @@ namespace ExperienceAndClasses {
             IN_COMBAT = in_combat;
         }
 
-        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Ability & Status ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Status ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
+        public bool HasStatus(Systems.Status.IDs id) {
+            return (Status[(uint)id] == null);
+        }
+
+        public void UpdateStatus() {
+            foreach (Systems.Status s in Status) {
+                if (s != null) {
+                    s.Update();
+                }
+            }
+        }
+        
+        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Ability ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+        /*
         public void Heal(int amount_life, int amount_mana) {
             if (Is_Local_Player) {
                 Main.NewText("do " + amount_life + " " + amount_mana);
@@ -1094,6 +1115,7 @@ namespace ExperienceAndClasses {
                 PacketHandler.Heal.Send((byte)player.whoAmI, (byte)Main.LocalPlayer.whoAmI, amount_life, amount_mana);
             }
         }
+        */
 
     }
 }
