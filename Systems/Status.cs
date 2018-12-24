@@ -50,7 +50,20 @@ namespace ExperienceAndClasses.Systems {
         public MPlayer Owner { get; protected set; }
         public MPlayer Target { get; protected set; }
 
-        public Texture2D Texture { get; protected set; }
+        public Texture2D Texture {
+            get {
+                if (texture != null) {
+                    return texture;
+                }
+                else {
+                    return LOOKUP[ID].Texture;
+                }
+            }
+            protected set {
+                texture = value;
+            }
+        }
+        private Texture2D texture;
         private string texture_path;
 
         public bool Unlimited_Duration { get; private set; }
