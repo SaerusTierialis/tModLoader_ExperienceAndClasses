@@ -47,36 +47,49 @@ namespace ExperienceAndClasses.Systems {
 
         public uint ID { get; protected set; }
 
-        public int Owner { get; protected set; }
+        public MPlayer Owner { get; protected set; }
+        public MPlayer Target { get; protected set; }
 
         public Texture2D Texture { get; protected set; }
         private string texture_path;
 
         public bool Unlimited_Duration { get; private set; }
-        public uint Duration_msec { get; private set; }
+        public double Duration_msec { get; private set; }
         private DateTime time_end;
-        public float Percent_Remaining { get; private set; }
+        public double Percent_Remaining { get; private set; } //local
+
+        private bool autosync;
 
         public Status(IDs id) {
             ID = (uint)id;
 
             //defaults
-            Owner = -1;
+            Owner = null;
+            Target = null;
             texture_path = null;
             Unlimited_Duration = false;
             Duration_msec = 0;
             time_end = DateTime.MinValue;
             Percent_Remaining = 1f;
+            autosync = true;
         }
 
         public void Update() {
-            if (!ExperienceAndClasses.IS_SERVER && (Owner==Main.LocalPlayer.whoAmI)) {
-                //end conditions
+            //target of status: end the status if out of time or owner has left
+            if (Target.player.whoAmI == Main.LocalPlayer.whoAmI) {
+                Percent_Remaining = time_end.Subtract(DateTime.Now).TotalMilliseconds / Duration_msec;
+                if ((!Unlimited_Duration && Percent_Remaining < 0) || !Main.player[Owner.player.whoAmI].Equals(Owner.player)) {
+                    End();
+                    return;
+                }
             }
             UpdateSpecific();
         }
+        public virtual void UpdateSpecific() { } //override with any on-update effects
 
-        public virtual void UpdateSpecific() { }
+        public void End() {
+
+        }
 
         public void LoadTexture() {
             if (texture_path != null) {
