@@ -1079,7 +1079,7 @@ namespace ExperienceAndClasses {
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Status ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         public bool HasStatus(Systems.Status.IDs id) {
-            return (Status[(uint)id] == null);
+            return (Status[(short)id] == null);
         }
 
         public void UpdateStatus() {

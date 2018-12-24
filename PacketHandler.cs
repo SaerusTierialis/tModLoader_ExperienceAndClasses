@@ -31,11 +31,12 @@ namespace ExperienceAndClasses {
             ForceClass,
             ForceAttribute,
             //Heal,
-            AFK,
-            InCombat,
+            AFK, //TODO convert to status
+            InCombat, //TODO convert to status
             XP,
-
-
+            AddStatus,
+            RemoveStatus,
+            SetStatuses,
 
             NUMBER_OF_TYPES, //must be last
         };
@@ -340,6 +341,33 @@ namespace ExperienceAndClasses {
 
                 //set
                 ExperienceAndClasses.LOCAL_MPLAYER.AddXP(xp);
+            }
+        }
+
+        public sealed class AddStatus : Handler {
+            public static readonly Handler Instance = LOOKUP[(byte)Enum.Parse(typeof(PACKET_TYPE), MethodBase.GetCurrentMethod().DeclaringType.Name)];
+
+            protected override void RecieveBody(BinaryReader reader, int origin, MPlayer origin_mplayer) {
+                //TODO
+                
+            }
+        }
+
+        public sealed class RemoveStatus : Handler {
+            public static readonly Handler Instance = LOOKUP[(byte)Enum.Parse(typeof(PACKET_TYPE), MethodBase.GetCurrentMethod().DeclaringType.Name)];
+
+            protected override void RecieveBody(BinaryReader reader, int origin, MPlayer origin_mplayer) {
+                //TODO
+
+            }
+        }
+
+        public sealed class SetStatuses : Handler {
+            public static readonly Handler Instance = LOOKUP[(byte)Enum.Parse(typeof(PACKET_TYPE), MethodBase.GetCurrentMethod().DeclaringType.Name)];
+
+            protected override void RecieveBody(BinaryReader reader, int origin, MPlayer origin_mplayer) {
+                //TODO
+
             }
         }
     }
