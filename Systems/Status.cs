@@ -11,14 +11,16 @@ using Terraria.ModLoader;
 namespace ExperienceAndClasses.Systems {
     /*
      * Statuses are like the builtin buff system, but can carry any amount of extra data. The system exists because
-     * there is a hard limit on the number of buffs that a player can have at one time.
+     * there is a hard limit on the number of buffs that a player can have at one time and the buff system is limited
+     * in the amount of data that is automatically synced.
      * 
-     * Statuses can be used for instant effects, toggles, duration buffs, and more. They can even be displayed with
-     * buffs in the top left UI.
+     * Statuses can be used for instant effects, toggles, duration buffs, and much more. They can even be displayed with
+     * buffs in the top left UI. Even abilities such as the support class' Sanctuary can be implemented as a status (with
+     * a location in the sync data).
      * 
-     * Statuses have builtin syncing and unified duration (the player with the status is the only one who can end it).
+     * Statuses have builtin syncing. Duration checking is handled by the client who is targeted by the status.
      * 
-     * The lookup instances should not be reused. When textures are 
+     * The lookup instances cannot be reused. A new instance must be created when a status is added to a player.
     */
     public abstract class Status {
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ IDs (order does not matter) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
@@ -35,81 +37,75 @@ namespace ExperienceAndClasses.Systems {
             MAGNITUDE,
         }
 
-        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Treated like readonly ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Auto-Populated Lookup ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         public static Status[] LOOKUP { get; private set; }
-
-        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Auto-Populate Lookup ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         static Status() {
             LOOKUP = new Status[(uint)Status.IDs.NUMBER_OF_IDs];
             string[] IDs = Enum.GetNames(typeof(IDs));
             for (byte i = 0; i < LOOKUP.Length; i++) {
                 LOOKUP[i] = (Status)(Assembly.GetExecutingAssembly().CreateInstance(typeof(Status).FullName + "+" + IDs[i]));
+                LOOKUP[i].prevent_reuse = true;
             }
         }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Instance ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-        public readonly IDs ID;
-        public readonly uint ID_num;
+        //ID (must override)
+        public abstract IDs ID();
+        public abstract uint ID_num();
 
+        //core info (can override)
+        protected virtual string Core_Texture_Path { get { return null; } }
+        public virtual bool Core_Duration_Instant { get { return false; } }
+        public virtual bool Core_Duration_Unlimited { get { return false; } }
+        public virtual uint Core_Duration_msec { get { return 0; } }
+        public virtual bool Core_Sync { get { return true; } }
+
+        //public variables
         public MPlayer Owner { get; protected set; }
         public MPlayer Target { get; protected set; }
+        public double Percent_Remaining { get; protected set; } //track duration on local player only
 
+        //protected variables
+        protected Dictionary<SYNC_DATA_TYPES, double> sync_data;
+
+        //private variables
+        private Texture2D texture;
+        private DateTime time_end;
+        private bool prevent_reuse; //lookup instances are locked to prevent accidental reuse
+
+        //get texture from any instance
         public Texture2D Texture {
             get {
                 if (texture != null) {
                     return texture;
                 }
                 else {
-                    return LOOKUP[ID_num].Texture;
+                    return LOOKUP[ID_num()].Texture;
                 }
             }
             protected set {
                 texture = value;
             }
         }
-        private Texture2D texture;
-        private string texture_path;
 
-        public bool Duration_Instant { get; protected set; }
-        public bool Duration_Unlimited { get; protected set; }
-        public double Duration_msec { get; protected set; }
-        private DateTime time_end;
-        public double Percent_Remaining { get; protected set; } //track duration on local player only
-
-        protected bool prevent_adding; //lookup instances are locked to prevent accidental reuse
-
-        private bool sync;
-
-        protected Dictionary<SYNC_DATA_TYPES, double> sync_data;
-
-        public Status(IDs id) {
-            ID = id;
-            ID_num = (uint)ID;
-
-            //core info likley to be overwritten
-            texture_path = null;
-            Duration_Instant = false;
-            Duration_Unlimited = false;
-            Duration_msec = 0;
-            sync = true;
-
-            //other defaults
+        public Status() {
+            //defaults
             time_end = DateTime.MinValue;
             Percent_Remaining = 100f;
             Owner = null;
             Target = null;
-            prevent_adding = false;
+            prevent_reuse = false;
             sync_data = new Dictionary<SYNC_DATA_TYPES, double>();
         }
 
         public void Update() {
             //target of status ends it if out of time or owner has left //TODO or if owner no longer has source ability
             if (Target.player.whoAmI == Main.LocalPlayer.whoAmI) {
-                Percent_Remaining = time_end.Subtract(DateTime.Now).TotalMilliseconds / Duration_msec;
-                if ((!Duration_Instant && Percent_Remaining < 0) || !Main.player[Owner.player.whoAmI].Equals(Owner.player)) {
+                Percent_Remaining = time_end.Subtract(DateTime.Now).TotalMilliseconds / Core_Duration_msec;
+                if ((!Core_Duration_Instant && Percent_Remaining < 0) || !Main.player[Owner.player.whoAmI].Equals(Owner.player)) {
                     Remove();
                     return;
                 }
@@ -119,7 +115,7 @@ namespace ExperienceAndClasses.Systems {
 
         protected void Add(Player target, MPlayer owner) {
             //don't allow add if locked (do not reuse lookup instance!)
-            if (prevent_adding) {
+            if (prevent_reuse) {
                 Commons.Error("Status lookup instance attempted reuse for type " + GetType());
                 return;
             }
@@ -129,23 +125,23 @@ namespace ExperienceAndClasses.Systems {
             Owner = owner;
 
             //calculate end time if there is one
-            if (!Duration_Instant && !Duration_Unlimited ) {
-                time_end = DateTime.Now.AddMilliseconds(Duration_msec);
+            if (!Core_Duration_Instant && !Core_Duration_Unlimited ) {
+                time_end = DateTime.Now.AddMilliseconds(Core_Duration_msec);
             }
 
             //add to target (unless instant)
             bool allow_update = true;
-            if (!Duration_Instant) {
-                if (Target.HasStatus(ID)) {
+            if (!Core_Duration_Instant) {
+                if (Target.HasStatus(ID())) {
                     allow_update = TryMerge();
                 }
                 else {
-                    Target.Status[ID_num] = this;
+                    Target.Status[ID_num()] = this;
                 }
             }
 
             //if owner is local and netmode is multiplayer, send to other clients (unless not sync)
-            if (sync && ExperienceAndClasses.IS_CLIENT && Owner.Equals(ExperienceAndClasses.LOCAL_MPLAYER)) {
+            if (Core_Sync && ExperienceAndClasses.IS_CLIENT && Owner.Equals(ExperienceAndClasses.LOCAL_MPLAYER)) {
                 SendPacket();
             }
 
@@ -161,8 +157,8 @@ namespace ExperienceAndClasses.Systems {
 
         public void Remove() {
             //remove (unless instant)
-            if (!Duration_Instant) {
-                Target.Status[ID_num] = null;
+            if (!Core_Duration_Instant) {
+                Target.Status[ID_num()] = null;
             }
 
             OnEnd();
@@ -184,16 +180,12 @@ namespace ExperienceAndClasses.Systems {
         }
 
         public void LoadTexture() {
-            if (texture_path != null) {
-                Texture = ModLoader.GetTexture(texture_path);
+            if (Core_Texture_Path != null) {
+                Texture = ModLoader.GetTexture(Core_Texture_Path);
             }
             else {
                 Texture = Textures.TEXTURE_STATUS_DEFAULT;
             }
-        }
-
-        public void LockAdding() {
-            prevent_adding = true;
         }
 
         //override with any specific effects
@@ -220,10 +212,12 @@ namespace ExperienceAndClasses.Systems {
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Example ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         public class Heal : Status {
-            //constructor must include ID and overwrite any core info
-            public Heal() : base(IDs.Heal) {
-                texture_path = "ExperienceAndClasses/Textures/Status/Heal";
-            }
+            //must override ID
+            public override IDs ID() { return IDs.Heal; }
+            public override uint ID_num() { return (uint)ID(); }
+
+            //may override any core info
+            protected override string Core_Texture_Path { get { return "ExperienceAndClasses/Textures/Status/Heal"; } }
 
             //must inlcude a static add method which creates a new instance (DO NOT REUSE THE LOOKUP INSTANCES)
             //add any non-core info to sync_data
