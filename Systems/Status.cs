@@ -42,9 +42,10 @@ namespace ExperienceAndClasses.Systems {
             NUMBER_OF_IDs, //leave this last
         }
 
-        public enum SYNC_DATA_TYPES : byte {
+        protected enum SYNC_DATA_TYPES : byte {
             MAGNITUDE,
         }
+        protected static readonly IEnumerable<SYNC_DATA_TYPES> SYNC_DATA_TYPES_STRINGS = Enum.GetValues(typeof(SYNC_DATA_TYPES)).Cast< SYNC_DATA_TYPES>();
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Auto-Populated Lookup ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -217,7 +218,21 @@ namespace ExperienceAndClasses.Systems {
             packet.Write(ID_num());
             packet.Write((byte)Owner.player.whoAmI);
             packet.Write((byte)Target.player.whoAmI);
-            //TODO
+
+            //gather data
+            List<double> data = new List<double>();
+            double value;
+            foreach (SYNC_DATA_TYPES type in SYNC_DATA_TYPES_STRINGS) {
+                if (sync_data.TryGetValue(type, out value)) {
+                    data.Add(value);
+                }
+            }
+
+            //write data
+            packet.Write((byte)data.Count);
+            foreach(double d in data) {
+                packet.Write(d);
+            }
         }
 
         public void ReadAddPacketBody(BinaryReader reader) {
