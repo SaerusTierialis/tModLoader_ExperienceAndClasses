@@ -187,7 +187,7 @@ namespace ExperienceAndClasses {
                 tool_power = 1f;
             }
 
-            Systems.Status.Heal.Add(player, this, 10);
+            //Systems.Status.Heal.Add(player, this, 10);
         }
 
         public override void PostUpdateEquips() {
