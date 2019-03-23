@@ -144,11 +144,11 @@ namespace ExperienceAndClasses {
                 }
 
                 //apply saved ui settings
-                UI.UIMain.Instance.panel.SetPosition(Commons.TryGet<float>(load_tag, "eac_ui_class_left", 300f), Commons.TryGet<float>(load_tag, "eac_ui_class_top", 300f));
-                UI.UIMain.Instance.panel.Auto =Commons.TryGet<bool>(load_tag, "eac_ui_class_auto", true);
+                UI.UIMain.Instance.panel.SetPosition(Utilities.Commons.TryGet<float>(load_tag, "eac_ui_class_left", 300f), Utilities.Commons.TryGet<float>(load_tag, "eac_ui_class_top", 300f));
+                UI.UIMain.Instance.panel.Auto =Utilities.Commons.TryGet<bool>(load_tag, "eac_ui_class_auto", true);
 
-                UI.UIAbility.Instance.panel.SetPosition(Commons.TryGet<float>(load_tag, "eac_ui_bars_left", 480f), Commons.TryGet<float>(load_tag, "eac_ui_bars_top", 10f));
-                UI.UIAbility.Instance.panel.Auto = Commons.TryGet<bool>(load_tag, "eac_ui_bars_auto", true);
+                UI.UIAbility.Instance.panel.SetPosition(Utilities.Commons.TryGet<float>(load_tag, "eac_ui_bars_left", 480f), Utilities.Commons.TryGet<float>(load_tag, "eac_ui_bars_top", 10f));
+                UI.UIAbility.Instance.panel.Auto = Utilities.Commons.TryGet<bool>(load_tag, "eac_ui_bars_auto", true);
 
                 //temp: show bars and status
                 UI.UIAbility.Instance.Visibility = true;
@@ -164,7 +164,7 @@ namespace ExperienceAndClasses {
                 initialized = true;
 
                 //get old xp one time if loaded old save
-                if (Commons.VersionIsOlder(Load_Version, new int[] { 2, 0, 0 })) {
+                if (Utilities.Commons.VersionIsOlder(Load_Version, new int[] { 2, 0, 0 })) {
                     old_xp = player.GetModPlayer<Legacy.MyPlayer>(mod).old_xp;
                 }
 
@@ -215,7 +215,7 @@ namespace ExperienceAndClasses {
                     Systems.XP.TRACK_PLAYER_XP[player.whoAmI] = 0;
 
                     if (ExperienceAndClasses.IS_SERVER) {
-                        PacketHandler.XP.Send(player.whoAmI, -1, xp);
+                        Utilities.PacketHandler.XP.Send(player.whoAmI, -1, xp);
                     }
                     else {
                         AddXP(xp);
@@ -305,7 +305,7 @@ namespace ExperienceAndClasses {
         public bool LocalSetClass(byte id, bool is_primary) {
             //local MPlayer only
             if (!Is_Local_Player) {
-                Commons.Error("Tried to set non-local player with SetClass! (please report)");
+                Utilities.Commons.Error("Tried to set non-local player with SetClass! (please report)");
                 return false;
             }
 
@@ -361,7 +361,7 @@ namespace ExperienceAndClasses {
                         break;
 
                     case CLASS_VALIDITY.INVALID_NON_LOCAL:
-                        Commons.Error("Tried to set non-local player with SetClass! (please report)");
+                        Utilities.Commons.Error("Tried to set non-local player with SetClass! (please report)");
                         break;
 
                     case CLASS_VALIDITY.INVALID_COMBAT:
@@ -369,7 +369,7 @@ namespace ExperienceAndClasses {
                         break;
 
                     default:
-                        Commons.Error("Failed to set class for unknown reasons! (please report)");
+                        Utilities.Commons.Error("Failed to set class for unknown reasons! (please report)");
                         break;
                 }
 
@@ -381,7 +381,7 @@ namespace ExperienceAndClasses {
         public bool UnlockClass(Systems.Class c) {
             //check locked
             if (Class_Unlocked[c.ID]) {
-                Commons.Error("Trying to unlock already unlocked class " + c.Name);
+                Utilities.Commons.Error("Trying to unlock already unlocked class " + c.Name);
                 return false;
             }
 
@@ -436,7 +436,7 @@ namespace ExperienceAndClasses {
         public bool UnlockSubclass() {
             //check locked
             if (Allow_Secondary) {
-                Commons.Error("Trying to unlock multiclassing when already unlocked");
+                Utilities.Commons.Error("Trying to unlock multiclassing when already unlocked");
                 return false;
             }
 
@@ -754,20 +754,20 @@ namespace ExperienceAndClasses {
                 //class and class levels
                 if ((clone.Class_Primary.ID != Class_Primary.ID) || (clone.Class_Secondary.ID != Class_Secondary.ID) ||
                     (clone.Class_Primary_Level_Effective != Class_Primary_Level_Effective) || (clone.Class_Secondary_Level_Effective != Class_Secondary_Level_Effective)) {
-                    PacketHandler.ForceClass.Send(-1, me, Class_Primary.ID, Class_Primary_Level_Effective, Class_Secondary.ID, Class_Secondary_Level_Effective);
+                    Utilities.PacketHandler.ForceClass.Send(-1, me, Class_Primary.ID, Class_Primary_Level_Effective, Class_Secondary.ID, Class_Secondary_Level_Effective);
                 }
 
                 //final attribute
                 for (byte i=0; i<(byte)Systems.Attribute.IDs.NUMBER_OF_IDs; i++) {
                     if (clone.Attributes_Final[i] != Attributes_Final[i]) {
-                        PacketHandler.ForceAttribute.Send(-1, me, Attributes_Final);
+                        Utilities.PacketHandler.ForceAttribute.Send(-1, me, Attributes_Final);
                         break;
                     }
                 }
 
                 //afk
                 if (clone.AFK != AFK) {
-                    PacketHandler.AFK.Send(-1, me, AFK);
+                    Utilities.PacketHandler.AFK.Send(-1, me, AFK);
                 }
 
                 //combat
@@ -794,14 +794,14 @@ namespace ExperienceAndClasses {
         /// </summary>
         private void FullSync() {
             //send one packet with everything needed
-            PacketHandler.ForceFull.Send(-1, (byte)player.whoAmI, Class_Primary.ID, Class_Primary_Level_Effective, Class_Secondary.ID, Class_Secondary_Level_Effective, Attributes_Final, AFK);
+            Utilities.PacketHandler.ForceFull.Send(-1, (byte)player.whoAmI, Class_Primary.ID, Class_Primary_Level_Effective, Class_Secondary.ID, Class_Secondary_Level_Effective, Attributes_Final, AFK);
         }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Sync Force Commands ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         public void ForceClass(byte primary_id, byte primary_level, byte secondary_id, byte secondary_level) {
             if (Is_Local_Player) {
-                Commons.Error("Cannot force class packet for local player");
+                Utilities.Commons.Error("Cannot force class packet for local player");
                 return;
             }
 
@@ -819,7 +819,7 @@ namespace ExperienceAndClasses {
 
         public void ForceAttribute(int[] attributes) {
             if (Is_Local_Player) {
-                Commons.Error("Cannot force attribute packet for local player");
+                Utilities.Commons.Error("Cannot force attribute packet for local player");
                 return;
             }
 
@@ -844,7 +844,7 @@ namespace ExperienceAndClasses {
 
         public void LocalAttributeAllocation1Point(byte id, bool add) {
             if (!Is_Local_Player) {
-                Commons.Error("Cannot set attribute allocation for non-local player");
+                Utilities.Commons.Error("Cannot set attribute allocation for non-local player");
                 return;
             }
             
@@ -862,7 +862,7 @@ namespace ExperienceAndClasses {
 
         public void LocalCalculateFinalAttributes() {
             if (!Is_Local_Player) {
-                Commons.Error("Cannot calculate final attribute for non-local player");
+                Utilities.Commons.Error("Cannot calculate final attribute for non-local player");
                 return;
             }
 
@@ -985,38 +985,38 @@ namespace ExperienceAndClasses {
             load_tag = tag;
 
             //old xp spent
-            old_xp = Commons.TryGet<double>(load_tag, "old_experience", 0);
+            old_xp = Utilities.Commons.TryGet<double>(load_tag, "old_experience", 0);
 
             //get version in case needed
-            Load_Version = Commons.TryGet<int[]>(load_tag, "eac_version", new int[3]);
+            Load_Version = Utilities.Commons.TryGet<int[]>(load_tag, "eac_version", new int[3]);
 
             //has killed wof
-            Killed_WOF = Commons.TryGet<bool>(load_tag, "eac_wof", Killed_WOF);
+            Killed_WOF = Utilities.Commons.TryGet<bool>(load_tag, "eac_wof", Killed_WOF);
 
             //subclass unlocked
-            Allow_Secondary = Commons.TryGet<bool>(load_tag, "eac_class_subclass_unlocked", Allow_Secondary);
+            Allow_Secondary = Utilities.Commons.TryGet<bool>(load_tag, "eac_class_subclass_unlocked", Allow_Secondary);
 
             //settings
-            show_xp = Commons.TryGet<bool>(load_tag, "eac_settings_show_xp", show_xp);
+            show_xp = Utilities.Commons.TryGet<bool>(load_tag, "eac_settings_show_xp", show_xp);
 
             //current classes
-            Class_Primary = Systems.Class.LOOKUP[Commons.TryGet<byte>(load_tag, "eac_class_current_primary", Class_Primary.ID)];
-            Class_Secondary = Systems.Class.LOOKUP[Commons.TryGet<byte>(load_tag, "eac_class_current_secondary", Class_Secondary.ID)];
+            Class_Primary = Systems.Class.LOOKUP[Utilities.Commons.TryGet<byte>(load_tag, "eac_class_current_primary", Class_Primary.ID)];
+            Class_Secondary = Systems.Class.LOOKUP[Utilities.Commons.TryGet<byte>(load_tag, "eac_class_current_secondary", Class_Secondary.ID)];
 
             //class unlocked
-            List<bool> class_unlock_loaded = Commons.TryGet<List<bool>>(load_tag, "eac_class_unlock", new List<bool>());
+            List<bool> class_unlock_loaded = Utilities.Commons.TryGet<List<bool>>(load_tag, "eac_class_unlock", new List<bool>());
             for (byte i = 0; i < class_unlock_loaded.Count; i++) {
                 Class_Unlocked[i] = class_unlock_loaded[i];
             }
 
             //class level
-            List<byte> class_level_loaded = Commons.TryGet<List<byte>>(load_tag, "eac_class_level", new List<byte>());
+            List<byte> class_level_loaded = Utilities.Commons.TryGet<List<byte>>(load_tag, "eac_class_level", new List<byte>());
             for (byte i = 0; i < class_level_loaded.Count; i++) {
                 Class_Levels[i] = class_level_loaded[i];
             }
 
             //class xp
-            List<uint> class_xp_loaded = Commons.TryGet<List<uint>>(load_tag, "eac_class_xp", new List<uint>());
+            List<uint> class_xp_loaded = Utilities.Commons.TryGet<List<uint>>(load_tag, "eac_class_xp", new List<uint>());
             for (byte i = 0; i < class_xp_loaded.Count; i++) {
                 Class_XP[i] = class_xp_loaded[i];
             }
@@ -1049,7 +1049,7 @@ namespace ExperienceAndClasses {
             }
 
             //allocated attributes
-            List<int> attribute_allocation = Commons.TryGet<List<int>>(load_tag, "eac_attribute_allocation", new List<int>());
+            List<int> attribute_allocation = Utilities.Commons.TryGet<List<int>>(load_tag, "eac_attribute_allocation", new List<int>());
             for(byte i = 0; i < attribute_allocation.Count; i++) {
                 if (Systems.Attribute.LOOKUP[i].Active) {
                     Attributes_Allocated[i] = attribute_allocation[i];
@@ -1112,7 +1112,7 @@ namespace ExperienceAndClasses {
                 }
             }
             else {
-                PacketHandler.Heal.Send((byte)player.whoAmI, (byte)Main.LocalPlayer.whoAmI, amount_life, amount_mana);
+                Utilities.PacketHandler.Heal.Send((byte)player.whoAmI, (byte)Main.LocalPlayer.whoAmI, amount_life, amount_mana);
             }
         }
         */

@@ -70,7 +70,7 @@ namespace ExperienceAndClasses.UI {
             ui_text_extra.Top.Set(Constants.UI_PADDING, 0f);
             panel.Append(ui_text_extra);
 
-            image = new UIImage(Textures.TEXTURE_BLANK);
+            image = new UIImage(Utilities.Textures.TEXTURE_BLANK);
             image.Left.Set(Constants.UI_PADDING, 0f);
             panel.Append(image);
 
@@ -99,7 +99,7 @@ namespace ExperienceAndClasses.UI {
                         break;
 
                     default:
-                        Commons.Error("Unsupported unlock action " + unlock_mode);
+                        Utilities.Commons.Error("Unsupported unlock action " + unlock_mode);
                         break;
                 }
                 ResetState();
@@ -139,7 +139,7 @@ namespace ExperienceAndClasses.UI {
                 float add_left;
                 float min_height_body = 0f;
                 if (texture == null) {
-                    image.SetImage(Textures.TEXTURE_BLANK);
+                    image.SetImage(Utilities.Textures.TEXTURE_BLANK);
                     add_left = 0;
                 }
                 else {
@@ -160,8 +160,8 @@ namespace ExperienceAndClasses.UI {
                     height += button_yes.Height.Pixels + Constants.UI_PADDING*3;
                     float height_button_center = height - Constants.UI_PADDING*2 - (button_yes.Height.Pixels / 2f);
 
-                    Commons.CenterUIElement(button_yes, (width - BUTTON_SEPARATION) / 2f, height_button_center);
-                    Commons.CenterUIElement(button_no, (width + BUTTON_SEPARATION) / 2f, height_button_center);
+                    Utilities.Commons.CenterUIElement(button_yes, (width - BUTTON_SEPARATION) / 2f, height_button_center);
+                    Utilities.Commons.CenterUIElement(button_no, (width + BUTTON_SEPARATION) / 2f, height_button_center);
                 }
                 else {
                     button_yes.visible = false;

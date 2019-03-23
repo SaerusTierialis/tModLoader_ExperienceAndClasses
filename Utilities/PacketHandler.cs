@@ -10,7 +10,7 @@ using Terraria;
 using Terraria.Localization;
 using Terraria.ModLoader;
 
-namespace ExperienceAndClasses {
+namespace ExperienceAndClasses.Utilities {
     /// <summary>
     /// Contains handlers for all mod packet types.
     /// 

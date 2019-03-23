@@ -102,7 +102,7 @@ namespace ExperienceAndClasses.Systems {
             }
             catch {
                 //no texture loaded, set blank to prevent crash
-                Texture = Textures.TEXTURE_BLANK;
+                Texture = Utilities.Textures.TEXTURE_BLANK;
             }
         }
 

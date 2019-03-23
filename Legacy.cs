@@ -20,7 +20,7 @@ namespace ExperienceAndClasses {
                 old_xp = 0;
             }
             public override void Load(TagCompound tag) {
-                old_xp = Commons.TryGet<double>(tag, "experience", 0);
+                old_xp = Utilities.Commons.TryGet<double>(tag, "experience", 0);
             }
             public override TagCompound Save() {
                 return new TagCompound {
@@ -35,11 +35,11 @@ namespace ExperienceAndClasses {
                 if (item.type > 0 && item.Name.Equals("Unloaded Item")) {
 
                     TagCompound tag = item.modItem.Save();
-                    string mod = Commons.TryGet<String>(tag, "mod", "");
+                    string mod = Utilities.Commons.TryGet<String>(tag, "mod", "");
 
                     if (mod.Equals("ExperienceAndClasses")) {
 
-                        string name = Commons.TryGet<String>(tag, "name", "");
+                        string name = Utilities.Commons.TryGet<String>(tag, "name", "");
 
                         double xp = 0;
                         ModItem[] items = new ModItem[0];

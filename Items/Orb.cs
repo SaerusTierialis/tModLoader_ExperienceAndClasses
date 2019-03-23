@@ -142,7 +142,7 @@ namespace ExperienceAndClasses.Items {
 
         public override void AddRecipes() {
             //convert boss orb to ascension orb
-            recipe = Commons.QuckRecipe(mod, new int[,] { { mod.ItemType<Orb_Boss>(), 1 } }, this, CONVERT_BOSS_ORB);
+            recipe = Utilities.Commons.QuckRecipe(mod, new int[,] { { mod.ItemType<Orb_Boss>(), 1 } }, this, CONVERT_BOSS_ORB);
         }
     }
 

@@ -67,7 +67,7 @@ namespace ExperienceAndClasses.Items {
 
         public string GetRecipeString(bool multiline=false) {
             if (recipe != null) {
-                return Commons.GetRecipeString(recipe, multiline);
+                return Utilities.Commons.GetRecipeString(recipe, multiline);
             }
             else {
                 //one-time runtime search for recipe if not set manually
@@ -76,7 +76,7 @@ namespace ExperienceAndClasses.Items {
                     foreach (Recipe r in Main.recipe) {
                         if (r.createItem.type == item.type) {
                             recipe = r;
-                            return Commons.GetRecipeString(recipe, multiline);
+                            return Utilities.Commons.GetRecipeString(recipe, multiline);
                         }
                     }
                 }

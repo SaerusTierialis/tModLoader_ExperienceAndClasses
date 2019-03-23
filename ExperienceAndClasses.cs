@@ -56,9 +56,9 @@ namespace ExperienceAndClasses {
             //hotkeys
             HOTKEY_UI = RegisterHotKey("Show Class Interface", "P");
 
-            //textures
+            //Textures
             if (!IS_SERVER) {
-                Textures.LoadTextures();
+                Utilities.Textures.LoadTextures();
             }
 
             //calculate xp requirements
@@ -115,11 +115,11 @@ namespace ExperienceAndClasses {
             byte packet_type = reader.ReadByte();
             int origin = reader.ReadInt32();
 
-            if (packet_type >= 0 && packet_type < (byte)PacketHandler.PACKET_TYPE.NUMBER_OF_TYPES) {
-                PacketHandler.LOOKUP[packet_type].Recieve(reader, origin);
+            if (packet_type >= 0 && packet_type < (byte)Utilities.PacketHandler.PACKET_TYPE.NUMBER_OF_TYPES) {
+                Utilities.PacketHandler.LOOKUP[packet_type].Recieve(reader, origin);
             }
             else {
-                Commons.Error("Cannot handle packet type id " + packet_type + " originating from " + origin);
+                Utilities.Commons.Error("Cannot handle packet type id " + packet_type + " originating from " + origin);
             }
         }
 

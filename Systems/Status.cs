@@ -216,7 +216,7 @@ namespace ExperienceAndClasses.Systems {
             }
 
             //create packet
-            ModPacket packet = PacketHandler.AddStatus.Instance.GetPacket(origin);
+            ModPacket packet = Utilities.PacketHandler.AddStatus.Instance.GetPacket(origin);
 
             //fill packet
             WriteAddPacketBody(packet);
@@ -289,7 +289,7 @@ namespace ExperienceAndClasses.Systems {
                 Texture_Buff = ModLoader.GetTexture(core_texture_path_buff);
             }
             else {
-                Texture_Buff = Textures.TEXTURE_STATUS_DEFAULT;
+                Texture_Buff = Utilities.Textures.TEXTURE_STATUS_DEFAULT;
             }
         }
 
@@ -307,7 +307,7 @@ namespace ExperienceAndClasses.Systems {
         protected double GetData(SYNC_DATA_TYPES key, double default_value = -1) {
             double value = default_value;
             if (!sync_data.TryGetValue(key, out value)) {
-                Commons.Error("Status attempted to access invalid sync data: " + GetType() + " " + key);
+                Utilities.Commons.Error("Status attempted to access invalid sync data: " + GetType() + " " + key);
             }
             return value;
         }

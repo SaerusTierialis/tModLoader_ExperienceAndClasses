@@ -41,7 +41,7 @@ namespace ExperienceAndClasses.UI {
             text_measure = Main.fontMouseText.MeasureString(text_select.Text);
             text_select.Width.Set(text_measure.X * text_size_hover, 0f);
             text_select.Height.Set(text_measure.Y / 2f * text_size_hover, 0f);
-            Commons.CenterUIElement(text_select, this);
+            Utilities.Commons.CenterUIElement(text_select, this);
             text_select.TextColor = COLOUR_SELECT;
             Append(text_select);
 
@@ -212,7 +212,7 @@ namespace ExperienceAndClasses.UI {
             Width.Set(UIStatus.BUFF_SIZE, 0f);
             Height.Set(UIStatus.BUFF_SIZE, 0f);
 
-            icon = new UITransparantImage(Textures.TEXTURE_BLANK, COLOUR_TRANSPARENT);
+            icon = new UITransparantImage(Utilities.Textures.TEXTURE_BLANK, COLOUR_TRANSPARENT);
             Append(icon);
 
             text = new UIText("", TEXT_SCALE);
@@ -383,7 +383,7 @@ namespace ExperienceAndClasses.UI {
             this.attribute = attribute;
             this.scale = scale;
 
-            left_final = width - (Textures.TEXTURE_BUTTON_SIZE*2) - RIGHT_SIDE_PADDING - UI.Constants.UI_PADDING;
+            left_final = width - (Utilities.Textures.TEXTURE_BUTTON_SIZE*2) - RIGHT_SIDE_PADDING - UI.Constants.UI_PADDING;
 
             SetPadding(0f);
             Left.Set(0f, 0f);
@@ -415,15 +415,15 @@ namespace ExperienceAndClasses.UI {
             final.Top.Set(top, 0f);
             Append(final);
 
-            UIImageButton button_add = new UIImageButton(Textures.TEXTURE_BUTTON_PLUS);
-            button_add.Width.Set(Textures.TEXTURE_BUTTON_SIZE, 0f);
-            button_add.Height.Set(Textures.TEXTURE_BUTTON_SIZE, 0f);
+            UIImageButton button_add = new UIImageButton(Utilities.Textures.TEXTURE_BUTTON_PLUS);
+            button_add.Width.Set(Utilities.Textures.TEXTURE_BUTTON_SIZE, 0f);
+            button_add.Height.Set(Utilities.Textures.TEXTURE_BUTTON_SIZE, 0f);
             button_add.Left.Set(width - (button_add.Width.Pixels * 2f) - RIGHT_SIDE_PADDING, 0f);
             button_add.Top.Set((height - button_add.Height.Pixels) / 2f, 0f);
             button_add.OnMouseDown += new MouseEvent(ClickAdd);
             Append(button_add);
 
-            UIImageButton button_subtract = new UIImageButton(Textures.TEXTURE_BUTTON_MINUS);
+            UIImageButton button_subtract = new UIImageButton(Utilities.Textures.TEXTURE_BUTTON_MINUS);
             button_subtract.Width.Set(height, 0f);
             button_subtract.Height.Set(height, 0f);
             button_subtract.Left.Set(width - button_add.Width.Pixels - RIGHT_SIDE_PADDING, 0f);
@@ -507,11 +507,11 @@ namespace ExperienceAndClasses.UI {
 
             button_size = Class.Texture.Width;
 
-            image_lock = new UIImage(Textures.TEXTURE_BLANK);
-            image_lock.Width.Set(Textures.TEXTURE_LOCK_WIDTH, 0f);
-            image_lock.Height.Set(Textures.TEXTURE_LOCK_HEIGHT, 0f);
-            image_lock.Left.Set(button_size / 2 - Textures.TEXTURE_LOCK_WIDTH / 2, 0f);
-            image_lock.Top.Set(button_size / 2 - Textures.TEXTURE_LOCK_HEIGHT / 2, 0f);
+            image_lock = new UIImage(Utilities.Textures.TEXTURE_BLANK);
+            image_lock.Width.Set(Utilities.Textures.TEXTURE_LOCK_WIDTH, 0f);
+            image_lock.Height.Set(Utilities.Textures.TEXTURE_LOCK_HEIGHT, 0f);
+            image_lock.Left.Set(button_size / 2 - Utilities.Textures.TEXTURE_LOCK_WIDTH / 2, 0f);
+            image_lock.Top.Set(button_size / 2 - Utilities.Textures.TEXTURE_LOCK_HEIGHT / 2, 0f);
             Append(image_lock);
 
             SetVisibility(1f, LOW_VISIBILITY);
@@ -565,7 +565,7 @@ namespace ExperienceAndClasses.UI {
             byte level = ExperienceAndClasses.LOCAL_MPLAYER.Class_Levels[Class.ID];
             if (ExperienceAndClasses.LOCAL_MPLAYER.Class_Unlocked[Class.ID]) {
                 //not locked
-                image_lock.SetImage(Textures.TEXTURE_BLANK);
+                image_lock.SetImage(Utilities.Textures.TEXTURE_BLANK);
 
                 //text level
                 string str = "";
@@ -593,10 +593,10 @@ namespace ExperienceAndClasses.UI {
             else {
                 //locked
                 if (ExperienceAndClasses.LOCAL_MPLAYER.HasClassPrereq(Class)) {
-                    image_lock.SetImage(Textures.TEXTURE_LOCK_BROWN);
+                    image_lock.SetImage(Utilities.Textures.TEXTURE_LOCK_BROWN);
                 }
                 else {
-                    image_lock.SetImage(Textures.TEXTURE_LOCK_RED);
+                    image_lock.SetImage(Utilities.Textures.TEXTURE_LOCK_RED);
                 }
                 SetVisibility(1f, LOW_VISIBILITY);
 
@@ -697,11 +697,11 @@ namespace ExperienceAndClasses.UI {
                 auto = value;
                 if (button_auto != null) {
                     if (auto) {
-                        button_auto.SetImage(Textures.TEXTURE_CORNER_BUTTON_AUTO);
+                        button_auto.SetImage(Utilities.Textures.TEXTURE_CORNER_BUTTON_AUTO);
                         button_auto.hoverText = "Hide In Inventory";
                     }
                     else {
-                        button_auto.SetImage(Textures.TEXTURE_CORNER_BUTTON_NO_AUTO);
+                        button_auto.SetImage(Utilities.Textures.TEXTURE_CORNER_BUTTON_NO_AUTO);
                         button_auto.hoverText = "Always Show";
                     }
                 }
@@ -727,9 +727,9 @@ namespace ExperienceAndClasses.UI {
             bool any_buttons = false;
 
             if (enable_close) {
-                button_close = new UIHoverImageButton(Textures.TEXTURE_CORNER_BUTTON_CLOSE, "Close");
-                button_close.Width.Set(Textures.TEXTURE_CORNER_BUTTON_SIZE, 0f);
-                button_close.Height.Set(Textures.TEXTURE_CORNER_BUTTON_SIZE, 0f);
+                button_close = new UIHoverImageButton(Utilities.Textures.TEXTURE_CORNER_BUTTON_CLOSE, "Close");
+                button_close.Width.Set(Utilities.Textures.TEXTURE_CORNER_BUTTON_SIZE, 0f);
+                button_close.Height.Set(Utilities.Textures.TEXTURE_CORNER_BUTTON_SIZE, 0f);
                 button_close.Top.Set(Constants.UI_PADDING, 0f);
                 button_close.OnClick += new MouseEvent(ButtonClickClose);
                 Append(button_close);
@@ -737,9 +737,9 @@ namespace ExperienceAndClasses.UI {
             }
 
             if (enable_auto) {
-                button_auto = new UIHoverImageButton(Textures.TEXTURE_BLANK, "");
-                button_auto.Width.Set(Textures.TEXTURE_CORNER_BUTTON_SIZE, 0f);
-                button_auto.Height.Set(Textures.TEXTURE_CORNER_BUTTON_SIZE, 0f);
+                button_auto = new UIHoverImageButton(Utilities.Textures.TEXTURE_BLANK, "");
+                button_auto.Width.Set(Utilities.Textures.TEXTURE_CORNER_BUTTON_SIZE, 0f);
+                button_auto.Height.Set(Utilities.Textures.TEXTURE_CORNER_BUTTON_SIZE, 0f);
                 button_auto.Top.Set(Constants.UI_PADDING, 0f);
                 button_auto.OnClick += new MouseEvent(ButtonClickAuto);
                 Append(button_auto);
@@ -748,7 +748,7 @@ namespace ExperienceAndClasses.UI {
             }
 
             if (any_buttons) {
-                button_panel = new DragableUIPanel(1, Textures.TEXTURE_CORNER_BUTTON_SIZE + Constants.UI_PADDING * 2f - BUTTON_PANEL_EDGE_SPACE, Constants.COLOR_UI_PANEL_BACKGROUND, UI, false, false, false, false);
+                button_panel = new DragableUIPanel(1, Utilities.Textures.TEXTURE_CORNER_BUTTON_SIZE + Constants.UI_PADDING * 2f - BUTTON_PANEL_EDGE_SPACE, Constants.COLOR_UI_PANEL_BACKGROUND, UI, false, false, false, false);
                 button_panel.Top.Set(BUTTON_PANEL_EDGE_SPACE, 0f);
                 button_panel.BorderColor = Color.Transparent;
                 Append(button_panel);
@@ -783,10 +783,10 @@ namespace ExperienceAndClasses.UI {
         public override void Recalculate() {
             float left = Width.Pixels - Constants.UI_PADDING;
             if (button_close != null) {
-                button_close.Left.Set(left -= Textures.TEXTURE_CORNER_BUTTON_SIZE, 0f);
+                button_close.Left.Set(left -= Utilities.Textures.TEXTURE_CORNER_BUTTON_SIZE, 0f);
             }
             if (button_auto != null) {
-                button_auto.Left.Set(left -= Textures.TEXTURE_CORNER_BUTTON_SIZE, 0f);
+                button_auto.Left.Set(left -= Utilities.Textures.TEXTURE_CORNER_BUTTON_SIZE, 0f);
             }
             if (button_panel != null) {
                 button_panel.Left.Set(left -= Constants.UI_PADDING, 0f);

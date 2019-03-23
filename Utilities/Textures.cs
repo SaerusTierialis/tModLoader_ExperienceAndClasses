@@ -5,7 +5,7 @@ using System.Reflection;
 using Terraria;
 using Terraria.ModLoader;
 
-namespace ExperienceAndClasses {
+namespace ExperienceAndClasses.Utilities {
     class Textures {
 
         public static Texture2D TEXTURE_BLANK { get; private set; }
