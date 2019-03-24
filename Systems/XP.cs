@@ -7,7 +7,7 @@ using Terraria;
 using Terraria.ID;
 
 namespace ExperienceAndClasses.Systems {
-    class XP {
+    static class XP {
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Constants ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         public const double SUBCLASS_PENALTY_XP_MULTIPLIER_PRIMARY = 0.7;
