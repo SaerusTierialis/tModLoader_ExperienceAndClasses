@@ -10,11 +10,6 @@ namespace ExperienceAndClasses.Systems {
     class XP {
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Constants ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-        //eater of world multipliers (I don't see a good way to grant all exp/drops from final piece so instead divide based on typical case)
-        private const double EATER_HEAD_MULT = 1.801792115f;
-        private const double EATER_BODY_MULT = 1.109713024f;
-        private const double EATER_TAIL_MULT = 0.647725809f;
-
         public const double SUBCLASS_PENALTY_XP_MULTIPLIER_PRIMARY = 0.7;
         public const double SUBCLASS_PENALTY_XP_MULTIPLIER_SECONDARY = 0.4;
 
@@ -50,15 +45,15 @@ namespace ExperienceAndClasses.Systems {
             //modify if exception
             switch (npc.netID) {
                 case NPCID.EaterofWorldsHead:
-                    xp *= EATER_HEAD_MULT;
+                    xp *= 1.801792115f;
                     break;
 
                 case NPCID.EaterofWorldsBody:
-                    xp *= EATER_BODY_MULT;
+                    xp *= 1.109713024f;
                     break;
 
                 case NPCID.EaterofWorldsTail:
-                    xp *= EATER_TAIL_MULT;
+                    xp *= 0.647725809f;
                     break;
             }
 
