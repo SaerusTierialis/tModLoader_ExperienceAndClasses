@@ -183,7 +183,7 @@ namespace ExperienceAndClasses.Systems {
             }
 
             //if owner is local and netmode is multiplayer, send to other clients (unless not sync)
-            if (status.core_sync && ExperienceAndClasses.IS_CLIENT && status.Owner.Equals(ExperienceAndClasses.LOCAL_MPLAYER)) {
+            if (status.core_sync && Utilities.Netmode.IS_CLIENT && status.Owner.Equals(ExperienceAndClasses.LOCAL_MPLAYER)) {
                 status.SendAddPacket();
             }
         }

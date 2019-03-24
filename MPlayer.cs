@@ -124,13 +124,13 @@ namespace ExperienceAndClasses {
         /// <param name="player"></param>
         public override void OnEnterWorld(Player player) {
             base.OnEnterWorld(player);
-            if (!ExperienceAndClasses.IS_SERVER) {
+            if (!Utilities.Netmode.IS_SERVER) {
                 //this is the current local player
                 Is_Local_Player = true;
                 ExperienceAndClasses.LOCAL_MPLAYER = this;
 
-                //is this multiplayer?
-                ExperienceAndClasses.CheckMultiplater();
+                //singleplayer or client?
+                Utilities.Netmode.UpdateNetmode();
 
                 //start timer for next full sync
                 time_next_full_sync = DateTime.Now.AddTicks(TICKS_PER_FULL_SYNC);
@@ -205,7 +205,7 @@ namespace ExperienceAndClasses {
             DateTime now = DateTime.Now;
 
             //server/singleplayer
-            if (!ExperienceAndClasses.IS_CLIENT) {
+            if (!Utilities.Netmode.IS_CLIENT) {
 
                 //sending xp packets (or handle locally in chunks)
                 uint xp = Systems.XP.TRACK_PLAYER_XP[player.whoAmI];
@@ -214,7 +214,7 @@ namespace ExperienceAndClasses {
                     send_xp_when = now.AddTicks(TICKS_PER_XP_SEND);
                     Systems.XP.TRACK_PLAYER_XP[player.whoAmI] = 0;
 
-                    if (ExperienceAndClasses.IS_SERVER) {
+                    if (Utilities.Netmode.IS_SERVER) {
                         Utilities.PacketHandler.XP.Send(player.whoAmI, -1, xp);
                     }
                     else {
@@ -678,7 +678,7 @@ namespace ExperienceAndClasses {
 
         public void AnnounceLevel(Systems.Class c) {
             //client/singleplayer only
-            if (ExperienceAndClasses.IS_SERVER)
+            if (Utilities.Netmode.IS_SERVER)
                 return;
 
             byte level = Class_Levels[c.ID];

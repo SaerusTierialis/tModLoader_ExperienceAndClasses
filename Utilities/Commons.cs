@@ -160,13 +160,13 @@ namespace ExperienceAndClasses.Utilities {
 
         public static void Error(string message) {
             message = message + " (please report)";
-            if (ExperienceAndClasses.IS_SERVER) {
+            if (Utilities.Netmode.IS_SERVER) {
                 message = "ERROR from Server: " + message;
                 Console.WriteLine(message);
                 NetMessage.BroadcastChatMessage(NetworkText.FromLiteral(message), UI.Constants.COLOUR_MESSAGE_ERROR);
             }
             else {
-                if (ExperienceAndClasses.IS_CLIENT) {
+                if (Utilities.Netmode.IS_CLIENT) {
                     message = "ERROR from Player" + Main.LocalPlayer.whoAmI + ": " + message;
                     Main.NewText("Sending " + message, UI.Constants.COLOUR_MESSAGE_ERROR);
                     PacketHandler.Broadcast.Send(-1, (byte)Main.LocalPlayer.whoAmI, message);
@@ -179,13 +179,13 @@ namespace ExperienceAndClasses.Utilities {
         }
 
         public static void Trace(string message) {
-            if (ExperienceAndClasses.IS_SERVER) {
+            if (Utilities.Netmode.IS_SERVER) {
                 message = "TRACE from Server: " + message;
                 Console.WriteLine(message);
                 NetMessage.BroadcastChatMessage(NetworkText.FromLiteral(message), UI.Constants.COLOUR_MESSAGE_TRACE);
             }
             else {
-                if (ExperienceAndClasses.IS_CLIENT) {
+                if (Utilities.Netmode.IS_CLIENT) {
                     message = "TRACE from Player" + Main.LocalPlayer.whoAmI + ": " + message;
                     Main.NewText("Sending " + message, UI.Constants.COLOUR_MESSAGE_TRACE);
                     PacketHandler.Broadcast.Send(-1, (byte)Main.LocalPlayer.whoAmI, message);

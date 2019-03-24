@@ -50,7 +50,7 @@ namespace ExperienceAndClasses {
             List<int> eligible_players = new List<int>();
             Player player;
             MPlayer mplayer;
-            if (ExperienceAndClasses.IS_SERVER) {
+            if (Utilities.Netmode.IS_SERVER) {
                 bool treat_as_boss = TreatAsBoss(npc);
                 for (int player_index = 0; player_index < 255; player_index++) {
                     player = Main.player[player_index];

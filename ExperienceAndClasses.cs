@@ -27,9 +27,6 @@ namespace ExperienceAndClasses {
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Treated like readonly after entering map ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-        //updated client-side when entering game to detect client vs singleplayer mode
-        public static bool IS_SERVER, IS_CLIENT, IS_SINGLEPLAYER;
-
         public static MPlayer LOCAL_MPLAYER;
         public static Mod MOD;
 
@@ -44,7 +41,7 @@ namespace ExperienceAndClasses {
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Constructor ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         public ExperienceAndClasses() {
-            CheckMultiplater();
+            Utilities.Netmode.UpdateNetmode();
         }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Load/Unload ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
@@ -57,7 +54,7 @@ namespace ExperienceAndClasses {
             HOTKEY_UI = RegisterHotKey("Show Class Interface", "P");
 
             //Textures
-            if (!IS_SERVER) {
+            if (!Utilities.Netmode.IS_SERVER) {
                 Utilities.Textures.LoadTextures();
             }
 
@@ -137,13 +134,6 @@ namespace ExperienceAndClasses {
             });
             // Registers the new recipe group with the specified name
             RecipeGroup.RegisterGroup(RECIPE_GROUP_MECHANICAL_SOUL, mechanical_soul);
-        }
-
-        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Other ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-        public static void CheckMultiplater() {
-            IS_SERVER = (Main.netMode == NetmodeID.Server);
-            IS_CLIENT = (Main.netMode == NetmodeID.MultiplayerClient);
-            IS_SINGLEPLAYER = (Main.netMode == NetmodeID.SinglePlayer);
         }
     }
 }

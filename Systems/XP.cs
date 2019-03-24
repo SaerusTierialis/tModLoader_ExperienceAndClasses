@@ -8,7 +8,6 @@ using Terraria.ID;
 
 namespace ExperienceAndClasses.Systems {
     class XP {
-
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Constants ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         //eater of world multipliers (I don't see a good way to grant all exp/drops from final piece so instead divide based on typical case)
@@ -30,7 +29,7 @@ namespace ExperienceAndClasses.Systems {
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ XP ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         public static void AddXP(byte player_index, double xp) {
-            if (!ExperienceAndClasses.IS_CLIENT) {
+            if (!Utilities.Netmode.IS_CLIENT) {
                 TRACK_PLAYER_XP[player_index] += ModifyXP(player_index, xp);
             }
         }

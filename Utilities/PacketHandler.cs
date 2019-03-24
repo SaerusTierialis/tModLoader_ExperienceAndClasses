@@ -173,7 +173,7 @@ namespace ExperienceAndClasses.Utilities {
                 origin_mplayer.ForceClass(bytes[0], bytes[1], bytes[2], bytes[3]);
 
                 //relay
-                if (ExperienceAndClasses.IS_SERVER) {
+                if (Utilities.Netmode.IS_SERVER) {
                     Send(-1, origin, bytes[0], bytes[1], bytes[2], bytes[3]);
                 }
             }
@@ -211,7 +211,7 @@ namespace ExperienceAndClasses.Utilities {
                 origin_mplayer.ForceAttribute(attributes);
 
                 //relay
-                if (ExperienceAndClasses.IS_SERVER) {
+                if (Utilities.Netmode.IS_SERVER) {
                     Send(-1, origin, attributes);
                 }
             }
@@ -245,7 +245,7 @@ namespace ExperienceAndClasses.Utilities {
                 origin_mplayer.SetInCombat(afk_status);
 
                 //relay
-                if (ExperienceAndClasses.IS_SERVER) {
+                if (Utilities.Netmode.IS_SERVER) {
                     Send(-1, origin, afk_status);
                 }
             }
@@ -277,7 +277,7 @@ namespace ExperienceAndClasses.Utilities {
                 origin_mplayer.SetInCombat(combat_status);
 
                 //relay
-                if (ExperienceAndClasses.IS_SERVER) {
+                if (Utilities.Netmode.IS_SERVER) {
                     Send(-1, origin, combat_status);
                 }
             }
@@ -301,7 +301,7 @@ namespace ExperienceAndClasses.Utilities {
                 packet.Write(amount_mana);
 
                 //send
-                if (ExperienceAndClasses.IS_SERVER) {
+                if (Utilities.Netmode.IS_SERVER) {
                     packet.Send(target, origin);
                 }
                 else {
