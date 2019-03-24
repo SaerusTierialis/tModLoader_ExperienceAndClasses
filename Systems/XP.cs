@@ -29,37 +29,6 @@ namespace ExperienceAndClasses.Systems {
             }
         }
 
-        public static double CalculateXP(NPC npc) {
-            //xp is double until it is added to mplayer as uint
-
-            //no exp from statue, critter, or friendly
-            if (npc.SpawnedFromStatue || npc.lifeMax <= 5 || npc.friendly) return 0f;
-
-            //calculate
-            double xp = 0;
-            if (npc.defDefense >= 1000)
-                xp = (npc.lifeMax / 100d) * (1d + (npc.defDamage / 25d));
-            else
-                xp = (npc.lifeMax / 100d) * (1d + (npc.defDefense / 10d)) * (1d + (npc.defDamage / 25d));
-
-            //modify if exception
-            switch (npc.netID) {
-                case NPCID.EaterofWorldsHead:
-                    xp *= 1.801792115f;
-                    break;
-
-                case NPCID.EaterofWorldsBody:
-                    xp *= 1.109713024f;
-                    break;
-
-                case NPCID.EaterofWorldsTail:
-                    xp *= 0.647725809f;
-                    break;
-            }
-
-            return xp;
-        }
-
         public static uint ModifyXP(byte player_index, double xp) {
             Player player = Main.player[player_index];
 

@@ -55,12 +55,12 @@
     </AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Systems\NPCRewards.cs" />
     <Compile Include="Utilities\Commons.cs" />
     <Compile Include="Items\MItem.cs" />
     <Compile Include="Items\Orb.cs" />
     <Compile Include="Items\Unlock.cs" />
     <Compile Include="Systems\Legacy.cs" />
-    <Compile Include="MNPC.cs" />
     <Compile Include="Utilities\Netmode.cs" />
     <Compile Include="Utilities\PacketHandler.cs" />
     <Compile Include="ExperienceAndClasses.cs" />
