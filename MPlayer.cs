@@ -48,8 +48,6 @@ namespace ExperienceAndClasses {
 
         public List<Projectile> minions;
 
-        public double old_xp; //pre-revamp xp
-
         public Systems.Status[] Status { get; private set; }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Instance Vars (syncing) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
@@ -80,7 +78,6 @@ namespace ExperienceAndClasses {
             show_xp = true;
             send_xp_when = DateTime.MinValue;
             minions = new List<Projectile>();
-            old_xp = 0;
             Status = new Systems.Status[(uint)Systems.Status.IDs.NUMBER_OF_IDs];
 
             //default level/xp/unlock
@@ -162,15 +159,6 @@ namespace ExperienceAndClasses {
 
                 //initialized
                 initialized = true;
-
-                //get old xp one time if loaded old save
-                if (Utilities.Commons.VersionIsOlder(Load_Version, new int[] { 2, 0, 0 })) {
-                    old_xp = player.GetModPlayer<Legacy.MyPlayer>(mod).old_xp;
-                }
-
-                //convert old items (call twice in case inventory is pretty full and first call makes room)
-                Legacy.ConvertLegacyItems(player);
-                Legacy.ConvertLegacyItems(player);
             }
         }
 
@@ -976,16 +964,12 @@ namespace ExperienceAndClasses {
                 {"eac_attribute_allocation", attributes_allocated },
                 {"eac_wof", Killed_WOF },
                 {"eac_settings_show_xp", show_xp},
-                {"old_experience", old_xp},
             };
         }
 
         public override void Load(TagCompound tag) {
             //some settings must be applied after init
             load_tag = tag;
-
-            //old xp spent
-            old_xp = Utilities.Commons.TryGet<double>(load_tag, "old_experience", 0);
 
             //get version in case needed
             Load_Version = Utilities.Commons.TryGet<int[]>(load_tag, "eac_version", new int[3]);
