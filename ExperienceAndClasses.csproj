@@ -70,6 +70,7 @@
     <Compile Include="Systems\Class.cs" />
     <Compile Include="Systems\Status.cs" />
     <Compile Include="Systems\XP.cs" />
+    <Compile Include="Utilities\Search.cs" />
     <Compile Include="Utilities\Textures.cs" />
     <Compile Include="UI\Elements.cs" />
     <Compile Include="UI\Constants.cs" />
