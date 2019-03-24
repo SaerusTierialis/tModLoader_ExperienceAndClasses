@@ -9,7 +9,7 @@ using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
 
 /// <summary>
-/// Handles conversion from legacy versions + maintains amount of old xp available to revamp
+/// Handles conversion from legacy versions (pre 2.0). Also maintains amount of legacy xp available.
 /// </summary>
 namespace ExperienceAndClasses.Utilities {
     static class Legacy {
@@ -17,57 +17,57 @@ namespace ExperienceAndClasses.Utilities {
         /// Must use the ModPlayer name "MyPlayer"
         /// </summary>
         public class MyPlayer : ModPlayer {
-            private double old_xp, old_xp_spent, old_xp_available;
+            private double legacy_xp, legacy_xp_spent, legacy_xp_available;
 
             public override void Initialize() {
-                old_xp = 0;
-                old_xp_spent = 0;
-                old_xp_available = 0;
+                legacy_xp = 0;
+                legacy_xp_spent = 0;
+                legacy_xp_available = 0;
             }
             public override void Load(TagCompound tag) {
-                old_xp = Utilities.Commons.TryGet<double>(tag, "experience", 0);
-                old_xp_spent = Utilities.Commons.TryGet<double>(tag, "experience_spent", 0);
+                legacy_xp = Utilities.Commons.TryGet<double>(tag, "experience", 0);
+                legacy_xp_spent = Utilities.Commons.TryGet<double>(tag, "experience_spent", 0);
             }
             public override TagCompound Save() {
                 return new TagCompound {
-                    {"experience", old_xp },
-                    {"experience_spent", old_xp_spent },
+                    {"experience", legacy_xp },
+                    {"experience_spent", legacy_xp_spent },
                 };
             }
             public override void OnEnterWorld(Player player) {
-                //convert old items into old xp/new items
+                //convert legacy items into legacy xp/new items
                 ConvertLegacyItems();
 
-                //update amount of old_xp that is available to revamp
-                UpdateOldXPAvailable();
+                //update amount of legacy_xp that is available to revamp
+                UpdateXPAvailable();
             }
 
-            private void UpdateOldXPAvailable() {
-                old_xp_available = old_xp - old_xp_spent;
+            private void UpdateXPAvailable() {
+                legacy_xp_available = legacy_xp - legacy_xp_spent;
             }
 
-            public double GetOldXPAvailable() {
-                return old_xp_available;
+            public double GetXPAvailable() {
+                return legacy_xp_available;
             }
 
-            public bool SpendOldXP(double amount) {
-                if (old_xp_available >= amount) {
-                    old_xp_spent += amount;
-                    UpdateOldXPAvailable();
+            public bool SpendXP(double amount) {
+                if (legacy_xp_available >= amount) {
+                    legacy_xp_spent += amount;
+                    UpdateXPAvailable();
                     return true;
                 }
                 else {
-                    //not enough old xp
+                    //not enough
                     return false;
                 }
             }
 
             /// <summary>
-            /// Search inventory for legacy items (tokens, orbs, etc.) and convert them to new items/old_xp as long as there is enough inventory space. The xp is added to the legacy value so it is also available to older versions.
+            /// Search inventory for legacy items (tokens, orbs, etc.) and convert them to new items/legacy_xp as long as there is enough inventory space. The xp is added to the legacy value so it is also available to older versions.
             /// </summary>
             /// <param name="player"></param>
             public void ConvertLegacyItems() {
-                double prior_old_xp;
+                double prior_legacy_xp;
                 for (int loop = 0; loop <= 1; loop++) { //loop twice in case first loop clears up enough space for other conversions
                     foreach (Item item in player.inventory) {
                         if (item.type > 0 && item.Name.Equals("Unloaded Item")) {
@@ -243,10 +243,10 @@ namespace ExperienceAndClasses.Utilities {
                                         }
 
                                         //add xp (check for overflow) for use in revamp versions
-                                        prior_old_xp = old_xp;
-                                        old_xp += (xp * num);
-                                        if (old_xp < prior_old_xp) {
-                                            old_xp = double.MaxValue;
+                                        prior_legacy_xp = legacy_xp;
+                                        legacy_xp += (xp * num);
+                                        if (legacy_xp < prior_legacy_xp) {
+                                            legacy_xp = double.MaxValue;
                                         }
 
                                         //add item
