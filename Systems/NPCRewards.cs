@@ -69,10 +69,7 @@ namespace ExperienceAndClasses.Systems {
                 OrbDrop(base_xp, treat_as_boss, npc, eligible_players, reward_modifier);
 
                 //award xp
-                double xp_per_player = base_xp * reward_modifier;
-                foreach (byte player_index in eligible_players) {
-                    XP.Rewards.ServerTallyCombatXP(player_index, xp_per_player);
-                }
+                AwardXP(base_xp, eligible_players, reward_modifier);
             }
         }
 
@@ -110,6 +107,19 @@ namespace ExperienceAndClasses.Systems {
                 eligible_players.Add((byte)Main.LocalPlayer.whoAmI);
             }
             return eligible_players;
+        }
+
+        /// <summary>
+        /// Award players with xp
+        /// </summary>
+        /// <param name="base_xp"></param>
+        /// <param name="eligible_players"></param>
+        /// <param name="reward_modifier"></param>
+        private static void AwardXP(double base_xp, List<byte> eligible_players, double reward_modifier) {
+            double xp = base_xp * reward_modifier;
+            foreach (byte player_index in eligible_players) {
+                XP.Rewards.ServerTallyCombatXP(player_index, xp);
+            }
         }
 
         /// <summary>
