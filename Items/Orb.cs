@@ -101,10 +101,10 @@ namespace ExperienceAndClasses.Items {
         private uint GetPrimaryValue() {
             if (ExperienceAndClasses.LOCAL_MPLAYER.CanGainXPPrimary()) {
                 if (ExperienceAndClasses.LOCAL_MPLAYER.CanGainXPSecondary()) {
-                    return (uint)Math.Ceiling(0.5 * xp_multiplier * Systems.XP.GetBossOrbXP(ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary, ExperienceAndClasses.LOCAL_MPLAYER.Class_Levels[ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary.ID]));
+                    return (uint)Math.Ceiling(0.5 * xp_multiplier * Systems.XP.Rewards.GetBossOrbXP(ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary, ExperienceAndClasses.LOCAL_MPLAYER.Class_Levels[ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary.ID]));
                 }
                 else {
-                    return (uint)Math.Ceiling(xp_multiplier * Systems.XP.GetBossOrbXP(ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary, ExperienceAndClasses.LOCAL_MPLAYER.Class_Levels[ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary.ID]));
+                    return (uint)Math.Ceiling(xp_multiplier * Systems.XP.Rewards.GetBossOrbXP(ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary, ExperienceAndClasses.LOCAL_MPLAYER.Class_Levels[ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary.ID]));
                 }
             }
             else {
@@ -115,10 +115,10 @@ namespace ExperienceAndClasses.Items {
         private uint GetSecondaryValue() {
             if (ExperienceAndClasses.LOCAL_MPLAYER.CanGainXPSecondary()) {
                 if (ExperienceAndClasses.LOCAL_MPLAYER.CanGainXPPrimary()) {
-                    return (uint)Math.Ceiling(0.5 * xp_multiplier * Systems.XP.GetBossOrbXP(ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary, ExperienceAndClasses.LOCAL_MPLAYER.Class_Levels[ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary.ID]));
+                    return (uint)Math.Ceiling(0.5 * xp_multiplier * Systems.XP.Rewards.GetBossOrbXP(ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary, ExperienceAndClasses.LOCAL_MPLAYER.Class_Levels[ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary.ID]));
                 }
                 else {
-                    return (uint)Math.Ceiling(xp_multiplier * Systems.XP.GetBossOrbXP(ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary, ExperienceAndClasses.LOCAL_MPLAYER.Class_Levels[ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary.ID]));
+                    return (uint)Math.Ceiling(xp_multiplier * Systems.XP.Rewards.GetBossOrbXP(ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary, ExperienceAndClasses.LOCAL_MPLAYER.Class_Levels[ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary.ID]));
                 }
             }
             else {

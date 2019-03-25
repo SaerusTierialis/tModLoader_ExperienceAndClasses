@@ -112,7 +112,7 @@ namespace ExperienceAndClasses {
             tool_power = 1f;
 
             //xp
-            Systems.XP.TRACK_PLAYER_XP[player.whoAmI] = 0;
+            Systems.XP.Rewards.TRACK_PLAYER_XP[player.whoAmI] = 0;
         }
 
         /// <summary>
@@ -196,11 +196,11 @@ namespace ExperienceAndClasses {
             if (!Utilities.Netmode.IS_CLIENT) {
 
                 //sending xp packets (or handle locally in chunks)
-                uint xp = Systems.XP.TRACK_PLAYER_XP[player.whoAmI];
+                uint xp = Systems.XP.Rewards.TRACK_PLAYER_XP[player.whoAmI];
                 if ((xp > 0) && (now.CompareTo(send_xp_when) >= 0)) {
 
                     send_xp_when = now.AddTicks(TICKS_PER_XP_SEND);
-                    Systems.XP.TRACK_PLAYER_XP[player.whoAmI] = 0;
+                    Systems.XP.Rewards.TRACK_PLAYER_XP[player.whoAmI] = 0;
 
                     if (Utilities.Netmode.IS_SERVER) {
                         Utilities.PacketHandler.XP.Send(player.whoAmI, -1, xp);
@@ -619,13 +619,13 @@ namespace ExperienceAndClasses {
             byte effective_secondary = Class_Secondary_Level_Effective;
 
             //level up
-            while ((Class_Levels[Class_Primary.ID] < Class_Primary.Max_Level) && (Class_XP[Class_Primary.ID] >= Systems.XP.GetXPReq(Class_Primary, Class_Levels[Class_Primary.ID]))) {
-                SubtractXP(Class_Primary.ID, Systems.XP.GetXPReq(Class_Primary, Class_Levels[Class_Primary.ID]));
+            while ((Class_Levels[Class_Primary.ID] < Class_Primary.Max_Level) && (Class_XP[Class_Primary.ID] >= Systems.XP.Requirements.GetXPReq(Class_Primary, Class_Levels[Class_Primary.ID]))) {
+                SubtractXP(Class_Primary.ID, Systems.XP.Requirements.GetXPReq(Class_Primary, Class_Levels[Class_Primary.ID]));
                 Class_Levels[Class_Primary.ID]++;
                 AnnounceLevel(Class_Primary);
             }
-            while ((Class_Levels[Class_Secondary.ID] < Class_Secondary.Max_Level) && (Class_XP[Class_Secondary.ID] >= Systems.XP.GetXPReq(Class_Secondary, Class_Levels[Class_Secondary.ID]))) {
-                SubtractXP(Class_Secondary.ID, Systems.XP.GetXPReq(Class_Secondary, Class_Levels[Class_Secondary.ID]));
+            while ((Class_Levels[Class_Secondary.ID] < Class_Secondary.Max_Level) && (Class_XP[Class_Secondary.ID] >= Systems.XP.Requirements.GetXPReq(Class_Secondary, Class_Levels[Class_Secondary.ID]))) {
+                SubtractXP(Class_Secondary.ID, Systems.XP.Requirements.GetXPReq(Class_Secondary, Class_Levels[Class_Secondary.ID]));
                 Class_Levels[Class_Secondary.ID]++;
                 AnnounceLevel(Class_Secondary);
             }
@@ -1009,8 +1009,8 @@ namespace ExperienceAndClasses {
             for (byte id = 0; id < (byte)Systems.Class.IDs.NUMBER_OF_IDs; id++) {
 
                 //level up if required xp changed
-                while ((Class_Levels[id] < Systems.Class.LOOKUP[id].Max_Level) && (Class_XP[id] >= Systems.XP.GetXPReq(Systems.Class.LOOKUP[id], Class_Levels[id]))) {
-                    SubtractXP(id, Systems.XP.GetXPReq(Systems.Class.LOOKUP[id], Class_Levels[id]));
+                while ((Class_Levels[id] < Systems.Class.LOOKUP[id].Max_Level) && (Class_XP[id] >= Systems.XP.Requirements.GetXPReq(Systems.Class.LOOKUP[id], Class_Levels[id]))) {
+                    SubtractXP(id, Systems.XP.Requirements.GetXPReq(Systems.Class.LOOKUP[id], Class_Levels[id]));
                     Class_Levels[id]++;
                 }
 

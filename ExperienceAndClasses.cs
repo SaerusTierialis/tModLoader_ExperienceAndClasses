@@ -59,7 +59,7 @@ namespace ExperienceAndClasses {
             }
 
             //calculate xp requirements
-            Systems.XP.CalcXPRequirements();
+            Systems.XP.Requirements.SetupXPRequirements();
         }
 
         public override void Unload() {
