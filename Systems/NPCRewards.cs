@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -12,6 +13,14 @@ namespace ExperienceAndClasses.Systems {
 
         //rewards are increased prior to division based on the number of eligable players 
         private const double PER_PLAYER_MODIFIER = 0.2;
+
+        //orb drop values (min/max is before number-of-players modifier)
+        private const double DROP_CHANCE_ORB_MONSTER_MIN = 0.0001;
+        private const double DROP_CHANCE_ORB_MONSTER_MAX = 0.01;
+        private const double DROP_CHANCE_ORB_MONSTER_MODIFIER = 2;
+        private const double DROP_CHANCE_ORB_BOSS_MIN = 0.01;
+        private const double DROP_CHANCE_ORB_BOSS_MAX = 0.5;
+        private const double DROP_CHANCE_ORB_BOSS_MODIFIER = 1.5;
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Varibles ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -66,7 +75,7 @@ namespace ExperienceAndClasses.Systems {
                 double reward_modifier = (1 + ((eligible_players.Count - 1) * PER_PLAYER_MODIFIER)) / eligible_players.Count;
 
                 //orb loot
-                OrbDrop(base_xp, treat_as_boss, npc, eligible_players, reward_modifier);
+                AwardOrbs(base_xp, treat_as_boss, npc, eligible_players, reward_modifier);
 
                 //award xp
                 AwardXP(base_xp, eligible_players, reward_modifier);
@@ -130,8 +139,58 @@ namespace ExperienceAndClasses.Systems {
         /// <param name="npc"></param>
         /// <param name="eligible_players"></param>
         /// <param name="reward_modifier"></param>
-        private static void OrbDrop(double base_xp, bool treat_as_boss, NPC npc, List<byte> eligible_players, double reward_modifier) {
-            //TODO
+        private static void AwardOrbs(double base_xp, bool treat_as_boss, NPC npc, List<byte> eligible_players, double reward_modifier) {
+            //backup npc interactions
+            bool[] prior_interactions = npc.playerInteraction;
+
+            //init orb interactions
+            bool[] orb_monster_interactions = new bool[prior_interactions.Length];
+            bool[] orb_boss_interactions = new bool[prior_interactions.Length];
+
+            //track any drop
+            bool any_orb_monster = false;
+            bool any_orb_boss = false;
+
+            //process players
+            MPlayer mplayer;
+            foreach (byte player_index in eligible_players) {
+                mplayer = Main.player[player_index].GetModPlayer<MPlayer>(ExperienceAndClasses.MOD);
+
+                //TODO: maybe make GetProgression in MPlayer in case it changes?? sync a progression value instead?
+                if (Main.rand.NextDouble() <= CalculateOrbChanceMonster(base_xp, mplayer.Allocation_Points_Total, reward_modifier)) {
+                    orb_monster_interactions[player_index] = true;
+                    any_orb_monster = true;
+                }
+
+                //TODO: boss orb
+
+            }
+
+            //monster orb drop
+            if (any_orb_monster) {
+                npc.playerInteraction = orb_monster_interactions;
+                npc.DropItemInstanced(npc.position, npc.Size, ExperienceAndClasses.MOD.ItemType<Items.Orb_Monster>(), 1, true);
+            }
+
+            //boss orb drop
+            if (any_orb_boss) {
+                npc.playerInteraction = orb_boss_interactions;
+                npc.DropItemInstanced(npc.position, npc.Size, ExperienceAndClasses.MOD.ItemType<Items.Orb_Boss>(), 1, true);
+            }
+
+            //restore interactions
+            npc.playerInteraction = prior_interactions;
+        }
+
+        /// <summary>
+        /// Returns chance ratio for monster orb
+        /// </summary>
+        /// <param name="base_xp"></param>
+        /// <param name="player_progression"></param>
+        /// <param name="reward_modifier"></param>
+        /// <returns></returns>
+        private static double CalculateOrbChanceMonster(double base_xp, int player_progression, double reward_modifier) {
+            return Math.Max(Math.Min(base_xp / Math.Pow(player_progression, DROP_CHANCE_ORB_MONSTER_MODIFIER), DROP_CHANCE_ORB_MONSTER_MAX), DROP_CHANCE_ORB_MONSTER_MIN) * reward_modifier;
         }
 
         /// <summary>

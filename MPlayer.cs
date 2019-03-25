@@ -36,7 +36,6 @@ namespace ExperienceAndClasses {
         public int[] Attributes_Bonus { get; private set; }
         public int Allocation_Points_Unallocated { get; private set; }
         private int Allocation_Points_Spent;
-        private int Allocation_Points_Total;
 
         public float heal_damage; //TODO
         public float dodge_chance; //TODO
@@ -55,6 +54,7 @@ namespace ExperienceAndClasses {
         public byte Class_Primary_Level_Effective { get; private set; }
         public byte Class_Secondary_Level_Effective { get; private set; }
 
+        public int Allocation_Points_Total { get; private set; }
         public int[] Attributes_Final { get; private set; }
         public bool AFK { get; private set; } //TODO local set
         public bool IN_COMBAT { get; private set; } //TODO local set
@@ -700,6 +700,8 @@ namespace ExperienceAndClasses {
 
             Attributes_Final.CopyTo(clone.Attributes_Final, 0);
 
+            clone.Allocation_Points_Total = Allocation_Points_Total;
+
             clone.AFK = AFK;
             clone.IN_COMBAT = IN_COMBAT;
         }
@@ -734,6 +736,11 @@ namespace ExperienceAndClasses {
                     }
                 }
 
+                //allocation points (measure of character progression)
+                if (clone.Allocation_Points_Total != Allocation_Points_Total) {
+                    //TODO
+                }
+
                 //afk
                 if (clone.AFK != AFK) {
                     Utilities.PacketHandler.AFK.Send(-1, me, AFK);
@@ -741,7 +748,7 @@ namespace ExperienceAndClasses {
 
                 //combat
                 if (clone.IN_COMBAT != IN_COMBAT) {
-
+                    //TODO
                 }
 
             }
