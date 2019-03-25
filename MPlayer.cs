@@ -109,7 +109,7 @@ namespace ExperienceAndClasses {
             tool_power = 1f;
 
             //xp
-            Systems.XP.Rewards.ResetPlayerXPBuffer(player.whoAmI);
+            Systems.XP.Rewards.ServerResetPlayerXPBuffer(player.whoAmI);
         }
 
         /// <summary>

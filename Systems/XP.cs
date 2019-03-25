@@ -32,7 +32,7 @@ namespace ExperienceAndClasses.Systems {
             /// <summary>
             /// Send all player rewards at once on interval
             /// </summary>
-            public static void ProcessXPBuffer() {
+            public static void ServerProcessXPBuffer() {
                 if (!xp_buffer_empty) { //fast check
                     DateTime now = DateTime.Now;
                     if (now.CompareTo(time_send_xp_buffer) >= 0) {
@@ -66,12 +66,12 @@ namespace ExperienceAndClasses.Systems {
             /// </summary>
             /// <param name="player_index"></param>
             /// <param name="xp"></param>
-            public static void TallyCombatXP(byte player_index, double xp) {
+            public static void ServerTallyCombatXP(byte player_index, double xp) {
                 xp_buffer[player_index] += FinalizeXP(player_index, xp);
                 xp_buffer_empty = false;
             }
 
-            public static void ResetPlayerXPBuffer(int player_index) {
+            public static void ServerResetPlayerXPBuffer(int player_index) {
                 xp_buffer[player_index] = 0;
             }
 

@@ -9,7 +9,7 @@ using Terraria.ModLoader;
 namespace ExperienceAndClasses {
     class MWorld : ModWorld {
         public override void PostUpdate() {
-            Systems.XP.Rewards.ProcessXPBuffer();
+            Systems.XP.Rewards.ServerProcessXPBuffer();
         }
     }
 }

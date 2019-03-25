@@ -71,7 +71,7 @@ namespace ExperienceAndClasses.Systems {
                 //award xp
                 double xp_per_player = base_xp * reward_modifier;
                 foreach (byte player_index in eligible_players) {
-                    XP.Rewards.TallyCombatXP(player_index, xp_per_player);
+                    XP.Rewards.ServerTallyCombatXP(player_index, xp_per_player);
                 }
             }
         }
