@@ -7,7 +7,7 @@ namespace ExperienceAndClasses.Systems {
     class NPCRewards : GlobalNPC {
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Constants ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-        //any non-afk player within this range is automatically eligable for rewards
+        //range for reward eligibility
         private const float RANGE_ELIGIBLE = 2500f;
 
         //rewards are increased prior to division based on the number of eligable players 
