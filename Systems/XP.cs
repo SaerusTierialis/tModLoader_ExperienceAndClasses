@@ -41,15 +41,17 @@ namespace ExperienceAndClasses.Systems {
                 if (!xp_buffer_empty) { //fast check
                     DateTime now = DateTime.Now;
                     if (now.CompareTo(time_send_xp_buffer) >= 0) {
-                        //send any rewards
+                        //send rewards
                         for (byte player_index = 0; player_index < Main.maxPlayers; player_index++) {
-                            if ((xp_buffer[player_index] > 0) && (Main.player[player_index].active)) {
+                            if (xp_buffer[player_index] > 0) {
                                 //do reward
-                                if (Utilities.Netmode.IS_SERVER) {
-                                    Utilities.PacketHandler.XP.Send(player_index, -1, xp_buffer[player_index]);
-                                }
-                                else {
-                                    ExperienceAndClasses.LOCAL_MPLAYER.AddXP(xp_buffer[player_index]);
+                                if (Main.player[player_index].active) {
+                                    if (Utilities.Netmode.IS_SERVER) {
+                                        Utilities.PacketHandler.XP.Send(player_index, -1, xp_buffer[player_index]);
+                                    }
+                                    else {
+                                        ExperienceAndClasses.LOCAL_MPLAYER.AddXP(xp_buffer[player_index]);
+                                    }
                                 }
 
                                 //set back to 0
@@ -74,10 +76,6 @@ namespace ExperienceAndClasses.Systems {
             public static void ServerTallyCombatXP(byte player_index, double xp) {
                 xp_buffer[player_index] += FinalizeXP(player_index, xp);
                 xp_buffer_empty = false;
-            }
-
-            public static void ServerResetPlayerXPBuffer(int player_index) {
-                xp_buffer[player_index] = 0;
             }
 
             /// <summary>

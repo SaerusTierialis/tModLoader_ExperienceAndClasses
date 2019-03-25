@@ -107,9 +107,6 @@ namespace ExperienceAndClasses {
             use_speed_melee = use_speed_ranged = use_speed_magic = use_speed_throwing = use_speed_minion = use_speed_tool = 1f;
             ability_delay_reduction = 1f;
             tool_power = 1f;
-
-            //xp
-            Systems.XP.Rewards.ServerResetPlayerXPBuffer(player.whoAmI);
         }
 
         /// <summary>
