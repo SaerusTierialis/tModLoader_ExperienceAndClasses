@@ -55,6 +55,7 @@
     </AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="MWorld.cs" />
     <Compile Include="Systems\NPCRewards.cs" />
     <Compile Include="Utilities\Commons.cs" />
     <Compile Include="Items\MItem.cs" />

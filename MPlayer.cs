@@ -11,7 +11,6 @@ namespace ExperienceAndClasses {
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Constants ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         private const long TICKS_PER_FULL_SYNC = TimeSpan.TicksPerMinute * 2;
-        private const long TICKS_PER_XP_SEND = (long)(TimeSpan.TicksPerSecond * 0.5);
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Static Vars ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -27,7 +26,6 @@ namespace ExperienceAndClasses {
         public bool Allow_Secondary { get; private set; }
 
         private bool show_xp;
-        private DateTime send_xp_when;
 
         public byte[] Class_Levels { get; private set; }
         public uint[] Class_XP { get; private set; }
@@ -76,7 +74,6 @@ namespace ExperienceAndClasses {
             IN_COMBAT = false;
             Killed_WOF = false;
             show_xp = true;
-            send_xp_when = DateTime.MinValue;
             minions = new List<Projectile>();
             Status = new Systems.Status[(uint)Systems.Status.IDs.NUMBER_OF_IDs];
 
@@ -112,7 +109,7 @@ namespace ExperienceAndClasses {
             tool_power = 1f;
 
             //xp
-            Systems.XP.Rewards.TRACK_PLAYER_XP[player.whoAmI] = 0;
+            Systems.XP.Rewards.ResetPlayerXPBuffer(player.whoAmI);
         }
 
         /// <summary>
@@ -195,20 +192,7 @@ namespace ExperienceAndClasses {
             //server/singleplayer
             if (!Utilities.Netmode.IS_CLIENT) {
 
-                //sending xp packets (or handle locally in chunks)
-                uint xp = Systems.XP.Rewards.TRACK_PLAYER_XP[player.whoAmI];
-                if ((xp > 0) && (now.CompareTo(send_xp_when) >= 0)) {
-
-                    send_xp_when = now.AddTicks(TICKS_PER_XP_SEND);
-                    Systems.XP.Rewards.TRACK_PLAYER_XP[player.whoAmI] = 0;
-
-                    if (Utilities.Netmode.IS_SERVER) {
-                        Utilities.PacketHandler.XP.Send(player.whoAmI, -1, xp);
-                    }
-                    else {
-                        AddXP(xp);
-                    }
-                }
+                
 
             }
 

@@ -17,11 +17,49 @@ namespace ExperienceAndClasses.Systems {
 
         public static class Rewards {
 
+            /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Constants ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+            private const long TICKS_PER_XP_SEND = (long)(TimeSpan.TicksPerSecond * 0.5);
+
             /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Variables ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-            public static uint[] TRACK_PLAYER_XP = new uint[Main.maxPlayers];
+            private static uint[] xp_buffer = new uint[Main.maxPlayers];
+            private static DateTime time_send_xp_buffer = DateTime.MinValue;
+            private static bool xp_buffer_empty = true;
 
             /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Methods ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+            /// <summary>
+            /// Send all player rewards at once on interval
+            /// </summary>
+            public static void ProcessXPBuffer() {
+                if (!xp_buffer_empty) { //fast check
+                    DateTime now = DateTime.Now;
+                    if (now.CompareTo(time_send_xp_buffer) >= 0) {
+                        //send any rewards
+                        for (byte player_index = 0; player_index < Main.maxPlayers; player_index++) {
+                            if ((xp_buffer[player_index] > 0) && (Main.player[player_index].active)) {
+                                //do reward
+                                if (Utilities.Netmode.IS_SERVER) {
+                                    Utilities.PacketHandler.XP.Send(player_index, -1, xp_buffer[player_index]);
+                                }
+                                else {
+                                    ExperienceAndClasses.LOCAL_MPLAYER.AddXP(xp_buffer[player_index]);
+                                }
+
+                                //set back to 0
+                                xp_buffer[player_index] = 0;
+                            }
+                        }
+
+                        //set time next
+                        time_send_xp_buffer = now.AddTicks(TICKS_PER_XP_SEND);
+
+                        //buffer is empty
+                        xp_buffer_empty = true;
+                    }
+                }
+            }
 
             /// <summary>
             /// Track combat xp to be sent to client in a lump sum at next sync interval.
@@ -29,9 +67,12 @@ namespace ExperienceAndClasses.Systems {
             /// <param name="player_index"></param>
             /// <param name="xp"></param>
             public static void TallyCombatXP(byte player_index, double xp) {
-                if (!Utilities.Netmode.IS_CLIENT) {
-                    TRACK_PLAYER_XP[player_index] += FinalizeXP(player_index, xp);
-                }
+                xp_buffer[player_index] += FinalizeXP(player_index, xp);
+                xp_buffer_empty = false;
+            }
+
+            public static void ResetPlayerXPBuffer(int player_index) {
+                xp_buffer[player_index] = 0;
             }
 
             /// <summary>
