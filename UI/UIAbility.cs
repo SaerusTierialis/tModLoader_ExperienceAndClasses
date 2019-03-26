@@ -18,6 +18,11 @@ namespace ExperienceAndClasses.UI {
         private const float WIDTH = 200f;
         private const float HEIGHT = 200f; //default, actual height is dynamic
 
+        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Static Variables ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+        public static float initial_panel_left = 300;
+        public static float initial_panel_top = 300;
+        public static bool initial_panel_auto = true;
+
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Variables ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         public DragableUIPanel panel { get; private set; }
         private XPBar xp_bar_primary, xp_bar_secondary;
@@ -27,7 +32,9 @@ namespace ExperienceAndClasses.UI {
         protected override void InitializeState() {
             needs_first_arrange = true;
 
-            panel = new DragableUIPanel(WIDTH, HEIGHT, Constants.COLOR_BAR_UI, this, false, true);
+            panel = new DragableUIPanel(WIDTH, HEIGHT, Constants.COLOR_BAR_UI, this, false, initial_panel_auto);
+
+            panel.SetPosition(initial_panel_left, initial_panel_top);
 
             xp_bar_primary = new XPBar(WIDTH - (Constants.UI_PADDING * 2), Systems.Class.LOOKUP[(byte)Systems.Class.IDs.Novice]);
             xp_bar_primary.Left.Set(Constants.UI_PADDING, 0f);

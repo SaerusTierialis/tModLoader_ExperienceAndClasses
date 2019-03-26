@@ -44,6 +44,11 @@ namespace ExperienceAndClasses.UI {
         private const float FONT_SCALE_TITLE = 1.5f;
         private const float FONT_SCALE_ATTRIBUTE = 1f;
 
+        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Static Variables ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+        public static float initial_panel_left = 300;
+        public static float initial_panel_top = 300;
+        public static bool initial_panel_auto = true;
+
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Variables ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         public DragableUIPanel panel { get; private set; }
 
@@ -58,7 +63,10 @@ namespace ExperienceAndClasses.UI {
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Initialize ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         protected override void InitializeState() {
             //main panel
-            panel = new DragableUIPanel(WIDTH, HEIGHT, Constants.COLOR_UI_PANEL_BACKGROUND, this, true, true);
+            panel = new DragableUIPanel(WIDTH, HEIGHT, Constants.COLOR_UI_PANEL_BACKGROUND, this, true, initial_panel_auto);
+
+            //initial panel position
+            panel.SetPosition(initial_panel_left, initial_panel_top);
 
             //class panel
             DragableUIPanel panel_class = new DragableUIPanel(CLASS_WIDTH, (HEIGHT - (Constants.UI_PADDING * 2)), Constants.COLOR_SUBPANEL, this, false, false, false);

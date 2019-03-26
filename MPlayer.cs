@@ -18,7 +18,6 @@ namespace ExperienceAndClasses {
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Instance Vars (non-syncing) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-        private TagCompound load_tag;
         public bool Is_Local_Player { get; private set; }
         private bool initialized;
         public int[] Load_Version { get; private set; }
@@ -135,16 +134,6 @@ namespace ExperienceAndClasses {
                 foreach (UI.UIStateCombo ui in ExperienceAndClasses.UIs) {
                     ui.Initialize();
                 }
-
-                //apply saved ui settings
-                UI.UIMain.Instance.panel.SetPosition(Utilities.Commons.TryGet<float>(load_tag, "eac_ui_class_left", 300f), Utilities.Commons.TryGet<float>(load_tag, "eac_ui_class_top", 300f));
-                UI.UIMain.Instance.panel.Auto =Utilities.Commons.TryGet<bool>(load_tag, "eac_ui_class_auto", true);
-
-                UI.UIAbility.Instance.panel.SetPosition(Utilities.Commons.TryGet<float>(load_tag, "eac_ui_bars_left", 480f), Utilities.Commons.TryGet<float>(load_tag, "eac_ui_bars_top", 10f));
-                UI.UIAbility.Instance.panel.Auto = Utilities.Commons.TryGet<bool>(load_tag, "eac_ui_bars_auto", true);
-
-                //loaded data no longer needed
-                load_tag = null;
 
                 //temp: show bars and status
                 UI.UIAbility.Instance.Visibility = true;
@@ -964,39 +953,36 @@ namespace ExperienceAndClasses {
         }
 
         public override void Load(TagCompound tag) {
-            //some settings must be applied after init
-            load_tag = tag;
-
             //get version in case needed
-            Load_Version = Utilities.Commons.TryGet<int[]>(load_tag, "eac_version", new int[3]);
+            Load_Version = Utilities.Commons.TryGet<int[]>(tag, "eac_version", new int[3]);
 
             //has killed wof
-            Killed_WOF = Utilities.Commons.TryGet<bool>(load_tag, "eac_wof", Killed_WOF);
+            Killed_WOF = Utilities.Commons.TryGet<bool>(tag, "eac_wof", Killed_WOF);
 
             //subclass unlocked
-            Allow_Secondary = Utilities.Commons.TryGet<bool>(load_tag, "eac_class_subclass_unlocked", Allow_Secondary);
+            Allow_Secondary = Utilities.Commons.TryGet<bool>(tag, "eac_class_subclass_unlocked", Allow_Secondary);
 
             //settings
-            show_xp = Utilities.Commons.TryGet<bool>(load_tag, "eac_settings_show_xp", show_xp);
+            show_xp = Utilities.Commons.TryGet<bool>(tag, "eac_settings_show_xp", show_xp);
 
             //current classes
-            Class_Primary = Systems.Class.LOOKUP[Utilities.Commons.TryGet<byte>(load_tag, "eac_class_current_primary", Class_Primary.ID)];
-            Class_Secondary = Systems.Class.LOOKUP[Utilities.Commons.TryGet<byte>(load_tag, "eac_class_current_secondary", Class_Secondary.ID)];
+            Class_Primary = Systems.Class.LOOKUP[Utilities.Commons.TryGet<byte>(tag, "eac_class_current_primary", Class_Primary.ID)];
+            Class_Secondary = Systems.Class.LOOKUP[Utilities.Commons.TryGet<byte>(tag, "eac_class_current_secondary", Class_Secondary.ID)];
 
             //class unlocked
-            List<bool> class_unlock_loaded = Utilities.Commons.TryGet<List<bool>>(load_tag, "eac_class_unlock", new List<bool>());
+            List<bool> class_unlock_loaded = Utilities.Commons.TryGet<List<bool>>(tag, "eac_class_unlock", new List<bool>());
             for (byte i = 0; i < class_unlock_loaded.Count; i++) {
                 Class_Unlocked[i] = class_unlock_loaded[i];
             }
 
             //class level
-            List<byte> class_level_loaded = Utilities.Commons.TryGet<List<byte>>(load_tag, "eac_class_level", new List<byte>());
+            List<byte> class_level_loaded = Utilities.Commons.TryGet<List<byte>>(tag, "eac_class_level", new List<byte>());
             for (byte i = 0; i < class_level_loaded.Count; i++) {
                 Class_Levels[i] = class_level_loaded[i];
             }
 
             //class xp
-            List<uint> class_xp_loaded = Utilities.Commons.TryGet<List<uint>>(load_tag, "eac_class_xp", new List<uint>());
+            List<uint> class_xp_loaded = Utilities.Commons.TryGet<List<uint>>(tag, "eac_class_xp", new List<uint>());
             for (byte i = 0; i < class_xp_loaded.Count; i++) {
                 Class_XP[i] = class_xp_loaded[i];
             }
@@ -1029,13 +1015,20 @@ namespace ExperienceAndClasses {
             }
 
             //allocated attributes
-            List<int> attribute_allocation = Utilities.Commons.TryGet<List<int>>(load_tag, "eac_attribute_allocation", new List<int>());
+            List<int> attribute_allocation = Utilities.Commons.TryGet<List<int>>(tag, "eac_attribute_allocation", new List<int>());
             for(byte i = 0; i < attribute_allocation.Count; i++) {
                 if (Systems.Attribute.LOOKUP[i].Active) {
                     Attributes_Allocated[i] = attribute_allocation[i];
                 }
             }
-            
+
+            //UI data
+            UI.UIMain.initial_panel_left = Utilities.Commons.TryGet<float>(tag, "eac_ui_class_left", 300f);
+            UI.UIMain.initial_panel_top = Utilities.Commons.TryGet<float>(tag, "eac_ui_class_top", 300f);
+            UI.UIMain.initial_panel_auto = Utilities.Commons.TryGet<bool>(tag, "eac_ui_class_auto", true);
+            UI.UIAbility.initial_panel_left = Utilities.Commons.TryGet<float>(tag, "eac_ui_bars_left", 300f);
+            UI.UIAbility.initial_panel_top = Utilities.Commons.TryGet<float>(tag, "eac_ui_bars_top", 300f);
+            UI.UIAbility.initial_panel_auto = Utilities.Commons.TryGet<bool>(tag, "eac_ui_bars_auto", true);
         }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Misc ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
