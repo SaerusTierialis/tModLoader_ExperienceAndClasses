@@ -48,6 +48,12 @@ namespace ExperienceAndClasses.Utilities {
             return recipe;
         }
 
+        /// <summary>
+        /// Returns a string representation of an item's recipe for UI or any other purpose
+        /// </summary>
+        /// <param name="recipe"></param>
+        /// <param name="multiline"></param>
+        /// <returns></returns>
         public static string GetRecipeString(Recipe recipe, bool multiline=false) {
             string str = "";
 
@@ -109,6 +115,10 @@ namespace ExperienceAndClasses.Utilities {
             }
         }
 
+        /// <summary>
+        /// Log error message and display for server and all players
+        /// </summary>
+        /// <param name="message"></param>
         public static void Error(string message) {
             message = message + " (please report)";
             if (Utilities.Netmode.IS_SERVER) {
@@ -129,6 +139,10 @@ namespace ExperienceAndClasses.Utilities {
             ErrorLogger.Log(message);
         }
 
+        /// <summary>
+        /// Display message for server and all players
+        /// </summary>
+        /// <param name="message"></param>
         public static void Trace(string message) {
             if (Utilities.Netmode.IS_SERVER) {
                 message = "TRACE from Server: " + message;
@@ -147,6 +161,12 @@ namespace ExperienceAndClasses.Utilities {
             }
         }
 
+        /// <summary>
+        /// Checks whether target version is earlier then reference. 
+        /// </summary>
+        /// <param name="target"></param>
+        /// <param name="reference"></param>
+        /// <returns></returns>
         public static bool VersionIsOlder(int[] target, int[] reference) {
             int max_length = Math.Max(target.Length, reference.Length);
             int t, r;
