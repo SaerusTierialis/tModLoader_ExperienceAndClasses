@@ -20,7 +20,7 @@ namespace ExperienceAndClasses {
 
         public bool Is_Local_Player { get; private set; }
         public int[] Load_Version { get; private set; }
-        public bool Killed_WOF { get; private set; }
+        public bool Killed_WOF { get; private set; } //TODO use this to limit tier 3 unlock
         public bool Allow_Secondary { get; private set; }
 
         /// <summary>
