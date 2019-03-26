@@ -19,10 +19,14 @@ namespace ExperienceAndClasses {
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Instance Vars (non-syncing) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         public bool Is_Local_Player { get; private set; }
-        private bool initialized;
         public int[] Load_Version { get; private set; }
         public bool Killed_WOF { get; private set; }
         public bool Allow_Secondary { get; private set; }
+
+        /// <summary>
+        /// Set true for local player during OnEnterWorld. Set true for non-local players when first full sync is recieved.
+        /// </summary>
+        public bool initialized;
 
         private bool show_xp;
 
@@ -778,10 +782,6 @@ namespace ExperienceAndClasses {
                 return;
             }
 
-            if (!initialized) {
-                initialized = true;
-            }
-
             Class_Primary = Systems.Class.LOOKUP[primary_id];
             Class_Primary_Level_Effective = primary_level;
             Class_Secondary = Systems.Class.LOOKUP[secondary_id];
@@ -794,10 +794,6 @@ namespace ExperienceAndClasses {
             if (Is_Local_Player) {
                 Utilities.Commons.Error("Cannot force attribute packet for local player");
                 return;
-            }
-
-            if (!initialized) {
-                initialized = true;
             }
 
             for (byte i = 0; i < attributes.Length; i++) {

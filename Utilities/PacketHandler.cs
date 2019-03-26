@@ -153,6 +153,8 @@ namespace ExperienceAndClasses.Utilities {
                 LOOKUP[(byte)PACKET_TYPE.AFK].Recieve(reader, origin);
                 LOOKUP[(byte)PACKET_TYPE.InCombat].Recieve(reader, origin);
                 LOOKUP[(byte)PACKET_TYPE.Progression].Recieve(reader, origin);
+                if (!origin_mplayer.initialized)
+                    origin_mplayer.initialized = true;
             }
         }
 
