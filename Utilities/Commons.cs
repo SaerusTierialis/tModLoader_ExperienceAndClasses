@@ -48,37 +48,6 @@ namespace ExperienceAndClasses.Utilities {
             return recipe;
         }
 
-        /// <summary>
-        /// Combines duplicate items and checks if the player has enough. Workaround for duplicate item recipe bug.
-        /// Returns true if the player has enough of the item.
-        /// </summary>
-        /// <param name="recipe"></param>
-        /// <returns></returns>
-        public static bool EnforceDuplicatesInRecipe(ModRecipe recipe) {
-            List<int> types = new List<int>();
-            List<int> stacks = new List<int>();
-
-            Item[] ingedients = recipe.requiredItem;
-            int ind;
-            for (int i = 0; i < ingedients.Length; i++) {
-                ind = types.IndexOf(ingedients[i].type);
-                if (ind >= 0) {
-                    stacks[ind] += ingedients[i].stack;
-                }
-                else {
-                    types.Add(ingedients[i].type);
-                    stacks.Add(ingedients[i].stack);
-                }
-            }
-            for (int i = 0; i < types.Count; i++) {
-                if (Main.LocalPlayer.CountItem(types[i], stacks[i]) < stacks[i]) {
-                    return false;
-                }
-            }
-
-            return true;
-        }
-
         public static string GetRecipeString(Recipe recipe, bool multiline=false) {
             string str = "";
 
