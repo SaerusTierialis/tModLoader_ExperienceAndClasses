@@ -741,9 +741,9 @@ namespace ExperienceAndClasses {
                     }
                 }
 
-                //allocation points (measure of character progression)
+                //measure of character progression
                 if (clone.Progression != Progression) {
-                    //TODO
+                    Utilities.PacketHandler.Progression.Send(-1, me, Progression);
                 }
 
                 //afk
@@ -753,7 +753,7 @@ namespace ExperienceAndClasses {
 
                 //combat
                 if (clone.IN_COMBAT != IN_COMBAT) {
-                    //TODO
+                    Utilities.PacketHandler.InCombat.Send(-1, me, IN_COMBAT);
                 }
 
             }
@@ -775,7 +775,7 @@ namespace ExperienceAndClasses {
         /// </summary>
         private void FullSync() {
             //send one packet with everything needed
-            Utilities.PacketHandler.ForceFull.Send(-1, (byte)player.whoAmI, Class_Primary.ID, Class_Primary_Level_Effective, Class_Secondary.ID, Class_Secondary_Level_Effective, Attributes_Final, AFK);
+            Utilities.PacketHandler.ForceFull.Send(-1, (byte)player.whoAmI, Class_Primary.ID, Class_Primary_Level_Effective, Class_Secondary.ID, Class_Secondary_Level_Effective, Attributes_Final, AFK, IN_COMBAT, Progression);
         }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Sync Force Commands ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
@@ -1054,7 +1054,11 @@ namespace ExperienceAndClasses {
         }
 
         private void RecalculateProgression() {
-            Progression = Allocation_Points_Total;
+            SetProgression(Allocation_Points_Total);
+        }
+
+        public void SetProgression(int player_progression) {
+            Progression = player_progression;
         }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Status ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/

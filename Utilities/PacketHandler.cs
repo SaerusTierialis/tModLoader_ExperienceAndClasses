@@ -33,6 +33,7 @@ namespace ExperienceAndClasses.Utilities {
             //Heal,
             AFK, //TODO convert to status
             InCombat, //TODO convert to status
+            Progression,
             XP,
             AddStatus,
             RemoveStatus,
@@ -131,7 +132,7 @@ namespace ExperienceAndClasses.Utilities {
         public sealed class ForceFull : Handler {
             private static readonly Handler Instance = LOOKUP[(byte)Enum.Parse(typeof(PACKET_TYPE), MethodBase.GetCurrentMethod().DeclaringType.Name)];
 
-            public static void Send(int target, int origin, byte primary_id, byte primary_level, byte secondary_id, byte secondary_level, int[] attributes, bool afk_status) {
+            public static void Send(int target, int origin, byte primary_id, byte primary_level, byte secondary_id, byte secondary_level, int[] attributes, bool afk_status, bool in_combat, int player_progression) {
                 //get packet containing header
                 ModPacket packet = Instance.GetPacket(origin);
 
@@ -139,6 +140,8 @@ namespace ExperienceAndClasses.Utilities {
                 ForceClass.WritePacketBody(packet, primary_id, primary_level, secondary_id, secondary_level);
                 ForceAttribute.WritePacketBody(packet, attributes);
                 AFK.WritePacketBody(packet, afk_status);
+                InCombat.WritePacketBody(packet, in_combat);
+                Progression.WritePacketBody(packet, player_progression);
 
                 //send
                 packet.Send(target, origin);
@@ -148,6 +151,8 @@ namespace ExperienceAndClasses.Utilities {
                 LOOKUP[(byte)PACKET_TYPE.ForceClass].Recieve(reader, origin);
                 LOOKUP[(byte)PACKET_TYPE.ForceAttribute].Recieve(reader, origin);
                 LOOKUP[(byte)PACKET_TYPE.AFK].Recieve(reader, origin);
+                LOOKUP[(byte)PACKET_TYPE.InCombat].Recieve(reader, origin);
+                LOOKUP[(byte)PACKET_TYPE.Progression].Recieve(reader, origin);
             }
         }
 
@@ -284,6 +289,38 @@ namespace ExperienceAndClasses.Utilities {
 
             public static void WritePacketBody(ModPacket packet, bool afk_status) {
                 packet.Write(afk_status);
+            }
+        }
+
+        public sealed class Progression : Handler {
+            private static readonly Handler Instance = LOOKUP[(byte)Enum.Parse(typeof(PACKET_TYPE), MethodBase.GetCurrentMethod().DeclaringType.Name)];
+
+            public static void Send(int target, int origin, int player_progression) {
+                //get packet containing header
+                ModPacket packet = Instance.GetPacket(origin);
+
+                //specific content
+                WritePacketBody(packet, player_progression);
+
+                //send
+                packet.Send(target, origin);
+            }
+
+            protected override void RecieveBody(BinaryReader reader, int origin, MPlayer origin_mplayer) {
+                //read
+                int player_progression = reader.ReadInt32();
+
+                //set
+                origin_mplayer.SetProgression(player_progression);
+
+                //relay
+                if (Utilities.Netmode.IS_SERVER) {
+                    Send(-1, origin, player_progression);
+                }
+            }
+
+            public static void WritePacketBody(ModPacket packet, int player_progression) {
+                packet.Write(player_progression);
             }
         }
 
