@@ -36,6 +36,7 @@ namespace ExperienceAndClasses {
         public int[] Attributes_Bonus { get; private set; }
         public int Allocation_Points_Unallocated { get; private set; }
         private int Allocation_Points_Spent;
+        private int Allocation_Points_Total;
 
         public float heal_damage; //TODO
         public float dodge_chance; //TODO
@@ -54,7 +55,7 @@ namespace ExperienceAndClasses {
         public byte Class_Primary_Level_Effective { get; private set; }
         public byte Class_Secondary_Level_Effective { get; private set; }
 
-        public int Allocation_Points_Total { get; private set; }
+        public int Progression { get; private set; }
         public int[] Attributes_Final { get; private set; }
         public bool AFK { get; private set; } //TODO local set
         public bool IN_COMBAT { get; private set; } //TODO local set
@@ -76,6 +77,7 @@ namespace ExperienceAndClasses {
             show_xp = true;
             minions = new List<Projectile>();
             Status = new Systems.Status[(uint)Systems.Status.IDs.NUMBER_OF_IDs];
+            Progression = 0;
 
             //default level/xp/unlock
             Class_Levels = new byte[(byte)Systems.Class.IDs.NUMBER_OF_IDs];
@@ -506,6 +508,9 @@ namespace ExperienceAndClasses {
             //sum attributes
             LocalCalculateFinalAttributes();
 
+            //calclate progression value
+            RecalculateProgression();
+
             //update UI
             UI.UIMain.Instance.UpdateClassInfo();
             UI.UIAbility.Instance.Update();
@@ -700,7 +705,7 @@ namespace ExperienceAndClasses {
 
             Attributes_Final.CopyTo(clone.Attributes_Final, 0);
 
-            clone.Allocation_Points_Total = Allocation_Points_Total;
+            clone.Progression = Progression;
 
             clone.AFK = AFK;
             clone.IN_COMBAT = IN_COMBAT;
@@ -737,7 +742,7 @@ namespace ExperienceAndClasses {
                 }
 
                 //allocation points (measure of character progression)
-                if (clone.Allocation_Points_Total != Allocation_Points_Total) {
+                if (clone.Progression != Progression) {
                     //TODO
                 }
 
@@ -1046,6 +1051,10 @@ namespace ExperienceAndClasses {
 
         public void SetInCombat(bool in_combat) {
             IN_COMBAT = in_combat;
+        }
+
+        private void RecalculateProgression() {
+            Progression = Allocation_Points_Total;
         }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Status ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
