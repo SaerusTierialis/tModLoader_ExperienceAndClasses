@@ -155,15 +155,14 @@ namespace ExperienceAndClasses.Systems {
             MPlayer mplayer;
             foreach (byte player_index in eligible_players) {
                 mplayer = Main.player[player_index].GetModPlayer<MPlayer>(ExperienceAndClasses.MOD);
-
-                //TODO: maybe make GetProgression in MPlayer in case it changes?? sync a progression value instead?
-                if (Main.rand.NextDouble() <= CalculateOrbChanceMonster(base_xp, mplayer.Allocation_Points_Total, reward_modifier)) {
+                if (Main.rand.NextDouble() <= CalculateOrbChanceMonster(base_xp, mplayer.Progression, reward_modifier)) {
                     orb_monster_interactions[player_index] = true;
                     any_orb_monster = true;
                 }
-
-                //TODO: boss orb
-
+                if (treat_as_boss && (Main.rand.NextDouble() <= CalculateOrbChanceBoss(base_xp, mplayer.Progression, reward_modifier))) {
+                    orb_boss_interactions[player_index] = true;
+                    any_orb_boss = true;
+                }
             }
 
             //monster orb drop
@@ -191,6 +190,17 @@ namespace ExperienceAndClasses.Systems {
         /// <returns></returns>
         private static double CalculateOrbChanceMonster(double base_xp, int player_progression, double reward_modifier) {
             return Math.Max(Math.Min(base_xp / Math.Pow(player_progression, DROP_CHANCE_ORB_MONSTER_MODIFIER), DROP_CHANCE_ORB_MONSTER_MAX), DROP_CHANCE_ORB_MONSTER_MIN) * reward_modifier;
+        }
+
+        /// <summary>
+        /// Returns chance ratio for boss orb
+        /// </summary>
+        /// <param name="base_xp"></param>
+        /// <param name="player_progression"></param>
+        /// <param name="reward_modifier"></param>
+        /// <returns></returns>
+        private static double CalculateOrbChanceBoss(double base_xp, int player_progression, double reward_modifier) {
+            return Math.Max(Math.Min(base_xp / Math.Pow(player_progression, DROP_CHANCE_ORB_BOSS_MODIFIER), DROP_CHANCE_ORB_BOSS_MAX), DROP_CHANCE_ORB_BOSS_MIN) * reward_modifier;
         }
 
         /// <summary>
