@@ -21,11 +21,17 @@ namespace ExperienceAndClasses.Utilities {
         public static Recipe QuckRecipe(Mod mod, int[,] ingredients, ModItem result, int numResult = 1, ModRecipe buildOn = null, ushort where = TileID.WorkBenches) {
             //recipe
             ModRecipe recipe;
-            if (buildOn == null) recipe = new ModRecipe(mod);
-            else recipe = buildOn;
+            if (buildOn == null) {
+                recipe = new ModRecipe(mod);
+            }
+            else {
+                recipe = buildOn;
+            }
 
             //where to craft (use MaxValue to skip)
-            if (where != ushort.MaxValue) recipe.AddTile(where);
+            if (where != ushort.MaxValue) {
+                recipe.AddTile(where);
+            }
 
             //add ingredients
             if (ingredients.GetLength(1) == 2) {
