@@ -143,6 +143,9 @@ namespace ExperienceAndClasses {
                 UI.UIAbility.Instance.panel.SetPosition(Utilities.Commons.TryGet<float>(load_tag, "eac_ui_bars_left", 480f), Utilities.Commons.TryGet<float>(load_tag, "eac_ui_bars_top", 10f));
                 UI.UIAbility.Instance.panel.Auto = Utilities.Commons.TryGet<bool>(load_tag, "eac_ui_bars_auto", true);
 
+                //loaded data no longer needed
+                load_tag = null;
+
                 //temp: show bars and status
                 UI.UIAbility.Instance.Visibility = true;
                 UI.UIStatus.Instance.Visibility = true;
