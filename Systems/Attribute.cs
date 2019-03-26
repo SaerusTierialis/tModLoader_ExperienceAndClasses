@@ -36,6 +36,31 @@ namespace ExperienceAndClasses.Systems {
         //allocation points
         public static readonly int[] ALLOCATION_POINTS_PER_LEVEL_TIERS = new int[] { 0, 1, 2, 3 };
 
+        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Attribute Effects (per point) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+        private const float POWER_DAMAGE = 0.005f;
+        private const float POWER_FISH = 0.1f;
+
+        private const float VITALITY_LIFE = 1f;
+        private const float VITALITY_LIFE_REGEN = 0.2f;
+        private const float VITALITY_DEFENSE = 0.1f;
+
+        private const float MIND_MANA = 1f;
+        private const float MIND_MANA_REGEN = 0.5f;
+        private const float MIND_MANA_DELAY = 0.5f;
+
+        private const float SPIRIT_CRIT = 0.125f;
+        private const float SPIRIT_MINION_CAP = 0.025f;
+        private const float SPIRIT_HEAL = 0.5f;
+
+        private const float AGILITY_MOVEMENT = 0.005f;
+        private const float AGILITY_JUMP = 0.01f;
+        private const float AGILITY_DODGE = 0.0025f;
+        private const float AGILITY_FLY = 0.5f;
+
+        private const float DEXTERITY_USE_SPEED = 0.0025f;
+        private const float DEXTERITY_ABILITY_DELAY_REDUCTION = 0.01f;
+
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Treated like readonly ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         public static Attribute[] LOOKUP { get; private set; }
 
@@ -177,30 +202,6 @@ namespace ExperienceAndClasses.Systems {
             Active = active;
             Bonus = "";
         }
-
-        //per point bonuses
-        private const float POWER_DAMAGE = 0.005f;
-        private const float POWER_FISH = 0.1f;
-
-        private const float VITALITY_LIFE = 1f;
-        private const float VITALITY_LIFE_REGEN = 0.2f;
-        private const float VITALITY_DEFENSE = 0.1f;
-
-        private const float MIND_MANA = 1f;
-        private const float MIND_MANA_REGEN = 0.5f;
-        private const float MIND_MANA_DELAY = 0.5f;
-
-        private const float SPIRIT_CRIT = 0.125f;
-        private const float SPIRIT_MINION_CAP = 0.025f;
-        private const float SPIRIT_HEAL = 0.5f;
-
-        private const float AGILITY_MOVEMENT = 0.005f;
-        private const float AGILITY_JUMP = 0.01f;
-        private const float AGILITY_DODGE = 0.0025f;
-        private const float AGILITY_FLY = 0.5f;
-
-        private const float DEXTERITY_USE_SPEED = 0.0025f;
-        private const float DEXTERITY_ABILITY_DELAY_REDUCTION = 0.01f;
 
         public void ApplyEffect(MPlayer mplayer, int points) {
             if (Active) {
