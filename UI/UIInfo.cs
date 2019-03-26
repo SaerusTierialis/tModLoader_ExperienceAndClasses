@@ -160,8 +160,8 @@ namespace ExperienceAndClasses.UI {
                     height += button_yes.Height.Pixels + Constants.UI_PADDING*3;
                     float height_button_center = height - Constants.UI_PADDING*2 - (button_yes.Height.Pixels / 2f);
 
-                    Utilities.Commons.CenterUIElement(button_yes, (width - BUTTON_SEPARATION) / 2f, height_button_center);
-                    Utilities.Commons.CenterUIElement(button_no, (width + BUTTON_SEPARATION) / 2f, height_button_center);
+                    Utilities.UIFunctions.CenterUIElement(button_yes, (width - BUTTON_SEPARATION) / 2f, height_button_center);
+                    Utilities.UIFunctions.CenterUIElement(button_no, (width + BUTTON_SEPARATION) / 2f, height_button_center);
                 }
                 else {
                     button_yes.visible = false;

@@ -41,7 +41,7 @@ namespace ExperienceAndClasses.UI {
             text_measure = Main.fontMouseText.MeasureString(text_select.Text);
             text_select.Width.Set(text_measure.X * text_size_hover, 0f);
             text_select.Height.Set(text_measure.Y / 2f * text_size_hover, 0f);
-            Utilities.Commons.CenterUIElement(text_select, this);
+            Utilities.UIFunctions.CenterUIElement(text_select, this);
             text_select.TextColor = COLOUR_SELECT;
             Append(text_select);
 
