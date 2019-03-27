@@ -931,6 +931,8 @@ namespace ExperienceAndClasses {
             Version version = ExperienceAndClasses.MOD.Version;
             int[] version_array = new int[] { version.Major, version.Minor, version.Build };
 
+            //ui positions
+            float ui_main_left, ui_main_top, ui_hud_left, ui_hud_top;
             bool ui_main_auto, ui_hud_auto;
             if (UI.UIMain.Instance.panel != null) {
                 ui_main_left = UI.UIMain.Instance.panel.GetLeft();
