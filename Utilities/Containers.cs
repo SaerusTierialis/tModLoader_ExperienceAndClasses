@@ -67,6 +67,31 @@ namespace ExperienceAndClasses.Utilities.Containers {
                 Commons.Error("Failed to find StatusInstances for removing status " + status_id + " (instance " + instance_id + ")");
         }
 
+        /// <summary>
+        /// Returns list of instances for each active status (empty if no statuses)
+        /// </summary>
+        /// <returns></returns>
+        public List<List<Systems.Status>> GetAllStatuses() {
+            List<List<Systems.Status>> list = new List<List<Systems.Status>>();
+            foreach (StatusInstances status in statuses.Values) {
+                list.Add(status.GetInstances());
+            }
+            return list;
+        }
+
+        /// <summary>
+        /// Returns list of instances for specified status type (empty if no instances)
+        /// </summary>
+        /// <param name="status_id"></param>
+        /// <returns></returns>
+        public List<Systems.Status> GetStatuses(Systems.Status.IDs status_id) {
+            StatusInstances status_instances;
+            if (statuses.TryGetValue(status_id, out status_instances))
+                return status_instances.GetInstances();
+            else
+                return new List<Systems.Status>();
+        }
+
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ StatusInstances ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         private class StatusInstances {
             /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Variables ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
@@ -74,6 +99,11 @@ namespace ExperienceAndClasses.Utilities.Containers {
             private List<byte> available_keys = Enumerable.Range(1, byte.MaxValue).Select(i => (byte)i).ToList(); //instance_id = 0 is reserved for default value and instant statuses
             
             /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Methods ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+            public List<Systems.Status> GetInstances() {
+                //should never be empty
+                return instances.Values.ToList();
+            }
 
             public Systems.Status GetStatus(byte instance_id) {
                 Systems.Status status;
