@@ -17,6 +17,10 @@ namespace ExperienceAndClasses.Utilities.Containers {
     }
 
     public class StatusList {
+        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Constants ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+        private const byte MAXIMUM_INSTANCES_PER_STATUS = byte.MaxValue;
+        public const byte UNASSIGNED_INSTANCE_KEY = 0;
+
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Variables ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         private SortedList<Systems.Status.IDs, StatusInstances> statuses = new SortedList<Systems.Status.IDs, StatusInstances>((int)Systems.Status.IDs.NUMBER_OF_IDs);
 
@@ -95,9 +99,9 @@ namespace ExperienceAndClasses.Utilities.Containers {
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ StatusInstances ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         private class StatusInstances {
             /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Variables ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-            private SortedList<byte, Systems.Status> instances = new SortedList<byte, Systems.Status>(byte.MaxValue);
-            private List<byte> available_keys = Enumerable.Range(1, byte.MaxValue).Select(i => (byte)i).ToList(); //instance_id = 0 is reserved for default value and instant statuses
-
+            private SortedList<byte, Systems.Status> instances = new SortedList<byte, Systems.Status>(MAXIMUM_INSTANCES_PER_STATUS);
+            private Queue<byte> available_keys = new Queue<byte>(Enumerable.Range(1, MAXIMUM_INSTANCES_PER_STATUS).Select(i => (byte)i)); //instance_id = 0 is reserved for default value and instant statuses
+            
             /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Methods ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
             public List<Systems.Status> GetInstances() {
@@ -114,14 +118,13 @@ namespace ExperienceAndClasses.Utilities.Containers {
             }
 
             public void AddStatus(Systems.Status status) {
-                if (status.instance_id == 0) {
+                if (status.instance_id == UNASSIGNED_INSTANCE_KEY) {
                     //needs an instance id
                     if (available_keys.Count == 0)
                         Commons.Error("Cannot add any more instances of " + status.core_display_name);
                     else {
                         //get first available instance id
-                        status.instance_id = available_keys[0];
-                        available_keys.RemoveAt(0);
+                        status.instance_id = available_keys.Dequeue();
                         //add instance
                         instances.Add(status.instance_id, status);
                     }
@@ -145,7 +148,7 @@ namespace ExperienceAndClasses.Utilities.Containers {
 
                 //make key available
                 if (!available_keys.Contains(instance_id))
-                    available_keys.Add(instance_id);
+                    available_keys.Enqueue(instance_id);
 
                 //check if no more instances
                 return (instances.Count == 0);

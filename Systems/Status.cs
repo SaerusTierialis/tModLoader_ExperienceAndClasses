@@ -133,7 +133,7 @@ namespace ExperienceAndClasses.Systems {
             Owner = null;
             Target = null;
             sync_data = new Dictionary<SYNC_DATA_TYPES, double>();
-            instance_id = 0;
+            instance_id = Utilities.Containers.StatusList.UNASSIGNED_INSTANCE_KEY;
         }
 
         public void Update() {
