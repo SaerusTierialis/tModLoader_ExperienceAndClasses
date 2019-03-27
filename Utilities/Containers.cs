@@ -44,10 +44,7 @@ namespace ExperienceAndClasses.Utilities.Containers {
             StatusInstances status_instances;
             if (statuses.TryGetValue(status.ID, out status_instances))
                 //add the status
-                if (Netmode.IS_CLIENT)
-                    status_instances.ClientSetStatus(status);
-                else
-                    status_instances.ServerAddStatus(status);
+                status_instances.AddStatus(status);
             else
                 Commons.Error("Failed to create StatusInstances for new status " + status.core_display_name);
         }
@@ -86,14 +83,21 @@ namespace ExperienceAndClasses.Utilities.Containers {
                     return null;
             }
 
-            public void ServerAddStatus(Systems.Status status) {
-                //TODO (merge too, set instance_id in status)
-            }
-
-            public void ClientSetStatus(Systems.Status status) {
-                if (status.instance_id == 0)
-                    Commons.Error("Client tried to set status without instance_id");
+            public void AddStatus(Systems.Status status) {
+                if (status.instance_id == 0) {
+                    //needs an instance id
+                    if (available_keys.Count <= 0)
+                        Commons.Error("Cannot add any more instances of " + status.core_display_name);
+                    else {
+                        //get first available instance id
+                        status.instance_id = available_keys[0];
+                        available_keys.RemoveAt(0);
+                        //add instance
+                        instances.Add(status.instance_id, status);
+                    }
+                }
                 else {
+                    //already has an instance id (is from another client)
                     if (instances.ContainsKey(status.instance_id)) {
                         //replace existing instance
                         instances[status.instance_id] = status;
