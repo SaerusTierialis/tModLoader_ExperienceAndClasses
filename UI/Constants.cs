@@ -26,9 +26,18 @@ namespace ExperienceAndClasses.UI {
         public static readonly Color COLOUR_XP_BRIGHT = new Color(0, 255, 0);
         public static readonly Color COLOUR_XP_DIM = new Color(0, 200, 0);
 
-        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ UI ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Spacing ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         public const float UI_PADDING = 5f;
+
+        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Defaults ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+        public const float DEFAULT_UI_MAIN_LEFT = 300;
+        public const float DEFAULT_UI_MAIN_TOP = 300;
+        public const bool DEFAULT_UI_MAIN_AUTO = true;
+
+        public const float DEFAULT_UI_HUD_LEFT = 465;
+        public const float DEFAULT_UI_HUD_TOP = 2;
+        public const bool DEFAULT_UI_HUD_AUTO = true;
 
     }
 }

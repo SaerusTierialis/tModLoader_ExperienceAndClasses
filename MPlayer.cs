@@ -931,14 +931,34 @@ namespace ExperienceAndClasses {
             Version version = ExperienceAndClasses.MOD.Version;
             int[] version_array = new int[] { version.Major, version.Minor, version.Build };
 
+            bool ui_main_auto, ui_hud_auto;
+            if (UI.UIMain.Instance.panel != null) {
+                ui_main_left = UI.UIMain.Instance.panel.GetLeft();
+                ui_main_top = UI.UIMain.Instance.panel.GetTop();
+                ui_main_auto = UI.UIMain.Instance.panel.Auto;
+
+                ui_hud_left = UI.UIHUD.Instance.panel.GetLeft();
+                ui_hud_top = UI.UIHUD.Instance.panel.GetTop();
+                ui_hud_auto = UI.UIHUD.Instance.panel.Auto;
+            }
+            else {
+                ui_main_left = UI.Constants.DEFAULT_UI_MAIN_LEFT;
+                ui_main_top = UI.Constants.DEFAULT_UI_MAIN_TOP;
+                ui_main_auto = UI.Constants.DEFAULT_UI_MAIN_AUTO;
+
+                ui_hud_left = UI.Constants.DEFAULT_UI_HUD_LEFT;
+                ui_hud_top = UI.Constants.DEFAULT_UI_HUD_TOP;
+                ui_hud_auto = UI.Constants.DEFAULT_UI_HUD_AUTO;
+            }
+
             return new TagCompound {
                 {"eac_version", version_array },
-                {"eac_ui_class_left", UI.UIMain.Instance.panel.GetLeft() },
-                {"eac_ui_class_top", UI.UIMain.Instance.panel.GetTop() },
-                {"eac_ui_class_auto", UI.UIMain.Instance.panel.Auto },
-                {"eac_ui_hud_left", UI.UIHUD.Instance.panel.GetLeft() },
-                {"eac_ui_hud_top", UI.UIHUD.Instance.panel.GetTop() },
-                {"eac_ui_hud_auto", UI.UIHUD.Instance.panel.Auto },
+                {"eac_ui_class_left", ui_main_left },
+                {"eac_ui_class_top", ui_main_top },
+                {"eac_ui_class_auto", ui_main_auto },
+                {"eac_ui_hud_left", ui_hud_left },
+                {"eac_ui_hud_top", ui_hud_top },
+                {"eac_ui_hud_auto", ui_hud_auto },
                 {"eac_class_unlock", class_unlocked },
                 {"eac_class_xp", class_xp },
                 {"eac_class_level", class_level },
@@ -1023,14 +1043,14 @@ namespace ExperienceAndClasses {
 
             //UI data
             loaded_ui_main = new Utilities.Containers.Loaded_UI_Data(
-                Utilities.Commons.TryGet<float>(tag, "eac_ui_class_left", 300f),
-                Utilities.Commons.TryGet<float>(tag, "eac_ui_class_top", 300f),
-                Utilities.Commons.TryGet<bool>(tag, "eac_ui_class_auto", true));
+                Utilities.Commons.TryGet<float>(tag, "eac_ui_class_left", UI.Constants.DEFAULT_UI_MAIN_LEFT),
+                Utilities.Commons.TryGet<float>(tag, "eac_ui_class_top", UI.Constants.DEFAULT_UI_MAIN_TOP),
+                Utilities.Commons.TryGet<bool>(tag, "eac_ui_class_auto", UI.Constants.DEFAULT_UI_MAIN_AUTO));
 
             loaded_ui_hud = new Utilities.Containers.Loaded_UI_Data(
-                Utilities.Commons.TryGet<float>(tag, "eac_ui_hud_left", 300f),
-                Utilities.Commons.TryGet<float>(tag, "eac_ui_hud_top", 300f),
-                Utilities.Commons.TryGet<bool>(tag, "eac_ui_hud_auto", true));
+                Utilities.Commons.TryGet<float>(tag, "eac_ui_hud_left", UI.Constants.DEFAULT_UI_HUD_LEFT),
+                Utilities.Commons.TryGet<float>(tag, "eac_ui_hud_top", UI.Constants.DEFAULT_UI_HUD_TOP),
+                Utilities.Commons.TryGet<bool>(tag, "eac_ui_hud_auto", UI.Constants.DEFAULT_UI_HUD_AUTO));
         }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Misc ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
