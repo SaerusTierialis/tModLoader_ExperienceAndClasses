@@ -52,7 +52,7 @@ namespace ExperienceAndClasses {
 
         public Systems.Status[] Status { get; private set; }
 
-        public Utilities.Containers.Loaded_UI_Data loaded_ui_main, loaded_ui_hud;
+        public Utilities.Containers.LoadedUIData loaded_ui_main, loaded_ui_hud;
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Instance Vars (syncing) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -87,8 +87,8 @@ namespace ExperienceAndClasses {
             Progression = 0;
 
             //ui
-            loaded_ui_main = new Utilities.Containers.Loaded_UI_Data();
-            loaded_ui_hud = new Utilities.Containers.Loaded_UI_Data();
+            loaded_ui_main = new Utilities.Containers.LoadedUIData();
+            loaded_ui_hud = new Utilities.Containers.LoadedUIData();
 
             //default level/xp/unlock
             Class_Levels = new byte[(byte)Systems.Class.IDs.NUMBER_OF_IDs];
@@ -1044,12 +1044,12 @@ namespace ExperienceAndClasses {
             }
 
             //UI data
-            loaded_ui_main = new Utilities.Containers.Loaded_UI_Data(
+            loaded_ui_main = new Utilities.Containers.LoadedUIData(
                 Utilities.Commons.TryGet<float>(tag, "eac_ui_class_left", UI.Constants.DEFAULT_UI_MAIN_LEFT),
                 Utilities.Commons.TryGet<float>(tag, "eac_ui_class_top", UI.Constants.DEFAULT_UI_MAIN_TOP),
                 Utilities.Commons.TryGet<bool>(tag, "eac_ui_class_auto", UI.Constants.DEFAULT_UI_MAIN_AUTO));
 
-            loaded_ui_hud = new Utilities.Containers.Loaded_UI_Data(
+            loaded_ui_hud = new Utilities.Containers.LoadedUIData(
                 Utilities.Commons.TryGet<float>(tag, "eac_ui_hud_left", UI.Constants.DEFAULT_UI_HUD_LEFT),
                 Utilities.Commons.TryGet<float>(tag, "eac_ui_hud_top", UI.Constants.DEFAULT_UI_HUD_TOP),
                 Utilities.Commons.TryGet<bool>(tag, "eac_ui_hud_auto", UI.Constants.DEFAULT_UI_HUD_AUTO));
