@@ -10,18 +10,13 @@ namespace ExperienceAndClasses.UI {
 
     //UI for displaying XP and cooldown bars
 
-    public class UIAbility : UIStateCombo {
+    public class UIHUD : UIStateCombo {
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Singleton ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-        public static readonly UIAbility Instance = new UIAbility();
+        public static readonly UIHUD Instance = new UIHUD();
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Constants ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         private const float WIDTH = 200f;
         private const float HEIGHT = 200f; //default, actual height is dynamic
-
-        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Static Variables ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-        public static float initial_panel_left = 300;
-        public static float initial_panel_top = 300;
-        public static bool initial_panel_auto = true;
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Variables ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         public DragableUIPanel panel { get; private set; }
@@ -32,9 +27,7 @@ namespace ExperienceAndClasses.UI {
         protected override void InitializeState() {
             needs_first_arrange = true;
 
-            panel = new DragableUIPanel(WIDTH, HEIGHT, Constants.COLOR_BAR_UI, this, false, initial_panel_auto);
-
-            panel.SetPosition(initial_panel_left, initial_panel_top);
+            panel = new DragableUIPanel(WIDTH, HEIGHT, Constants.COLOR_BAR_UI, this, false, ExperienceAndClasses.LOCAL_MPLAYER.loaded_ui_hud.AUTO);
 
             xp_bar_primary = new XPBar(WIDTH - (Constants.UI_PADDING * 2), Systems.Class.LOOKUP[(byte)Systems.Class.IDs.Novice]);
             xp_bar_primary.Left.Set(Constants.UI_PADDING, 0f);
@@ -45,6 +38,8 @@ namespace ExperienceAndClasses.UI {
             panel.Append(xp_bar_secondary);
 
             state.Append(panel);
+
+            panel.SetPosition(ExperienceAndClasses.LOCAL_MPLAYER.loaded_ui_hud.LEFT, ExperienceAndClasses.LOCAL_MPLAYER.loaded_ui_hud.TOP, true);
         }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Methods ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/

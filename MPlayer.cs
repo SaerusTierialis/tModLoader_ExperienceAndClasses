@@ -52,6 +52,8 @@ namespace ExperienceAndClasses {
 
         public Systems.Status[] Status { get; private set; }
 
+        public Utilities.Containers.Loaded_UI_Data loaded_ui_main, loaded_ui_hud;
+
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Instance Vars (syncing) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         public Systems.Class Class_Primary { get; private set; }
@@ -83,6 +85,10 @@ namespace ExperienceAndClasses {
             minion_slots_used = 0;
             Status = new Systems.Status[(uint)Systems.Status.IDs.NUMBER_OF_IDs];
             Progression = 0;
+
+            //ui
+            loaded_ui_main = new Utilities.Containers.Loaded_UI_Data();
+            loaded_ui_hud = new Utilities.Containers.Loaded_UI_Data();
 
             //default level/xp/unlock
             Class_Levels = new byte[(byte)Systems.Class.IDs.NUMBER_OF_IDs];
@@ -134,15 +140,15 @@ namespace ExperienceAndClasses {
                 time_next_full_sync = DateTime.Now.AddTicks(TICKS_PER_FULL_SYNC);
 
                 //grab UI-state combos to display
-                ExperienceAndClasses.UIs = new UI.UIStateCombo[] { UI.UIStatus.Instance, UI.UIAbility.Instance, UI.UIMain.Instance, UI.UIInfo.Instance };
+                ExperienceAndClasses.UIs = new UI.UIStateCombo[] { UI.UIStatus.Instance, UI.UIHUD.Instance, UI.UIMain.Instance, UI.UIInfo.Instance };
 
                 //(re)initialize ui
                 foreach (UI.UIStateCombo ui in ExperienceAndClasses.UIs) {
                     ui.Initialize();
                 }
 
-                //temp: show bars and status
-                UI.UIAbility.Instance.Visibility = true;
+                //temp: show bars and status //TODO something here?
+                UI.UIHUD.Instance.Visibility = true;
                 UI.UIStatus.Instance.Visibility = true;
 
                 //apply ui auto
@@ -197,6 +203,7 @@ namespace ExperienceAndClasses {
             if (Is_Local_Player) {
                 //ui
                 UI.UIStatus.Instance.Update();
+
             }
         }
 
@@ -509,7 +516,7 @@ namespace ExperienceAndClasses {
 
             //update UI
             UI.UIMain.Instance.UpdateClassInfo();
-            UI.UIAbility.Instance.Update();
+            UI.UIHUD.Instance.Update();
 
             //update class features
             UpdateClassInfo();
@@ -621,7 +628,7 @@ namespace ExperienceAndClasses {
             }
             else {
                 //otherwise just update xp bars
-                UI.UIAbility.Instance.Update();
+                UI.UIHUD.Instance.Update();
             }
         }
 
@@ -929,9 +936,9 @@ namespace ExperienceAndClasses {
                 {"eac_ui_class_left", UI.UIMain.Instance.panel.GetLeft() },
                 {"eac_ui_class_top", UI.UIMain.Instance.panel.GetTop() },
                 {"eac_ui_class_auto", UI.UIMain.Instance.panel.Auto },
-                {"eac_ui_bars_left", UI.UIAbility.Instance.panel.GetLeft() },
-                {"eac_ui_bars_top", UI.UIAbility.Instance.panel.GetTop() },
-                {"eac_ui_bars_auto", UI.UIAbility.Instance.panel.Auto },
+                {"eac_ui_hud_left", UI.UIHUD.Instance.panel.GetLeft() },
+                {"eac_ui_hud_top", UI.UIHUD.Instance.panel.GetTop() },
+                {"eac_ui_hud_auto", UI.UIHUD.Instance.panel.Auto },
                 {"eac_class_unlock", class_unlocked },
                 {"eac_class_xp", class_xp },
                 {"eac_class_level", class_level },
@@ -1015,12 +1022,15 @@ namespace ExperienceAndClasses {
             }
 
             //UI data
-            UI.UIMain.initial_panel_left = Utilities.Commons.TryGet<float>(tag, "eac_ui_class_left", 300f);
-            UI.UIMain.initial_panel_top = Utilities.Commons.TryGet<float>(tag, "eac_ui_class_top", 300f);
-            UI.UIMain.initial_panel_auto = Utilities.Commons.TryGet<bool>(tag, "eac_ui_class_auto", true);
-            UI.UIAbility.initial_panel_left = Utilities.Commons.TryGet<float>(tag, "eac_ui_bars_left", 300f);
-            UI.UIAbility.initial_panel_top = Utilities.Commons.TryGet<float>(tag, "eac_ui_bars_top", 300f);
-            UI.UIAbility.initial_panel_auto = Utilities.Commons.TryGet<bool>(tag, "eac_ui_bars_auto", true);
+            loaded_ui_main = new Utilities.Containers.Loaded_UI_Data(
+                Utilities.Commons.TryGet<float>(tag, "eac_ui_class_left", 300f),
+                Utilities.Commons.TryGet<float>(tag, "eac_ui_class_top", 300f),
+                Utilities.Commons.TryGet<bool>(tag, "eac_ui_class_auto", true));
+
+            loaded_ui_hud = new Utilities.Containers.Loaded_UI_Data(
+                Utilities.Commons.TryGet<float>(tag, "eac_ui_hud_left", 300f),
+                Utilities.Commons.TryGet<float>(tag, "eac_ui_hud_top", 300f),
+                Utilities.Commons.TryGet<bool>(tag, "eac_ui_hud_auto", true));
         }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Misc ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/

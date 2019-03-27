@@ -93,7 +93,7 @@ namespace ExperienceAndClasses.Utilities {
         }
 
         /// <summary>
-        /// Try to get from tag, else default to specified value. Supports int, float, double, bool, long, and string.
+        /// Try to get from tag, else default to specified value.
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="tag"></param>

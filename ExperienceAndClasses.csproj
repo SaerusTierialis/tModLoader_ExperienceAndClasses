@@ -62,6 +62,7 @@
     <Compile Include="Items\Orb.cs" />
     <Compile Include="Items\Unlock.cs" />
     <Compile Include="Systems\Legacy.cs" />
+    <Compile Include="Utilities\Containers.cs" />
     <Compile Include="Utilities\Netmode.cs" />
     <Compile Include="Utilities\PacketHandler.cs" />
     <Compile Include="ExperienceAndClasses.cs" />
@@ -75,7 +76,7 @@
     <Compile Include="Utilities\Textures.cs" />
     <Compile Include="UI\Elements.cs" />
     <Compile Include="UI\Constants.cs" />
-    <Compile Include="UI\UIAbility.cs" />
+    <Compile Include="UI\UIHUD.cs" />
     <Compile Include="UI\UIInfo.cs" />
     <Compile Include="UI\UIMain.cs" />
     <Compile Include="UI\UIStatus.cs" />
