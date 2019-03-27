@@ -97,7 +97,7 @@ namespace ExperienceAndClasses.Utilities.Containers {
             /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Variables ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
             private SortedList<byte, Systems.Status> instances = new SortedList<byte, Systems.Status>(byte.MaxValue);
             private List<byte> available_keys = Enumerable.Range(1, byte.MaxValue).Select(i => (byte)i).ToList(); //instance_id = 0 is reserved for default value and instant statuses
-            
+
             /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Methods ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
             public List<Systems.Status> GetInstances() {
@@ -116,7 +116,7 @@ namespace ExperienceAndClasses.Utilities.Containers {
             public void AddStatus(Systems.Status status) {
                 if (status.instance_id == 0) {
                     //needs an instance id
-                    if (available_keys.Count <= 0)
+                    if (available_keys.Count == 0)
                         Commons.Error("Cannot add any more instances of " + status.core_display_name);
                     else {
                         //get first available instance id
