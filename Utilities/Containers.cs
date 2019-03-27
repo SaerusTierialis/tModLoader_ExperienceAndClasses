@@ -18,8 +18,7 @@ namespace ExperienceAndClasses.Utilities.Containers {
 
     public class StatusList {
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Constants ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-        private const byte MAXIMUM_INSTANCES_PER_STATUS = byte.MaxValue;
-        public const byte UNASSIGNED_INSTANCE_KEY = 0;
+        public const byte UNASSIGNED_INSTANCE_KEY = byte.MaxValue;
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Variables ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         private SortedList<Systems.Status.IDs, StatusInstances> statuses = new SortedList<Systems.Status.IDs, StatusInstances>((int)Systems.Status.IDs.NUMBER_OF_IDs);
@@ -61,8 +60,10 @@ namespace ExperienceAndClasses.Utilities.Containers {
             //get the StatusInstances
             StatusInstances status_instances;
             if (statuses.TryGetValue(status_id, out status_instances)) {
-                //remove the status
-                if (!status_instances.RemoveStatus(instance_id)) {
+                //remove the status from instances
+                status_instances.RemoveStatus(instance_id);
+                //remove the StatusInstances if no more instances
+                if (status_instances.IsEmpty()) {
                     //no more instances so remove the status_instances too
                     statuses.Remove(status_id);
                 }
@@ -99,9 +100,9 @@ namespace ExperienceAndClasses.Utilities.Containers {
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ StatusInstances ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         private class StatusInstances {
             /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Variables ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-            private SortedList<byte, Systems.Status> instances = new SortedList<byte, Systems.Status>(MAXIMUM_INSTANCES_PER_STATUS);
-            private Queue<byte> available_keys = new Queue<byte>(Enumerable.Range(1, MAXIMUM_INSTANCES_PER_STATUS).Select(i => (byte)i)); //instance_id = 0 is reserved for default value and instant statuses
-            
+            private SortedList<byte, Systems.Status> instances = new SortedList<byte, Systems.Status>(UNASSIGNED_INSTANCE_KEY);
+            private bool[] key_taken = new bool[UNASSIGNED_INSTANCE_KEY]; //keys are 0 to (UNASSIGNED_INSTANCE_KEY - 1)
+
             /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Methods ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
             public List<Systems.Status> GetInstances() {
@@ -119,14 +120,9 @@ namespace ExperienceAndClasses.Utilities.Containers {
 
             public void AddStatus(Systems.Status status) {
                 if (status.instance_id == UNASSIGNED_INSTANCE_KEY) {
-                    //needs an instance id
-                    if (available_keys.Count == 0)
-                        Commons.Error("Cannot add any more instances of " + status.core_display_name);
-                    else {
-                        //get first available instance id
-                        status.instance_id = available_keys.Dequeue();
-                        //add instance
-                        instances.Add(status.instance_id, status);
+                    //assign new key and add
+                    if (!AddNewStatus(status)) {
+                        Commons.Error("Cannot add instances of " + status.core_display_name);
                     }
                 }
                 else {
@@ -139,19 +135,54 @@ namespace ExperienceAndClasses.Utilities.Containers {
                         //add another instance
                         instances.Add(status.instance_id, status);
                     }
+
+                    //be certain that key is marked as taken
+                    key_taken[status.instance_id] = true;
                 }
             }
 
-            public bool RemoveStatus(byte instance_id) {
+            /// <summary>
+            /// Removes instance by id
+            /// </summary>
+            /// <param name="instance_id"></param>
+            /// <returns></returns>
+            public void RemoveStatus(byte instance_id) {
                 //remove status
                 instances.Remove(instance_id);
 
                 //make key available
-                if (!available_keys.Contains(instance_id))
-                    available_keys.Enqueue(instance_id);
+                key_taken[instance_id] = false;
+            }
 
-                //check if no more instances
+            public bool IsEmpty() {
                 return (instances.Count == 0);
+            }
+
+            /// <summary>
+            /// Assigns a key and adds the instance. Returns false if no keys available or status already has a key.
+            /// </summary>
+            /// <param name="status"></param>
+            /// <returns></returns>
+            private bool AddNewStatus(Systems.Status status) {
+                if (status.instance_id != UNASSIGNED_INSTANCE_KEY) {
+                    //status already has key
+                    return false;
+                }
+                else {
+                    //find first available key
+                    int key = Array.FindIndex<bool>(key_taken, i => i == false);
+                    if (key < 0) {
+                        //no keys available
+                        return false;
+                    }
+                    else {
+                        //assign key and add status
+                        status.instance_id = (byte)key;
+                        key_taken[key] = true;
+                        instances.Add(status.instance_id, status);
+                        return true;
+                    }
+                }
             }
         }
     }
