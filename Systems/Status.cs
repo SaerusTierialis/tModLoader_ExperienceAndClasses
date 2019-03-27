@@ -93,6 +93,9 @@ namespace ExperienceAndClasses.Systems {
         private Texture2D texture_buff;
         private DateTime time_end;
 
+        //public instance_id (don't touch this except in StatusList)
+        public byte instance_id;
+
         //get texture from any instance
         public Texture2D Texture_Buff {
             get {
@@ -130,6 +133,7 @@ namespace ExperienceAndClasses.Systems {
             Owner = null;
             Target = null;
             sync_data = new Dictionary<SYNC_DATA_TYPES, double>();
+            instance_id = 0;
         }
 
         public void Update() {
