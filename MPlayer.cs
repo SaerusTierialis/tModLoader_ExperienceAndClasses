@@ -50,6 +50,11 @@ namespace ExperienceAndClasses {
         public bool[] Class_Unlocked { get; private set; }
 
         /// <summary>
+        /// Earning XP when all active classes are maxed stores the extra here
+        /// </summary>
+        public uint Extra_XP { get; private set; }
+
+        /// <summary>
         /// Base values from current classes
         /// </summary>
         public int[] Attributes_Base { get; private set; }
@@ -131,6 +136,7 @@ namespace ExperienceAndClasses {
             minions = new List<Projectile>();
             Statuses = new Utilities.Containers.StatusList();
             Progression = 0;
+            Extra_XP = 0;
 
             //ui
             loaded_ui_main = new Utilities.Containers.LoadedUIData();
@@ -249,7 +255,7 @@ namespace ExperienceAndClasses {
             if (Is_Local_Player) {
                 //ui
                 UI.UIStatus.Instance.Update();
-
+                
             }
         }
 
@@ -431,11 +437,32 @@ namespace ExperienceAndClasses {
                 Class_Levels[c.ID] = 1;
             }
 
+            //success
+            Main.NewText("You have unlocked " + c.Name + "!", UI.Constants.COLOUR_MESSAGE_ANNOUNCE);
+
+            //add extra xp (after penalty)
+            uint extra_xp_add = (uint)(Extra_XP * Systems.XP.EXTRA_XP_POOL_MULTIPLIER);
+            if (extra_xp_add > 0) {
+                //add xp
+                AddXP(c.ID, extra_xp_add);
+
+                //clear pool
+                Extra_XP = 0;
+
+                //levelup?
+                while ((Class_Levels[c.ID] < c.Max_Level) && (Class_XP[c.ID] >= Systems.XP.Requirements.GetXPReq(c, Class_Levels[c.ID]))) {
+                    SubtractXP(c.ID, Systems.XP.Requirements.GetXPReq(c, Class_Levels[c.ID]));
+                    Class_Levels[c.ID]++;
+                    AnnounceLevel(c);
+                }
+
+                //tell player
+                Main.NewText(extra_xp_add + " unclaimed XP has been transferred to " + c.Name + "!", UI.Constants.COLOUR_MESSAGE_ANNOUNCE);
+            }
+
             //update
             LocalUpdateClassInfo();
 
-            //success
-            Main.NewText("You have unlocked " + c.Name + "!", UI.Constants.COLOUR_MESSAGE_ANNOUNCE);
             return true;
         }
 
@@ -615,30 +642,36 @@ namespace ExperienceAndClasses {
         }
 
         public void AddXP(uint xp) {
-            if (CanGainXP()) {
+            if (Is_Local_Player) {
                 if (show_xp) {
                     CombatText.NewText(Main.LocalPlayer.getRect(), UI.Constants.COLOUR_XP_BRIGHT, "+" + xp + " XP");
                 }
 
-                bool add_primary = CanGainXPPrimary();
-                bool add_secondary = CanGainXPSecondary();
+                if (CanGainXP()) {
+                    bool add_primary = CanGainXPPrimary();
+                    bool add_secondary = CanGainXPSecondary();
 
-                if (add_primary && add_secondary) {
-                    AddXP(Class_Primary.ID, (uint)Math.Ceiling(xp * Systems.XP.SUBCLASS_PENALTY_XP_MULTIPLIER_PRIMARY));
-                    AddXP(Class_Secondary.ID, (uint)Math.Ceiling(xp * Systems.XP.SUBCLASS_PENALTY_XP_MULTIPLIER_SECONDARY));
-                }
-                else if (add_primary) {
-                    AddXP(Class_Primary.ID, xp);
-                }
-                else if (add_secondary) {
-                    AddXP(Class_Secondary.ID, xp);
+                    if (add_primary && add_secondary) {
+                        AddXP(Class_Primary.ID, (uint)Math.Ceiling(xp * Systems.XP.SUBCLASS_PENALTY_XP_MULTIPLIER_PRIMARY));
+                        AddXP(Class_Secondary.ID, (uint)Math.Ceiling(xp * Systems.XP.SUBCLASS_PENALTY_XP_MULTIPLIER_SECONDARY));
+                    }
+                    else if (add_primary) {
+                        AddXP(Class_Primary.ID, xp);
+                    }
+                    else if (add_secondary) {
+                        AddXP(Class_Secondary.ID, xp);
+                    }
+                    else {
+                        //shouldn't be reachable unless something is changed later
+                        Extra_XP = Math.Max(Extra_XP, Extra_XP + xp); //prevent overflow
+                        return;
+                    }
+
+                    CheckForLevel();
                 }
                 else {
-                    //can't gain xp (max level, etc.)
-                    return;
+                    Extra_XP = Math.Max(Extra_XP, Extra_XP + xp); //prevent overflow
                 }
-
-                CheckForLevel();
             }
         }
 
@@ -1008,6 +1041,7 @@ namespace ExperienceAndClasses {
                 {"eac_attribute_allocation", attributes_allocated },
                 {"eac_wof", Defeated_WOF },
                 {"eac_settings_show_xp", show_xp},
+                {"eac_extra_xp", Extra_XP},
             };
         }
 
@@ -1020,6 +1054,9 @@ namespace ExperienceAndClasses {
 
             //subclass unlocked
             Allow_Secondary = Utilities.Commons.TryGet<bool>(tag, "eac_class_subclass_unlocked", Allow_Secondary);
+
+            //extra xp pool
+            Extra_XP = Utilities.Commons.TryGet<uint>(tag, "eac_extra_xp", Extra_XP);
 
             //settings
             show_xp = Utilities.Commons.TryGet<bool>(tag, "eac_settings_show_xp", show_xp);

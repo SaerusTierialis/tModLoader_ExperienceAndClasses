@@ -13,6 +13,8 @@ namespace ExperienceAndClasses.Systems {
         public const double SUBCLASS_PENALTY_XP_MULTIPLIER_PRIMARY = 0.7;
         public const double SUBCLASS_PENALTY_XP_MULTIPLIER_SECONDARY = 0.4;
 
+        public const double EXTRA_XP_POOL_MULTIPLIER = 0.5;
+
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ XP Rewards ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         /// <summary>
