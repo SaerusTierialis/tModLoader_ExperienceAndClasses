@@ -129,7 +129,7 @@ namespace ExperienceAndClasses {
             Defeated_WOF = false;
             show_xp = true;
             minions = new List<Projectile>();
-            Status = new Systems.Status[(uint)Systems.Status.IDs.NUMBER_OF_IDs];
+            Statuses = new Utilities.Containers.StatusList();
             Progression = 0;
 
             //ui
@@ -612,12 +612,6 @@ namespace ExperienceAndClasses {
 
         public bool CanGainXPSecondary() {
             return (Is_Local_Player && Allow_Secondary && (Class_Secondary.Tier > 0) && (Class_Levels[Class_Secondary.ID] < Class_Secondary.Max_Level));
-        }
-
-        public void AddOrbXP(uint xp_primary, uint xp_secondary) {
-            AddXP(Class_Primary.ID, xp_primary);
-            AddXP(Class_Secondary.ID, xp_secondary);
-            CheckForLevel();
         }
 
         public void AddXP(uint xp) {
@@ -1128,14 +1122,12 @@ namespace ExperienceAndClasses {
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Status ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         public bool HasStatus(Systems.Status.IDs id) {
-            return (Status[(short)id] == null);
+            return Statuses.ContainsStatus(id);
         }
 
         public void UpdateStatus() {
-            foreach (Systems.Status s in Status) {
-                if (s != null) {
-                    s.Update();
-                }
+            foreach (List<Systems.Status> s in Statuses.GetAllStatuses()) {
+                //TODO
             }
         }
         

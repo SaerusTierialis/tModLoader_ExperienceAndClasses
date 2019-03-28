@@ -17,7 +17,7 @@ namespace ExperienceAndClasses.Items {
         private const bool CONSUMABLE = true;
         private const bool CONSUMABLE_AUTO = true;
 
-        public float xp_multiplier = 0f;
+        public double xp_multiplier = 0.0;
 
         protected Orb(string name, string tooltip, string texture, int rarity, short dust) : base(name, tooltip, texture, CONSUMABLE, WIDTH, HEIGTH, rarity, CONSUMABLE_AUTO) {
             DUST = dust;
@@ -36,45 +36,12 @@ namespace ExperienceAndClasses.Items {
         }
 
         public override void ModifyTooltips(List<TooltipLine> tooltips) {
-            string str = "";
-            uint value;
-            bool can_use = false;
+            TooltipLine line = new TooltipLine(mod, "desc", "Current XP Value: " + GetXPValue());
+            line.overrideColor = UI.Constants.COLOUR_XP_BRIGHT;
+            tooltips.Add(line);
 
-            if (ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary.ID != (byte)Systems.Class.IDs.None) {
-                str += ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary.Name;
-                value = GetPrimaryValue();
-                if (value > 0) {
-                    str += " XP: " + value;
-                    can_use = true;
-                }
-                else {
-                    str += " is MAXED";
-                }
-            }
-
-            if (ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary.ID != (byte)Systems.Class.IDs.None) {
-                if (str.Length > 0) {
-                    str += "\n";
-                }
-                str += ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary.Name;
-                value = GetSecondaryValue();
-                if (value > 0) {
-                    str += " XP: " + value;
-                    can_use = true;
-                }
-                else {
-                    str += " is MAXED";
-                }
-            }
-
-            if (str.Length > 0) {
-                TooltipLine line = new TooltipLine(mod, "desc", str);
-                line.overrideColor = UI.Constants.COLOUR_XP_BRIGHT;
-                tooltips.Add(line);
-            }
-
-            if (!can_use) {
-                TooltipLine line = new TooltipLine(mod, "desc2", "Use is currently prevented because you cannot gain XP!");
+            if (!ExperienceAndClasses.LOCAL_MPLAYER.CanGainXP()) {
+                line = new TooltipLine(mod, "desc2", "Use is currently prevented because you cannot gain XP!");
                 line.overrideColor = UI.Constants.COLOUR_MESSAGE_ERROR;
                 tooltips.Add(line);
             }
@@ -85,45 +52,18 @@ namespace ExperienceAndClasses.Items {
         }
 
         public override bool UseItem(Player player) {
-            uint xp_primary = GetPrimaryValue();
-            uint xp_secondary = GetSecondaryValue();
-
-            if ((xp_primary + xp_secondary) <= 0) {
+            if (ExperienceAndClasses.LOCAL_MPLAYER.CanGainXP()) {
+                ExperienceAndClasses.LOCAL_MPLAYER.AddXP(GetXPValue());
+                return true;
+            }
+            else {
                 //cannot gain xp!
                 return false;
             }
-            else {
-                ExperienceAndClasses.LOCAL_MPLAYER.AddOrbXP(xp_primary, xp_secondary);
-                return true;
-            }
         }
 
-        private uint GetPrimaryValue() {
-            if (ExperienceAndClasses.LOCAL_MPLAYER.CanGainXPPrimary()) {
-                if (ExperienceAndClasses.LOCAL_MPLAYER.CanGainXPSecondary()) {
-                    return (uint)Math.Ceiling(0.5 * xp_multiplier * Systems.XP.Rewards.GetBossOrbXP(ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary, ExperienceAndClasses.LOCAL_MPLAYER.Class_Levels[ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary.ID]));
-                }
-                else {
-                    return (uint)Math.Ceiling(xp_multiplier * Systems.XP.Rewards.GetBossOrbXP(ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary, ExperienceAndClasses.LOCAL_MPLAYER.Class_Levels[ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary.ID]));
-                }
-            }
-            else {
-                return 0;
-            }
-        }
-
-        private uint GetSecondaryValue() {
-            if (ExperienceAndClasses.LOCAL_MPLAYER.CanGainXPSecondary()) {
-                if (ExperienceAndClasses.LOCAL_MPLAYER.CanGainXPPrimary()) {
-                    return (uint)Math.Ceiling(0.5 * xp_multiplier * Systems.XP.Rewards.GetBossOrbXP(ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary, ExperienceAndClasses.LOCAL_MPLAYER.Class_Levels[ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary.ID]));
-                }
-                else {
-                    return (uint)Math.Ceiling(xp_multiplier * Systems.XP.Rewards.GetBossOrbXP(ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary, ExperienceAndClasses.LOCAL_MPLAYER.Class_Levels[ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary.ID]));
-                }
-            }
-            else {
-                return 0;
-            }
+        public uint GetXPValue() {
+            return (uint)(Systems.XP.Rewards.GetBossOrbXP() * xp_multiplier);
         }
     }
 
@@ -137,7 +77,7 @@ namespace ExperienceAndClasses.Items {
         public const int CONVERT_BOSS_ORB = 5;
 
         public Orb_Monster() : base(NAME, TOOLTIP, TEXTURE, RARITY, DUST) {
-            xp_multiplier = 1f / CONVERT_BOSS_ORB;
+            xp_multiplier = 1.0 / CONVERT_BOSS_ORB;
         }
 
         public override void AddRecipes() {
@@ -154,7 +94,7 @@ namespace ExperienceAndClasses.Items {
         private const short DUST = DustID.PurpleCrystalShard;
 
         public Orb_Boss() : base(NAME, TOOLTIP, TEXTURE, RARITY, DUST) {
-            xp_multiplier = 1f;
+            xp_multiplier = 1.0;
         }
 
     }

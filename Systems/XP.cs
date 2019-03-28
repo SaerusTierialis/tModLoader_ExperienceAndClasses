@@ -96,25 +96,11 @@ namespace ExperienceAndClasses.Systems {
             }
 
             /// <summary>
-            /// Returns the value of a boss orb for a specific class/level
+            /// Returns the value of a boss orb for the local player
             /// </summary>
-            /// <param name="c"></param>
-            /// <param name="level"></param>
             /// <returns></returns>
-            public static uint GetBossOrbXP(Class c, byte level) {
-                Class pre = c.Prereq;
-                uint level_sum = level;
-                while (pre != null) {
-                    level_sum += pre.Max_Level;
-                    pre = pre.Prereq;
-                }
-
-                uint xp = 195 + (5 * (uint)Math.Pow(level_sum, 1.76));
-                uint xp_min = (uint)(0.005 * Requirements.GetXPReq(c, level));
-                if (xp < xp_min)
-                    xp = xp_min;
-
-                return xp;
+            public static double GetBossOrbXP() {
+                return Math.Pow(ExperienceAndClasses.LOCAL_MPLAYER.Progression, 1.7) * 3.0;
             }
         }
 

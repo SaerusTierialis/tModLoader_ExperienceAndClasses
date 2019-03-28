@@ -171,6 +171,9 @@ namespace ExperienceAndClasses.Systems {
                 status.time_end = DateTime.Now.AddMilliseconds(status.core_duration_msec);
             }
 
+            //TODO
+
+            /*
             //add to target (unless instant)
             if (!status.core_duration_instant) {
                 Status prior_instance = status.Target.Status[status.ID_num];
@@ -185,6 +188,7 @@ namespace ExperienceAndClasses.Systems {
                     status.OnStart();
                 }
             }
+            */
 
             //if owner is local and netmode is multiplayer, send to other clients (unless not sync)
             if (status.core_sync && Utilities.Netmode.IS_CLIENT && status.Owner.Equals(ExperienceAndClasses.LOCAL_MPLAYER)) {
@@ -206,7 +210,7 @@ namespace ExperienceAndClasses.Systems {
 
         public void Remove() {
             //remove from player
-            Target.Status[ID_num] = null;
+            Target.Statuses.RemoveStatus(this);
 
             //TODO
 
