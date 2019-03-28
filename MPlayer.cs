@@ -90,7 +90,10 @@ namespace ExperienceAndClasses {
         /// </summary>
         public List<Projectile> minions { get; private set;  }
 
-        public Systems.Status[] Status { get; private set; }
+        /// <summary>
+        /// Container of statuses on this player
+        /// </summary>
+        public Utilities.Containers.StatusList Statuses { get; private set; }
 
         public Utilities.Containers.LoadedUIData loaded_ui_main, loaded_ui_hud;
 
@@ -101,7 +104,11 @@ namespace ExperienceAndClasses {
         public byte Class_Primary_Level_Effective { get; private set; }
         public byte Class_Secondary_Level_Effective { get; private set; }
 
+        /// <summary>
+        /// A value summarizing overall progress used to scale orb drops and value
+        /// </summary>
         public int Progression { get; private set; }
+
         public int[] Attributes_Final { get; private set; }
         public bool AFK { get; private set; } //TODO local set
         public bool IN_COMBAT { get; private set; } //TODO local set
