@@ -89,7 +89,6 @@ namespace ExperienceAndClasses {
         /// List of minions including sentries. Includes each part of multi-part minions. Updates on CheckMinions().
         /// </summary>
         public List<Projectile> minions { get; private set;  }
-        public float minion_slots_used { get; private set; }
 
         public Systems.Status[] Status { get; private set; }
 
@@ -123,7 +122,6 @@ namespace ExperienceAndClasses {
             Defeated_WOF = false;
             show_xp = true;
             minions = new List<Projectile>();
-            minion_slots_used = 0;
             Status = new Systems.Status[(uint)Systems.Status.IDs.NUMBER_OF_IDs];
             Progression = 0;
 
@@ -716,11 +714,9 @@ namespace ExperienceAndClasses {
 
         public void CheckMinions() {
             minions = new List<Projectile>();
-            minion_slots_used = 0;
             foreach (Projectile p in Main.projectile) {
                 if (p.active && (p.minion || p.sentry) && (p.owner == player.whoAmI)) {
                     minions.Add(p);
-                    minion_slots_used += p.minionSlots;
                 }
             }
         }
