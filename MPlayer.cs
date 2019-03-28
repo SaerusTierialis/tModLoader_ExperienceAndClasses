@@ -361,8 +361,11 @@ namespace ExperienceAndClasses {
 
                         //destroy all minions
                         CheckMinions();
-                        foreach (Projectile p in minions) {
-                            p.Kill();
+                        if (minions.Count > 0) {
+                            Main.NewText("Your minions have been despawned because you changed classes!", UI.Constants.COLOUR_MESSAGE_ERROR);
+                            foreach (Projectile p in minions) {
+                                p.Kill();
+                            }
                         }
 
                         if (is_primary) {
