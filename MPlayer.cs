@@ -19,8 +19,20 @@ namespace ExperienceAndClasses {
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Instance Vars (non-syncing) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         public bool Is_Local_Player { get; private set; }
+
+        /// <summary>
+        /// Mod version loaded from
+        /// </summary>
         public int[] Load_Version { get; private set; }
-        public bool Killed_WOF { get; private set; } //TODO use this to limit tier 3 unlock
+
+        /// <summary>
+        /// Track wall of flesh progress for tier 3 unlock
+        /// </summary>
+        public bool Defeated_WOF { get; private set; } //TODO use this to limit tier 3 unlock
+
+        /// <summary>
+        /// Can have a secondary class active
+        /// </summary>
         public bool Allow_Secondary { get; private set; }
 
         /// <summary>
@@ -28,17 +40,43 @@ namespace ExperienceAndClasses {
         /// </summary>
         public bool initialized;
 
+        /// <summary>
+        /// Show xp gain overhead
+        /// </summary>
         private bool show_xp;
 
         public byte[] Class_Levels { get; private set; }
         public uint[] Class_XP { get; private set; }
         public bool[] Class_Unlocked { get; private set; }
 
+        /// <summary>
+        /// Base values from current classes
+        /// </summary>
         public int[] Attributes_Base { get; private set; }
+
+        /// <summary>
+        /// Allocated points
+        /// </summary>
         public int[] Attributes_Allocated { get; private set; }
+
+        /// <summary>
+        /// Bonus points from statuses, etc.
+        /// </summary>
         public int[] Attributes_Bonus { get; private set; }
+
+        /// <summary>
+        /// Available allocation points
+        /// </summary>
         public int Allocation_Points_Unallocated { get; private set; }
+
+        /// <summary>
+        /// Spent allocation points
+        /// </summary>
         private int Allocation_Points_Spent;
+
+        /// <summary>
+        /// Total allocation points
+        /// </summary>
         private int Allocation_Points_Total;
 
         public float heal_damage; //TODO
@@ -47,6 +85,9 @@ namespace ExperienceAndClasses {
         public float use_speed_melee, use_speed_ranged, use_speed_magic, use_speed_throwing, use_speed_minion, use_speed_tool;
         public float tool_power;
 
+        /// <summary>
+        /// List of minions including sentries. Includes each part of multi-part minions. Updates on CheckMinions().
+        /// </summary>
         public List<Projectile> minions { get; private set;  }
         public float minion_slots_used { get; private set; }
 
@@ -79,7 +120,7 @@ namespace ExperienceAndClasses {
             Load_Version = new int[3];
             AFK = false;
             IN_COMBAT = false;
-            Killed_WOF = false;
+            Defeated_WOF = false;
             show_xp = true;
             minions = new List<Projectile>();
             minion_slots_used = 0;
@@ -968,7 +1009,7 @@ namespace ExperienceAndClasses {
                 {"eac_class_current_secondary", Class_Secondary.ID },
                 {"eac_class_subclass_unlocked", Allow_Secondary },
                 {"eac_attribute_allocation", attributes_allocated },
-                {"eac_wof", Killed_WOF },
+                {"eac_wof", Defeated_WOF },
                 {"eac_settings_show_xp", show_xp},
             };
         }
@@ -978,7 +1019,7 @@ namespace ExperienceAndClasses {
             Load_Version = Utilities.Commons.TryGet<int[]>(tag, "eac_version", new int[3]);
 
             //has killed wof
-            Killed_WOF = Utilities.Commons.TryGet<bool>(tag, "eac_wof", Killed_WOF);
+            Defeated_WOF = Utilities.Commons.TryGet<bool>(tag, "eac_wof", Defeated_WOF);
 
             //subclass unlocked
             Allow_Secondary = Utilities.Commons.TryGet<bool>(tag, "eac_class_subclass_unlocked", Allow_Secondary);
