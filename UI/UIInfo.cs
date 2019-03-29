@@ -284,7 +284,13 @@ namespace ExperienceAndClasses.UI {
         public void ShowUnlockClass(UIElement source, Systems.Class c) {
             Items.MItem item = c.Unlock_Item;
 
-            string str = "Requirements:\n" + "Level " + c.Prereq.Max_Level + " " + c.Prereq.Name + "\nx1 " + item.item.Name + "\n\nToken Recipe:\n" + item.GetRecipeString(true) + "\n(Work Bench)";
+            string str = "Requirements:\n";
+
+            if (c.Tier == 3) {
+                str += "Defeat the Wall of Flesh\n";
+            }
+
+            str += c.Prereq.Name + " Level " + c.Prereq.Max_Level + "\n" + item.item.Name + " x1\n\nToken Recipe:\n" + item.GetRecipeString(true) + "\n(Work Bench)";
 
             mode = MODE.INPUT;
             unlock_mode = UNLOCK_MODE.CLASS;

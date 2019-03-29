@@ -79,6 +79,11 @@ namespace ExperienceAndClasses.Systems {
 
                 //award xp
                 AwardXP(base_xp, eligible_players, reward_modifier);
+
+                //wof defeated
+                if (npc.netID == NPCID.WallofFlesh) {
+                    DefeatWOF(eligible_players);
+                }
             }
         }
 
@@ -236,6 +241,17 @@ namespace ExperienceAndClasses.Systems {
             }
 
             return xp;
+        }
+
+        private void DefeatWOF(List<byte> eligible_players) {
+            foreach (byte player_index in eligible_players) {
+                if (Utilities.Netmode.IS_SERVER) {
+                    Utilities.PacketHandler.WOF.Send(player_index, -1);
+                }
+                else {
+                    ExperienceAndClasses.LOCAL_MPLAYER.DefeatWOF();
+                }
+            }
         }
     }
 }

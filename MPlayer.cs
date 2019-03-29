@@ -414,6 +414,17 @@ namespace ExperienceAndClasses {
                 return false;
             }
 
+            //tier 3 requirement
+            if (c.Tier==3 && !CanUnlockTier3()) {
+                if (!Defeated_WOF) {
+                    Main.NewText("You must defeat the Wall of Flesh to unlock tier 3 classes!", UI.Constants.COLOUR_MESSAGE_ERROR);
+                }
+                else {
+                    Utilities.Commons.Error("CanUnlockTier3 returned false for unknown reasons! Please Report!");
+                }
+                return false;
+            }
+
             //level requirements
             if (!HasClassPrereq(c)) {
                 Main.NewText("You must reach level " + c.Prereq.Max_Level + " " + c.Prereq.Name + " to unlock " + c.Name + "!", UI.Constants.COLOUR_MESSAGE_ERROR);
@@ -725,7 +736,20 @@ namespace ExperienceAndClasses {
                 Class_XP[class_id] = 0;
             }
         }
+
+        public void DefeatWOF() {
+            if (!Defeated_WOF) {
+                Defeated_WOF = true;
+                Main.NewText("You have defeated the Wall of Flesh!", UI.Constants.COLOUR_MESSAGE_SUCCESS);
+                if (CanUnlockTier3()) {
+                    Main.NewText("You can now unlock tier 3 classes!", UI.Constants.COLOUR_MESSAGE_SUCCESS);
+                }
+            }
+        }
         
+        public bool CanUnlockTier3() {
+            return Defeated_WOF;
+        }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Announce ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 

@@ -38,6 +38,7 @@ namespace ExperienceAndClasses.Utilities {
             AddStatus,
             RemoveStatus,
             SetStatuses,
+            WOF,
 
             NUMBER_OF_TYPES, //must be last
         };
@@ -407,6 +408,27 @@ namespace ExperienceAndClasses.Utilities {
             protected override void RecieveBody(BinaryReader reader, int origin, MPlayer origin_mplayer) {
                 //TODO
 
+            }
+        }
+
+        /// <summary>
+        /// When a client recieves this packet, WOF is marked as defeated
+        /// </summary>
+        public sealed class WOF : Handler {
+            private static readonly Handler Instance = LOOKUP[(byte)Enum.Parse(typeof(PACKET_TYPE), MethodBase.GetCurrentMethod().DeclaringType.Name)];
+
+            public static void Send(int target, int origin) {
+                //get packet containing header
+                ModPacket packet = Instance.GetPacket(origin);
+
+                //no contents
+
+                //send
+                packet.Send(target, origin);
+            }
+
+            protected override void RecieveBody(BinaryReader reader, int origin, MPlayer origin_mplayer) {
+                ExperienceAndClasses.LOCAL_MPLAYER.DefeatWOF();
             }
         }
     }
