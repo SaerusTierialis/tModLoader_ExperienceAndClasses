@@ -87,7 +87,7 @@ namespace ExperienceAndClasses.UI {
 
             text_measure = Main.fontMouseText.MeasureString(text.Text);
 
-            Height.Set((text_measure.Y * text_scale / 2f) + (Constants.UI_PADDING * 2), 0f);
+            Height.Set((text_measure.Y * text_scale / 2f) + (Constants.UI_PADDING * 2) + 2f, 0f);
         }
 
         public void SetText(string new_text) {
