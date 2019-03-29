@@ -23,7 +23,7 @@ namespace ExperienceAndClasses.Systems {
             Summoner,
             Cleric,
             Hybrid,
-            Unnamed1,
+            BloodKnight,
             Berserker,
             Guardian,
             Engineer,
@@ -259,9 +259,9 @@ namespace ExperienceAndClasses.Systems {
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Tier 3 Classes ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-        public class Unnamed1 : Tier3 {
-            public Unnamed1() : base(IDs.Unnamed1, PowerScaling.IDs.Melee, IDs.Warrior) {
-                Name = "Unnamed1";
+        public class BloodKnight : Tier3 {
+            public BloodKnight() : base(IDs.BloodKnight, PowerScaling.IDs.Melee, IDs.Warrior) {
+                Name = "Blood Knight";
                 Description = "TODO_desc";
                 Class_Locations[2, 0] = ID;
                 Attribute_Growth[(byte)Attribute.IDs.Power] = 5;
