@@ -25,7 +25,7 @@ namespace ExperienceAndClasses.Items {
         public Unlock_Tier2() : base(NAME, TOOLTIP, TEXTURE, RARITY) { }
 
         public override void AddRecipes() {
-            Utilities.Commons.QuckRecipe(mod, new int[,] { { ItemID.Gel, 50 } , { mod.ItemType<Orb_Monster>(), 1 } }, this, 1);
+            Utilities.Commons.QuckRecipe(mod, new int[,] { { ItemID.Gel, 50 } , { ItemID.FallenStar, 1 } , { mod.ItemType<Orb_Monster>(), 1 } }, this, 1);
         }
     }
 
@@ -71,6 +71,7 @@ namespace ExperienceAndClasses.Items {
             ModRecipe recipe = new ModRecipe(ExperienceAndClasses.MOD);
             recipe.AddRecipeGroup("Wood", 50); //any wood
             recipe.AddRecipeGroup("IronBar", 1); //iron or tin
+            recipe.AddIngredient(ItemID.FallenStar, 1);
             recipe.SetResult(this, 1);
             recipe.AddRecipe();
         }
