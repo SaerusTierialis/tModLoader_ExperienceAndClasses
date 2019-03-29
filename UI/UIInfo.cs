@@ -213,10 +213,17 @@ namespace ExperienceAndClasses.UI {
         }
 
         public void ShowTextClass(UIElement source, Systems.Class c) {
-            string title = c.Name + " (Tier " + c.Tier + ")";
+            string title = c.Name;
+            if (c.ID == (byte)Systems.Class.IDs.Explorer) {
+                title += " [Unique]";
+            }
+            else {
+                title += " [Tier " + c.Tier + "]";
+            }
+
             string text = "";
             if (!ExperienceAndClasses.LOCAL_MPLAYER.Class_Unlocked[c.ID]) {
-                title += " (locked)";
+                title += " [locked]";
                 text += "Left click for class unlock requirements.\n";
             }
 
