@@ -376,8 +376,9 @@ namespace ExperienceAndClasses.UI {
         private const float SCALE_SUM_SMALL = 0.6f;
 
         private Systems.Attribute attribute;
-        private UIText title, sum, sum_small, final;
+        private UIText title, sum, sum_small, final, cost;
         private float scale, left_final;
+        UIImageButton button_add;
 
         public AttributeText(float width, float height, float scale, Systems.Attribute attribute) {
             this.attribute = attribute;
@@ -398,24 +399,24 @@ namespace ExperienceAndClasses.UI {
             title.Top.Set(top, 0f);
             Append(title);
 
-            float top_sum = ((height - (Main.fontMouseText.MeasureString("A").Y * SCALE_SUM)) / 2f) + UI.Constants.UI_PADDING;
-            sum = new UIText("", SCALE_SUM);
-            sum.Left.Set(LEFT_SUM, 0f);
-            sum.Top.Set(top_sum, 0f);
-            Append(sum);
-
-            top_sum = ((height - (Main.fontMouseText.MeasureString("A").Y * SCALE_SUM_SMALL)) / 2f) + UI.Constants.UI_PADDING;
+            float top_sum = ((height - (Main.fontMouseText.MeasureString("A").Y * SCALE_SUM_SMALL)) / 2f) + UI.Constants.UI_PADDING;
             sum_small = new UIText("", SCALE_SUM_SMALL);
             sum_small.Left.Set(LEFT_SUM, 0f);
             sum_small.Top.Set(top_sum, 0f);
             Append(sum_small);
+
+            top_sum = ((height - (Main.fontMouseText.MeasureString("A").Y * SCALE_SUM)) / 2f) + UI.Constants.UI_PADDING;
+            sum = new UIText("", SCALE_SUM);
+            sum.Left.Set(LEFT_SUM, 0f);
+            sum.Top.Set(top_sum, 0f);
+            Append(sum);
 
             final = new UIText("", scale);
             final.Left.Set(left_final, 0f);
             final.Top.Set(top, 0f);
             Append(final);
 
-            UIImageButton button_add = new UIImageButton(Utilities.Textures.TEXTURE_BUTTON_PLUS);
+            button_add = new UIImageButton(Utilities.Textures.TEXTURE_BUTTON_PLUS);
             button_add.Width.Set(Utilities.Textures.TEXTURE_BUTTON_SIZE, 0f);
             button_add.Height.Set(Utilities.Textures.TEXTURE_BUTTON_SIZE, 0f);
             button_add.Left.Set(width - (button_add.Width.Pixels * 2f) - RIGHT_SIDE_PADDING, 0f);
@@ -423,13 +424,10 @@ namespace ExperienceAndClasses.UI {
             button_add.OnMouseDown += new MouseEvent(ClickAdd);
             Append(button_add);
 
-            UIImageButton button_subtract = new UIImageButton(Utilities.Textures.TEXTURE_BUTTON_MINUS);
-            button_subtract.Width.Set(height, 0f);
-            button_subtract.Height.Set(height, 0f);
-            button_subtract.Left.Set(width - button_add.Width.Pixels - RIGHT_SIDE_PADDING, 0f);
-            button_subtract.Top.Set((height - button_add.Height.Pixels) / 2f, 0f);
-            button_subtract.OnMouseDown += new MouseEvent(ClickSubtract);
-            Append(button_subtract);
+            cost = new UIText("", SCALE_SUM);
+            cost.Left.Set(button_add.Left.Pixels + button_add.Width.Pixels + Constants.UI_PADDING, 0f);
+            cost.Top.Set(top_sum, 0f);
+            Append(cost);
 
             Update();
         }
@@ -437,13 +435,7 @@ namespace ExperienceAndClasses.UI {
         public void ClickAdd(UIMouseEvent evt, UIElement listeningElement) {
             if (!UIInfo.AllowClicks()) return;
 
-            ExperienceAndClasses.LOCAL_MPLAYER.LocalAttributeAllocation1Point(attribute.ID, true);
-        }
-
-        public void ClickSubtract(UIMouseEvent evt, UIElement listeningElement) {
-            if (!UIInfo.AllowClicks()) return;
-
-            ExperienceAndClasses.LOCAL_MPLAYER.LocalAttributeAllocation1Point(attribute.ID, false);
+            ExperienceAndClasses.LOCAL_MPLAYER.LocalAttributeAllocationAddPoint(attribute.ID);
         }
 
         public override void MouseUp(UIMouseEvent evt) {
@@ -466,14 +458,14 @@ namespace ExperienceAndClasses.UI {
             final.SetText(str);
             final.Left.Set(left_final - (Main.fontMouseText.MeasureString(str).X * scale), 0f);
 
+            int allocation_cost = Systems.Attribute.AllocationPointCost(ExperienceAndClasses.LOCAL_MPLAYER.Attributes_Allocated[attribute.ID]);
+            cost.SetText("" + allocation_cost);
+
             float width_cutoff = final.Left.Pixels - sum.Left.Pixels;
 
-            int bonus = ExperienceAndClasses.LOCAL_MPLAYER.Attributes_Status[attribute.ID];
-            str = "(" + ExperienceAndClasses.LOCAL_MPLAYER.Attributes_Base[attribute.ID] + "+" + ExperienceAndClasses.LOCAL_MPLAYER.Attributes_Allocated[attribute.ID];
-            if (bonus != 0) {
-                str += "+" + bonus;
-            }
-            str += ")";
+            str = ExperienceAndClasses.LOCAL_MPLAYER.Attributes_Allocated[attribute.ID] + "+" +
+                    ExperienceAndClasses.LOCAL_MPLAYER.Attributes_Class[attribute.ID] + "+" +
+                    ExperienceAndClasses.LOCAL_MPLAYER.Attributes_Status[attribute.ID];
 
             if ((Main.fontMouseText.MeasureString(str).X * SCALE_SUM) >= width_cutoff) {
                 sum_small.SetText(str);
@@ -482,6 +474,13 @@ namespace ExperienceAndClasses.UI {
             else {
                 sum_small.SetText("");
                 sum.SetText(str);
+            }
+
+            if (allocation_cost <= ExperienceAndClasses.LOCAL_MPLAYER.Allocation_Points_Unallocated) {
+                button_add.SetVisibility(1f, 0.8f);
+            }
+            else {
+                button_add.SetVisibility(0.4f, 0.2f);
             }
         }
     }

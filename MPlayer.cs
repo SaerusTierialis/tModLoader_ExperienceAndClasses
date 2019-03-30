@@ -57,7 +57,7 @@ namespace ExperienceAndClasses {
         /// <summary>
         /// Base values from current classes
         /// </summary>
-        public int[] Attributes_Base { get; private set; }
+        public int[] Attributes_Class { get; private set; }
 
         /// <summary>
         /// Allocated points
@@ -70,7 +70,7 @@ namespace ExperienceAndClasses {
         public int[] Attributes_Status { get; private set; }
 
         /// <summary>
-        /// Sync + Status
+        /// Sync + Status (set during ApplyAttributes)
         /// </summary>
         public int[] Attributes_Final { get; private set; }
 
@@ -120,7 +120,7 @@ namespace ExperienceAndClasses {
         public int Progression { get; private set; }
 
         /// <summary>
-        /// Base + Allocated
+        /// Class + Allocated
         /// </summary>
         public int[] Attributes_Sync { get; private set; }
 
@@ -167,7 +167,7 @@ namespace ExperienceAndClasses {
             Class_Secondary = Systems.Class.LOOKUP[(byte)Systems.Class.IDs.None];
 
             //initialize attributes
-            Attributes_Base = new int[(byte)Systems.Attribute.IDs.NUMBER_OF_IDs];
+            Attributes_Class = new int[(byte)Systems.Attribute.IDs.NUMBER_OF_IDs];
             Attributes_Allocated = new int[(byte)Systems.Attribute.IDs.NUMBER_OF_IDs];
             Attributes_Sync = new int[(byte)Systems.Attribute.IDs.NUMBER_OF_IDs];
             Attributes_Status = new int[(byte)Systems.Attribute.IDs.NUMBER_OF_IDs];
@@ -243,7 +243,7 @@ namespace ExperienceAndClasses {
         public override void PostUpdateEquips() {
             base.PostUpdateEquips();
             if (initialized) {
-                UpdateStatus();
+                ApplyStatuses();
                 ApplyAttributes();
             }
         }
@@ -592,11 +592,11 @@ namespace ExperienceAndClasses {
                 }
 
                 if (Class_Secondary_Level_Effective > 0) {
-                    Attributes_Base[id] = (int)Math.Floor((sum_primary / Systems.Attribute.ATTRIBUTE_GROWTH_LEVELS * Systems.Attribute.SUBCLASS_PENALTY_ATTRIBUTE_MULTIPLIER_PRIMARY) +
+                    Attributes_Class[id] = (int)Math.Floor((sum_primary / Systems.Attribute.ATTRIBUTE_GROWTH_LEVELS * Systems.Attribute.SUBCLASS_PENALTY_ATTRIBUTE_MULTIPLIER_PRIMARY) +
                                                             (sum_secondary / Systems.Attribute.ATTRIBUTE_GROWTH_LEVELS * Systems.Attribute.SUBCLASS_PENALTY_ATTRIBUTE_MULTIPLIER_SECONDARY));
                 }
                 else {
-                    Attributes_Base[id] = (int)Math.Floor(sum_primary / Systems.Attribute.ATTRIBUTE_GROWTH_LEVELS);
+                    Attributes_Class[id] = (int)Math.Floor(sum_primary / Systems.Attribute.ATTRIBUTE_GROWTH_LEVELS);
                 }
             }
 
@@ -607,6 +607,7 @@ namespace ExperienceAndClasses {
 
             //sum attributes
             LocalCalculateAttributesSync();
+            CalculateAttributesFinal();
 
             //calclate progression value
             RecalculateProgression();
@@ -901,6 +902,10 @@ namespace ExperienceAndClasses {
             UpdateClassInfo();
         }
 
+        /// <summary>
+        /// Sync = Class + Allocated (the local stuff)
+        /// </summary>
+        /// <param name="attributes"></param>
         public void SetSyncAttributes(int[] attributes) {
             if (Is_Local_Player) {
                 Utilities.Commons.Error("Cannot force attribute packet for local player");
@@ -920,22 +925,25 @@ namespace ExperienceAndClasses {
         /// Calculates final attribute (sync + status) and applies effects
         /// </summary>
         private void ApplyAttributes() {
+            CalculateAttributesFinal();
             for (byte i=0; i<(byte)Systems.Attribute.IDs.NUMBER_OF_IDs; i++) {
-                Attributes_Final[i] = Attributes_Sync[i] + Attributes_Status[i];
                 Systems.Attribute.LOOKUP[i].ApplyEffect(this, Attributes_Final[i]);
             }
         }
 
-        public void LocalAttributeAllocation1Point(byte id, bool add) {
+        private void CalculateAttributesFinal() {
+            for (byte i = 0; i < (byte)Systems.Attribute.IDs.NUMBER_OF_IDs; i++) {
+                Attributes_Final[i] = Attributes_Sync[i] + Attributes_Status[i];
+            }
+        }
+
+        public void LocalAttributeAllocationAddPoint(byte id) {
             if (!Is_Local_Player) {
                 Utilities.Commons.Error("Cannot set attribute allocation for non-local player");
                 return;
             }
             
             int adjustment = +1;
-            if (!add) {
-                adjustment = -1;
-            }
 
             if ((Attributes_Allocated[id] < 0 && adjustment > 0) || (Allocation_Points_Unallocated < 0 && adjustment < 0) || 
                 (((adjustment < 0) || (Allocation_Points_Unallocated >= Systems.Attribute.AllocationPointCost(Attributes_Allocated[id]))) && ((Attributes_Allocated[id] + adjustment) >= 0))) {
@@ -945,7 +953,7 @@ namespace ExperienceAndClasses {
         }
 
         /// <summary>
-        /// Calculates base + allocation
+        /// Calculates class + allocation
         /// </summary>
         public void LocalCalculateAttributesSync() {
             if (!Is_Local_Player) {
@@ -954,7 +962,7 @@ namespace ExperienceAndClasses {
             }
 
             for (byte id = 0; id < (byte)Systems.Attribute.IDs.NUMBER_OF_IDs; id++) {
-                Attributes_Sync[id] = Attributes_Base[id] + Attributes_Allocated[id];
+                Attributes_Sync[id] = Attributes_Class[id] + Attributes_Allocated[id];
             }
         }
 
@@ -1206,7 +1214,7 @@ namespace ExperienceAndClasses {
             return Statuses.ContainsStatus(id);
         }
 
-        public void UpdateStatus() {
+        private void ApplyStatuses() {
             Attributes_Status = new int[(byte)Systems.Attribute.IDs.NUMBER_OF_IDs];
             foreach (List<Systems.Status> s in Statuses.GetAllStatuses()) {
                 //TODO
