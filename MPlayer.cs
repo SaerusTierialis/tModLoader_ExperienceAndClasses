@@ -65,9 +65,14 @@ namespace ExperienceAndClasses {
         public int[] Attributes_Allocated { get; private set; }
 
         /// <summary>
-        /// Bonus points from statuses, etc.
+        /// Bonus points from status
         /// </summary>
-        public int[] Attributes_Bonus { get; private set; }
+        public int[] Attributes_Status { get; private set; }
+
+        /// <summary>
+        /// Sync + Status
+        /// </summary>
+        public int[] Attributes_Final { get; private set; }
 
         /// <summary>
         /// Available allocation points
@@ -114,7 +119,11 @@ namespace ExperienceAndClasses {
         /// </summary>
         public int Progression { get; private set; }
 
-        public int[] Attributes_Final { get; private set; }
+        /// <summary>
+        /// Base + Allocated
+        /// </summary>
+        public int[] Attributes_Sync { get; private set; }
+
         public bool AFK { get; private set; } //TODO local set
         public bool IN_COMBAT { get; private set; } //TODO local set
 
@@ -160,7 +169,8 @@ namespace ExperienceAndClasses {
             //initialize attributes
             Attributes_Base = new int[(byte)Systems.Attribute.IDs.NUMBER_OF_IDs];
             Attributes_Allocated = new int[(byte)Systems.Attribute.IDs.NUMBER_OF_IDs];
-            Attributes_Bonus = new int[(byte)Systems.Attribute.IDs.NUMBER_OF_IDs];
+            Attributes_Sync = new int[(byte)Systems.Attribute.IDs.NUMBER_OF_IDs];
+            Attributes_Status = new int[(byte)Systems.Attribute.IDs.NUMBER_OF_IDs];
             Attributes_Final = new int[(byte)Systems.Attribute.IDs.NUMBER_OF_IDs];
             Allocation_Points_Unallocated = 0;
             Allocation_Points_Spent = 0;
@@ -233,8 +243,8 @@ namespace ExperienceAndClasses {
         public override void PostUpdateEquips() {
             base.PostUpdateEquips();
             if (initialized) {
-                ApplyAttributes();
                 UpdateStatus();
+                ApplyAttributes();
             }
         }
 
@@ -596,7 +606,7 @@ namespace ExperienceAndClasses {
             Allocation_Points_Unallocated = Allocation_Points_Total - Allocation_Points_Spent;
 
             //sum attributes
-            LocalCalculateFinalAttributes();
+            LocalCalculateAttributesSync();
 
             //calclate progression value
             RecalculateProgression();
@@ -800,7 +810,7 @@ namespace ExperienceAndClasses {
             clone.Class_Primary_Level_Effective = Class_Primary_Level_Effective;
             clone.Class_Secondary_Level_Effective = Class_Secondary_Level_Effective;
 
-            Attributes_Final.CopyTo(clone.Attributes_Final, 0);
+            Attributes_Sync.CopyTo(clone.Attributes_Sync, 0);
 
             clone.Progression = Progression;
 
@@ -832,8 +842,8 @@ namespace ExperienceAndClasses {
 
                 //final attribute
                 for (byte i=0; i<(byte)Systems.Attribute.IDs.NUMBER_OF_IDs; i++) {
-                    if (clone.Attributes_Final[i] != Attributes_Final[i]) {
-                        Utilities.PacketHandler.ForceAttribute.Send(-1, me, Attributes_Final);
+                    if (clone.Attributes_Sync[i] != Attributes_Sync[i]) {
+                        Utilities.PacketHandler.SyncAttribute.Send(-1, me, Attributes_Sync);
                         break;
                     }
                 }
@@ -872,7 +882,7 @@ namespace ExperienceAndClasses {
         /// </summary>
         private void FullSync() {
             //send one packet with everything needed
-            Utilities.PacketHandler.ForceFull.Send(-1, (byte)player.whoAmI, Class_Primary.ID, Class_Primary_Level_Effective, Class_Secondary.ID, Class_Secondary_Level_Effective, Attributes_Final, AFK, IN_COMBAT, Progression);
+            Utilities.PacketHandler.ForceFull.Send(-1, (byte)player.whoAmI, Class_Primary.ID, Class_Primary_Level_Effective, Class_Secondary.ID, Class_Secondary_Level_Effective, Attributes_Sync, AFK, IN_COMBAT, Progression);
         }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Sync Force Commands ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
@@ -891,14 +901,14 @@ namespace ExperienceAndClasses {
             UpdateClassInfo();
         }
 
-        public void ForceAttribute(int[] attributes) {
+        public void SetSyncAttributes(int[] attributes) {
             if (Is_Local_Player) {
                 Utilities.Commons.Error("Cannot force attribute packet for local player");
                 return;
             }
 
             for (byte i = 0; i < attributes.Length; i++) {
-                Attributes_Final[i] = attributes[i];
+                Attributes_Sync[i] = attributes[i];
             }
 
             UpdateClassInfo();
@@ -906,8 +916,12 @@ namespace ExperienceAndClasses {
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Attributes ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
+        /// <summary>
+        /// Calculates final attribute (sync + status) and applies effects
+        /// </summary>
         private void ApplyAttributes() {
             for (byte i=0; i<(byte)Systems.Attribute.IDs.NUMBER_OF_IDs; i++) {
+                Attributes_Final[i] = Attributes_Sync[i] + Attributes_Status[i];
                 Systems.Attribute.LOOKUP[i].ApplyEffect(this, Attributes_Final[i]);
             }
         }
@@ -930,14 +944,17 @@ namespace ExperienceAndClasses {
             }
         }
 
-        public void LocalCalculateFinalAttributes() {
+        /// <summary>
+        /// Calculates base + allocation
+        /// </summary>
+        public void LocalCalculateAttributesSync() {
             if (!Is_Local_Player) {
                 Utilities.Commons.Error("Cannot calculate final attribute for non-local player");
                 return;
             }
 
             for (byte id = 0; id < (byte)Systems.Attribute.IDs.NUMBER_OF_IDs; id++) {
-                Attributes_Final[id] = Attributes_Base[id] + Attributes_Allocated[id] + Attributes_Bonus[id];
+                Attributes_Sync[id] = Attributes_Base[id] + Attributes_Allocated[id];
             }
         }
 
@@ -1190,6 +1207,7 @@ namespace ExperienceAndClasses {
         }
 
         public void UpdateStatus() {
+            Attributes_Status = new int[(byte)Systems.Attribute.IDs.NUMBER_OF_IDs];
             foreach (List<Systems.Status> s in Statuses.GetAllStatuses()) {
                 //TODO
             }

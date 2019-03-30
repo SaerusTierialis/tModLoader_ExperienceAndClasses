@@ -29,7 +29,7 @@ namespace ExperienceAndClasses.Utilities {
             Broadcast,
             ForceFull,
             ForceClass,
-            ForceAttribute,
+            SyncAttribute,
             //Heal,
             AFK, //TODO convert to status
             InCombat, //TODO convert to status
@@ -139,7 +139,7 @@ namespace ExperienceAndClasses.Utilities {
 
                 //specific content
                 ForceClass.WritePacketBody(packet, primary_id, primary_level, secondary_id, secondary_level);
-                ForceAttribute.WritePacketBody(packet, attributes);
+                SyncAttribute.WritePacketBody(packet, attributes);
                 AFK.WritePacketBody(packet, afk_status);
                 InCombat.WritePacketBody(packet, in_combat);
                 Progression.WritePacketBody(packet, player_progression);
@@ -150,7 +150,7 @@ namespace ExperienceAndClasses.Utilities {
 
             protected override void RecieveBody(BinaryReader reader, int origin, MPlayer origin_mplayer) {
                 LOOKUP[(byte)PACKET_TYPE.ForceClass].Recieve(reader, origin);
-                LOOKUP[(byte)PACKET_TYPE.ForceAttribute].Recieve(reader, origin);
+                LOOKUP[(byte)PACKET_TYPE.SyncAttribute].Recieve(reader, origin);
                 LOOKUP[(byte)PACKET_TYPE.AFK].Recieve(reader, origin);
                 LOOKUP[(byte)PACKET_TYPE.InCombat].Recieve(reader, origin);
                 LOOKUP[(byte)PACKET_TYPE.Progression].Recieve(reader, origin);
@@ -194,7 +194,7 @@ namespace ExperienceAndClasses.Utilities {
             }
         }
 
-        public sealed class ForceAttribute : Handler {
+        public sealed class SyncAttribute : Handler {
             private static readonly Handler Instance = LOOKUP[(byte)Enum.Parse(typeof(PACKET_TYPE), MethodBase.GetCurrentMethod().DeclaringType.Name)];
 
             public static void Send(int target, int origin, int[] attributes) {
@@ -216,7 +216,7 @@ namespace ExperienceAndClasses.Utilities {
                 }
 
                 //set
-                origin_mplayer.ForceAttribute(attributes);
+                origin_mplayer.SetSyncAttributes(attributes);
 
                 //relay
                 if (Utilities.Netmode.IS_SERVER) {

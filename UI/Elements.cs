@@ -468,7 +468,7 @@ namespace ExperienceAndClasses.UI {
 
             float width_cutoff = final.Left.Pixels - sum.Left.Pixels;
 
-            int bonus = ExperienceAndClasses.LOCAL_MPLAYER.Attributes_Bonus[attribute.ID];
+            int bonus = ExperienceAndClasses.LOCAL_MPLAYER.Attributes_Status[attribute.ID];
             str = "(" + ExperienceAndClasses.LOCAL_MPLAYER.Attributes_Base[attribute.ID] + "+" + ExperienceAndClasses.LOCAL_MPLAYER.Attributes_Allocated[attribute.ID];
             if (bonus != 0) {
                 str += "+" + bonus;
