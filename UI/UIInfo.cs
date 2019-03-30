@@ -29,6 +29,7 @@ namespace ExperienceAndClasses.UI {
         private const float WIDTH_HELP = 300f;
         private const float WIDTH_STATUS = 300f;
         private const float WIDTH_UNLOCK = 300f;
+        private const float WIDTH_RESET = 400f;
 
         private const float BUTTON_SEPARATION = 100f;
 
@@ -37,9 +38,10 @@ namespace ExperienceAndClasses.UI {
             INPUT,
         }
 
-        private enum UNLOCK_MODE : byte {
+        private enum INPUT_MODE : byte {
             CLASS,
             SUBCLASS,
+            RESET_ATTRIBUTES,
         }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Variables ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
@@ -48,14 +50,14 @@ namespace ExperienceAndClasses.UI {
         private UIElement source = null;
         private UIImage image;
         private static MODE mode;
-        private UNLOCK_MODE unlock_mode;
+        private INPUT_MODE unlock_mode;
         private Systems.Class unlock_class;
         private TextButton button_yes, button_no;
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Initialize ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         protected override void InitializeState() {
             mode = MODE.HOVER;
-            unlock_mode = UNLOCK_MODE.SUBCLASS;
+            unlock_mode = INPUT_MODE.SUBCLASS;
             unlock_class = null;
 
             panel = new DragableUIPanel(1f, 1f, Constants.COLOR_UI_PANEL_BACKGROUND, this, false, false, false);
@@ -90,12 +92,16 @@ namespace ExperienceAndClasses.UI {
         public void ClickYes(UIMouseEvent evt, UIElement listeningElement) {
             if (button_yes.visible) {
                 switch (unlock_mode) {
-                    case UNLOCK_MODE.CLASS:
+                    case INPUT_MODE.CLASS:
                         ExperienceAndClasses.LOCAL_MPLAYER.UnlockClass(unlock_class);
                         break;
 
-                    case UNLOCK_MODE.SUBCLASS:
+                    case INPUT_MODE.SUBCLASS:
                         ExperienceAndClasses.LOCAL_MPLAYER.UnlockSubclass();
+                        break;
+
+                    case INPUT_MODE.RESET_ATTRIBUTES:
+                        ExperienceAndClasses.LOCAL_MPLAYER.LocalAttributeReset();
                         break;
 
                     default:
@@ -273,7 +279,7 @@ namespace ExperienceAndClasses.UI {
 
         public void ShowTextAttribute(UIElement source, Systems.Attribute attribute) {
             string title = attribute.Name;
-            string text = attribute.Description + "\n\n" + attribute.Bonus;
+            string text = attribute.Description + "\n" + attribute.Bonus;
             ShowText(source, title, text, WIDTH_ATTRIBUTE);
         }
 
@@ -300,7 +306,7 @@ namespace ExperienceAndClasses.UI {
             str += c.Prereq.Name + " Level " + c.Prereq.Max_Level + "\n" + item.item.Name + " x1\n\nToken Recipe:\n" + item.GetRecipeString(true) + "\n(Work Bench)";
 
             mode = MODE.INPUT;
-            unlock_mode = UNLOCK_MODE.CLASS;
+            unlock_mode = INPUT_MODE.CLASS;
             unlock_class = c;
 
             ShowText(source, "Unlock " + c.Name, str , WIDTH_UNLOCK, null, 0, ModLoader.GetTexture(item.Texture), true);
@@ -312,9 +318,24 @@ namespace ExperienceAndClasses.UI {
             string str = "Unlocking multiclassing will allow you to freely set any class as your subclass.\n\nRequirements:\nx1 " + item.item.Name + "\n\nToken Recipe:\n" + item.GetRecipeString(true) + "\n(Work Bench)";
 
             mode = MODE.INPUT;
-            unlock_mode = UNLOCK_MODE.SUBCLASS;
+            unlock_mode = INPUT_MODE.SUBCLASS;
 
             ShowText(source, "Unlock Multiclassing", str, WIDTH_UNLOCK, null, 0, ModLoader.GetTexture(item.Texture), true);
+        }
+
+        public void ShowResetAttributes(UIElement source) {
+            int cost = Systems.Attribute.LocalCalculateResetCost();
+
+            string str = "Resetting attributes is free when less than " + (Systems.Attribute.RESET_POINTS_FREE + 1) +
+                " points are allocated. Each point beyond that increases the number of " + Systems.Attribute.RESET_COST_ITEM.item.Name + "s required.\n\n" +
+                "Allocated: " + ExperienceAndClasses.LOCAL_MPLAYER.Allocation_Points_Spent + "\n" +
+                "Cost: " + cost + " " + Systems.Attribute.RESET_COST_ITEM.item.Name + "(s)\n" +
+                "\nWould you like to reset your attributes?";
+
+            mode = MODE.INPUT;
+            unlock_mode = INPUT_MODE.RESET_ATTRIBUTES;
+
+            ShowText(source, "Attribute Reset", str, WIDTH_RESET, null, 0, ModLoader.GetTexture(Systems.Attribute.RESET_COST_ITEM.Texture), true);
         }
 
     }

@@ -3,6 +3,7 @@ using Terraria.GameContent.UI.Elements;
 using Terraria.UI;
 using System.Collections.Generic;
 using Terraria;
+using System;
 
 namespace ExperienceAndClasses.UI {
 
@@ -21,6 +22,7 @@ namespace ExperienceAndClasses.UI {
         private const float WIDTH_ATTRIBUTES = 230f;
         private const float HEIGHT_ATTRIBUTES = 250f;
         private const float HEIGHT_ATTRIBUTE = 30f;
+        private const float WIDTH_ATTRIBUTES_RESET = 100f;
 
         private const float WIDTH_ABILITY = WIDTH_ATTRIBUTES;
         private const float HEIGHT_ABILITY = (HEIGHT - HEIGHT_ATTRIBUTES) - (Constants.UI_PADDING * 2) + 1;
@@ -132,11 +134,19 @@ namespace ExperienceAndClasses.UI {
                 attribute_texts.Add(attribute_text);
             }
 
+            //attribute reset
+            TextButton attribute_point_reset = new TextButton("   Reset", FONT_SCALE_ATTRIBUTE, FONT_SCALE_ATTRIBUTE + 0.1f);
+            attribute_point_reset.Left.Set(Constants.UI_PADDING, 0f);
+            attribute_point_reset.Top.Set(top + Constants.UI_PADDING, 0f);
+            attribute_point_reset.Width.Set(WIDTH_ATTRIBUTES_RESET, 0f);
+            attribute_point_reset.OnClick += new UIElement.MouseEvent(ClickReset);
+            panel_attribute.Append(attribute_point_reset);
+
             //attribute points
-            attribute_point_text = new HelpTextPanel("Available Points: 0", FONT_SCALE_ATTRIBUTE, false, "TODO_help_text", "Attribute Allocation");
-            attribute_point_text.Left.Set(Constants.UI_PADDING, 0f);
+            attribute_point_text = new HelpTextPanel("Points: 0", FONT_SCALE_ATTRIBUTE, false, "TODO_help_text", "Attribute Allocation");
+            attribute_point_text.Left.Set(WIDTH_ATTRIBUTES_RESET + (Constants.UI_PADDING * 2f), 0f);
             attribute_point_text.Top.Set(top + Constants.UI_PADDING, 0f);
-            attribute_point_text.Width.Set(panel_attribute.Width.Pixels - (Constants.UI_PADDING * 2f), 0f);
+            attribute_point_text.Width.Set(panel_attribute.Width.Pixels - WIDTH_ATTRIBUTES_RESET - (Constants.UI_PADDING * 3f), 0f);
             attribute_point_text.BackgroundColor = Color.Transparent;
             attribute_point_text.BorderColor = Color.Transparent;
             panel_attribute.Append(attribute_point_text);
@@ -204,7 +214,7 @@ namespace ExperienceAndClasses.UI {
         }
 
         private void UpdateAttributePoints() {
-            attribute_point_text.SetText("Points: " + ExperienceAndClasses.LOCAL_MPLAYER.Allocation_Points_Unallocated);
+            attribute_point_text.SetText("Points: " + String.Format("{0,5}", ExperienceAndClasses.LOCAL_MPLAYER.Allocation_Points_Unallocated));
         }
 
         //the panel behind the selected buttons prevents their use without this workaround
@@ -231,6 +241,12 @@ namespace ExperienceAndClasses.UI {
         }
         private void SecondaryButtonDeHover(UIMouseEvent evt, UIElement listeningElement) {
             button_secondary.MouseOut(evt);
+        }
+
+        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Events ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+        public void ClickReset(UIMouseEvent evt, UIElement listeningElement) {
+            UIInfo.Instance.ShowResetAttributes(listeningElement);
         }
     }
 }

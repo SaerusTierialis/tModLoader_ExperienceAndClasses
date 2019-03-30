@@ -82,7 +82,7 @@ namespace ExperienceAndClasses {
         /// <summary>
         /// Spent allocation points
         /// </summary>
-        private int Allocation_Points_Spent;
+        public int Allocation_Points_Spent { get; private set; }
 
         /// <summary>
         /// Total allocation points
@@ -948,6 +948,26 @@ namespace ExperienceAndClasses {
             if ((Attributes_Allocated[id] < 0 && adjustment > 0) || (Allocation_Points_Unallocated < 0 && adjustment < 0) || 
                 (((adjustment < 0) || (Allocation_Points_Unallocated >= Systems.Attribute.AllocationPointCost(Attributes_Allocated[id]))) && ((Attributes_Allocated[id] + adjustment) >= 0))) {
                 Attributes_Allocated[id] += adjustment;
+                LocalUpdateClassInfo();
+            }
+        }
+
+        public void LocalAttributeReset() {
+            //item cost
+            int cost = Systems.Attribute.LocalCalculateResetCost();
+            int type = Systems.Attribute.RESET_COST_ITEM.item.type;
+            int held = player.CountItem(type);
+
+            //do reset
+            if (held >= cost) {
+                //consume
+                for (int i = 0; i < cost; i++)
+                    player.ConsumeItem(type);
+
+                //reset
+                for (byte i = 0; i < (byte)Systems.Attribute.IDs.NUMBER_OF_IDs; i++) {
+                    Attributes_Allocated[i] = 0;
+                }
                 LocalUpdateClassInfo();
             }
         }

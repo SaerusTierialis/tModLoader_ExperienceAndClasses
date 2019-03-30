@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Terraria;
 using Terraria.GameContent.UI.Elements;
+using Terraria.ModLoader;
 
 namespace ExperienceAndClasses.Systems {
     public class Attribute {
@@ -35,6 +36,10 @@ namespace ExperienceAndClasses.Systems {
 
         //allocation points
         public static readonly int[] ALLOCATION_POINTS_PER_LEVEL_TIERS = new int[] { 0, 1, 2, 3 };
+
+        //reset
+        public static readonly ModItem RESET_COST_ITEM = ExperienceAndClasses.MOD.GetItem<Items.Orb_Monster>();
+        public const int RESET_POINTS_FREE = 99;
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Attribute Effects (per point) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -119,6 +124,14 @@ namespace ExperienceAndClasses.Systems {
             }
 
             return sum;
+        }
+
+        public static int LocalCalculateResetCost() {
+            int points = ExperienceAndClasses.LOCAL_MPLAYER.Allocation_Points_Spent - RESET_POINTS_FREE;
+            if (points > 0)
+                return (int)Math.Floor(Math.Pow(points, 0.35));
+            else
+                return 0;
         }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Populate Lookup ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
