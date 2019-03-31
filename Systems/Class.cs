@@ -44,6 +44,7 @@ namespace ExperienceAndClasses.Systems {
             NUMBER_OF_IDs, //leave this last
         }
 
+        public const byte MAX_TIER = 3;
         public static readonly byte[] TIER_MAX_LEVELS = new byte[] {0, 10, 50, 100};
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Treated like readonly ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
@@ -315,6 +316,10 @@ namespace ExperienceAndClasses.Systems {
                 string message = "";
                 if (level == Max_Level) {
                     message = "You are now a MAX level " + Name + "!";
+
+                    if (Tier < MAX_TIER) {
+                        Main.NewText("Tier " + new string('I', Tier+1) + " Requirement Met: " + Name + " Level " + Max_Level, UI.Constants.COLOUR_MESSAGE_SUCCESS);
+                    }
                 }
                 else {
                     message = "You are now a level " + level + " " + Name + "!";
