@@ -226,6 +226,7 @@ namespace ExperienceAndClasses.Systems {
 
         private static void LocalSwapClass() {
             MPlayer.LocalForceClasses(ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary, ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary);
+            MPlayer.LocalUpdateAll();
         }
 
         public bool LocalUnlockClass() {
