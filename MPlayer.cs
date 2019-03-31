@@ -101,6 +101,11 @@ namespace ExperienceAndClasses {
         public List<Projectile> minions { get; private set;  }
 
         /// <summary>
+        /// List of minions including only those that take minion slots. Updates on CheckMinions().
+        /// </summary>
+        public List<Projectile> slot_minions { get; private set; }
+
+        /// <summary>
         /// Container of statuses on this player
         /// </summary>
         public Utilities.Containers.StatusList Statuses { get; private set; }
@@ -143,6 +148,7 @@ namespace ExperienceAndClasses {
             Defeated_WOF = false;
             show_xp = true;
             minions = new List<Projectile>();
+            slot_minions = new List<Projectile>();
             Statuses = new Utilities.Containers.StatusList();
             Progression = 0;
             Extra_XP = 0;
@@ -786,9 +792,13 @@ namespace ExperienceAndClasses {
 
         public void CheckMinions() {
             minions = new List<Projectile>();
+            slot_minions = new List<Projectile>();
             foreach (Projectile p in Main.projectile) {
                 if (p.active && (p.minion || p.sentry) && (p.owner == player.whoAmI)) {
                     minions.Add(p);
+                    if (p.minionSlots > 0) {
+                        slot_minions.Add(p);
+                    }
                 }
             }
         }
