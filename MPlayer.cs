@@ -531,9 +531,9 @@ namespace ExperienceAndClasses {
         public void DefeatWOF() {
             if (!Defeated_WOF) {
                 Defeated_WOF = true;
-                Main.NewText("You have defeated the Wall of Flesh!", UI.Constants.COLOUR_MESSAGE_SUCCESS);
+                Main.NewText("Tier III Requirement Met: Defeat Wall of Flesh", UI.Constants.COLOUR_MESSAGE_SUCCESS);
                 if (CanUnlockTier3()) {
-                    Main.NewText("You can now unlock tier 3 classes!", UI.Constants.COLOUR_MESSAGE_SUCCESS);
+                    Main.NewText("You can now unlock tier III classes!", UI.Constants.COLOUR_MESSAGE_SUCCESS);
                 }
             }
         }

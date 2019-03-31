@@ -224,7 +224,7 @@ namespace ExperienceAndClasses.UI {
                 title += " [Unique]";
             }
             else {
-                title += " [Tier " + c.Tier + "]";
+                title += " [Tier " + new string('I', c.Tier) + "]";
             }
 
             string text = "";
