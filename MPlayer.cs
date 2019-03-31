@@ -16,24 +16,9 @@ namespace ExperienceAndClasses {
 
         private static DateTime time_next_full_sync;
 
-        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Instance Vars (non-syncing) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Instance Vars (non-syncing, non-save/load) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         public bool Is_Local_Player { get; private set; }
-
-        /// <summary>
-        /// Mod version loaded from
-        /// </summary>
-        public int[] Load_Version { get; private set; }
-
-        /// <summary>
-        /// Track wall of flesh progress for tier 3 unlock
-        /// </summary>
-        public bool Defeated_WOF { get; private set; } //TODO use this to limit tier 3 unlock
-
-        /// <summary>
-        /// Can have a secondary class active
-        /// </summary>
-        public bool Allow_Secondary { get; private set; }
 
         /// <summary>
         /// Set true for local player during OnEnterWorld. Set true for non-local players when first full sync is recieved.
@@ -41,28 +26,9 @@ namespace ExperienceAndClasses {
         public bool initialized;
 
         /// <summary>
-        /// Show xp gain overhead
-        /// </summary>
-        private bool show_xp;
-
-        public byte[] Class_Levels { get; private set; }
-        public uint[] Class_XP { get; private set; }
-        public bool[] Class_Unlocked { get; private set; }
-
-        /// <summary>
-        /// Earning XP when all active classes are maxed stores the extra here
-        /// </summary>
-        public uint Extra_XP { get; private set; }
-
-        /// <summary>
         /// Base values from current classes
         /// </summary>
         public int[] Attributes_Class { get; private set; }
-
-        /// <summary>
-        /// Allocated points
-        /// </summary>
-        public int[] Attributes_Allocated { get; private set; }
 
         /// <summary>
         /// Bonus points from status
@@ -110,7 +76,45 @@ namespace ExperienceAndClasses {
         /// </summary>
         public Utilities.Containers.StatusList Statuses { get; private set; }
 
+        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Instance Vars (saved/loaded) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+        //Class_Primary and Class_Secondary also save/load (specifically the .ID)
+
+        /// <summary>
+        /// Mod version loaded from
+        /// </summary>
+        public int[] Load_Version { get; private set; }
+
+        /// <summary>
+        /// Track wall of flesh progress for tier 3 unlock
+        /// </summary>
+        public bool Defeated_WOF { get; private set; } //TODO use this to limit tier 3 unlock
+
+        /// <summary>
+        /// Can have a secondary class active
+        /// </summary>
+        public bool Allow_Secondary { get; private set; }
+
+        /// <summary>
+        /// Allocated points
+        /// </summary>
+        public int[] Attributes_Allocated { get; private set; }
+
         public Utilities.Containers.LoadedUIData loaded_ui_main, loaded_ui_hud;
+
+        /// <summary>
+        /// Show xp gain overhead
+        /// </summary>
+        private bool show_xp;
+
+        public byte[] Class_Levels { get; private set; }
+        public uint[] Class_XP { get; private set; }
+        public bool[] Class_Unlocked { get; private set; }
+
+        /// <summary>
+        /// Earning XP when all active classes are maxed stores the extra here
+        /// </summary>
+        public uint Extra_XP { get; private set; }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Instance Vars (syncing) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
