@@ -263,7 +263,7 @@ namespace ExperienceAndClasses {
 
             //local events
             if (Is_Local_Player) {
-                //ui
+                //ui //TODO only update if something changed
                 UI.UIStatus.Instance.Update();
                 
             }
