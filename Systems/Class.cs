@@ -107,6 +107,9 @@ namespace ExperienceAndClasses.Systems {
             }
         }
 
+        /// <summary>
+        /// Return from LocalCheckClassValid
+        /// </summary>
         private enum CLASS_VALIDITY : byte {
             VALID,
             INVALID_UNKNOWN,
@@ -115,6 +118,12 @@ namespace ExperienceAndClasses.Systems {
             INVALID_MINIONS,
             INVALID_COMBAT,
         }
+
+        /// <summary>
+        /// Check if switch to this class would be valid
+        /// </summary>
+        /// <param name="is_primary"></param>
+        /// <returns></returns>
         private CLASS_VALIDITY LocalCheckClassValid(bool is_primary) {
             if (ExperienceAndClasses.LOCAL_MPLAYER.IN_COMBAT) {
                 return CLASS_VALIDITY.INVALID_COMBAT;
@@ -166,7 +175,12 @@ namespace ExperienceAndClasses.Systems {
             }
         }
 
-        public bool LocalSetClass(bool is_primary) {
+        /// <summary>
+        /// Set local class (with checks + updates)
+        /// </summary>
+        /// <param name="is_primary"></param>
+        /// <returns></returns>
+        public bool LocalTrySetClass(bool is_primary) {
             //fail if secondary not allowed
             if (!is_primary && !ExperienceAndClasses.LOCAL_MPLAYER.Allow_Secondary) {
                 Main.NewText("Failed to set class because multiclassing is locked!", UI.Constants.COLOUR_MESSAGE_ERROR);
@@ -224,12 +238,19 @@ namespace ExperienceAndClasses.Systems {
             }
         }
 
+        /// <summary>
+        /// Swap local player's primary and secondary classes
+        /// </summary>
         private static void LocalSwapClass() {
             MPlayer.LocalForceClasses(ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary, ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary);
             MPlayer.LocalUpdateAll();
         }
 
-        public bool LocalUnlockClass() {
+        /// <summary>
+        /// Try to unlock this class (called from UI)
+        /// </summary>
+        /// <returns></returns>
+        public bool LocalTryUnlockClass() {
             //check locked
             if (ExperienceAndClasses.LOCAL_MPLAYER.Class_Unlocked[ID]) {
                 Utilities.Commons.Error("Trying to unlock already unlocked class " + Name);
@@ -280,7 +301,7 @@ namespace ExperienceAndClasses.Systems {
             uint extra_xp_add = (uint)(ExperienceAndClasses.LOCAL_MPLAYER.Extra_XP * Systems.XP.EXTRA_XP_POOL_MULTIPLIER);
             if (extra_xp_add > 0) {
                 //add xp
-                Systems.XP.Adjusting.LocalAddXP(ID, extra_xp_add);
+                Systems.XP.Adjusting.LocalAddXPToClass(ID, extra_xp_add);
 
                 //clear pool
                 ExperienceAndClasses.LOCAL_MPLAYER.Extra_XP = 0;
@@ -298,6 +319,11 @@ namespace ExperienceAndClasses.Systems {
             return true;
         }
 
+        /// <summary>
+        /// Do any levelups on this class for local player
+        /// </summary>
+        /// <param name="announce"></param>
+        /// <returns></returns>
         public bool LocalCheckDoLevelup(bool announce = true) {
             uint xp_req;
             bool any_levels = false;
@@ -307,7 +333,7 @@ namespace ExperienceAndClasses.Systems {
                     break;
                 }
                 else {
-                    Systems.XP.Adjusting.LocalSubtractXP(ID, xp_req);
+                    Systems.XP.Adjusting.LocalSubtractXPFromClass(ID, xp_req);
                     ExperienceAndClasses.LOCAL_MPLAYER.Class_Levels[ID]++;
                     if (announce) {
                         LocalAnnounceLevel();
@@ -318,7 +344,10 @@ namespace ExperienceAndClasses.Systems {
             return any_levels;
         }
 
-        public void LocalAnnounceLevel() {
+        /// <summary>
+        /// Display levelup text
+        /// </summary>
+        private void LocalAnnounceLevel() {
             //client/singleplayer only
             if (!Utilities.Netmode.IS_SERVER) {
                 byte level = ExperienceAndClasses.LOCAL_MPLAYER.Class_Levels[ID];
@@ -339,6 +368,10 @@ namespace ExperienceAndClasses.Systems {
             }
         }
 
+        /// <summary>
+        /// Check if local player meets class prereqs
+        /// </summary>
+        /// <returns></returns>
         public bool LocalHasClassPrereq() {
             Systems.Class pre = Prereq;
             while (pre != null) {
@@ -353,7 +386,10 @@ namespace ExperienceAndClasses.Systems {
             return true;
         }
 
-        public static void LocalUnlockSubclass() {
+        /// <summary>
+        /// Try to unlock subclassing (called from UI)
+        /// </summary>
+        public static void LocalTryUnlockSubclass() {
             //check locked
             if (ExperienceAndClasses.LOCAL_MPLAYER.Allow_Secondary) {
                 Utilities.Commons.Error("Trying to unlock multiclassing when already unlocked");
@@ -383,6 +419,10 @@ namespace ExperienceAndClasses.Systems {
             }
         }
 
+        /// <summary>
+        /// Check if local player meets extra requirements for tier 3
+        /// </summary>
+        /// <returns></returns>
         public static bool LocalCanUnlockTier3() {
             return ExperienceAndClasses.LOCAL_MPLAYER.Defeated_WOF;
         }

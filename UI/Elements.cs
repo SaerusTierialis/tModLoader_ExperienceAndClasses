@@ -526,10 +526,10 @@ namespace ExperienceAndClasses.UI {
             }
             else {
                 if (ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary.ID == Class.ID) {
-                    Systems.Class.LOOKUP[(byte)Systems.Class.IDs.None].LocalSetClass(true);
+                    Systems.Class.LOOKUP[(byte)Systems.Class.IDs.None].LocalTrySetClass(true);
                 }
                 else {
-                    Class.LocalSetClass(true);
+                    Class.LocalTrySetClass(true);
                 }
             }
         }
@@ -543,10 +543,10 @@ namespace ExperienceAndClasses.UI {
                 UIInfo.Instance.ShowUnlockSubclass(this);
             }
             else if (ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary.ID == Class.ID) {
-                Systems.Class.LOOKUP[(byte)Systems.Class.IDs.None].LocalSetClass(false);
+                Systems.Class.LOOKUP[(byte)Systems.Class.IDs.None].LocalTrySetClass(false);
             }
             else {
-                Class.LocalSetClass(false);
+                Class.LocalTrySetClass(false);
             }
         }
 

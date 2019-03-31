@@ -83,18 +83,34 @@ namespace ExperienceAndClasses.Systems {
         }
 
         public static class Adjusting {
+            /// <summary>
+            /// Can local player gain xp at all
+            /// </summary>
+            /// <returns></returns>
             public static bool LocalCanGainXP() {
                 return (LocalCanGainXPPrimary() || LocalCanGainXPSecondary());
             }
 
+            /// <summary>
+            /// Can local player's primary class gain xp
+            /// </summary>
+            /// <returns></returns>
             public static bool LocalCanGainXPPrimary() {
                 return (ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary.Tier > 0) && (ExperienceAndClasses.LOCAL_MPLAYER.Class_Levels[ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary.ID] < ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary.Max_Level);
             }
 
+            /// <summary>
+            /// Can local player's secondary class gain xp
+            /// </summary>
+            /// <returns></returns>
             public static bool LocalCanGainXPSecondary() {
                 return ExperienceAndClasses.LOCAL_MPLAYER.Allow_Secondary && (ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary.Tier > 0) && (ExperienceAndClasses.LOCAL_MPLAYER.Class_Levels[ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary.ID] < ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary.Max_Level);
             }
 
+            /// <summary>
+            /// Add XP to local character (to primary/secondary/extra)
+            /// </summary>
+            /// <param name="xp"></param>
             public static void LocalAddXP(uint xp) {
                 if (ExperienceAndClasses.LOCAL_MPLAYER.show_xp) {
                     CombatText.NewText(Main.LocalPlayer.getRect(), UI.Constants.COLOUR_XP_BRIGHT, "+" + xp + " XP");
@@ -105,14 +121,14 @@ namespace ExperienceAndClasses.Systems {
                     bool add_secondary = LocalCanGainXPSecondary();
 
                     if (add_primary && add_secondary) {
-                        LocalAddXP(ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary.ID, (uint)Math.Ceiling(xp * Systems.XP.SUBCLASS_PENALTY_XP_MULTIPLIER_PRIMARY));
-                        LocalAddXP(ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary.ID, (uint)Math.Ceiling(xp * Systems.XP.SUBCLASS_PENALTY_XP_MULTIPLIER_SECONDARY));
+                        LocalAddXPToClass(ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary.ID, (uint)Math.Ceiling(xp * Systems.XP.SUBCLASS_PENALTY_XP_MULTIPLIER_PRIMARY));
+                        LocalAddXPToClass(ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary.ID, (uint)Math.Ceiling(xp * Systems.XP.SUBCLASS_PENALTY_XP_MULTIPLIER_SECONDARY));
                     }
                     else if (add_primary) {
-                        LocalAddXP(ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary.ID, xp);
+                        LocalAddXPToClass(ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary.ID, xp);
                     }
                     else if (add_secondary) {
-                        LocalAddXP(ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary.ID, xp);
+                        LocalAddXPToClass(ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary.ID, xp);
                     }
                     else {
                         //shouldn't be reachable unless something is changed later
@@ -127,25 +143,27 @@ namespace ExperienceAndClasses.Systems {
                 }
             }
 
-            public static void LocalAddXP(byte class_id, uint amount) {
-                uint new_value = ExperienceAndClasses.LOCAL_MPLAYER.Class_XP[class_id] + amount;
-                if (new_value > ExperienceAndClasses.LOCAL_MPLAYER.Class_XP[class_id]) {
-                    ExperienceAndClasses.LOCAL_MPLAYER.Class_XP[class_id] = new_value;
-                }
-                else {
-                    ExperienceAndClasses.LOCAL_MPLAYER.Class_XP[class_id] = uint.MaxValue;
-                }
+            /// <summary>
+            /// Add class XP (no updates)
+            /// </summary>
+            /// <param name="class_id"></param>
+            /// <param name="amount"></param>
+            public static void LocalAddXPToClass(byte class_id, uint amount) {
+                ExperienceAndClasses.LOCAL_MPLAYER.Class_XP[class_id] = Math.Max(ExperienceAndClasses.LOCAL_MPLAYER.Class_XP[class_id] + amount, ExperienceAndClasses.LOCAL_MPLAYER.Class_XP[class_id]);
             }
 
-            public static void LocalSubtractXP(byte class_id, uint amount) {
-                if (ExperienceAndClasses.LOCAL_MPLAYER.Class_XP[class_id] > amount) {
-                    ExperienceAndClasses.LOCAL_MPLAYER.Class_XP[class_id] -= amount;
-                }
-                else {
-                    ExperienceAndClasses.LOCAL_MPLAYER.Class_XP[class_id] = 0;
-                }
+            /// <summary>
+            /// Subtract class XP (no updates)
+            /// </summary>
+            /// <param name="class_id"></param>
+            /// <param name="amount"></param>
+            public static void LocalSubtractXPFromClass(byte class_id, uint amount) {
+                ExperienceAndClasses.LOCAL_MPLAYER.Class_XP[class_id] = Math.Min(ExperienceAndClasses.LOCAL_MPLAYER.Class_XP[class_id] - amount, ExperienceAndClasses.LOCAL_MPLAYER.Class_XP[class_id]);
             }
 
+            /// <summary>
+            /// Look for any levelup, update as needed
+            /// </summary>
             private static void LocalCheckDoLevelup() {
                 //store prior levels to detect level-up
                 byte effective_primary = ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary_Level_Effective;

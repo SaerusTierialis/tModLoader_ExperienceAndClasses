@@ -93,11 +93,11 @@ namespace ExperienceAndClasses.UI {
             if (button_yes.visible) {
                 switch (unlock_mode) {
                     case INPUT_MODE.CLASS:
-                        unlock_class.LocalUnlockClass();
+                        unlock_class.LocalTryUnlockClass();
                         break;
 
                     case INPUT_MODE.SUBCLASS:
-                        Systems.Class.LocalUnlockSubclass();
+                        Systems.Class.LocalTryUnlockSubclass();
                         break;
 
                     case INPUT_MODE.RESET_ATTRIBUTES:

@@ -282,7 +282,7 @@ namespace ExperienceAndClasses {
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ XP & Class ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         /// <summary>
-        /// Set the local player's classes and update.
+        /// Force the local player's classes (no checks) and update.
         /// </summary>
         /// <param name="primary"></param>
         /// <param name="secondary"></param>
@@ -293,7 +293,7 @@ namespace ExperienceAndClasses {
         }
 
         /// <summary>
-        /// Set one of the local player's classes and update.
+        /// Force one of the local player's classes (no checks) and update.
         /// </summary>
         /// <param name="c"></param>
         /// <param name="is_primary"></param>
