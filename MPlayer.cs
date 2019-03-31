@@ -93,7 +93,7 @@ namespace ExperienceAndClasses {
         /// <summary>
         /// Can have a secondary class active
         /// </summary>
-        public bool Allow_Secondary { get; private set; }
+        public bool Allow_Secondary;
 
         /// <summary>
         /// Allocated points
@@ -105,7 +105,7 @@ namespace ExperienceAndClasses {
         /// <summary>
         /// Show xp gain overhead
         /// </summary>
-        private bool show_xp;
+        public bool show_xp;
 
         public byte[] Class_Levels { get; private set; }
         public uint[] Class_XP { get; private set; }
@@ -227,7 +227,7 @@ namespace ExperienceAndClasses {
                 ExperienceAndClasses.SetUIAutoStates();
 
                 //update class info
-                LocalUpdateClassInfo();
+                LocalUpdateAll();
 
                 //initialized
                 initialized = true;
@@ -281,12 +281,22 @@ namespace ExperienceAndClasses {
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ XP & Class ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
+        /// <summary>
+        /// Set the local player's classes and update.
+        /// </summary>
+        /// <param name="primary"></param>
+        /// <param name="secondary"></param>
         public static void LocalForceClasses(Systems.Class primary, Systems.Class secondary) {
             ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary = primary;
             ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary = secondary;
-            LocalUpdateClassInfo();
+            LocalUpdateAll();
         }
 
+        /// <summary>
+        /// Set one of the local player's classes and update.
+        /// </summary>
+        /// <param name="c"></param>
+        /// <param name="is_primary"></param>
         public static void LocalForceClass(Systems.Class c, bool is_primary) {
             if (is_primary) {
                 ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary = c;
@@ -294,42 +304,10 @@ namespace ExperienceAndClasses {
             else {
                 ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary = c;
             }
-
-            LocalUpdateClassInfo();
+            LocalUpdateAll();
         }
 
-        public static bool LocalUnlockSubclass() {
-            //check locked
-            if (ExperienceAndClasses.LOCAL_MPLAYER.Allow_Secondary) {
-                Utilities.Commons.Error("Trying to unlock multiclassing when already unlocked");
-                return false;
-            }
-
-            //item requirements
-            Item item = ExperienceAndClasses.MOD.GetItem<Items.Unlock_Subclass>().item;
-            if (!ExperienceAndClasses.LOCAL_MPLAYER.player.HasItem(item.type)) {
-                //item requirement not met
-                Main.NewText("You require a " + item.Name + " to unlock multiclassing!", UI.Constants.COLOUR_MESSAGE_ERROR);
-                return false;
-            }
-
-            //requirements met..
-
-            //take item
-            ExperienceAndClasses.LOCAL_MPLAYER.player.ConsumeItem(item.type);
-
-            //unlock class
-            ExperienceAndClasses.LOCAL_MPLAYER.Allow_Secondary = true;
-
-            //update
-            LocalUpdateClassInfo();
-
-            //success
-            Main.NewText("You can now multiclass! Right click a class to set it as your subclass.", UI.Constants.COLOUR_MESSAGE_ANNOUNCE);
-            return true;
-        }
-
-        public static void LocalUpdateClassInfo() {
+        public static void LocalUpdateAll() {
             //prevent secondary without primary class (move secondary to primary)
             if ((ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary.ID == (byte)Systems.Class.IDs.New) || (ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary.ID == (byte)Systems.Class.IDs.None)) {
                 ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary = ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary;
@@ -350,7 +328,7 @@ namespace ExperienceAndClasses {
             }
 
             //effective levels
-            ExperienceAndClasses.LOCAL_MPLAYER.SetEffectiveLevels();
+            LocalCalculateEffectiveLevels();
 
             //base class attributes
             float sum_primary, sum_secondary;
@@ -386,160 +364,62 @@ namespace ExperienceAndClasses {
             ExperienceAndClasses.LOCAL_MPLAYER.Allocation_Points_Unallocated = ExperienceAndClasses.LOCAL_MPLAYER.Allocation_Points_Total - ExperienceAndClasses.LOCAL_MPLAYER.Allocation_Points_Spent;
 
             //sum attributes
-            LocalCalculateAttributesSync();
+            LocalAttributesCalculateSync();
             ExperienceAndClasses.LOCAL_MPLAYER.CalculateAttributesFinal();
 
             //calclate progression value
-            LocalUpdateProgression();
+            LocalProgressionUpdate();
 
             //update UI
             UI.UIMain.Instance.UpdateClassInfo();
             UI.UIHUD.Instance.Update();
 
             //update class features
-            ExperienceAndClasses.LOCAL_MPLAYER.UpdateClassInfo();
+            LocalUpdateClassInfo();
         }
 
-        public void UpdateClassInfo() {
-
+        public static void LocalUpdateClassInfo() {
+            //TODO
         }
 
-        private void SetEffectiveLevels() {
-            //set current levels for easier checking
-            Class_Primary_Level_Effective = Class_Levels[Class_Primary.ID];
-            Class_Secondary_Level_Effective = Class_Levels[Class_Secondary.ID];
+        public static void LocalCalculateEffectiveLevels() {
+            //set current levels as default
+            ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary_Level_Effective = ExperienceAndClasses.LOCAL_MPLAYER.Class_Levels[ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary.ID];
+            ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary_Level_Effective = ExperienceAndClasses.LOCAL_MPLAYER.Class_Levels[ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary.ID];
 
             //level cap primary
-            if (Class_Primary_Level_Effective > Class_Primary.Max_Level) {
-                Class_Primary_Level_Effective = Class_Primary.Max_Level;
+            if (ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary_Level_Effective > ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary.Max_Level) {
+                ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary_Level_Effective = ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary.Max_Level;
             }
 
             //subclass secondary effective level penalty
-            if (Class_Secondary.Tier > Class_Primary.Tier) {
+            if (ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary.Tier > ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary.Tier) {
                 //subclass of higher tier limited to lv1
-                Class_Secondary_Level_Effective = 1;
+                ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary_Level_Effective = 1;
             }
-            else if (Class_Secondary.Tier == Class_Primary.Tier) {
+            else if (ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary.Tier == ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary.Tier) {
                 //subclass of same tier limited to half primary
-                Class_Secondary_Level_Effective = (byte)Math.Min(Class_Secondary_Level_Effective, Class_Primary_Level_Effective / 2);
+                ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary_Level_Effective = (byte)Math.Min(ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary_Level_Effective, ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary_Level_Effective / 2);
 
                 //prevent effective level 0 if using two level 1s of same tier
-                if (Class_Secondary.Tier > 0)
-                    Class_Secondary_Level_Effective = Math.Max(Class_Secondary_Level_Effective, (byte)1);
+                if (ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary.Tier > 0)
+                    ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary_Level_Effective = Math.Max(ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary_Level_Effective, (byte)1);
             }//subclass of lower tier has no penalty
 
             //level cap secondary
-            if (Class_Secondary_Level_Effective > Class_Secondary.Max_Level) {
-                Class_Secondary_Level_Effective = Class_Secondary.Max_Level;
+            if (ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary_Level_Effective > ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary.Max_Level) {
+                ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary_Level_Effective = ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary.Max_Level;
             }
         }
 
-        public bool CanGainXP() {
-            return (CanGainXPPrimary() || CanGainXPSecondary());
-        }
-
-        public bool CanGainXPPrimary() {
-            return (Is_Local_Player && (Class_Primary.Tier > 0) && (Class_Levels[Class_Primary.ID] < Class_Primary.Max_Level));
-        }
-
-        public bool CanGainXPSecondary() {
-            return (Is_Local_Player && Allow_Secondary && (Class_Secondary.Tier > 0) && (Class_Levels[Class_Secondary.ID] < Class_Secondary.Max_Level));
-        }
-
-        public void AddXP(uint xp) {
-            if (Is_Local_Player) {
-                if (show_xp) {
-                    CombatText.NewText(Main.LocalPlayer.getRect(), UI.Constants.COLOUR_XP_BRIGHT, "+" + xp + " XP");
-                }
-
-                if (CanGainXP()) {
-                    bool add_primary = CanGainXPPrimary();
-                    bool add_secondary = CanGainXPSecondary();
-
-                    if (add_primary && add_secondary) {
-                        AddXP(Class_Primary.ID, (uint)Math.Ceiling(xp * Systems.XP.SUBCLASS_PENALTY_XP_MULTIPLIER_PRIMARY));
-                        AddXP(Class_Secondary.ID, (uint)Math.Ceiling(xp * Systems.XP.SUBCLASS_PENALTY_XP_MULTIPLIER_SECONDARY));
-                    }
-                    else if (add_primary) {
-                        AddXP(Class_Primary.ID, xp);
-                    }
-                    else if (add_secondary) {
-                        AddXP(Class_Secondary.ID, xp);
-                    }
-                    else {
-                        //shouldn't be reachable unless something is changed later
-                        Extra_XP = Math.Max(Extra_XP, Extra_XP + xp); //prevent overflow
-                        return;
-                    }
-
-                    CheckForLevel();
-                }
-                else {
-                    Extra_XP = Math.Max(Extra_XP, Extra_XP + xp); //prevent overflow
-                }
-            }
-        }
-
-        private void CheckForLevel() {
-            //store prior levels to detect level-up
-            byte effective_primary = Class_Primary_Level_Effective;
-            byte effective_secondary = Class_Secondary_Level_Effective;
-
-            //level up
-            while ((Class_Levels[Class_Primary.ID] < Class_Primary.Max_Level) && (Class_XP[Class_Primary.ID] >= Systems.XP.Requirements.GetXPReq(Class_Primary, Class_Levels[Class_Primary.ID]))) {
-                SubtractXP(Class_Primary.ID, Systems.XP.Requirements.GetXPReq(Class_Primary, Class_Levels[Class_Primary.ID]));
-                Class_Levels[Class_Primary.ID]++;
-                Class_Primary.LocalAnnounceLevel();
-            }
-            while ((Class_Levels[Class_Secondary.ID] < Class_Secondary.Max_Level) && (Class_XP[Class_Secondary.ID] >= Systems.XP.Requirements.GetXPReq(Class_Secondary, Class_Levels[Class_Secondary.ID]))) {
-                SubtractXP(Class_Secondary.ID, Systems.XP.Requirements.GetXPReq(Class_Secondary, Class_Levels[Class_Secondary.ID]));
-                Class_Levels[Class_Secondary.ID]++;
-                Class_Secondary.LocalAnnounceLevel();
-            }
-
-            //adjust effective levels
-            SetEffectiveLevels();
-
-            //update class info if needed
-            if ((effective_primary != Class_Primary_Level_Effective) || (effective_secondary != Class_Secondary_Level_Effective)) {
-                LocalUpdateClassInfo();
-            }
-            else {
-                //otherwise just update xp bars
-                UI.UIHUD.Instance.Update();
-            }
-        }
-
-        public void AddXP(byte class_id, uint amount) {
-            uint new_value = Class_XP[class_id] + amount;
-            if (new_value > Class_XP[class_id]) {
-                Class_XP[class_id] = new_value;
-            }
-            else {
-                Class_XP[class_id] = uint.MaxValue;
-            }
-        }
-        public void SubtractXP(byte class_id, uint amount) {
-            if (Class_XP[class_id] > amount) {
-                Class_XP[class_id] -= amount;
-            }
-            else {
-                Class_XP[class_id] = 0;
-            }
-        }
-
-        public void DefeatWOF() {
-            if (!Defeated_WOF) {
-                Defeated_WOF = true;
+        public static void LocalDefeatWOF() {
+            if (!ExperienceAndClasses.LOCAL_MPLAYER.Defeated_WOF) {
+                ExperienceAndClasses.LOCAL_MPLAYER.Defeated_WOF = true;
                 Main.NewText("Tier III Requirement Met: Defeat Wall of Flesh", UI.Constants.COLOUR_MESSAGE_SUCCESS);
-                if (CanUnlockTier3()) {
+                if (Systems.Class.LocalCanUnlockTier3()) {
                     Main.NewText("You can now unlock tier III classes!", UI.Constants.COLOUR_MESSAGE_SUCCESS);
                 }
             }
-        }
-        
-        public bool CanUnlockTier3() {
-            return Defeated_WOF;
         }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Minions ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
@@ -652,7 +532,15 @@ namespace ExperienceAndClasses {
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Sync Force Commands ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-        public void ForceClass(byte primary_id, byte primary_level, byte secondary_id, byte secondary_level) {
+        /// <summary>
+        /// Set the class and level (effective level) of another player.
+        /// Attributes etc. are synced separately.
+        /// </summary>
+        /// <param name="primary_id"></param>
+        /// <param name="primary_level"></param>
+        /// <param name="secondary_id"></param>
+        /// <param name="secondary_level"></param>
+        public void NonLocalSyncClass(byte primary_id, byte primary_level, byte secondary_id, byte secondary_level) {
             if (Is_Local_Player) {
                 Utilities.Commons.Error("Cannot force class packet for local player");
                 return;
@@ -662,15 +550,13 @@ namespace ExperienceAndClasses {
             Class_Primary_Level_Effective = primary_level;
             Class_Secondary = Systems.Class.LOOKUP[secondary_id];
             Class_Secondary_Level_Effective = secondary_level;
-
-            UpdateClassInfo();
         }
 
         /// <summary>
-        /// Sync = Class + Allocated (the local stuff)
+        /// Sets Attributes_Sync of a non-local player, then recalculates Attributes_Final
         /// </summary>
         /// <param name="attributes"></param>
-        public void SetSyncAttributes(int[] attributes) {
+        public void NonLocalSyncAttributes(int[] attributes) {
             if (Is_Local_Player) {
                 Utilities.Commons.Error("Cannot force attribute packet for local player");
                 return;
@@ -680,7 +566,7 @@ namespace ExperienceAndClasses {
                 Attributes_Sync[i] = attributes[i];
             }
 
-            UpdateClassInfo();
+            CalculateAttributesFinal();
         }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Attributes ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
@@ -712,7 +598,7 @@ namespace ExperienceAndClasses {
             if ((Attributes_Allocated[id] < 0 && adjustment > 0) || (Allocation_Points_Unallocated < 0 && adjustment < 0) || 
                 (((adjustment < 0) || (Allocation_Points_Unallocated >= Systems.Attribute.AllocationPointCost(Attributes_Allocated[id]))) && ((Attributes_Allocated[id] + adjustment) >= 0))) {
                 Attributes_Allocated[id] += adjustment;
-                LocalUpdateClassInfo();
+                LocalUpdateAll();
             }
         }
 
@@ -732,14 +618,14 @@ namespace ExperienceAndClasses {
                 for (byte i = 0; i < (byte)Systems.Attribute.IDs.NUMBER_OF_IDs; i++) {
                     ExperienceAndClasses.LOCAL_MPLAYER.Attributes_Allocated[i] = 0;
                 }
-                LocalUpdateClassInfo();
+                LocalUpdateAll();
             }
         }
 
         /// <summary>
         /// Calculates class + allocation
         /// </summary>
-        public static void LocalCalculateAttributesSync() {
+        public static void LocalAttributesCalculateSync() {
             for (byte id = 0; id < (byte)Systems.Attribute.IDs.NUMBER_OF_IDs; id++) {
                 ExperienceAndClasses.LOCAL_MPLAYER.Attributes_Sync[id] = ExperienceAndClasses.LOCAL_MPLAYER.Attributes_Class[id] + ExperienceAndClasses.LOCAL_MPLAYER.Attributes_Allocated[id];
             }
@@ -918,10 +804,7 @@ namespace ExperienceAndClasses {
             for (byte id = 0; id < (byte)Systems.Class.IDs.NUMBER_OF_IDs; id++) {
 
                 //level up if required xp changed
-                while ((Class_Levels[id] < Systems.Class.LOOKUP[id].Max_Level) && (Class_XP[id] >= Systems.XP.Requirements.GetXPReq(Systems.Class.LOOKUP[id], Class_Levels[id]))) {
-                    SubtractXP(id, Systems.XP.Requirements.GetXPReq(Systems.Class.LOOKUP[id], Class_Levels[id]));
-                    Class_Levels[id]++;
-                }
+                Systems.Class.LOOKUP[id].LocalCheckDoLevelup(false);
 
                 //if unlocked, level should be at least one
                 if (Class_Unlocked[id] && (Class_Levels[id] < 1)) {
@@ -979,7 +862,7 @@ namespace ExperienceAndClasses {
             IN_COMBAT = in_combat;
         }
 
-        private static void LocalUpdateProgression() {
+        private static void LocalProgressionUpdate() {
             //calculate
             int progression = ExperienceAndClasses.LOCAL_MPLAYER.Allocation_Points_Total;
             //set

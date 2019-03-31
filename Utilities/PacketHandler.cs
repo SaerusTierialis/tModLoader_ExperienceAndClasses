@@ -178,7 +178,7 @@ namespace ExperienceAndClasses.Utilities {
                 byte[] bytes = reader.ReadBytes(4);
 
                 //set
-                origin_mplayer.ForceClass(bytes[0], bytes[1], bytes[2], bytes[3]);
+                origin_mplayer.NonLocalSyncClass(bytes[0], bytes[1], bytes[2], bytes[3]);
 
                 //relay
                 if (Utilities.Netmode.IS_SERVER) {
@@ -216,7 +216,7 @@ namespace ExperienceAndClasses.Utilities {
                 }
 
                 //set
-                origin_mplayer.SetSyncAttributes(attributes);
+                origin_mplayer.NonLocalSyncAttributes(attributes);
 
                 //relay
                 if (Utilities.Netmode.IS_SERVER) {
@@ -380,7 +380,7 @@ namespace ExperienceAndClasses.Utilities {
                 uint xp = reader.ReadUInt32();
 
                 //set
-                ExperienceAndClasses.LOCAL_MPLAYER.AddXP(xp);
+                Systems.XP.Adjusting.LocalAddXP(xp);
             }
         }
 
@@ -428,7 +428,7 @@ namespace ExperienceAndClasses.Utilities {
             }
 
             protected override void RecieveBody(BinaryReader reader, int origin, MPlayer origin_mplayer) {
-                ExperienceAndClasses.LOCAL_MPLAYER.DefeatWOF();
+                MPlayer.LocalDefeatWOF();
             }
         }
     }

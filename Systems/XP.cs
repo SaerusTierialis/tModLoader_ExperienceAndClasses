@@ -15,97 +15,6 @@ namespace ExperienceAndClasses.Systems {
 
         public const double EXTRA_XP_POOL_MULTIPLIER = 0.5;
 
-        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ XP Rewards ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-
-        /// <summary>
-        /// XP rewards are tallied server-side in a buffer and then sent out at regular intervals.
-        /// 
-        /// NOTE: consuming orbs for xp is handled entirely client-side
-        /// </summary>
-        public static class Rewards {
-
-            /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Constants ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-
-            private const long TICKS_PER_XP_SEND = (long)(TimeSpan.TicksPerSecond * 0.5);
-
-            /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Variables ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-
-            private static uint[] xp_buffer = new uint[Main.maxPlayers];
-            private static DateTime time_send_xp_buffer = DateTime.MinValue;
-            private static bool xp_buffer_empty = true;
-
-            /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Methods ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-
-            /// <summary>
-            /// Send all player rewards at once on interval
-            /// </summary>
-            public static void ServerProcessXPBuffer() {
-                if (!xp_buffer_empty) { //fast check
-                    DateTime now = DateTime.Now;
-                    if (now.CompareTo(time_send_xp_buffer) >= 0) {
-                        //send rewards
-                        for (byte player_index = 0; player_index < Main.maxPlayers; player_index++) {
-                            if (xp_buffer[player_index] > 0) {
-                                //do reward
-                                if (Main.player[player_index].active) {
-                                    if (Utilities.Netmode.IS_SERVER) {
-                                        Utilities.PacketHandler.XP.Send(player_index, -1, xp_buffer[player_index]);
-                                    }
-                                    else {
-                                        ExperienceAndClasses.LOCAL_MPLAYER.AddXP(xp_buffer[player_index]);
-                                    }
-                                }
-
-                                //set back to 0
-                                xp_buffer[player_index] = 0;
-                            }
-                        }
-
-                        //set time next
-                        time_send_xp_buffer = now.AddTicks(TICKS_PER_XP_SEND);
-
-                        //buffer is empty
-                        xp_buffer_empty = true;
-                    }
-                }
-            }
-
-            /// <summary>
-            /// Track combat xp to be sent to client in a lump sum at next sync interval.
-            /// </summary>
-            /// <param name="player_index"></param>
-            /// <param name="xp"></param>
-            public static void ServerTallyCombatXP(byte player_index, double xp) {
-                xp_buffer[player_index] += FinalizeXP(player_index, xp);
-                xp_buffer_empty = false;
-            }
-
-            /// <summary>
-            /// Apply any bonuses and convert to uint
-            /// </summary>
-            /// <param name="player_index"></param>
-            /// <param name="xp"></param>
-            /// <returns></returns>
-            private static uint FinalizeXP(byte player_index, double xp) {
-                Player player = Main.player[player_index];
-
-                //5% bonus for well fed
-                if (player.wellFed) {
-                    xp *= 1.05d;
-                }
-
-                return (uint)Math.Ceiling(xp);
-            }
-
-            /// <summary>
-            /// Returns the value of a boss orb for the local player
-            /// </summary>
-            /// <returns></returns>
-            public static double GetBossOrbXP() {
-                return Math.Pow(ExperienceAndClasses.LOCAL_MPLAYER.Progression, 1.7) * 3.0;
-            }
-        }
-
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ XP Requirements ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         public static class Requirements {
@@ -171,6 +80,95 @@ namespace ExperienceAndClasses.Systems {
                     return XP_REQ[level];
                 }
             }
+        }
+
+        public static class Adjusting {
+            public static bool LocalCanGainXP() {
+                return (LocalCanGainXPPrimary() || LocalCanGainXPSecondary());
+            }
+
+            public static bool LocalCanGainXPPrimary() {
+                return (ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary.Tier > 0) && (ExperienceAndClasses.LOCAL_MPLAYER.Class_Levels[ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary.ID] < ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary.Max_Level);
+            }
+
+            public static bool LocalCanGainXPSecondary() {
+                return ExperienceAndClasses.LOCAL_MPLAYER.Allow_Secondary && (ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary.Tier > 0) && (ExperienceAndClasses.LOCAL_MPLAYER.Class_Levels[ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary.ID] < ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary.Max_Level);
+            }
+
+            public static void LocalAddXP(uint xp) {
+                if (ExperienceAndClasses.LOCAL_MPLAYER.show_xp) {
+                    CombatText.NewText(Main.LocalPlayer.getRect(), UI.Constants.COLOUR_XP_BRIGHT, "+" + xp + " XP");
+                }
+
+                if (LocalCanGainXP()) {
+                    bool add_primary = LocalCanGainXPPrimary();
+                    bool add_secondary = LocalCanGainXPSecondary();
+
+                    if (add_primary && add_secondary) {
+                        LocalAddXP(ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary.ID, (uint)Math.Ceiling(xp * Systems.XP.SUBCLASS_PENALTY_XP_MULTIPLIER_PRIMARY));
+                        LocalAddXP(ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary.ID, (uint)Math.Ceiling(xp * Systems.XP.SUBCLASS_PENALTY_XP_MULTIPLIER_SECONDARY));
+                    }
+                    else if (add_primary) {
+                        LocalAddXP(ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary.ID, xp);
+                    }
+                    else if (add_secondary) {
+                        LocalAddXP(ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary.ID, xp);
+                    }
+                    else {
+                        //shouldn't be reachable unless something is changed later
+                        ExperienceAndClasses.LOCAL_MPLAYER.Extra_XP = Math.Max(ExperienceAndClasses.LOCAL_MPLAYER.Extra_XP, ExperienceAndClasses.LOCAL_MPLAYER.Extra_XP + xp); //prevent overflow
+                        return;
+                    }
+
+                    LocalCheckDoLevelup();
+                }
+                else {
+                    ExperienceAndClasses.LOCAL_MPLAYER.Extra_XP = Math.Max(ExperienceAndClasses.LOCAL_MPLAYER.Extra_XP, ExperienceAndClasses.LOCAL_MPLAYER.Extra_XP + xp); //prevent overflow
+                }
+            }
+
+            public static void LocalAddXP(byte class_id, uint amount) {
+                uint new_value = ExperienceAndClasses.LOCAL_MPLAYER.Class_XP[class_id] + amount;
+                if (new_value > ExperienceAndClasses.LOCAL_MPLAYER.Class_XP[class_id]) {
+                    ExperienceAndClasses.LOCAL_MPLAYER.Class_XP[class_id] = new_value;
+                }
+                else {
+                    ExperienceAndClasses.LOCAL_MPLAYER.Class_XP[class_id] = uint.MaxValue;
+                }
+            }
+
+            public static void LocalSubtractXP(byte class_id, uint amount) {
+                if (ExperienceAndClasses.LOCAL_MPLAYER.Class_XP[class_id] > amount) {
+                    ExperienceAndClasses.LOCAL_MPLAYER.Class_XP[class_id] -= amount;
+                }
+                else {
+                    ExperienceAndClasses.LOCAL_MPLAYER.Class_XP[class_id] = 0;
+                }
+            }
+
+            private static void LocalCheckDoLevelup() {
+                //store prior levels to detect level-up
+                byte effective_primary = ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary_Level_Effective;
+                byte effective_secondary = ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary_Level_Effective;
+
+                //level up
+                ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary.LocalCheckDoLevelup();
+                ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary.LocalCheckDoLevelup();
+
+                //adjust effective levels
+                MPlayer.LocalCalculateEffectiveLevels();
+
+                //update class info if needed
+                if ((effective_primary != ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary_Level_Effective) || (effective_secondary != ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary_Level_Effective)) {
+                    MPlayer.LocalUpdateAll();
+                }
+                else {
+                    //otherwise just update xp bars
+                    UI.UIHUD.Instance.Update();
+                }
+            }
+
+
         }
     }
 }

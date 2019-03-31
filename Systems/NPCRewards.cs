@@ -8,6 +8,8 @@ namespace ExperienceAndClasses.Systems {
     class NPCRewards : GlobalNPC {
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Constants ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
+        private const long TICKS_PER_XP_SEND = (long)(TimeSpan.TicksPerSecond * 0.5);
+
         //range for reward eligibility
         private const float RANGE_ELIGIBLE = 2500f;
 
@@ -22,7 +24,13 @@ namespace ExperienceAndClasses.Systems {
         private const double DROP_CHANCE_ORB_BOSS_MAX = 0.5;
         private const double DROP_CHANCE_ORB_BOSS_MODIFIER = 1.5;
 
-        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Varibles ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Varibles (static) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+        private static uint[] xp_buffer = new uint[Main.maxPlayers];
+        private static DateTime time_send_xp_buffer = DateTime.MinValue;
+        private static bool xp_buffer_empty = true;
+
+        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Varibles (instance) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         private bool initialized = false;
         private bool treat_as_boss = false;
@@ -132,7 +140,7 @@ namespace ExperienceAndClasses.Systems {
         private static void AwardXP(double base_xp, List<byte> eligible_players, double reward_modifier) {
             double xp = base_xp * reward_modifier;
             foreach (byte player_index in eligible_players) {
-                XP.Rewards.ServerTallyCombatXP(player_index, xp);
+                ServerTallyCombatXP(player_index, xp);
             }
         }
 
@@ -243,15 +251,84 @@ namespace ExperienceAndClasses.Systems {
             return xp;
         }
 
-        private void DefeatWOF(List<byte> eligible_players) {
+        private static void DefeatWOF(List<byte> eligible_players) {
             foreach (byte player_index in eligible_players) {
                 if (Utilities.Netmode.IS_SERVER) {
                     Utilities.PacketHandler.WOF.Send(player_index, -1);
                 }
                 else {
-                    ExperienceAndClasses.LOCAL_MPLAYER.DefeatWOF();
+                    MPlayer.LocalDefeatWOF();
                 }
             }
+        }
+
+        /// <summary>
+        /// Send all player rewards at once on interval
+        /// </summary>
+        public static void ServerProcessXPBuffer() {
+            if (!xp_buffer_empty) { //fast check
+                DateTime now = DateTime.Now;
+                if (now.CompareTo(time_send_xp_buffer) >= 0) {
+                    //send rewards
+                    for (byte player_index = 0; player_index < Main.maxPlayers; player_index++) {
+                        if (xp_buffer[player_index] > 0) {
+                            //do reward
+                            if (Main.player[player_index].active) {
+                                if (Utilities.Netmode.IS_SERVER) {
+                                    Utilities.PacketHandler.XP.Send(player_index, -1, xp_buffer[player_index]);
+                                }
+                                else {
+                                    Systems.XP.Adjusting.LocalAddXP(xp_buffer[player_index]);
+                                }
+                            }
+
+                            //set back to 0
+                            xp_buffer[player_index] = 0;
+                        }
+                    }
+
+                    //set time next
+                    time_send_xp_buffer = now.AddTicks(TICKS_PER_XP_SEND);
+
+                    //buffer is empty
+                    xp_buffer_empty = true;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Track combat xp to be sent to client in a lump sum at next sync interval. Used for singleplayer too.
+        /// </summary>
+        /// <param name="player_index"></param>
+        /// <param name="xp"></param>
+        public static void ServerTallyCombatXP(byte player_index, double xp) {
+            xp_buffer[player_index] += FinalizeXP(player_index, xp);
+            xp_buffer_empty = false;
+        }
+
+        /// <summary>
+        /// Apply any bonuses and convert to uint
+        /// </summary>
+        /// <param name="player_index"></param>
+        /// <param name="xp"></param>
+        /// <returns></returns>
+        private static uint FinalizeXP(byte player_index, double xp) {
+            Player player = Main.player[player_index];
+
+            //5% bonus for well fed
+            if (player.wellFed) {
+                xp *= 1.05d;
+            }
+
+            return (uint)Math.Ceiling(xp);
+        }
+
+        /// <summary>
+        /// Returns the value of a boss orb for the local player
+        /// </summary>
+        /// <returns></returns>
+        public static double GetBossOrbXP() {
+            return Math.Pow(ExperienceAndClasses.LOCAL_MPLAYER.Progression, 1.7) * 3.0;
         }
     }
 }

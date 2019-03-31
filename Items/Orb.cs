@@ -40,7 +40,7 @@ namespace ExperienceAndClasses.Items {
             line.overrideColor = UI.Constants.COLOUR_XP_BRIGHT;
             tooltips.Add(line);
 
-            if (!ExperienceAndClasses.LOCAL_MPLAYER.CanGainXP()) {
+            if (!Systems.XP.Adjusting.LocalCanGainXP()) {
                 line = new TooltipLine(mod, "desc2", "Use is currently prevented because you cannot gain XP!");
                 line.overrideColor = UI.Constants.COLOUR_MESSAGE_ERROR;
                 tooltips.Add(line);
@@ -48,12 +48,12 @@ namespace ExperienceAndClasses.Items {
         }
 
         public override bool CanUseItem(Player player) {
-            return ExperienceAndClasses.LOCAL_MPLAYER.CanGainXP();
+            return Systems.XP.Adjusting.LocalCanGainXP();
         }
 
         public override bool UseItem(Player player) {
-            if (ExperienceAndClasses.LOCAL_MPLAYER.CanGainXP()) {
-                ExperienceAndClasses.LOCAL_MPLAYER.AddXP(GetXPValue());
+            if (Systems.XP.Adjusting.LocalCanGainXP()) {
+                Systems.XP.Adjusting.LocalAddXP(GetXPValue());
                 return true;
             }
             else {
@@ -63,7 +63,7 @@ namespace ExperienceAndClasses.Items {
         }
 
         public uint GetXPValue() {
-            return (uint)(Systems.XP.Rewards.GetBossOrbXP() * xp_multiplier);
+            return (uint)(Systems.NPCRewards.GetBossOrbXP() * xp_multiplier);
         }
     }
 

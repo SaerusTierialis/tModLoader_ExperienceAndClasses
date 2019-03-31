@@ -97,7 +97,7 @@ namespace ExperienceAndClasses.UI {
                         break;
 
                     case INPUT_MODE.SUBCLASS:
-                        MPlayer.LocalUnlockSubclass();
+                        Systems.Class.LocalUnlockSubclass();
                         break;
 
                     case INPUT_MODE.RESET_ATTRIBUTES:

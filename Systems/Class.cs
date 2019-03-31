@@ -236,12 +236,12 @@ namespace ExperienceAndClasses.Systems {
             }
 
             //tier 3 requirement
-            if (Tier == 3 && !ExperienceAndClasses.LOCAL_MPLAYER.CanUnlockTier3()) {
+            if (Tier == 3 && !LocalCanUnlockTier3()) {
                 if (!ExperienceAndClasses.LOCAL_MPLAYER.Defeated_WOF) {
                     Main.NewText("You must defeat the Wall of Flesh to unlock tier 3 classes!", UI.Constants.COLOUR_MESSAGE_ERROR);
                 }
                 else {
-                    Utilities.Commons.Error("CanUnlockTier3 returned false for unknown reasons! Please Report!");
+                    Utilities.Commons.Error("LocalCanUnlockTier3 returned false for unknown reasons! Please Report!");
                 }
                 return false;
             }
@@ -279,33 +279,42 @@ namespace ExperienceAndClasses.Systems {
             uint extra_xp_add = (uint)(ExperienceAndClasses.LOCAL_MPLAYER.Extra_XP * Systems.XP.EXTRA_XP_POOL_MULTIPLIER);
             if (extra_xp_add > 0) {
                 //add xp
-                ExperienceAndClasses.LOCAL_MPLAYER.AddXP(ID, extra_xp_add);
+                Systems.XP.Adjusting.LocalAddXP(ID, extra_xp_add);
 
                 //clear pool
                 ExperienceAndClasses.LOCAL_MPLAYER.Extra_XP = 0;
 
                 //levelup?
-                uint xp_req;
-                while (ExperienceAndClasses.LOCAL_MPLAYER.Class_Levels[ID] < Max_Level) {
-                    xp_req = Systems.XP.Requirements.GetXPReq(this, ExperienceAndClasses.LOCAL_MPLAYER.Class_Levels[ID]);
-                    if (ExperienceAndClasses.LOCAL_MPLAYER.Class_XP[ID] < xp_req) {
-                        break;
-                    }
-                    else {
-                        ExperienceAndClasses.LOCAL_MPLAYER.SubtractXP(ID, xp_req);
-                        ExperienceAndClasses.LOCAL_MPLAYER.Class_Levels[ID]++;
-                        LocalAnnounceLevel();
-                    }
-                }
+                LocalCheckDoLevelup();
 
                 //tell player
                 Main.NewText(extra_xp_add + " unclaimed XP has been transferred to " + Name + "!", UI.Constants.COLOUR_MESSAGE_ANNOUNCE);
             }
 
             //update
-            MPlayer.LocalUpdateClassInfo();
+            MPlayer.LocalUpdateAll();
 
             return true;
+        }
+
+        public bool LocalCheckDoLevelup(bool announce = true) {
+            uint xp_req;
+            bool any_levels = false;
+            while (ExperienceAndClasses.LOCAL_MPLAYER.Class_Levels[ID] < Max_Level) {
+                xp_req = Systems.XP.Requirements.GetXPReq(this, ExperienceAndClasses.LOCAL_MPLAYER.Class_Levels[ID]);
+                if (ExperienceAndClasses.LOCAL_MPLAYER.Class_XP[ID] < xp_req) {
+                    break;
+                }
+                else {
+                    Systems.XP.Adjusting.LocalSubtractXP(ID, xp_req);
+                    ExperienceAndClasses.LOCAL_MPLAYER.Class_Levels[ID]++;
+                    if (announce) {
+                        LocalAnnounceLevel();
+                    }
+                    any_levels = true;
+                }
+            }
+            return any_levels;
         }
 
         public void LocalAnnounceLevel() {
@@ -341,6 +350,40 @@ namespace ExperienceAndClasses.Systems {
                 }
             }
             return true;
+        }
+
+        public static void LocalUnlockSubclass() {
+            //check locked
+            if (ExperienceAndClasses.LOCAL_MPLAYER.Allow_Secondary) {
+                Utilities.Commons.Error("Trying to unlock multiclassing when already unlocked");
+            }
+            else {
+                //item requirements
+                Item item = ExperienceAndClasses.MOD.GetItem<Items.Unlock_Subclass>().item;
+                if (!ExperienceAndClasses.LOCAL_MPLAYER.player.HasItem(item.type)) {
+                    //item requirement not met
+                    Main.NewText("You require a " + item.Name + " to unlock multiclassing!", UI.Constants.COLOUR_MESSAGE_ERROR);
+                }
+                else {
+                    //requirements met..
+
+                    //take item
+                    ExperienceAndClasses.LOCAL_MPLAYER.player.ConsumeItem(item.type);
+
+                    //unlock class
+                    ExperienceAndClasses.LOCAL_MPLAYER.Allow_Secondary = true;
+
+                    //update
+                    MPlayer.LocalUpdateAll();
+
+                    //success
+                    Main.NewText("You can now multiclass! Right click a class to set it as your subclass.", UI.Constants.COLOUR_MESSAGE_ANNOUNCE);
+                }
+            }
+        }
+
+        public static bool LocalCanUnlockTier3() {
+            return ExperienceAndClasses.LOCAL_MPLAYER.Defeated_WOF;
         }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Subtypes ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
