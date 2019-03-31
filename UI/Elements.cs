@@ -347,7 +347,7 @@ namespace ExperienceAndClasses.UI {
             }
             else {
                 str = xp + " / " + xp_needed;
-                string_width = Main.fontMouseText.MeasureString(str).X * TEXT_SCALE;
+                string_width = Main.fontMouseText.MeasureString(xp_needed + " / " + xp_needed).X * TEXT_SCALE;
 
                 if (string_width > bar.Width.Pixels) {
                     str = (Math.Round(percent * 10000f) / 100) + "%";
