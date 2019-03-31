@@ -328,7 +328,7 @@ namespace ExperienceAndClasses.Systems {
         /// </summary>
         /// <returns></returns>
         public static double GetBossOrbXP() {
-            return Math.Pow(ExperienceAndClasses.LOCAL_MPLAYER.Progression, 1.7) * 3.0;
+            return Math.Pow(ExperienceAndClasses.LOCAL_MPLAYER.Progression, 1.7);
         }
     }
 }
