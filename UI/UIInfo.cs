@@ -93,15 +93,15 @@ namespace ExperienceAndClasses.UI {
             if (button_yes.visible) {
                 switch (unlock_mode) {
                     case INPUT_MODE.CLASS:
-                        ExperienceAndClasses.LOCAL_MPLAYER.UnlockClass(unlock_class);
+                        unlock_class.LocalUnlockClass();
                         break;
 
                     case INPUT_MODE.SUBCLASS:
-                        ExperienceAndClasses.LOCAL_MPLAYER.UnlockSubclass();
+                        MPlayer.LocalUnlockSubclass();
                         break;
 
                     case INPUT_MODE.RESET_ATTRIBUTES:
-                        ExperienceAndClasses.LOCAL_MPLAYER.LocalAttributeReset();
+                        MPlayer.LocalAttributeReset();
                         break;
 
                     default:

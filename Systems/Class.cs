@@ -106,6 +106,238 @@ namespace ExperienceAndClasses.Systems {
             }
         }
 
+        private enum CLASS_VALIDITY : byte {
+            VALID,
+            INVALID_UNKNOWN,
+            INVALID_LOCKED,
+            INVALID_COMBINATION,
+            INVALID_MINIONS,
+            INVALID_COMBAT,
+        }
+        private CLASS_VALIDITY LocalCheckClassValid(bool is_primary) {
+            if (ExperienceAndClasses.LOCAL_MPLAYER.IN_COMBAT) {
+                return CLASS_VALIDITY.INVALID_COMBAT;
+            }
+            else if (ID == (byte)Systems.Class.IDs.None) {
+                return CLASS_VALIDITY.VALID; //setting to no class is always allowed (unless in combat)
+            }
+            else {
+                Systems.Class class_same_slot, class_other_slot;
+                if (is_primary) {
+                    class_same_slot = ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary;
+                    class_other_slot = ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary;
+                }
+                else {
+                    class_same_slot = ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary;
+                    class_other_slot = ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary;
+                }
+
+                if (((ExperienceAndClasses.LOCAL_MPLAYER.Class_Levels[ID] <= 0) || !ExperienceAndClasses.LOCAL_MPLAYER.Class_Unlocked[ID]) && (ID != (byte)Systems.Class.IDs.None)) {
+                    return CLASS_VALIDITY.INVALID_LOCKED; //locked class
+                }
+                else {
+                    if (ID != class_same_slot.ID) {
+                        Systems.Class pre = class_other_slot;
+                        while (pre != null) {
+                            if (ID == pre.ID) {
+                                return CLASS_VALIDITY.INVALID_COMBINATION; //invalid combination (same as other class or one of its prereqs)
+                            }
+                            else {
+                                pre = pre.Prereq;
+                            }
+                        }
+                        pre = Systems.Class.LOOKUP[ID].Prereq;
+                        while (pre != null) {
+                            if (class_other_slot.ID == pre.ID) {
+                                return CLASS_VALIDITY.INVALID_COMBINATION; //invalid combination (same as other class or one of its prereqs)
+                            }
+                            else {
+                                pre = pre.Prereq;
+                            }
+                        }
+
+                        //valid choice
+                        return CLASS_VALIDITY.VALID;
+                    }
+                }
+                //default
+                return CLASS_VALIDITY.INVALID_UNKNOWN;
+            }
+        }
+
+        public bool LocalSetClass(bool is_primary) {
+            //fail if secondary not allowed
+            if (!is_primary && !ExperienceAndClasses.LOCAL_MPLAYER.Allow_Secondary) {
+                Main.NewText("Failed to set class because multiclassing is locked!", UI.Constants.COLOUR_MESSAGE_ERROR);
+                return false;
+            }
+
+            byte id_other;
+            if (is_primary) {
+                id_other = ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary.ID;
+            }
+            else {
+                id_other = ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary.ID;
+            }
+            if ((ID == id_other) && (ID != (byte)Systems.Class.IDs.None)) {
+                //if setting to other set class, just swap
+                LocalSwapClass();
+                return true;
+            }
+            else {
+                CLASS_VALIDITY valid = LocalCheckClassValid(is_primary);
+                switch (valid) {
+                    case Systems.Class.CLASS_VALIDITY.VALID:
+
+                        //destroy all minions
+                        ExperienceAndClasses.LOCAL_MPLAYER.CheckMinions();
+                        if (ExperienceAndClasses.LOCAL_MPLAYER.minions.Count > 0) {
+                            Main.NewText("Your minions have been despawned because you changed classes!", UI.Constants.COLOUR_MESSAGE_ERROR);
+                            foreach (Projectile p in ExperienceAndClasses.LOCAL_MPLAYER.minions) {
+                                p.Kill();
+                            }
+                        }
+
+                        MPlayer.LocalForceClass(this, is_primary);
+                        return true;
+
+                    case CLASS_VALIDITY.INVALID_COMBINATION:
+                        Main.NewText("Failed to set class because combination is invalid!", UI.Constants.COLOUR_MESSAGE_ERROR);
+                        break;
+
+                    case CLASS_VALIDITY.INVALID_LOCKED:
+                        Main.NewText("Failed to set class because it is locked!", UI.Constants.COLOUR_MESSAGE_ERROR);
+                        break;
+
+                    case CLASS_VALIDITY.INVALID_COMBAT:
+                        Main.NewText("Failed to set class because you are in combat!", UI.Constants.COLOUR_MESSAGE_ERROR);
+                        break;
+
+                    default:
+                        Utilities.Commons.Error("Failed to set class for unknown reasons! (please report)");
+                        break;
+                }
+
+                //default
+                return false;
+            }
+        }
+
+        private static void LocalSwapClass() {
+            MPlayer.LocalForceClasses(ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary, ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary);
+        }
+
+        public bool LocalUnlockClass() {
+            //check locked
+            if (ExperienceAndClasses.LOCAL_MPLAYER.Class_Unlocked[ID]) {
+                Utilities.Commons.Error("Trying to unlock already unlocked class " + Name);
+                return false;
+            }
+
+            //tier 3 requirement
+            if (Tier == 3 && !ExperienceAndClasses.LOCAL_MPLAYER.CanUnlockTier3()) {
+                if (!ExperienceAndClasses.LOCAL_MPLAYER.Defeated_WOF) {
+                    Main.NewText("You must defeat the Wall of Flesh to unlock tier 3 classes!", UI.Constants.COLOUR_MESSAGE_ERROR);
+                }
+                else {
+                    Utilities.Commons.Error("CanUnlockTier3 returned false for unknown reasons! Please Report!");
+                }
+                return false;
+            }
+
+            //level requirements
+            if (!LocalHasClassPrereq()) {
+                Main.NewText("You must reach level " + Prereq.Max_Level + " " + Prereq.Name + " to unlock " + Name + "!", UI.Constants.COLOUR_MESSAGE_ERROR);
+                return false;
+            }
+
+            //item requirements
+            if (Unlock_Item != null) {
+                if (!ExperienceAndClasses.LOCAL_MPLAYER.player.HasItem(Unlock_Item.item.type)) {
+                    //item requirement not met
+                    Main.NewText("You require a " + Unlock_Item.item.Name + " to unlock " + Name + "!", UI.Constants.COLOUR_MESSAGE_ERROR);
+                    return false;
+                }
+            }
+
+            //requirements met..
+
+            //take item
+            ExperienceAndClasses.LOCAL_MPLAYER.player.ConsumeItem(Unlock_Item.item.type);
+
+            //unlock class
+            ExperienceAndClasses.LOCAL_MPLAYER.Class_Unlocked[ID] = true;
+            if (ExperienceAndClasses.LOCAL_MPLAYER.Class_Levels[ID] < 1) {
+                ExperienceAndClasses.LOCAL_MPLAYER.Class_Levels[ID] = 1;
+            }
+
+            //success
+            Main.NewText("You have unlocked " + Name + "!", UI.Constants.COLOUR_MESSAGE_ANNOUNCE);
+
+            //add extra xp (after penalty)
+            uint extra_xp_add = (uint)(ExperienceAndClasses.LOCAL_MPLAYER.Extra_XP * Systems.XP.EXTRA_XP_POOL_MULTIPLIER);
+            if (extra_xp_add > 0) {
+                //add xp
+                ExperienceAndClasses.LOCAL_MPLAYER.AddXP(ID, extra_xp_add);
+
+                //clear pool
+                ExperienceAndClasses.LOCAL_MPLAYER.Extra_XP = 0;
+
+                //levelup?
+                uint xp_req;
+                while (ExperienceAndClasses.LOCAL_MPLAYER.Class_Levels[ID] < Max_Level) {
+                    xp_req = Systems.XP.Requirements.GetXPReq(this, ExperienceAndClasses.LOCAL_MPLAYER.Class_Levels[ID]);
+                    if (ExperienceAndClasses.LOCAL_MPLAYER.Class_XP[ID] < xp_req) {
+                        break;
+                    }
+                    else {
+                        ExperienceAndClasses.LOCAL_MPLAYER.SubtractXP(ID, xp_req);
+                        ExperienceAndClasses.LOCAL_MPLAYER.Class_Levels[ID]++;
+                        LocalAnnounceLevel();
+                    }
+                }
+
+                //tell player
+                Main.NewText(extra_xp_add + " unclaimed XP has been transferred to " + Name + "!", UI.Constants.COLOUR_MESSAGE_ANNOUNCE);
+            }
+
+            //update
+            MPlayer.LocalUpdateClassInfo();
+
+            return true;
+        }
+
+        public void LocalAnnounceLevel() {
+            //client/singleplayer only
+            if (!Utilities.Netmode.IS_SERVER) {
+                byte level = ExperienceAndClasses.LOCAL_MPLAYER.Class_Levels[ID];
+
+                string message = "";
+                if (level == Max_Level) {
+                    message = "You are now a MAX level " + Name + "!";
+                }
+                else {
+                    message = "You are now a level " + level + " " + Name + "!";
+                }
+
+                Main.NewText(message, UI.Constants.COLOUR_MESSAGE_ANNOUNCE);
+            }
+        }
+
+        public bool LocalHasClassPrereq() {
+            Systems.Class pre = Prereq;
+            while (pre != null) {
+                if (ExperienceAndClasses.LOCAL_MPLAYER.Class_Levels[pre.ID] < pre.Max_Level) {
+                    //level requirement not met
+                    return false;
+                }
+                else {
+                    pre = pre.Prereq;
+                }
+            }
+            return true;
+        }
+
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Subtypes ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         public abstract class RealClass : Class {

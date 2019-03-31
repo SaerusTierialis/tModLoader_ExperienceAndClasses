@@ -526,10 +526,10 @@ namespace ExperienceAndClasses.UI {
             }
             else {
                 if (ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary.ID == Class.ID) {
-                    ExperienceAndClasses.LOCAL_MPLAYER.LocalSetClass((byte)Systems.Class.IDs.None, true);
+                    Systems.Class.LOOKUP[(byte)Systems.Class.IDs.None].LocalSetClass(true);
                 }
                 else {
-                    ExperienceAndClasses.LOCAL_MPLAYER.LocalSetClass(Class.ID, true);
+                    Class.LocalSetClass(true);
                 }
             }
         }
@@ -543,10 +543,10 @@ namespace ExperienceAndClasses.UI {
                 UIInfo.Instance.ShowUnlockSubclass(this);
             }
             else if (ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary.ID == Class.ID) {
-                ExperienceAndClasses.LOCAL_MPLAYER.LocalSetClass((byte)Systems.Class.IDs.None, false);
+                Systems.Class.LOOKUP[(byte)Systems.Class.IDs.None].LocalSetClass(false);
             }
             else {
-                ExperienceAndClasses.LOCAL_MPLAYER.LocalSetClass(Class.ID, false);
+                Class.LocalSetClass(false);
             }
         }
 
@@ -591,7 +591,7 @@ namespace ExperienceAndClasses.UI {
             }
             else {
                 //locked
-                if (ExperienceAndClasses.LOCAL_MPLAYER.HasClassPrereq(Class)) {
+                if (Class.LocalHasClassPrereq()) {
                     image_lock.SetImage(Utilities.Textures.TEXTURE_LOCK_BROWN);
                 }
                 else {

@@ -97,12 +97,12 @@ namespace ExperienceAndClasses.Systems {
         /// </summary>
         /// <param name="mplayer"></param>
         /// <returns></returns>
-        public static int AllocationPointTotal(MPlayer mplayer) {
+        public static int LocalAllocationPointTotal() {
             int sum = 0;
-
-            for (byte i = 0; i< mplayer.Class_Levels.Length; i++) {
-                if (mplayer.Class_Unlocked[i] && Class.LOOKUP[i].Gives_Allocation_Attributes && Class.LOOKUP[i].Tier > 0) {
-                    sum += Math.Min(mplayer.Class_Levels[i], Class.LOOKUP[i].Max_Level) * ALLOCATION_POINTS_PER_LEVEL_TIERS[Class.LOOKUP[i].Tier];
+            
+            for (byte i = 0; i< ExperienceAndClasses.LOCAL_MPLAYER.Class_Levels.Length; i++) {
+                if (ExperienceAndClasses.LOCAL_MPLAYER.Class_Unlocked[i] && Class.LOOKUP[i].Gives_Allocation_Attributes && Class.LOOKUP[i].Tier > 0) {
+                    sum += Math.Min(ExperienceAndClasses.LOCAL_MPLAYER.Class_Levels[i], Class.LOOKUP[i].Max_Level) * ALLOCATION_POINTS_PER_LEVEL_TIERS[Class.LOOKUP[i].Tier];
                 }
             }
 
@@ -114,12 +114,12 @@ namespace ExperienceAndClasses.Systems {
         /// </summary>
         /// <param name="mplayer"></param>
         /// <returns></returns>
-        public static int AllocationPointSpent(MPlayer mplayer) {
+        public static int LocalAllocationPointSpent() {
             int sum = 0;
 
-            for (byte i = 0; i< mplayer.Attributes_Allocated.Length; i++) {
+            for (byte i = 0; i< ExperienceAndClasses.LOCAL_MPLAYER.Attributes_Allocated.Length; i++) {
                 if (LOOKUP[i].Active) {
-                    sum += AllocationPointCostTotal(mplayer.Attributes_Allocated[i]);
+                    sum += AllocationPointCostTotal(ExperienceAndClasses.LOCAL_MPLAYER.Attributes_Allocated[i]);
                 }
             }
 

@@ -114,7 +114,7 @@ namespace ExperienceAndClasses {
         /// <summary>
         /// Earning XP when all active classes are maxed stores the extra here
         /// </summary>
-        public uint Extra_XP { get; private set; }
+        public uint Extra_XP;
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Instance Vars (syncing) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -281,249 +281,33 @@ namespace ExperienceAndClasses {
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ XP & Class ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-        public enum CLASS_VALIDITY : byte {
-            VALID,
-            INVALID_UNKNOWN,
-            INVALID_ID,
-            INVALID_LOCKED,
-            INVALID_COMBINATION,
-            INVALID_NON_LOCAL,
-            INVALID_MINIONS,
-            INVALID_COMBAT,
-        }
-        public CLASS_VALIDITY LocalCheckClassValid(byte id, bool is_primary) {
-            //local MPlayer only
-            if (!Is_Local_Player) return CLASS_VALIDITY.INVALID_NON_LOCAL;
-
-            if (IN_COMBAT) {
-                return CLASS_VALIDITY.INVALID_COMBAT;
-            }
-            else if (id == (byte)Systems.Class.IDs.None) {
-                return CLASS_VALIDITY.VALID; //setting to no class is always allowed (unless in combat)
-            }
-            else {
-                if (id >= (byte)Systems.Class.IDs.NUMBER_OF_IDs) {
-                    return CLASS_VALIDITY.INVALID_ID; //invalid idsss
-                }
-                else {
-                    Systems.Class class_same_slot, class_other_slot;
-                    if (is_primary) {
-                        class_same_slot = Class_Primary;
-                        class_other_slot = Class_Secondary;
-                    }
-                    else {
-                        class_same_slot = Class_Secondary;
-                        class_other_slot = Class_Primary;
-                    }
-
-                    if (((Class_Levels[id] <= 0) || !Class_Unlocked[id]) && (id != (byte)Systems.Class.IDs.None)) {
-                        return CLASS_VALIDITY.INVALID_LOCKED; //locked class
-                    }
-                    else {
-                        if (id != class_same_slot.ID) {
-                            Systems.Class pre = class_other_slot;
-                            while (pre != null) {
-                                if (id == pre.ID) {
-                                    return CLASS_VALIDITY.INVALID_COMBINATION; //invalid combination (same as other class or one of its prereqs)
-                                }
-                                else {
-                                    pre = pre.Prereq;
-                                }
-                            }
-                            pre = Systems.Class.LOOKUP[id].Prereq;
-                            while (pre != null) {
-                                if (class_other_slot.ID == pre.ID) {
-                                    return CLASS_VALIDITY.INVALID_COMBINATION; //invalid combination (same as other class or one of its prereqs)
-                                }
-                                else {
-                                    pre = pre.Prereq;
-                                }
-                            }
-
-                            //valid choice
-                            return CLASS_VALIDITY.VALID;
-                        }
-                    }
-                }
-                //default
-                return CLASS_VALIDITY.INVALID_UNKNOWN;
-            }
-        }
-
-        public bool LocalSetClass(byte id, bool is_primary) {
-            //local MPlayer only
-            if (!Is_Local_Player) {
-                Utilities.Commons.Error("Tried to set non-local player with SetClass! (please report)");
-                return false;
-            }
-
-            //fail if secondary not allowed
-            if (!is_primary && !Allow_Secondary) {
-                Main.NewText("Failed to set class because multiclassing is locked!", UI.Constants.COLOUR_MESSAGE_ERROR);
-                return false;
-            }
-
-            byte id_other;
-            if (is_primary) {
-                id_other = Class_Secondary.ID;
-            }
-            else {
-                id_other = Class_Primary.ID;
-            }
-            if ((id == id_other) && (id != (byte)Systems.Class.IDs.None)) {
-                //if setting to other set class, just swap
-                return LocalSwapClass();
-            }
-            else {
-                CLASS_VALIDITY valid = LocalCheckClassValid(id, is_primary);
-                switch (valid) {
-                    case CLASS_VALIDITY.VALID:
-
-                        //destroy all minions
-                        CheckMinions();
-                        if (minions.Count > 0) {
-                            Main.NewText("Your minions have been despawned because you changed classes!", UI.Constants.COLOUR_MESSAGE_ERROR);
-                            foreach (Projectile p in minions) {
-                                p.Kill();
-                            }
-                        }
-
-                        if (is_primary) {
-                            Class_Primary = Systems.Class.LOOKUP[id];
-                        }
-                        else {
-                            Class_Secondary = Systems.Class.LOOKUP[id];
-                        }
-                        LocalUpdateClassInfo();
-                        return true;
-
-                    case CLASS_VALIDITY.INVALID_COMBINATION:
-                        Main.NewText("Failed to set class because combination is invalid!", UI.Constants.COLOUR_MESSAGE_ERROR);
-                        break;
-
-                    case CLASS_VALIDITY.INVALID_ID:
-                        Main.NewText("Failed to set class because class id is invalid!", UI.Constants.COLOUR_MESSAGE_ERROR);
-                        break;
-
-                    case CLASS_VALIDITY.INVALID_LOCKED:
-                        Main.NewText("Failed to set class because it is locked!", UI.Constants.COLOUR_MESSAGE_ERROR);
-                        break;
-
-                    case CLASS_VALIDITY.INVALID_NON_LOCAL:
-                        Utilities.Commons.Error("Tried to set non-local player with SetClass! (please report)");
-                        break;
-
-                    case CLASS_VALIDITY.INVALID_COMBAT:
-                        Main.NewText("Failed to set class because you are in combat!", UI.Constants.COLOUR_MESSAGE_ERROR);
-                        break;
-
-                    default:
-                        Utilities.Commons.Error("Failed to set class for unknown reasons! (please report)");
-                        break;
-                }
-
-                //default
-                return false;
-            }
-        }
-
-        public bool UnlockClass(Systems.Class c) {
-            //check locked
-            if (Class_Unlocked[c.ID]) {
-                Utilities.Commons.Error("Trying to unlock already unlocked class " + c.Name);
-                return false;
-            }
-
-            //tier 3 requirement
-            if (c.Tier==3 && !CanUnlockTier3()) {
-                if (!Defeated_WOF) {
-                    Main.NewText("You must defeat the Wall of Flesh to unlock tier 3 classes!", UI.Constants.COLOUR_MESSAGE_ERROR);
-                }
-                else {
-                    Utilities.Commons.Error("CanUnlockTier3 returned false for unknown reasons! Please Report!");
-                }
-                return false;
-            }
-
-            //level requirements
-            if (!HasClassPrereq(c)) {
-                Main.NewText("You must reach level " + c.Prereq.Max_Level + " " + c.Prereq.Name + " to unlock " + c.Name + "!", UI.Constants.COLOUR_MESSAGE_ERROR);
-                return false;
-            }
-
-            //item requirements
-            if (c.Unlock_Item != null) {
-                if (!player.HasItem(c.Unlock_Item.item.type)) {
-                    //item requirement not met
-                    Main.NewText("You require a " + c.Unlock_Item.item.Name + " to unlock " + c.Name + "!", UI.Constants.COLOUR_MESSAGE_ERROR);
-                    return false;
-                }
-            }
-
-            //requirements met..
-
-            //take item
-            player.ConsumeItem(c.Unlock_Item.item.type);
-
-            //unlock class
-            Class_Unlocked[c.ID] = true;
-            if (Class_Levels[c.ID] < 1) {
-                Class_Levels[c.ID] = 1;
-            }
-
-            //success
-            Main.NewText("You have unlocked " + c.Name + "!", UI.Constants.COLOUR_MESSAGE_ANNOUNCE);
-
-            //add extra xp (after penalty)
-            uint extra_xp_add = (uint)(Extra_XP * Systems.XP.EXTRA_XP_POOL_MULTIPLIER);
-            if (extra_xp_add > 0) {
-                //add xp
-                AddXP(c.ID, extra_xp_add);
-
-                //clear pool
-                Extra_XP = 0;
-
-                //levelup?
-                while ((Class_Levels[c.ID] < c.Max_Level) && (Class_XP[c.ID] >= Systems.XP.Requirements.GetXPReq(c, Class_Levels[c.ID]))) {
-                    SubtractXP(c.ID, Systems.XP.Requirements.GetXPReq(c, Class_Levels[c.ID]));
-                    Class_Levels[c.ID]++;
-                    AnnounceLevel(c);
-                }
-
-                //tell player
-                Main.NewText(extra_xp_add + " unclaimed XP has been transferred to " + c.Name + "!", UI.Constants.COLOUR_MESSAGE_ANNOUNCE);
-            }
-
-            //update
+        public static void LocalForceClasses(Systems.Class primary, Systems.Class secondary) {
+            ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary = primary;
+            ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary = secondary;
             LocalUpdateClassInfo();
-
-            return true;
         }
 
-        public bool HasClassPrereq(Systems.Class c) {
-            Systems.Class pre = c.Prereq;
-            while (pre != null) {
-                if (Class_Levels[pre.ID] < pre.Max_Level) {
-                    //level requirement not met
-                    return false;
-                }
-                else {
-                    pre = pre.Prereq;
-                }
+        public static void LocalForceClass(Systems.Class c, bool is_primary) {
+            if (is_primary) {
+                ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary = c;
             }
-            return true;
+            else {
+                ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary = c;
+            }
+
+            LocalUpdateClassInfo();
         }
 
-        public bool UnlockSubclass() {
+        public static bool LocalUnlockSubclass() {
             //check locked
-            if (Allow_Secondary) {
+            if (ExperienceAndClasses.LOCAL_MPLAYER.Allow_Secondary) {
                 Utilities.Commons.Error("Trying to unlock multiclassing when already unlocked");
                 return false;
             }
 
             //item requirements
             Item item = ExperienceAndClasses.MOD.GetItem<Items.Unlock_Subclass>().item;
-            if (!player.HasItem(item.type)) {
+            if (!ExperienceAndClasses.LOCAL_MPLAYER.player.HasItem(item.type)) {
                 //item requirement not met
                 Main.NewText("You require a " + item.Name + " to unlock multiclassing!", UI.Constants.COLOUR_MESSAGE_ERROR);
                 return false;
@@ -532,10 +316,10 @@ namespace ExperienceAndClasses {
             //requirements met..
 
             //take item
-            player.ConsumeItem(item.type);
+            ExperienceAndClasses.LOCAL_MPLAYER.player.ConsumeItem(item.type);
 
             //unlock class
-            Allow_Secondary = true;
+            ExperienceAndClasses.LOCAL_MPLAYER.Allow_Secondary = true;
 
             //update
             LocalUpdateClassInfo();
@@ -545,42 +329,28 @@ namespace ExperienceAndClasses {
             return true;
         }
 
-        private bool LocalSwapClass() {
-            //local MPlayer only
-            if (!Is_Local_Player) return false;
-
-            Systems.Class temp = Class_Primary;
-            Class_Primary = Class_Secondary;
-            Class_Secondary = temp;
-            LocalUpdateClassInfo();
-            return true;
-        }
-
-        public void LocalUpdateClassInfo() {
-            //local MPlayer only
-            if (!Is_Local_Player) return;
-
+        public static void LocalUpdateClassInfo() {
             //prevent secondary without primary class (move secondary to primary)
-            if ((Class_Primary.ID == (byte)Systems.Class.IDs.New) || (Class_Primary.ID == (byte)Systems.Class.IDs.None)) {
-                Class_Primary = Class_Secondary;
-                Class_Secondary = Systems.Class.LOOKUP[(byte)Systems.Class.IDs.None];
+            if ((ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary.ID == (byte)Systems.Class.IDs.New) || (ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary.ID == (byte)Systems.Class.IDs.None)) {
+                ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary = ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary;
+                ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary = Systems.Class.LOOKUP[(byte)Systems.Class.IDs.None];
             }
 
             //any "new" class should be set
-            if (Class_Primary.ID == (byte)Systems.Class.IDs.New) {
-                Class_Primary = Systems.Class.LOOKUP[(byte)Systems.Class.IDs.Novice];
+            if (ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary.ID == (byte)Systems.Class.IDs.New) {
+                ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary = Systems.Class.LOOKUP[(byte)Systems.Class.IDs.Novice];
             }
-            if (Class_Secondary.ID == (byte)Systems.Class.IDs.New) {
-                Class_Secondary = Systems.Class.LOOKUP[(byte)Systems.Class.IDs.None];
+            if (ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary.ID == (byte)Systems.Class.IDs.New) {
+                ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary = Systems.Class.LOOKUP[(byte)Systems.Class.IDs.None];
             }
 
             //clear secondary if not allowed
-            if (!Allow_Secondary) {
-                Class_Secondary = Systems.Class.LOOKUP[(byte)Systems.Class.IDs.None];
+            if (!ExperienceAndClasses.LOCAL_MPLAYER.Allow_Secondary) {
+                ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary = Systems.Class.LOOKUP[(byte)Systems.Class.IDs.None];
             }
 
             //effective levels
-            SetEffectiveLevels();
+            ExperienceAndClasses.LOCAL_MPLAYER.SetEffectiveLevels();
 
             //base class attributes
             float sum_primary, sum_secondary;
@@ -589,45 +359,45 @@ namespace ExperienceAndClasses {
                 sum_primary = 0;
                 sum_secondary = 0;
 
-                c = Class_Primary;
+                c = ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary;
                 while ((c != null) && (c.Tier > 0)) {
-                    sum_primary += (c.Attribute_Growth[id] * Math.Min(Class_Levels[c.ID], c.Max_Level));
+                    sum_primary += (c.Attribute_Growth[id] * Math.Min(ExperienceAndClasses.LOCAL_MPLAYER.Class_Levels[c.ID], c.Max_Level));
                     c = c.Prereq;
                 }
 
-                c = Class_Secondary;
+                c = ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary;
                 while ((c != null) && (c.Tier > 0)) {
-                    sum_secondary += (c.Attribute_Growth[id] * Math.Min(Class_Levels[c.ID], c.Max_Level));
+                    sum_secondary += (c.Attribute_Growth[id] * Math.Min(ExperienceAndClasses.LOCAL_MPLAYER.Class_Levels[c.ID], c.Max_Level));
                     c = c.Prereq;
                 }
 
-                if (Class_Secondary_Level_Effective > 0) {
-                    Attributes_Class[id] = (int)Math.Floor((sum_primary / Systems.Attribute.ATTRIBUTE_GROWTH_LEVELS * Systems.Attribute.SUBCLASS_PENALTY_ATTRIBUTE_MULTIPLIER_PRIMARY) +
+                if (ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary_Level_Effective > 0) {
+                    ExperienceAndClasses.LOCAL_MPLAYER.Attributes_Class[id] = (int)Math.Floor((sum_primary / Systems.Attribute.ATTRIBUTE_GROWTH_LEVELS * Systems.Attribute.SUBCLASS_PENALTY_ATTRIBUTE_MULTIPLIER_PRIMARY) +
                                                             (sum_secondary / Systems.Attribute.ATTRIBUTE_GROWTH_LEVELS * Systems.Attribute.SUBCLASS_PENALTY_ATTRIBUTE_MULTIPLIER_SECONDARY));
                 }
                 else {
-                    Attributes_Class[id] = (int)Math.Floor(sum_primary / Systems.Attribute.ATTRIBUTE_GROWTH_LEVELS);
+                    ExperienceAndClasses.LOCAL_MPLAYER.Attributes_Class[id] = (int)Math.Floor(sum_primary / Systems.Attribute.ATTRIBUTE_GROWTH_LEVELS);
                 }
             }
 
             //allocated attribute points
-            Allocation_Points_Total = Systems.Attribute.AllocationPointTotal(this);
-            Allocation_Points_Spent = Systems.Attribute.AllocationPointSpent(this);
-            Allocation_Points_Unallocated = Allocation_Points_Total - Allocation_Points_Spent;
+            ExperienceAndClasses.LOCAL_MPLAYER.Allocation_Points_Total = Systems.Attribute.LocalAllocationPointTotal();
+            ExperienceAndClasses.LOCAL_MPLAYER.Allocation_Points_Spent = Systems.Attribute.LocalAllocationPointSpent();
+            ExperienceAndClasses.LOCAL_MPLAYER.Allocation_Points_Unallocated = ExperienceAndClasses.LOCAL_MPLAYER.Allocation_Points_Total - ExperienceAndClasses.LOCAL_MPLAYER.Allocation_Points_Spent;
 
             //sum attributes
             LocalCalculateAttributesSync();
-            CalculateAttributesFinal();
+            ExperienceAndClasses.LOCAL_MPLAYER.CalculateAttributesFinal();
 
             //calclate progression value
-            RecalculateProgression();
+            LocalUpdateProgression();
 
             //update UI
             UI.UIMain.Instance.UpdateClassInfo();
             UI.UIHUD.Instance.Update();
 
             //update class features
-            UpdateClassInfo();
+            ExperienceAndClasses.LOCAL_MPLAYER.UpdateClassInfo();
         }
 
         public void UpdateClassInfo() {
@@ -719,12 +489,12 @@ namespace ExperienceAndClasses {
             while ((Class_Levels[Class_Primary.ID] < Class_Primary.Max_Level) && (Class_XP[Class_Primary.ID] >= Systems.XP.Requirements.GetXPReq(Class_Primary, Class_Levels[Class_Primary.ID]))) {
                 SubtractXP(Class_Primary.ID, Systems.XP.Requirements.GetXPReq(Class_Primary, Class_Levels[Class_Primary.ID]));
                 Class_Levels[Class_Primary.ID]++;
-                AnnounceLevel(Class_Primary);
+                Class_Primary.LocalAnnounceLevel();
             }
             while ((Class_Levels[Class_Secondary.ID] < Class_Secondary.Max_Level) && (Class_XP[Class_Secondary.ID] >= Systems.XP.Requirements.GetXPReq(Class_Secondary, Class_Levels[Class_Secondary.ID]))) {
                 SubtractXP(Class_Secondary.ID, Systems.XP.Requirements.GetXPReq(Class_Secondary, Class_Levels[Class_Secondary.ID]));
                 Class_Levels[Class_Secondary.ID]++;
-                AnnounceLevel(Class_Secondary);
+                Class_Secondary.LocalAnnounceLevel();
             }
 
             //adjust effective levels
@@ -740,7 +510,7 @@ namespace ExperienceAndClasses {
             }
         }
 
-        private void AddXP(byte class_id, uint amount) {
+        public void AddXP(byte class_id, uint amount) {
             uint new_value = Class_XP[class_id] + amount;
             if (new_value > Class_XP[class_id]) {
                 Class_XP[class_id] = new_value;
@@ -749,7 +519,7 @@ namespace ExperienceAndClasses {
                 Class_XP[class_id] = uint.MaxValue;
             }
         }
-        private void SubtractXP(byte class_id, uint amount) {
+        public void SubtractXP(byte class_id, uint amount) {
             if (Class_XP[class_id] > amount) {
                 Class_XP[class_id] -= amount;
             }
@@ -770,26 +540,6 @@ namespace ExperienceAndClasses {
         
         public bool CanUnlockTier3() {
             return Defeated_WOF;
-        }
-
-        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Announce ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-
-        public void AnnounceLevel(Systems.Class c) {
-            //client/singleplayer only
-            if (Utilities.Netmode.IS_SERVER)
-                return;
-
-            byte level = Class_Levels[c.ID];
-
-            string message = "";
-            if (level == c.Max_Level) {
-                message = "You are now a MAX level " + c.Name + "!";
-            }
-            else {
-                message = "You are now a level " + level + " " + c.Name + "!";
-            }
-
-            Main.NewText(message, UI.Constants.COLOUR_MESSAGE_ANNOUNCE);
         }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Minions ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
@@ -966,21 +716,21 @@ namespace ExperienceAndClasses {
             }
         }
 
-        public void LocalAttributeReset() {
+        public static void LocalAttributeReset() {
             //item cost
             int cost = Systems.Attribute.LocalCalculateResetCost();
             int type = Systems.Attribute.RESET_COST_ITEM.item.type;
-            int held = player.CountItem(type);
+            int held = ExperienceAndClasses.LOCAL_MPLAYER.player.CountItem(type);
 
             //do reset
             if (held >= cost) {
                 //consume
                 for (int i = 0; i < cost; i++)
-                    player.ConsumeItem(type);
+                    ExperienceAndClasses.LOCAL_MPLAYER.player.ConsumeItem(type);
 
                 //reset
                 for (byte i = 0; i < (byte)Systems.Attribute.IDs.NUMBER_OF_IDs; i++) {
-                    Attributes_Allocated[i] = 0;
+                    ExperienceAndClasses.LOCAL_MPLAYER.Attributes_Allocated[i] = 0;
                 }
                 LocalUpdateClassInfo();
             }
@@ -989,14 +739,9 @@ namespace ExperienceAndClasses {
         /// <summary>
         /// Calculates class + allocation
         /// </summary>
-        public void LocalCalculateAttributesSync() {
-            if (!Is_Local_Player) {
-                Utilities.Commons.Error("Cannot calculate final attribute for non-local player");
-                return;
-            }
-
+        public static void LocalCalculateAttributesSync() {
             for (byte id = 0; id < (byte)Systems.Attribute.IDs.NUMBER_OF_IDs; id++) {
-                Attributes_Sync[id] = Attributes_Class[id] + Attributes_Allocated[id];
+                ExperienceAndClasses.LOCAL_MPLAYER.Attributes_Sync[id] = ExperienceAndClasses.LOCAL_MPLAYER.Attributes_Class[id] + ExperienceAndClasses.LOCAL_MPLAYER.Attributes_Allocated[id];
             }
         }
 
@@ -1234,8 +979,11 @@ namespace ExperienceAndClasses {
             IN_COMBAT = in_combat;
         }
 
-        private void RecalculateProgression() {
-            SetProgression(Allocation_Points_Total);
+        private static void LocalUpdateProgression() {
+            //calculate
+            int progression = ExperienceAndClasses.LOCAL_MPLAYER.Allocation_Points_Total;
+            //set
+            ExperienceAndClasses.LOCAL_MPLAYER.SetProgression(progression);
         }
 
         public void SetProgression(int player_progression) {
