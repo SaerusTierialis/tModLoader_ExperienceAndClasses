@@ -149,8 +149,8 @@ namespace ExperienceAndClasses.Systems {
 
         protected static void Add(Player target, MPlayer owner, IDs ID, Dictionary<SYNC_DATA_TYPES, double> sync_data) {
             //create new instance
-            Status status = (Status)(Assembly.GetExecutingAssembly().CreateInstance(typeof(Status).FullName + "+" + ID));
-            
+            Status status = (Status)LOOKUP[(ushort)ID].MemberwiseClone();
+
             //set sync_data
             if (sync_data != null) {
                 status.sync_data = sync_data;
