@@ -11,6 +11,8 @@ using Terraria.ModLoader;
 
 namespace ExperienceAndClasses.Systems {
     /*
+     * TODO check if this is still accurate after changes
+     * 
      * Statuses are like the builtin buff system, but can carry any amount of extra data. The system exists because
      * there is a hard limit on the number of buffs that a player can have at one time and the buff system is limited
      * in the amount of data that is automatically synced.
@@ -22,14 +24,6 @@ namespace ExperienceAndClasses.Systems {
      * Statuses have builtin syncing. Duration checking is handled by the client who is targeted by the status.
      * 
      * The lookup instances cannot be reused. A new instance must be created when a status is added to a player.
-     * 
-     * TODO:
-     * 1. trymerge
-     * 2. finish sync
-     * 3. update status ui
-     * 4. add player draw
-     * 5. add non-player draw (if separate)
-     * 6. add full sync
     */
     public abstract class Status {
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ IDs (order does not matter) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
