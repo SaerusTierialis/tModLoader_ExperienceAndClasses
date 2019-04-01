@@ -803,12 +803,15 @@ namespace ExperienceAndClasses {
             //fix any potential issues...
             for (byte id = 0; id < (byte)Systems.Class.IDs.NUMBER_OF_IDs; id++) {
 
-                //level up if required xp changed
-                Systems.Class.LOOKUP[id].LocalCheckDoLevelup(false);
+                //if unlocked...
+                if (Class_Unlocked[id]) {
+                    //level should be at least one
+                    if (Class_Levels[id] < 1) {
+                        Class_Levels[id] = 1;
+                    }
 
-                //if unlocked, level should be at least one
-                if (Class_Unlocked[id] && (Class_Levels[id] < 1)) {
-                    Class_Levels[id] = 1;
+                    //level up if required xp changed
+                    Systems.Class.LOOKUP[id].LocalCheckDoLevelup(false);
                 }
 
             }
