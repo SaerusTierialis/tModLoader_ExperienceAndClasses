@@ -26,7 +26,7 @@ namespace ExperienceAndClasses.Systems {
      * The lookup instances cannot be reused. A new instance must be created when a status is added to a player.
     */
     public abstract class Status {
-        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ IDs (order does not matter) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ IDs ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         public enum IDs : ushort {
             Heal,
