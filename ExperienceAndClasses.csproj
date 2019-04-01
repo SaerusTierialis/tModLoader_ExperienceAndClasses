@@ -57,6 +57,7 @@
   <ItemGroup>
     <Compile Include="MWorld.cs" />
     <Compile Include="Systems\NPCRewards.cs" />
+    <Compile Include="Systems\Status.cs" />
     <Compile Include="Utilities\Commons.cs" />
     <Compile Include="Items\MItem.cs" />
     <Compile Include="Items\Orb.cs" />
@@ -70,7 +71,6 @@
     <Compile Include="Systems\Ability.cs" />
     <Compile Include="Systems\Attribute.cs" />
     <Compile Include="Systems\Class.cs" />
-    <Compile Include="Systems\Status.cs" />
     <Compile Include="Systems\XP.cs" />
     <Compile Include="Utilities\Search.cs" />
     <Compile Include="Utilities\Textures.cs" />
