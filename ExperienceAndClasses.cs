@@ -38,6 +38,8 @@ namespace ExperienceAndClasses {
 
         public static bool inventory_state = false;
 
+        public static DateTime Now { get; private set; }
+
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Constructor ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         public ExperienceAndClasses() {
@@ -80,6 +82,9 @@ namespace ExperienceAndClasses {
         }
 
         public override void UpdateUI(GameTime gameTime) {
+            //update time if non-server
+            UpdateTime();
+
             //auto ui states
             if (inventory_state != Main.playerInventory) {
                 SetUIAutoStates();
@@ -134,6 +139,12 @@ namespace ExperienceAndClasses {
             });
             // Registers the new recipe group with the specified name
             RecipeGroup.RegisterGroup(RECIPE_GROUP_MECHANICAL_SOUL, mechanical_soul);
+        }
+
+        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Misc ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+        public static void UpdateTime() {
+            Now = DateTime.Now;
         }
     }
 }

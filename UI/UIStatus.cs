@@ -56,6 +56,8 @@ namespace ExperienceAndClasses.UI {
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Methods ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         public void Update() {
+            //TODO - redraw (complete and times only)
+
             int number_buffs = 0;
             foreach (int i in Main.LocalPlayer.buffType) {
                 if (i > 0)

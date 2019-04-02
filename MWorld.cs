@@ -10,6 +10,11 @@ namespace ExperienceAndClasses {
     class MWorld : ModWorld {
         public override void PostUpdate() {
             Systems.NPCRewards.ServerProcessXPBuffer();
+
+            if (Utilities.Netmode.IS_SERVER) {
+                //update time if server
+                ExperienceAndClasses.UpdateTime();
+            }
         }
     }
 }

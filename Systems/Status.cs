@@ -77,9 +77,8 @@ namespace ExperienceAndClasses.Systems {
         /// </summary>
         protected enum UI_TYPES : byte {
             NONE,
-            ONE, //even if more than one is taking effect, only one instance is shown (first by instance id)
-            ALL_APPLY,
-            ALL,
+            ONE, //even if more than one is taking effect, only one of these is shown (first applied by instance id)
+            ALL_APPLY, //all that are being applied
         }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Constants ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
@@ -104,7 +103,7 @@ namespace ExperienceAndClasses.Systems {
             }
         }
 
-        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Static ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Static Varibles ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         /// <summary>
         /// contains one element per status that has a texture, these status contain texture_index
@@ -210,9 +209,14 @@ namespace ExperienceAndClasses.Systems {
         protected Systems.Passive.IDs specific_owner_player_required_passive = Systems.Passive.IDs.NONE;
 
         /// <summary>
-        /// remove if target does not have specified status (checked by server) | default is none
+        /// remove if target DOES NOT have specified status (checked by server) | default is none
         /// </summary>
         protected IDs specific_target_required_status = IDs.NONE;
+
+        /// <summary>
+        /// remove if target DOES have specified status (checked by server) | default is none
+        /// </summary>
+        protected IDs specific_target_antirequisite_status = IDs.NONE;
 
         /// <summary>
         /// when merging, add to stack count | default is FALSE
@@ -245,7 +249,7 @@ namespace ExperienceAndClasses.Systems {
         protected bool target_is_player; //else NPC
         protected int target_index;
         protected MPlayer target_mplayer;
-        protected MNPC target_MNPC;
+        protected MNPC target_mnpc;
 
         //owner
         protected bool owner_is_player; //else NPC
@@ -261,7 +265,10 @@ namespace ExperienceAndClasses.Systems {
 
         //for UI
         public string Time_Remaining_String { get; private set; }
-        protected int time_remaining_min, time_remaining_sec;
+        private int time_remaining_min = -1;
+        private int time_remaining_sec = -1;
+        private long time_remaining_ticks = long.MaxValue;
+        public bool draw = false;
 
         //set during init
         private int texture_index = TEXTURE_INDEX_NONE; 
@@ -272,6 +279,7 @@ namespace ExperienceAndClasses.Systems {
             ID = id;
             ID_num = (ushort)id;
             Instance_ID = Utilities.Containers.StatusList.UNASSIGNED_INSTANCE_KEY;
+            Time_Remaining_String = "";
         }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Instance Methods ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
@@ -308,8 +316,18 @@ namespace ExperienceAndClasses.Systems {
         }
 
         protected void RemoveLocally() {
-            //TODO
-            //update ui if this was being shown
+            //if this was being drawn, need complete redraw
+            if (draw) {
+                UI.UIStatus.needs_redraw_complete = true;
+            }
+
+            //remove
+            if (target_is_player) {
+                target_mplayer.Statuses.Remove(this);
+            }
+            else {
+                target_mnpc.Statuses.Remove(this);
+            }
         }
 
         protected void RemoveEverywhere() {
@@ -318,7 +336,7 @@ namespace ExperienceAndClasses.Systems {
 
             //remove everywhere else (send end packet)
             if (specific_syncs) {
-                //TODO
+                //TODO - send remove packet
             }
         }
 
@@ -332,16 +350,17 @@ namespace ExperienceAndClasses.Systems {
         /// </summary>
         /// <param name="now"></param>
         /// <returns></returns>
-        public bool PreUpdate(DateTime now) {
+        public bool PreUpdate() {
             //remove?
-            bool removed = PreUpdate_CheckRemoval(now);
-            if (removed) {
+            bool remove = PreUpdate_CheckRemoval();
+            if (remove) {
                 RemoveEverywhere();
             }
             else {
                 //new string for ui?
-                if (local_enforce_duration && target_is_player) {
-                    TimeSpan time_remain = time_end.Subtract(now);
+                if (draw) {
+                    TimeSpan time_remain = time_end.Subtract(ExperienceAndClasses.Now);
+                    time_remaining_ticks = time_remain.Ticks;
                     int time_remaining_min_now = time_remain.Minutes;
                     int time_remaining_sec_now = time_remain.Seconds;
                     if ((time_remaining_min_now != time_remaining_min) || (time_remaining_sec_now != time_remaining_sec)) {
@@ -353,25 +372,30 @@ namespace ExperienceAndClasses.Systems {
                         else {
                             Time_Remaining_String = time_remaining_sec + " sec";
                         }
+                        //a new string was created so ui must update
+                        UI.UIStatus.needs_redraw_times_only = true;
                     }
                 }
+
+                //set as not part of UI
+                draw = false;
 
                 //TODO
 
             }
 
             //return removal
-            return removed;
+            return remove;
         }
 
         /// <summary>
-        /// Check if status should be removed
+        /// Check if status should be removed. Includes calls to override methods ShouldRemove and ShouldRemoveLocal.
         /// </summary>
         /// <param name="now"></param>
         /// <returns></returns>
-        private bool PreUpdate_CheckRemoval(DateTime now) {
+        private bool PreUpdate_CheckRemoval() {
             //remove if this client/server is responsible for the duration (else update time remaining if target is a player)
-            if (local_enforce_duration && (now.CompareTo(time_end) >= 0)) { //timeup
+            if (local_enforce_duration && (ExperienceAndClasses.Now.CompareTo(time_end) >= 0)) { //timeup
                 return true;
             }
 
@@ -407,8 +431,18 @@ namespace ExperienceAndClasses.Systems {
                     if (target_is_player && !target_mplayer.Statuses.Contains(specific_target_required_status)) {
                         return true;
                     }
-                    else {
-                        //TODO
+                    else if (target_mnpc.Statuses.Contains(specific_target_required_status)) {
+                        return true;
+                    }
+                }
+
+                //remove if target has antirequisite status
+                if (specific_target_antirequisite_status != IDs.NONE) {
+                    if (target_is_player && target_mplayer.Statuses.Contains(specific_target_antirequisite_status)) {
+                        return true;
+                    }
+                    else if (target_mnpc.Statuses.Contains(specific_target_antirequisite_status)) {
+                        return true;
                     }
                 }
             }
@@ -440,6 +474,21 @@ namespace ExperienceAndClasses.Systems {
             return false;
         }
 
+        public bool IsBetterThan(Status status) {
+            if (ID != status.ID) {
+                //different types of status
+                return false;
+            }
+            else if (autosync_data.Count == 0) {
+                //no autosync data to check
+                return false;
+            }
+            //TODO - compare each autosync_data
+            //TODO - check duration if response for durations
+
+            return false;
+        }
+
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Instance Methods To Override (Required) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
@@ -453,6 +502,50 @@ namespace ExperienceAndClasses.Systems {
         protected virtual bool ShouldRemove() { return false; }
         protected virtual bool ShouldRemoveLocal() { return false; }
         protected virtual void Merge() {}
+
+        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Static Methods ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+        public static void ProcessStatuses(Utilities.Containers.StatusList statuses) {
+            //reset ui status list
+            UI.UIStatus.status_to_draw = new SortedList<float, Status>();
+
+            bool removed;
+            Status reference;
+            SortedList<int, Status> best_per_owner;
+            Status best;
+            foreach (List<Status> status_list in statuses.GetAllStatuses()) {
+                reference = status_list[0];
+                best = reference;
+                best_per_owner = new SortedList<int, Status>();
+
+                foreach (Status status in status_list) {
+                    removed = status.PreUpdate();
+                    if (!removed) {
+
+                        switch (reference.specific_apply_type) {
+                            case APPLY_TYPES.ALL:
+                                status.DoEffect();
+                                if (reference.specific_ui_type == UI_TYPES.ALL_APPLY) {
+                                    status.draw = true;
+                                    UI.UIStatus.status_to_draw.Add(status.time_remaining_ticks, status);
+                                }
+                                break;
+                                break;
+                            case APPLY_TYPES.BEST_PER_OWNER:
+                                best_per_owner = new SortedList<int, Status>();
+                                break;
+                        }
+
+
+
+                    }
+                }
+
+
+
+
+            }
+        }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Example ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
