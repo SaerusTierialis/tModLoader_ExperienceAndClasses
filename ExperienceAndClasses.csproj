@@ -58,6 +58,7 @@
     <Compile Include="MNPC.cs" />
     <Compile Include="MWorld.cs" />
     <Compile Include="Systems\NPCRewards.cs" />
+    <Compile Include="Systems\Passive.cs" />
     <Compile Include="Systems\Status.cs" />
     <Compile Include="Utilities\Commons.cs" />
     <Compile Include="Items\MItem.cs" />
