@@ -12,12 +12,16 @@ namespace ExperienceAndClasses.Systems {
     public abstract class Status {
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ IDs ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
+        /// <summary>
+        /// inlcudes NUMBER_OF_IDs and NONE
+        /// </summary>
         public enum IDs : ushort {
             Heal,
 
             //insert here
 
-            NUMBER_OF_IDs //leave this last
+            NUMBER_OF_IDs, //leave this second to last
+            NONE, //leave this last
         }
 
         /// <summary>
@@ -27,6 +31,7 @@ namespace ExperienceAndClasses.Systems {
             MAGNITUDE1,
             MAGNITUDE2,
             RANGE,
+            STACKS,
 
             //insert here
 
@@ -53,7 +58,7 @@ namespace ExperienceAndClasses.Systems {
         /// Limit on how many instances can be on a single target
         /// </summary>
         protected enum LIMIT_TYPES : byte {
-            UNLIMITED,
+            MANY, //up to limit of container
             ONE_PER_OWNER,
             ONE,
         }
@@ -72,17 +77,23 @@ namespace ExperienceAndClasses.Systems {
         /// </summary>
         protected enum UI_TYPES : byte {
             NONE,
-            ONE,
+            ONE, //even if more than one is taking effect, only one instance is shown (first by instance id)
             ALL_APPLY,
             ALL,
         }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Constants ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-        private const int TEXTURE_INDEX_NONE = -1;
+        /// <summary>
+        /// this texture index value indicates that there is no texture
+        /// </summary>
+        private static int TEXTURE_INDEX_NONE = -1;
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Auto-Populated Lookup ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
+        /// <summary>
+        /// singleton instanstances for packet-recieving (do NOT attach these to targets)
+        /// </summary>
         public static Status[] LOOKUP { get; private set; }
 
         static Status() {
@@ -95,98 +106,190 @@ namespace ExperienceAndClasses.Systems {
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Static ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
+        /// <summary>
+        /// contains one element per status that has a texture, these status contain texture_index
+        /// </summary>
         private static List<Texture2D> Textures = new List<Texture2D>();
 
-        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Instance ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Instance Vars Status-Specific ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+        //all of these begin with "specific_" and have a description including the default value to make adding more statuses easier
+
+        /// <summary>
+        /// name of status | leave if not shown in ui
+        /// </summary>
+        public string specific_name = "default_name";
+
+        /// <summary>
+        /// description of status (mouse-over text) | leave if not shown in ui
+        /// </summary>
+        public string specific_description = "default_desc";
+
+        /// <summary>
+        /// path to status icon | leave if not shown in ui
+        /// </summary>
+        protected string specific_texture_path;
+
+        /// <summary>
+        /// list of autosync data types | leave null if not using any
+        /// </summary>
+        protected List<AUTOSYNC_DATA_TYPES> specific_autosync_data_types;
+
+        /// <summary>
+        /// allow target to be player | default is TRUE
+        /// </summary>
+        protected bool specific_target_can_be_player = true;
+
+        /// <summary>
+        /// allow target to be npc | default is FALSE
+        /// </summary>
+        protected bool specific_target_can_be_npc = false;
+
+        /// <summary>
+        /// allow owner to be player | default is TRUE
+        /// </summary>
+        protected bool specific_owner_can_be_player = true;
+
+        /// <summary>
+        /// allow owner to be npc | default is FALSE
+        /// </summary>
+        protected bool specific_owner_can_be_npc = false;
+
+        /// <summary>
+        /// duration type | default is timed
+        /// </summary>
+        protected DURATION_TYPES specific_duration_type = DURATION_TYPES.TIMED;
+
+        /// <summary>
+        /// duration in seconds if timed | default is 5 seconds
+        /// </summary>
+        protected float specific_duration_sec = 5f;
+
+        /// <summary>
+        /// type of effect | default is constant
+        /// </summary>
+        protected EFFECT_TYPES specific_effect_type = EFFECT_TYPES.CONSTANT;
+
+        /// <summary>
+        /// frequency of effect if effect type is timed | default is 1 second
+        /// </summary>
+        protected float specific_effect_update_frequency_sec = 1f;
+
+        /// <summary>
+        /// instance limitation type | default is many (up to a max of whatever the status container is set to hold)
+        /// </summary>
+        protected LIMIT_TYPES specific_limit_type = LIMIT_TYPES.MANY;
+
+        /// <summary>
+        /// when there are multiple instances, the apply type determines which take effect | default is BEST_PER_OWNER
+        /// </summary>
+        protected APPLY_TYPES specific_apply_type = APPLY_TYPES.BEST_PER_OWNER;
+
+        /// <summary>
+        /// when a status would replace another, merges best of both status autosync fields instead (sets owner to latest owner) (there is an additional status-specific merge method that is also called) | default is TRUE
+        /// </summary>
+        protected bool specific_allow_merge = true;
+
+        /// <summary>
+        /// sync in multiplayer mode | default is true
+        /// </summary>
+        protected bool specific_syncs = true;
+
+        /// <summary>
+        /// ui display type | default is ALL_APPLY (all that are allowed to apply based on APPLY_TYPES)
+        /// </summary>
+        protected UI_TYPES specific_ui_type = UI_TYPES.ALL_APPLY;
+
+        /// <summary>
+        /// remove if the local client is the owner and does not have specified status | default is none
+        /// </summary>
+        protected IDs specific_owner_player_required_status = IDs.NONE;
+
+        /// <summary>
+        /// remove if the local client is the owner and does not have specified passive ability | default is none
+        /// </summary>
+        protected Systems.Passive.IDs specific_owner_player_required_passive = Systems.Passive.IDs.NONE;
+
+        /// <summary>
+        /// remove if target does not have specified status (checked by server) | default is none
+        /// </summary>
+        protected IDs specific_target_required_status = IDs.NONE;
+
+        /// <summary>
+        /// when merging, add to stack count | default is FALSE
+        /// </summary>
+        protected bool specific_autostack_on_merge = false;
+
+        /// <summary>
+        /// remove if owner died | default is FALSE
+        /// </summary>
+        protected bool specific_remove_on_owner_death = false;
+
+        /// <summary>
+        /// remove if target died | default is TRUE
+        /// </summary>
+        protected bool specific_remove_on_target_death = true;
+
+        /// <summary>
+        /// remove if the owner is a player and has left the game (always treated as true for toggle status) | default is FALSE
+        /// </summary>
+        protected bool specific_remove_if_owner_player_leaves = false;
+
+        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Instance Vars Generic ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         //ID
         public IDs ID { get; private set; }
         public ushort ID_num { get; private set; }
         public byte Instance_ID { get; private set; }
 
-        //status-specific vars
-        protected string specific_texture_path, specific_name, specific_description;
-        protected List<AUTOSYNC_DATA_TYPES> specific_autosync_data_types;
-        protected bool specific_target_can_be_player, specific_target_can_be_npc, specific_owner_can_be_player, specific_owner_can_be_npc;
-        protected DURATION_TYPES specific_duration_type;
-        protected float specific_duration_sec;
-        protected EFFECT_TYPES specific_effect_type;
-        protected float specific_effect_update_frequency_sec;
-        protected LIMIT_TYPES specific_limit_type;
-        protected APPLY_TYPES specific_apply_type;
-        protected bool specific_allow_merge; //when a status would overwrite another, merge them instead (use max duration, magnitude, etc. - use new owner)
-        protected bool specific_syncs;
-        protected UI_TYPES specific_ui_type;
-        protected Systems.Class.IDs specific_owner_required_class;
-        protected byte specific_owner_required_class_level;
-        protected IDs specific_owner_required_status;
-        protected IDs specific_target_required_status;
-
         //target
         protected bool target_is_player; //else NPC
+        protected int target_index;
         protected MPlayer target_mplayer;
         protected MNPC target_MNPC;
 
         //owner
         protected bool owner_is_player; //else NPC
+        protected int owner_index;
         protected MPlayer owner_mplayer;
         protected MNPC owner_MNPC;
 
         //generic
         private DateTime time_end, time_next_effect;
         protected bool locally_owned; //the local client is the owner (always false for server)
-        private bool check_duration; //is this client (or server) responsible for enforcing duration
+        private bool local_enforce_duration; //is this client (or server) responsible for enforcing duration
         protected Dictionary<AUTOSYNC_DATA_TYPES, float> autosync_data;
 
         //for UI
-        public string Time_Remaining { get; private set; }
-        protected ushort time_remaining_min, time_remaining_sec;
+        public string Time_Remaining_String { get; private set; }
+        protected int time_remaining_min, time_remaining_sec;
 
         //set during init
-        private int texture_index; 
+        private int texture_index = TEXTURE_INDEX_NONE; 
 
-        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Constructor ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Core Constructor ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         public Status(IDs id) {
-            //ID
             ID = id;
             ID_num = (ushort)id;
             Instance_ID = Utilities.Containers.StatusList.UNASSIGNED_INSTANCE_KEY;
-            
-            //status-specific defaults
-            specific_name = "default_status";
-            specific_description = "default_description";
-            specific_autosync_data_types = new List<AUTOSYNC_DATA_TYPES>();
-            specific_target_can_be_player = specific_target_can_be_npc = specific_owner_can_be_player = specific_owner_can_be_npc = true;
-            specific_duration_type = DURATION_TYPES.TOGGLE;
-            specific_duration_sec = -1;
-            specific_effect_type = EFFECT_TYPES.NONE;
-            specific_effect_update_frequency_sec = -1;
-            specific_limit_type = LIMIT_TYPES.UNLIMITED;
-            specific_apply_type = APPLY_TYPES.ALL;
-            specific_allow_merge = true;
-            specific_syncs = true;
-            specific_ui_type = UI_TYPES.ALL;
-
-            //generic
-            autosync_data = new Dictionary<AUTOSYNC_DATA_TYPES, float>();
-
-            //texture
-            texture_index = TEXTURE_INDEX_NONE;
         }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Instance Methods ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         /// <summary>
-        /// Run one during init
+        /// Run once during init
         /// </summary>
         public void LoadTexture() {
             if (specific_texture_path != null) {
-                texture_index = (ushort)Textures.Count;
+                texture_index = Textures.Count;
                 Textures.Add(ModLoader.GetTexture(specific_texture_path));
             }
         }
 
+        /// <summary>
+        /// Returns the status texture (default texture if not set)
+        /// </summary>
+        /// <returns></returns>
         public Texture2D Texture() {
             if (texture_index == TEXTURE_INDEX_NONE) {
                 return Utilities.Textures.TEXTURE_STATUS_DEFAULT;
@@ -196,38 +299,160 @@ namespace ExperienceAndClasses.Systems {
             }
         }
 
+        /// <summary>
+        /// Called by the container when status is created locally or by the packet-recieved when originating from elsewhere
+        /// </summary>
+        /// <param name="instance_id"></param>
         public void SetInstanceID(byte instance_id) {
             Instance_ID = instance_id;
         }
 
-        /// <summary>
-        /// Update the time remaining string. Returns true if the string has changed.
-        /// </summary>
-        /// <returns></returns>
-        private bool UpdateTimeRemaining() {
-            //TODO
-            return false;
-        }
-
         protected void RemoveLocally() {
             //TODO
+            //update ui if this was being shown
         }
 
         protected void RemoveEverywhere() {
-            //TODO
+            //remove locally
+            RemoveLocally();
+
+            //remove everywhere else (send end packet)
+            if (specific_syncs) {
+                //TODO
+            }
         }
 
-        protected void Add(int target_index, int owner_index, Dictionary<AUTOSYNC_DATA_TYPES, float> sync_data, bool target_is_player = true, bool owner_is_player = true) {
+        protected void Add(int target_index, int owner_index, Dictionary<AUTOSYNC_DATA_TYPES, float> sync_data = null, bool target_is_player = true, bool owner_is_player = true) {
             //TODO
+            //check if target is valid
         }
 
-        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Instance Methods To Override ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+        /// <summary>
+        /// Called on every cycles even if effect is not applied. Returns false if status was removed.
+        /// </summary>
+        /// <param name="now"></param>
+        /// <returns></returns>
+        public bool PreUpdate(DateTime now) {
+            //remove?
+            bool removed = PreUpdate_CheckRemoval(now);
+            if (removed) {
+                RemoveEverywhere();
+            }
+            else {
+                //new string for ui?
+                if (local_enforce_duration && target_is_player) {
+                    TimeSpan time_remain = time_end.Subtract(now);
+                    int time_remaining_min_now = time_remain.Minutes;
+                    int time_remaining_sec_now = time_remain.Seconds;
+                    if ((time_remaining_min_now != time_remaining_min) || (time_remaining_sec_now != time_remaining_sec)) {
+                        time_remaining_min = time_remaining_min_now;
+                        time_remaining_sec = time_remaining_sec_now;
+                        if (time_remaining_min > 0) {
+                            Time_Remaining_String = time_remaining_min + " min";
+                        }
+                        else {
+                            Time_Remaining_String = time_remaining_sec + " sec";
+                        }
+                    }
+                }
 
+                //TODO
+
+            }
+
+            //return removal
+            return removed;
+        }
+
+        /// <summary>
+        /// Check if status should be removed
+        /// </summary>
+        /// <param name="now"></param>
+        /// <returns></returns>
+        private bool PreUpdate_CheckRemoval(DateTime now) {
+            //remove if this client/server is responsible for the duration (else update time remaining if target is a player)
+            if (local_enforce_duration && (now.CompareTo(time_end) >= 0)) { //timeup
+                return true;
+            }
+
+            //requirements: server/singleplayer (not client) checks
+            if (!Utilities.Netmode.IS_CLIENT) {
+                //remove if owner player leaves
+                if ((specific_remove_if_owner_player_leaves || (specific_duration_type == DURATION_TYPES.TOGGLE)) && owner_is_player && !owner_mplayer.player.active) {
+                    return true;
+                }
+
+                //remove if owner died
+                if (specific_remove_on_owner_death) {
+                    if (owner_is_player && owner_mplayer.player.dead) { //player owner died
+                        return true;
+                    }
+                    else if (!Main.npc[owner_index].active) { //npc owner died
+                        return true;
+                    }
+                }
+
+                //remove if target died
+                if (specific_remove_on_target_death) {
+                    if (target_is_player && target_mplayer.player.dead) { //player target died
+                        return true;
+                    }
+                    else if (!Main.npc[target_index].active) { //npc target died
+                        return true;
+                    }
+                }
+
+                //remove if target lacks required status
+                if (specific_target_required_status != IDs.NONE) {
+                    if (target_is_player && !target_mplayer.Statuses.Contains(specific_target_required_status)) {
+                        return true;
+                    }
+                    else {
+                        //TODO
+                    }
+                }
+            }
+
+            //requirements: local
+            if (locally_owned) { //owner is always player if locally_owned
+                //required status
+                if ((specific_owner_player_required_status != IDs.NONE) && !owner_mplayer.Statuses.Contains(specific_owner_player_required_status)) {
+                    return true;
+                }
+
+                //required passive
+                if ((specific_owner_player_required_passive != Systems.Passive.IDs.NONE) && !owner_mplayer.Passives.Contains(specific_owner_player_required_passive)) {
+                    return true;
+                }
+
+                //status-specific check
+                if (ShouldRemoveLocal()) {
+                    return true;
+                }
+            }
+
+            //status-specific check
+            if (ShouldRemove()) {
+                return true;
+            }
+
+            //default to not remove
+            return false;
+        }
+
+        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Instance Methods To Override (Required) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+
+
+        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Instance Methods To Override (Optional) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+        //these are for any additional status-specific code
         protected virtual void OnStart() {}
-
         protected virtual void OnUpdate() {}
-
         protected virtual void OnEnd() {}
+        protected virtual void DoEffect() {}
+        protected virtual bool ShouldRemove() { return false; }
+        protected virtual bool ShouldRemoveLocal() { return false; }
+        protected virtual void Merge() {}
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Example ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 

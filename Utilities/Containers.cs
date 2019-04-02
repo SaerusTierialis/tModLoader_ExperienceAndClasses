@@ -36,7 +36,7 @@ namespace ExperienceAndClasses.Utilities.Containers {
         /// </summary>
         /// <param name="status_id"></param>
         /// <returns></returns>
-        public bool ContainsStatus(Systems.Status.IDs status_id) {
+        public bool Contains(Systems.Status.IDs status_id) {
             return statuses.ContainsKey(status_id);
         }
 
@@ -46,7 +46,7 @@ namespace ExperienceAndClasses.Utilities.Containers {
         /// <param name="status_id"></param>
         /// <param name="instance_id"></param>
         /// <returns></returns>
-        public Systems.Status GetStatus(Systems.Status.IDs status_id, byte instance_id) {
+        public Systems.Status Get(Systems.Status.IDs status_id, byte instance_id) {
             StatusInstances status_instances;
             if (statuses.TryGetValue(status_id, out status_instances))
                 return status_instances.GetStatus(instance_id);
@@ -58,9 +58,9 @@ namespace ExperienceAndClasses.Utilities.Containers {
         /// Add status. Will create a new StatusInstances if needed. Will assign instance id if not set.
         /// </summary>
         /// <param name="status"></param>
-        public void AddStatus(Systems.Status status) {
+        public void Add(Systems.Status status) {
             //add StatusInstances if there are no other instances of the status
-            if (!ContainsStatus(status.ID)) {
+            if (!Contains(status.ID)) {
                 statuses.Add(status.ID, new StatusInstances());
             }
 
@@ -77,8 +77,8 @@ namespace ExperienceAndClasses.Utilities.Containers {
         /// Remove status directly
         /// </summary>
         /// <param name="status"></param>
-        public void RemoveStatus(Systems.Status status) {
-            RemoveStatus(status.ID, status.instance_id);
+        public void Remove(Systems.Status status) {
+            Remove(status.ID, status.Instance_ID);
         }
 
         /// <summary>
@@ -86,7 +86,7 @@ namespace ExperienceAndClasses.Utilities.Containers {
         /// </summary>
         /// <param name="status_id"></param>
         /// <param name="instance_id"></param>
-        public void RemoveStatus(Systems.Status.IDs status_id, byte instance_id) {
+        public void Remove(Systems.Status.IDs status_id, byte instance_id) {
             //get the StatusInstances
             StatusInstances status_instances;
             if (statuses.TryGetValue(status_id, out status_instances)) {
@@ -172,25 +172,25 @@ namespace ExperienceAndClasses.Utilities.Containers {
             /// </summary>
             /// <param name="status"></param>
             public void AddStatus(Systems.Status status) {
-                if (status.instance_id == UNASSIGNED_INSTANCE_KEY) {
+                if (status.Instance_ID == UNASSIGNED_INSTANCE_KEY) {
                     //assign new key and add
                     if (!AddNewStatus(status)) {
-                        Commons.Error("Cannot add instances of " + status.core_display_name);
+                        Commons.Error("Cannot add instances of " + status.specific_name);
                     }
                 }
                 else {
                     //already has an instance id (is from another client)
-                    if (instances.ContainsKey(status.instance_id)) {
+                    if (instances.ContainsKey(status.Instance_ID)) {
                         //replace existing instance
-                        instances[status.instance_id] = status;
+                        instances[status.Instance_ID] = status;
                     }
                     else {
                         //add another instance
-                        instances.Add(status.instance_id, status);
+                        instances.Add(status.Instance_ID, status);
                     }
 
                     //be certain that key is marked as taken
-                    key_taken[status.instance_id] = true;
+                    key_taken[status.Instance_ID] = true;
                 }
             }
 
@@ -217,7 +217,7 @@ namespace ExperienceAndClasses.Utilities.Containers {
             /// <param name="status"></param>
             /// <returns></returns>
             private bool AddNewStatus(Systems.Status status) {
-                if (status.instance_id != UNASSIGNED_INSTANCE_KEY) {
+                if (status.Instance_ID != UNASSIGNED_INSTANCE_KEY) {
                     //status already has key
                     return false;
                 }
@@ -230,9 +230,9 @@ namespace ExperienceAndClasses.Utilities.Containers {
                     }
                     else {
                         //assign key and add status
-                        status.instance_id = (byte)key;
+                        status.SetInstanceID((byte)key);
                         key_taken[key] = true;
-                        instances.Add(status.instance_id, status);
+                        instances.Add(status.Instance_ID, status);
                         return true;
                     }
                 }

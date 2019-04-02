@@ -67,7 +67,8 @@ namespace ExperienceAndClasses.Systems {
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Instance ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-        public byte ID { get; protected set; }
+        public IDs ID { get; protected set; }
+        public byte ID_num { get; protected set; }
         public string Name { get; protected set; }
         public string Description { get; protected set; }
         public byte Tier { get; protected set; }
@@ -81,7 +82,8 @@ namespace ExperienceAndClasses.Systems {
 
         public Class(IDs id) {
             //defaults
-            ID = (byte)id;
+            ID = id;
+            ID_num = (byte)id;
             Name = "Undefined_Name";
             Description = "Undefined_Desc";
             Tier = 0;
@@ -128,7 +130,7 @@ namespace ExperienceAndClasses.Systems {
             if (ExperienceAndClasses.LOCAL_MPLAYER.IN_COMBAT) {
                 return CLASS_VALIDITY.INVALID_COMBAT;
             }
-            else if (ID == (byte)Systems.Class.IDs.None) {
+            else if (ID_num == (byte)Systems.Class.IDs.None) {
                 return CLASS_VALIDITY.VALID; //setting to no class is always allowed (unless in combat)
             }
             else {
@@ -142,23 +144,23 @@ namespace ExperienceAndClasses.Systems {
                     class_other_slot = ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary;
                 }
 
-                if (((ExperienceAndClasses.LOCAL_MPLAYER.Class_Levels[ID] <= 0) || !ExperienceAndClasses.LOCAL_MPLAYER.Class_Unlocked[ID]) && (ID != (byte)Systems.Class.IDs.None)) {
+                if (((ExperienceAndClasses.LOCAL_MPLAYER.Class_Levels[ID_num] <= 0) || !ExperienceAndClasses.LOCAL_MPLAYER.Class_Unlocked[ID_num]) && (ID_num != (byte)Systems.Class.IDs.None)) {
                     return CLASS_VALIDITY.INVALID_LOCKED; //locked class
                 }
                 else {
-                    if (ID != class_same_slot.ID) {
+                    if (ID_num != class_same_slot.ID_num) {
                         Systems.Class pre = class_other_slot;
                         while (pre != null) {
-                            if (ID == pre.ID) {
+                            if (ID_num == pre.ID_num) {
                                 return CLASS_VALIDITY.INVALID_COMBINATION; //invalid combination (same as other class or one of its prereqs)
                             }
                             else {
                                 pre = pre.Prereq;
                             }
                         }
-                        pre = Systems.Class.LOOKUP[ID].Prereq;
+                        pre = Systems.Class.LOOKUP[ID_num].Prereq;
                         while (pre != null) {
-                            if (class_other_slot.ID == pre.ID) {
+                            if (class_other_slot.ID_num == pre.ID_num) {
                                 return CLASS_VALIDITY.INVALID_COMBINATION; //invalid combination (same as other class or one of its prereqs)
                             }
                             else {
@@ -189,12 +191,12 @@ namespace ExperienceAndClasses.Systems {
 
             byte id_other;
             if (is_primary) {
-                id_other = ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary.ID;
+                id_other = ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary.ID_num;
             }
             else {
-                id_other = ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary.ID;
+                id_other = ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary.ID_num;
             }
-            if ((ID == id_other) && (ID != (byte)Systems.Class.IDs.None)) {
+            if ((ID_num == id_other) && (ID_num != (byte)Systems.Class.IDs.None)) {
                 //if setting to other set class, just swap
                 LocalSwapClass();
                 return true;
@@ -252,7 +254,7 @@ namespace ExperienceAndClasses.Systems {
         /// <returns></returns>
         public bool LocalTryUnlockClass() {
             //check locked
-            if (ExperienceAndClasses.LOCAL_MPLAYER.Class_Unlocked[ID]) {
+            if (ExperienceAndClasses.LOCAL_MPLAYER.Class_Unlocked[ID_num]) {
                 Utilities.Commons.Error("Trying to unlock already unlocked class " + Name);
                 return false;
             }
@@ -289,9 +291,9 @@ namespace ExperienceAndClasses.Systems {
             ExperienceAndClasses.LOCAL_MPLAYER.player.ConsumeItem(Unlock_Item.item.type);
 
             //unlock class
-            ExperienceAndClasses.LOCAL_MPLAYER.Class_Unlocked[ID] = true;
-            if (ExperienceAndClasses.LOCAL_MPLAYER.Class_Levels[ID] < 1) {
-                ExperienceAndClasses.LOCAL_MPLAYER.Class_Levels[ID] = 1;
+            ExperienceAndClasses.LOCAL_MPLAYER.Class_Unlocked[ID_num] = true;
+            if (ExperienceAndClasses.LOCAL_MPLAYER.Class_Levels[ID_num] < 1) {
+                ExperienceAndClasses.LOCAL_MPLAYER.Class_Levels[ID_num] = 1;
             }
 
             //success
@@ -301,7 +303,7 @@ namespace ExperienceAndClasses.Systems {
             uint extra_xp_add = (uint)(ExperienceAndClasses.LOCAL_MPLAYER.Extra_XP * Systems.XP.EXTRA_XP_POOL_MULTIPLIER);
             if (extra_xp_add > 0) {
                 //add xp
-                Systems.XP.Adjusting.LocalAddXPToClass(ID, extra_xp_add);
+                Systems.XP.Adjusting.LocalAddXPToClass(ID_num, extra_xp_add);
 
                 //clear pool
                 ExperienceAndClasses.LOCAL_MPLAYER.Extra_XP = 0;
@@ -327,14 +329,14 @@ namespace ExperienceAndClasses.Systems {
         public bool LocalCheckDoLevelup(bool announce = true) {
             uint xp_req;
             bool any_levels = false;
-            while (ExperienceAndClasses.LOCAL_MPLAYER.Class_Levels[ID] < Max_Level) {
-                xp_req = Systems.XP.Requirements.GetXPReq(this, ExperienceAndClasses.LOCAL_MPLAYER.Class_Levels[ID]);
-                if (ExperienceAndClasses.LOCAL_MPLAYER.Class_XP[ID] < xp_req) {
+            while (ExperienceAndClasses.LOCAL_MPLAYER.Class_Levels[ID_num] < Max_Level) {
+                xp_req = Systems.XP.Requirements.GetXPReq(this, ExperienceAndClasses.LOCAL_MPLAYER.Class_Levels[ID_num]);
+                if (ExperienceAndClasses.LOCAL_MPLAYER.Class_XP[ID_num] < xp_req) {
                     break;
                 }
                 else {
-                    Systems.XP.Adjusting.LocalSubtractXPFromClass(ID, xp_req);
-                    ExperienceAndClasses.LOCAL_MPLAYER.Class_Levels[ID]++;
+                    Systems.XP.Adjusting.LocalSubtractXPFromClass(ID_num, xp_req);
+                    ExperienceAndClasses.LOCAL_MPLAYER.Class_Levels[ID_num]++;
                     if (announce) {
                         LocalAnnounceLevel();
                     }
@@ -350,7 +352,7 @@ namespace ExperienceAndClasses.Systems {
         private void LocalAnnounceLevel() {
             //client/singleplayer only
             if (!Utilities.Netmode.IS_SERVER) {
-                byte level = ExperienceAndClasses.LOCAL_MPLAYER.Class_Levels[ID];
+                byte level = ExperienceAndClasses.LOCAL_MPLAYER.Class_Levels[ID_num];
 
                 string message = "";
                 if (level == Max_Level) {
@@ -375,7 +377,7 @@ namespace ExperienceAndClasses.Systems {
         public bool LocalHasClassPrereq() {
             Systems.Class pre = Prereq;
             while (pre != null) {
-                if (ExperienceAndClasses.LOCAL_MPLAYER.Class_Levels[pre.ID] < pre.Max_Level) {
+                if (ExperienceAndClasses.LOCAL_MPLAYER.Class_Levels[pre.ID_num] < pre.Max_Level) {
                     //level requirement not met
                     return false;
                 }
@@ -481,7 +483,7 @@ namespace ExperienceAndClasses.Systems {
                 Description = "TODO_desc";
                 Max_Level = TIER_MAX_LEVELS[3]; //tier 2 class with tier 3 level cap
                 Unlock_Item = ExperienceAndClasses.MOD.GetItem<Items.Unlock_Explorer>();
-                Class_Locations[0, 6] = ID;
+                Class_Locations[0, 6] = ID_num;
                 Attribute_Growth[(byte)Attribute.IDs.Power] = 2f;
                 Attribute_Growth[(byte)Attribute.IDs.Vitality] = 2f;
                 Attribute_Growth[(byte)Attribute.IDs.Mind] = 2f;
@@ -496,7 +498,7 @@ namespace ExperienceAndClasses.Systems {
             public Novice() : base(IDs.Novice, PowerScaling.IDs.All) {
                 Name = "Novice";
                 Description = "TODO_desc";
-                Class_Locations[0, 3] = ID;
+                Class_Locations[0, 3] = ID_num;
             }
         }
 
@@ -506,7 +508,7 @@ namespace ExperienceAndClasses.Systems {
             public Warrior() : base(IDs.Warrior, PowerScaling.IDs.Melee) {
                 Name = "Warrior";
                 Description = "TODO_desc";
-                Class_Locations[1, 0] = ID;
+                Class_Locations[1, 0] = ID_num;
                 Attribute_Growth[(byte)Attribute.IDs.Power] = 2;
                 Attribute_Growth[(byte)Attribute.IDs.Vitality] = 3;
                 Attribute_Growth[(byte)Attribute.IDs.Dexterity] = 2;
@@ -517,7 +519,7 @@ namespace ExperienceAndClasses.Systems {
             public Ranger() : base(IDs.Ranger, PowerScaling.IDs.Ranged) {
                 Name = "Ranger";
                 Description = "TODO_desc";
-                Class_Locations[1, 1] = ID;
+                Class_Locations[1, 1] = ID_num;
                 Attribute_Growth[(byte)Attribute.IDs.Power] = 3;
                 Attribute_Growth[(byte)Attribute.IDs.Spirit] = 2;
                 Attribute_Growth[(byte)Attribute.IDs.Dexterity] = 2;
@@ -528,7 +530,7 @@ namespace ExperienceAndClasses.Systems {
             public Mage() : base(IDs.Mage, PowerScaling.IDs.Magic) {
                 Name = "Mage";
                 Description = "TODO_desc";
-                Class_Locations[1, 2] = ID;
+                Class_Locations[1, 2] = ID_num;
                 Attribute_Growth[(byte)Attribute.IDs.Power] = 3;
                 Attribute_Growth[(byte)Attribute.IDs.Mind] = 3;
             }
@@ -538,7 +540,7 @@ namespace ExperienceAndClasses.Systems {
             public Rogue() : base(IDs.Rogue, PowerScaling.IDs.Rogue) {
                 Name = "Rogue";
                 Description = "TODO_desc";
-                Class_Locations[1, 3] = ID;
+                Class_Locations[1, 3] = ID_num;
                 Attribute_Growth[(byte)Attribute.IDs.Spirit] = 3;
                 Attribute_Growth[(byte)Attribute.IDs.Agility] = 3;
             }
@@ -548,7 +550,7 @@ namespace ExperienceAndClasses.Systems {
             public Summoner() : base(IDs.Summoner, PowerScaling.IDs.Minion) {
                 Name = "Summoner";
                 Description = "TODO_desc";
-                Class_Locations[1, 4] = ID;
+                Class_Locations[1, 4] = ID_num;
                 Attribute_Growth[(byte)Attribute.IDs.Power] = 3;
                 Attribute_Growth[(byte)Attribute.IDs.Spirit] = 3;
             }
@@ -558,7 +560,7 @@ namespace ExperienceAndClasses.Systems {
             public Cleric() : base(IDs.Cleric, PowerScaling.IDs.All) {
                 Name = "Cleric";
                 Description = "TODO_desc";
-                Class_Locations[1, 5] = ID;
+                Class_Locations[1, 5] = ID_num;
                 Attribute_Growth[(byte)Attribute.IDs.Mind] = 3;
                 Attribute_Growth[(byte)Attribute.IDs.Spirit] = 3;
             }
@@ -568,7 +570,7 @@ namespace ExperienceAndClasses.Systems {
             public Hybrid() : base(IDs.Hybrid, PowerScaling.IDs.All) {
                 Name = "Hybrid";
                 Description = "TODO_desc";
-                Class_Locations[1, 6] = ID;
+                Class_Locations[1, 6] = ID_num;
                 Attribute_Growth[(byte)Attribute.IDs.Power] = 2;
                 Attribute_Growth[(byte)Attribute.IDs.Vitality] = 2;
                 Attribute_Growth[(byte)Attribute.IDs.Mind] = 2;
@@ -584,7 +586,7 @@ namespace ExperienceAndClasses.Systems {
             public BloodKnight() : base(IDs.BloodKnight, PowerScaling.IDs.Melee, IDs.Warrior) {
                 Name = "Blood Knight";
                 Description = "TODO_desc";
-                Class_Locations[2, 0] = ID;
+                Class_Locations[2, 0] = ID_num;
                 Attribute_Growth[(byte)Attribute.IDs.Power] = 5;
                 Attribute_Growth[(byte)Attribute.IDs.Vitality] = 3;
             }
@@ -594,7 +596,7 @@ namespace ExperienceAndClasses.Systems {
             public Berserker() : base(IDs.Berserker, PowerScaling.IDs.Melee, IDs.Warrior) {
                 Name = "Berserker";
                 Description = "TODO_desc";
-                Class_Locations[3, 0] = ID;
+                Class_Locations[3, 0] = ID_num;
                 Attribute_Growth[(byte)Attribute.IDs.Power] = 2;
                 Attribute_Growth[(byte)Attribute.IDs.Vitality] = 2;
                 Attribute_Growth[(byte)Attribute.IDs.Agility] = 2;
@@ -606,7 +608,7 @@ namespace ExperienceAndClasses.Systems {
             public Guardian() : base(IDs.Guardian, PowerScaling.IDs.Melee, IDs.Warrior) {
                 Name = "Guardian";
                 Description = "TODO_desc";
-                Class_Locations[4, 0] = ID;
+                Class_Locations[4, 0] = ID_num;
                 Attribute_Growth[(byte)Attribute.IDs.Power] = 3;
                 Attribute_Growth[(byte)Attribute.IDs.Vitality] = 5;
             }
@@ -616,7 +618,7 @@ namespace ExperienceAndClasses.Systems {
             public Sniper() : base(IDs.Sniper, PowerScaling.IDs.Ranged, IDs.Ranger) {
                 Name = "Sniper";
                 Description = "TODO_desc";
-                Class_Locations[2, 1] = ID;
+                Class_Locations[2, 1] = ID_num;
                 Attribute_Growth[(byte)Attribute.IDs.Power] = 4;
                 Attribute_Growth[(byte)Attribute.IDs.Spirit] = 4;
             }
@@ -626,7 +628,7 @@ namespace ExperienceAndClasses.Systems {
             public Engineer() : base(IDs.Engineer, PowerScaling.IDs.Ranged, IDs.Ranger) {
                 Name = "Engineer";
                 Description = "TODO_desc";
-                Class_Locations[3, 1] = ID;
+                Class_Locations[3, 1] = ID_num;
                 Attribute_Growth[(byte)Attribute.IDs.Power] = 3;
                 Attribute_Growth[(byte)Attribute.IDs.Vitality] = 3;
                 Attribute_Growth[(byte)Attribute.IDs.Spirit] = 2;
@@ -638,7 +640,7 @@ namespace ExperienceAndClasses.Systems {
             public Elementalist() : base(IDs.Elementalist, PowerScaling.IDs.Magic, IDs.Mage) {
                 Name = "Elementalist";
                 Description = "TODO_desc";
-                Class_Locations[2, 2] = ID;
+                Class_Locations[2, 2] = ID_num;
                 Attribute_Growth[(byte)Attribute.IDs.Power] = 5;
                 Attribute_Growth[(byte)Attribute.IDs.Mind] = 3;
             }
@@ -648,7 +650,7 @@ namespace ExperienceAndClasses.Systems {
             public Sage() : base(IDs.Sage, PowerScaling.IDs.Magic, IDs.Mage) {
                 Name = "Sage";
                 Description = "TODO_desc";
-                Class_Locations[3, 2] = ID;
+                Class_Locations[3, 2] = ID_num;
                 Attribute_Growth[(byte)Attribute.IDs.Power] = 3;
                 Attribute_Growth[(byte)Attribute.IDs.Vitality] = 2;
                 Attribute_Growth[(byte)Attribute.IDs.Mind] = 4;
@@ -659,7 +661,7 @@ namespace ExperienceAndClasses.Systems {
             public Assassin() : base(IDs.Assassin, PowerScaling.IDs.Rogue, IDs.Rogue) {
                 Name = "Assassin";
                 Description = "TODO_desc";
-                Class_Locations[2, 3] = ID;
+                Class_Locations[2, 3] = ID_num;
                 Attribute_Growth[(byte)Attribute.IDs.Power] = 2;
                 Attribute_Growth[(byte)Attribute.IDs.Spirit] = 4;
                 Attribute_Growth[(byte)Attribute.IDs.Agility] = 3;
@@ -670,7 +672,7 @@ namespace ExperienceAndClasses.Systems {
             public Chrono() : base(IDs.Chrono, PowerScaling.IDs.Rogue, IDs.Rogue) {
                 Name = "Chrono";
                 Description = "TODO_desc";
-                Class_Locations[3, 3] = ID;
+                Class_Locations[3, 3] = ID_num;
                 Attribute_Growth[(byte)Attribute.IDs.Power] = 2;
                 Attribute_Growth[(byte)Attribute.IDs.Spirit] = 2;
                 Attribute_Growth[(byte)Attribute.IDs.Dexterity] = 5;
@@ -681,7 +683,7 @@ namespace ExperienceAndClasses.Systems {
             public Ninja() : base(IDs.Ninja, PowerScaling.IDs.Throwing, IDs.Rogue) {
                 Name = "Ninja";
                 Description = "TODO_desc";
-                Class_Locations[4, 3] = ID;
+                Class_Locations[4, 3] = ID_num;
                 Attribute_Growth[(byte)Attribute.IDs.Power] = 3;
                 Attribute_Growth[(byte)Attribute.IDs.Spirit] = 3;
                 Attribute_Growth[(byte)Attribute.IDs.Agility] = 3;
@@ -692,7 +694,7 @@ namespace ExperienceAndClasses.Systems {
             public SoulBinder() : base(IDs.SoulBinder, PowerScaling.IDs.Minion, IDs.Summoner) {
                 Name = "Soul Binder";
                 Description = "TODO_desc";
-                Class_Locations[2, 4] = ID;
+                Class_Locations[2, 4] = ID_num;
                 Attribute_Growth[(byte)Attribute.IDs.Power] = 5;
                 Attribute_Growth[(byte)Attribute.IDs.Mind] = 2;
                 Attribute_Growth[(byte)Attribute.IDs.Spirit] = 2;
@@ -703,7 +705,7 @@ namespace ExperienceAndClasses.Systems {
             public Hivemind() : base(IDs.Hivemind, PowerScaling.IDs.Minion, IDs.Summoner) {
                 Name = "Hivemind";
                 Description = "TODO_desc";
-                Class_Locations[3, 4] = ID;
+                Class_Locations[3, 4] = ID_num;
                 Attribute_Growth[(byte)Attribute.IDs.Power] = 3;
                 Attribute_Growth[(byte)Attribute.IDs.Mind] = 2;
                 Attribute_Growth[(byte)Attribute.IDs.Spirit] = 4;
@@ -714,7 +716,7 @@ namespace ExperienceAndClasses.Systems {
             public Saint() : base(IDs.Saint, PowerScaling.IDs.All, IDs.Cleric) {
                 Name = "Saint";
                 Description = "TODO_desc";
-                Class_Locations[2, 5] = ID;
+                Class_Locations[2, 5] = ID_num;
                 Attribute_Growth[(byte)Attribute.IDs.Mind] = 3;
                 Attribute_Growth[(byte)Attribute.IDs.Spirit] = 5;
             }
@@ -724,7 +726,7 @@ namespace ExperienceAndClasses.Systems {
             public HybridPrime() : base(IDs.HybridPrime, PowerScaling.IDs.All, IDs.Hybrid) {
                 Name = "Hybrid Prime";
                 Description = "TODO_desc";
-                Class_Locations[2, 6] = ID;
+                Class_Locations[2, 6] = ID_num;
                 Attribute_Growth[(byte)Attribute.IDs.Power] = 2.5f;
                 Attribute_Growth[(byte)Attribute.IDs.Vitality] = 2.5f;
                 Attribute_Growth[(byte)Attribute.IDs.Mind] = 2.5f;

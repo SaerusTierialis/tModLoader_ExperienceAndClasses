@@ -96,7 +96,7 @@ namespace ExperienceAndClasses.Systems {
             /// </summary>
             /// <returns></returns>
             public static bool LocalCanGainXPPrimary() {
-                return (ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary.Tier > 0) && (ExperienceAndClasses.LOCAL_MPLAYER.Class_Levels[ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary.ID] < ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary.Max_Level);
+                return (ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary.Tier > 0) && (ExperienceAndClasses.LOCAL_MPLAYER.Class_Levels[ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary.ID_num] < ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary.Max_Level);
             }
 
             /// <summary>
@@ -104,7 +104,7 @@ namespace ExperienceAndClasses.Systems {
             /// </summary>
             /// <returns></returns>
             public static bool LocalCanGainXPSecondary() {
-                return ExperienceAndClasses.LOCAL_MPLAYER.Allow_Secondary && (ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary.Tier > 0) && (ExperienceAndClasses.LOCAL_MPLAYER.Class_Levels[ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary.ID] < ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary.Max_Level);
+                return ExperienceAndClasses.LOCAL_MPLAYER.Allow_Secondary && (ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary.Tier > 0) && (ExperienceAndClasses.LOCAL_MPLAYER.Class_Levels[ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary.ID_num] < ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary.Max_Level);
             }
 
             /// <summary>
@@ -121,14 +121,14 @@ namespace ExperienceAndClasses.Systems {
                     bool add_secondary = LocalCanGainXPSecondary();
 
                     if (add_primary && add_secondary) {
-                        LocalAddXPToClass(ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary.ID, (uint)Math.Ceiling(xp * Systems.XP.SUBCLASS_PENALTY_XP_MULTIPLIER_PRIMARY));
-                        LocalAddXPToClass(ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary.ID, (uint)Math.Ceiling(xp * Systems.XP.SUBCLASS_PENALTY_XP_MULTIPLIER_SECONDARY));
+                        LocalAddXPToClass(ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary.ID_num, (uint)Math.Ceiling(xp * Systems.XP.SUBCLASS_PENALTY_XP_MULTIPLIER_PRIMARY));
+                        LocalAddXPToClass(ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary.ID_num, (uint)Math.Ceiling(xp * Systems.XP.SUBCLASS_PENALTY_XP_MULTIPLIER_SECONDARY));
                     }
                     else if (add_primary) {
-                        LocalAddXPToClass(ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary.ID, xp);
+                        LocalAddXPToClass(ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary.ID_num, xp);
                     }
                     else if (add_secondary) {
-                        LocalAddXPToClass(ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary.ID, xp);
+                        LocalAddXPToClass(ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary.ID_num, xp);
                     }
                     else {
                         //shouldn't be reachable unless something is changed later

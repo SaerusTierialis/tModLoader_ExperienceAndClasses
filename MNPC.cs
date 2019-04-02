@@ -9,5 +9,13 @@ using Terraria.ModLoader;
 namespace ExperienceAndClasses {
     public class MNPC : GlobalNPC {
 
+
+
+        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Overrides ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+        /// <summary>
+        /// Instance per entity to store pre-calculated xp, etc.
+        /// </summary>
+        public override bool InstancePerEntity { get { return true; } }
     }
 }

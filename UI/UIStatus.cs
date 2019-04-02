@@ -1,4 +1,5 @@
-﻿using Terraria;
+﻿using System.Collections.Generic;
+using Terraria;
 
 namespace ExperienceAndClasses.UI {
 
@@ -22,10 +23,21 @@ namespace ExperienceAndClasses.UI {
         private const byte SLOTS = ROWS * COLUMNS;
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Variables ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-        private StatusIcon[] icons;
+        private static StatusIcon[] icons;
+        public static bool needs_redraw_complete;
+        public static bool needs_redraw_times_only;
+
+        /// <summary>
+        /// sorted by float duration remaining
+        /// </summary>
+        public static SortedList<float, Systems.Status> status_to_draw;
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Initialize ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         protected override void InitializeState() {
+            needs_redraw_complete = false;
+            needs_redraw_times_only = false;
+            status_to_draw = new SortedList<float, Systems.Status>();
+
             icons = new StatusIcon[SLOTS];
             for (byte i = 0; i < icons.Length; i++) icons[i] = new StatusIcon();
 

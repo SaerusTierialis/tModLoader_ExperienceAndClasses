@@ -220,7 +220,7 @@ namespace ExperienceAndClasses.UI {
 
         public void ShowTextClass(UIElement source, Systems.Class c) {
             string title = c.Name;
-            if (c.ID == (byte)Systems.Class.IDs.Explorer) {
+            if (c.ID_num == (byte)Systems.Class.IDs.Explorer) {
                 title += " [Unique]";
             }
             else {
@@ -228,7 +228,7 @@ namespace ExperienceAndClasses.UI {
             }
 
             string text = "";
-            if (!ExperienceAndClasses.LOCAL_MPLAYER.Class_Unlocked[c.ID]) {
+            if (!ExperienceAndClasses.LOCAL_MPLAYER.Class_Unlocked[c.ID_num]) {
                 title += " [locked]";
                 text += "Left click for class unlock requirements.\n";
             }

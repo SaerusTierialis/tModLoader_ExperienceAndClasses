@@ -58,7 +58,7 @@ namespace ExperienceAndClasses.UI {
                     needs_first_arrange = false;
                 }
 
-                if (ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary.ID != xp_bar_primary.Class_Tracked.ID) {
+                if (ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary.ID_num != xp_bar_primary.Class_Tracked.ID_num) {
                     if (ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary.Tier < 1 || xp_bar_primary.Class_Tracked.Tier < 1) {
                         needs_rearrangement = true;
                     }
@@ -66,7 +66,7 @@ namespace ExperienceAndClasses.UI {
                 }
                 xp_bar_primary.Update();
 
-                if (ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary.ID != xp_bar_secondary.Class_Tracked.ID) {
+                if (ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary.ID_num != xp_bar_secondary.Class_Tracked.ID_num) {
                     if (ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary.Tier < 1 || xp_bar_secondary.Class_Tracked.Tier < 1) {
                         needs_rearrangement = true;
                     }

@@ -76,6 +76,8 @@ namespace ExperienceAndClasses {
         /// </summary>
         public Utilities.Containers.StatusList Statuses { get; private set; }
 
+        public List<Systems.Passive.IDs> Passives { get; private set; }
+
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Instance Vars (saved/loaded) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         //Class_Primary and Class_Secondary also save/load (specifically the .ID)
@@ -156,6 +158,7 @@ namespace ExperienceAndClasses {
             Statuses = new Utilities.Containers.StatusList();
             Progression = 0;
             Extra_XP = 0;
+            Passives = new List<Systems.Passive.IDs>();
 
             //ui
             loaded_ui_main = new Utilities.Containers.LoadedUIData();
@@ -309,16 +312,16 @@ namespace ExperienceAndClasses {
 
         public static void LocalUpdateAll() {
             //prevent secondary without primary class (move secondary to primary)
-            if ((ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary.ID == (byte)Systems.Class.IDs.New) || (ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary.ID == (byte)Systems.Class.IDs.None)) {
+            if ((ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary.ID_num == (byte)Systems.Class.IDs.New) || (ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary.ID_num == (byte)Systems.Class.IDs.None)) {
                 ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary = ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary;
                 ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary = Systems.Class.LOOKUP[(byte)Systems.Class.IDs.None];
             }
 
             //any "new" class should be set
-            if (ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary.ID == (byte)Systems.Class.IDs.New) {
+            if (ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary.ID_num == (byte)Systems.Class.IDs.New) {
                 ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary = Systems.Class.LOOKUP[(byte)Systems.Class.IDs.Novice];
             }
-            if (ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary.ID == (byte)Systems.Class.IDs.New) {
+            if (ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary.ID_num == (byte)Systems.Class.IDs.New) {
                 ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary = Systems.Class.LOOKUP[(byte)Systems.Class.IDs.None];
             }
 
@@ -339,13 +342,13 @@ namespace ExperienceAndClasses {
 
                 c = ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary;
                 while ((c != null) && (c.Tier > 0)) {
-                    sum_primary += (c.Attribute_Growth[id] * Math.Min(ExperienceAndClasses.LOCAL_MPLAYER.Class_Levels[c.ID], c.Max_Level));
+                    sum_primary += (c.Attribute_Growth[id] * Math.Min(ExperienceAndClasses.LOCAL_MPLAYER.Class_Levels[c.ID_num], c.Max_Level));
                     c = c.Prereq;
                 }
 
                 c = ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary;
                 while ((c != null) && (c.Tier > 0)) {
-                    sum_secondary += (c.Attribute_Growth[id] * Math.Min(ExperienceAndClasses.LOCAL_MPLAYER.Class_Levels[c.ID], c.Max_Level));
+                    sum_secondary += (c.Attribute_Growth[id] * Math.Min(ExperienceAndClasses.LOCAL_MPLAYER.Class_Levels[c.ID_num], c.Max_Level));
                     c = c.Prereq;
                 }
 
@@ -384,8 +387,8 @@ namespace ExperienceAndClasses {
 
         public static void LocalCalculateEffectiveLevels() {
             //set current levels as default
-            ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary_Level_Effective = ExperienceAndClasses.LOCAL_MPLAYER.Class_Levels[ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary.ID];
-            ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary_Level_Effective = ExperienceAndClasses.LOCAL_MPLAYER.Class_Levels[ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary.ID];
+            ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary_Level_Effective = ExperienceAndClasses.LOCAL_MPLAYER.Class_Levels[ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary.ID_num];
+            ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary_Level_Effective = ExperienceAndClasses.LOCAL_MPLAYER.Class_Levels[ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary.ID_num];
 
             //level cap primary
             if (ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary_Level_Effective > ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary.Max_Level) {
@@ -480,9 +483,9 @@ namespace ExperienceAndClasses {
                 Byte me = (byte)player.whoAmI;
 
                 //class and class levels
-                if ((clone.Class_Primary.ID != Class_Primary.ID) || (clone.Class_Secondary.ID != Class_Secondary.ID) ||
+                if ((clone.Class_Primary.ID_num != Class_Primary.ID_num) || (clone.Class_Secondary.ID_num != Class_Secondary.ID_num) ||
                     (clone.Class_Primary_Level_Effective != Class_Primary_Level_Effective) || (clone.Class_Secondary_Level_Effective != Class_Secondary_Level_Effective)) {
-                    Utilities.PacketHandler.ForceClass.Send(-1, me, Class_Primary.ID, Class_Primary_Level_Effective, Class_Secondary.ID, Class_Secondary_Level_Effective);
+                    Utilities.PacketHandler.ForceClass.Send(-1, me, Class_Primary.ID_num, Class_Primary_Level_Effective, Class_Secondary.ID_num, Class_Secondary_Level_Effective);
                 }
 
                 //final attribute
@@ -527,7 +530,7 @@ namespace ExperienceAndClasses {
         /// </summary>
         private void FullSync() {
             //send one packet with everything needed
-            Utilities.PacketHandler.ForceFull.Send(-1, (byte)player.whoAmI, Class_Primary.ID, Class_Primary_Level_Effective, Class_Secondary.ID, Class_Secondary_Level_Effective, Attributes_Sync, AFK, IN_COMBAT, Progression);
+            Utilities.PacketHandler.ForceFull.Send(-1, (byte)player.whoAmI, Class_Primary.ID_num, Class_Primary_Level_Effective, Class_Secondary.ID_num, Class_Secondary_Level_Effective, Attributes_Sync, AFK, IN_COMBAT, Progression);
         }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Sync Force Commands ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
@@ -752,8 +755,8 @@ namespace ExperienceAndClasses {
                 {"eac_class_unlock", class_unlocked },
                 {"eac_class_xp", class_xp },
                 {"eac_class_level", class_level },
-                {"eac_class_current_primary", Class_Primary.ID },
-                {"eac_class_current_secondary", Class_Secondary.ID },
+                {"eac_class_current_primary", Class_Primary.ID_num },
+                {"eac_class_current_secondary", Class_Secondary.ID_num },
                 {"eac_class_subclass_unlocked", Allow_Secondary },
                 {"eac_attribute_allocation", attributes_allocated },
                 {"eac_wof", Defeated_WOF },
@@ -779,8 +782,8 @@ namespace ExperienceAndClasses {
             show_xp = Utilities.Commons.TryGet<bool>(tag, "eac_settings_show_xp", show_xp);
 
             //current classes
-            Class_Primary = Systems.Class.LOOKUP[Utilities.Commons.TryGet<byte>(tag, "eac_class_current_primary", Class_Primary.ID)];
-            Class_Secondary = Systems.Class.LOOKUP[Utilities.Commons.TryGet<byte>(tag, "eac_class_current_secondary", Class_Secondary.ID)];
+            Class_Primary = Systems.Class.LOOKUP[Utilities.Commons.TryGet<byte>(tag, "eac_class_current_primary", Class_Primary.ID_num)];
+            Class_Secondary = Systems.Class.LOOKUP[Utilities.Commons.TryGet<byte>(tag, "eac_class_current_secondary", Class_Secondary.ID_num)];
 
             //class unlocked
             List<bool> class_unlock_loaded = Utilities.Commons.TryGet<List<bool>>(tag, "eac_class_unlock", new List<bool>());
@@ -822,7 +825,7 @@ namespace ExperienceAndClasses {
             }
 
             //if selected class is now locked for some reason, select no class
-            if ((!Class_Unlocked[Class_Primary.ID]) || (!Class_Unlocked[Class_Secondary.ID])) {
+            if ((!Class_Unlocked[Class_Primary.ID_num]) || (!Class_Unlocked[Class_Secondary.ID_num])) {
                 Class_Primary = Systems.Class.LOOKUP[(byte)Systems.Class.IDs.None];
                 Class_Secondary = Systems.Class.LOOKUP[(byte)Systems.Class.IDs.None];
             }
@@ -879,7 +882,7 @@ namespace ExperienceAndClasses {
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Status ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         public bool HasStatus(Systems.Status.IDs id) {
-            return Statuses.ContainsStatus(id);
+            return Statuses.Contains(id);
         }
 
         private void ApplyStatuses() {

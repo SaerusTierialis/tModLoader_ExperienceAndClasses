@@ -321,8 +321,8 @@ namespace ExperienceAndClasses.UI {
         }
 
         public void Update() {
-            uint xp = ExperienceAndClasses.LOCAL_MPLAYER.Class_XP[Class_Tracked.ID];
-            uint xp_needed = Systems.XP.Requirements.GetXPReq(Class_Tracked, ExperienceAndClasses.LOCAL_MPLAYER.Class_Levels[Class_Tracked.ID]);
+            uint xp = ExperienceAndClasses.LOCAL_MPLAYER.Class_XP[Class_Tracked.ID_num];
+            uint xp_needed = Systems.XP.Requirements.GetXPReq(Class_Tracked, ExperienceAndClasses.LOCAL_MPLAYER.Class_Levels[Class_Tracked.ID_num]);
 
             float percent;
             bool maxed;
@@ -521,11 +521,11 @@ namespace ExperienceAndClasses.UI {
 
             base.Click(evt);
 
-            if (!ExperienceAndClasses.LOCAL_MPLAYER.Class_Unlocked[Class.ID]) {
+            if (!ExperienceAndClasses.LOCAL_MPLAYER.Class_Unlocked[Class.ID_num]) {
                 UIInfo.Instance.ShowUnlockClass(this, Class);
             }
             else {
-                if (ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary.ID == Class.ID) {
+                if (ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary.ID_num == Class.ID_num) {
                     Systems.Class.LOOKUP[(byte)Systems.Class.IDs.None].LocalTrySetClass(true);
                 }
                 else {
@@ -542,7 +542,7 @@ namespace ExperienceAndClasses.UI {
             if(!ExperienceAndClasses.LOCAL_MPLAYER.Allow_Secondary) {
                 UIInfo.Instance.ShowUnlockSubclass(this);
             }
-            else if (ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary.ID == Class.ID) {
+            else if (ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary.ID_num == Class.ID_num) {
                 Systems.Class.LOOKUP[(byte)Systems.Class.IDs.None].LocalTrySetClass(false);
             }
             else {
@@ -561,8 +561,8 @@ namespace ExperienceAndClasses.UI {
         }
 
         public void Update() {
-            byte level = ExperienceAndClasses.LOCAL_MPLAYER.Class_Levels[Class.ID];
-            if (ExperienceAndClasses.LOCAL_MPLAYER.Class_Unlocked[Class.ID]) {
+            byte level = ExperienceAndClasses.LOCAL_MPLAYER.Class_Levels[Class.ID_num];
+            if (ExperienceAndClasses.LOCAL_MPLAYER.Class_Unlocked[Class.ID_num]) {
                 //not locked
                 image_lock.SetImage(Utilities.Textures.TEXTURE_BLANK);
 
@@ -580,7 +580,7 @@ namespace ExperienceAndClasses.UI {
                 text.Top.Set(button_size + TEXT_OFFSET, 0F);
                 text.Recalculate();
 
-                if ((ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary.ID == Class.ID) || (ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary.ID == Class.ID)) {
+                if ((ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary.ID_num == Class.ID_num) || (ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary.ID_num == Class.ID_num)) {
                     //selected
                     SetVisibility(LOW_VISIBILITY, 1f);
                 }

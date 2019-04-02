@@ -191,12 +191,12 @@ namespace ExperienceAndClasses.UI {
             indicate_primary.visible = false;
             indicate_secondary.visible = false;
             foreach (ClassButton button in class_buttons) {
-                if (button.Class.ID == ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary.ID) {
+                if (button.Class.ID_num == ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary.ID_num) {
                     indicate_primary.SetPosition(button.Left.Pixels + INDICATOR_OFFSETS, button.Top.Pixels + INDICATOR_OFFSETS);
                     button_primary = button;
                     indicate_primary.visible = true;
                 }
-                else if (button.Class.ID == ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary.ID) {
+                else if (button.Class.ID_num == ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary.ID_num) {
                     indicate_secondary.SetPosition(button.Left.Pixels + INDICATOR_OFFSETS, button.Top.Pixels + INDICATOR_OFFSETS);
                     button_secondary = button;
                     indicate_secondary.visible = true;
