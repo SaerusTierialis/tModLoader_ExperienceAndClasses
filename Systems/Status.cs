@@ -132,17 +132,17 @@ namespace ExperienceAndClasses.Systems {
         /// <summary>
         /// description of status (mouse-over text) | leave if not shown in ui
         /// </summary>
-        public string specific_description = "default_desc";
+        public string specific_description = "default_description";
 
         /// <summary>
-        /// path to status icon | leave if not shown in ui
+        /// path to status icon | leave null if not shown in ui
         /// </summary>
-        protected string specific_texture_path;
+        protected string specific_texture_path = null;
 
         /// <summary>
         /// list of autosync data types | leave null if not using any
         /// </summary>
-        protected List<AUTOSYNC_DATA_TYPES> specific_autosync_data_types;
+        protected List<AUTOSYNC_DATA_TYPES> specific_autosync_data_types = null;
 
         /// <summary>
         /// allow target to be player | default is TRUE
@@ -150,9 +150,9 @@ namespace ExperienceAndClasses.Systems {
         protected bool specific_target_can_be_player = true;
 
         /// <summary>
-        /// allow target to be npc | default is FALSE
+        /// allow target to be npc | default is TRUE
         /// </summary>
-        protected bool specific_target_can_be_npc = false;
+        protected bool specific_target_can_be_npc = true;
 
         /// <summary>
         /// allow owner to be player | default is TRUE
@@ -160,9 +160,9 @@ namespace ExperienceAndClasses.Systems {
         protected bool specific_owner_can_be_player = true;
 
         /// <summary>
-        /// allow owner to be npc | default is FALSE
+        /// allow owner to be npc | default is TRUE
         /// </summary>
-        protected bool specific_owner_can_be_npc = false;
+        protected bool specific_owner_can_be_npc = true;
 
         /// <summary>
         /// duration type | default is timed
@@ -495,7 +495,7 @@ namespace ExperienceAndClasses.Systems {
                 }
 
                 //required passive
-                if ((specific_owner_player_required_passive != Systems.Passive.IDs.NONE) && !owner.mplayer.Passives.Contains(specific_owner_player_required_passive)) {
+                if ((specific_owner_player_required_passive != Systems.Passive.IDs.NONE) && !owner.MPlayer.Passives.Contains(specific_owner_player_required_passive)) {
                     return true;
                 }
 
@@ -636,7 +636,7 @@ namespace ExperienceAndClasses.Systems {
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Instance Methods To Override (Required) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-        protected static void Create(IDs id, Utilities.Containers.Thing target, Utilities.Containers.Thing owner, Dictionary<AUTOSYNC_DATA_TYPES, float> sync_data = null, float seconds_remaining = 0f, float seconds_until_effect = 0f) {
+        protected static void Add(IDs id, Utilities.Containers.Thing target, Utilities.Containers.Thing owner, Dictionary<AUTOSYNC_DATA_TYPES, float> sync_data = null, float seconds_remaining = 0f, float seconds_until_effect = 0f) {
             //create instance
             Status status = Utilities.Commons.CreateObjectFromName<Status>(Enum.GetName(typeof(IDs), id));
             
@@ -797,30 +797,24 @@ namespace ExperienceAndClasses.Systems {
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Example ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-        /*
         public class Heal : Status {
             public Heal() : base(IDs.Heal) {
                 //any overwrites
                 specific_name = "Heal"; //not needed unless displayed as a buff
                 specific_texture_path = "ExperienceAndClasses/Textures/Status/Heal"; //not needed unless displayed as a buff
+                specific_duration_type = DURATION_TYPES.INSTANT;
 
                 //add any sync data types that will be used (for syncing)
                 specific_autosync_data_types.Add(AUTOSYNC_DATA_TYPES.MAGNITUDE1);
             }
 
             //must inlcude a static add method with target/owner and any extra info
-            public static void CreateNew(Player target, MPlayer owner, float magnitude) {
-                Add(target, owner, IDs.Heal, new Dictionary<AUTOSYNC_DATA_TYPES, float> {
+            public static void CreateNew(Utilities.Containers.Thing target, Utilities.Containers.Thing owner, float magnitude) {
+                Add(IDs.Heal, target, owner, new Dictionary<AUTOSYNC_DATA_TYPES, float> {
                     { AUTOSYNC_DATA_TYPES.MAGNITUDE1, magnitude }
                 });
             }
-
-            //optional overrides (base methods are empty)
-            protected override void OnStart() { }
-            protected override void OnUpdate() { }
-            protected override void OnEnd() { }
         }
-        */
 
     }
 }

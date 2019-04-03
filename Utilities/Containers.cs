@@ -62,10 +62,10 @@ namespace ExperienceAndClasses.Utilities.Containers {
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Instance ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         public bool Is_Player { get; private set; } = false;
-        public MPlayer mplayer { get; private set; } = null;
+        private MPlayer mplayer = null;
 
         public bool Is_Npc { get; private set; } = false;
-        public MNPC nnpc { get; private set; } = null;
+        private MNPC mnpc = null;
 
         /// <summary>
         /// A reference index which is identical across clients/server. This Thing is Thing[Index].
@@ -88,7 +88,7 @@ namespace ExperienceAndClasses.Utilities.Containers {
 
         public Thing(MNPC mnpc) {
             Is_Npc = true;
-            this.nnpc = mnpc;
+            this.mnpc = mnpc;
             Add();
         }
 
@@ -120,6 +120,30 @@ namespace ExperienceAndClasses.Utilities.Containers {
             }
         }
 
+        public MPlayer MPlayer {
+            get {
+                if (mplayer == null) {
+                    Commons.Error("Attempted to get MPlayer from non-player Thing!");
+                    return null;
+                }
+                else {
+                    return mplayer;
+                }
+            }
+        }
+
+        public MNPC MNPC {
+            get {
+                if (mnpc == null) {
+                    Commons.Error("Attempted to get MNPC from non-NPC Thing!");
+                    return null;
+                }
+                else {
+                    return mnpc;
+                }
+            }
+        }
+
         private void Remove() {
             Things.Remove(Index);
         }
@@ -133,7 +157,7 @@ namespace ExperienceAndClasses.Utilities.Containers {
                     return mplayer.Statuses;
                 }
                 else {
-                    return nnpc.Statuses;
+                    return mnpc.Statuses;
                 }
             }
         }
@@ -147,7 +171,7 @@ namespace ExperienceAndClasses.Utilities.Containers {
                     return mplayer.player.whoAmI;
                 }
                 else {
-                    int who = nnpc.npc.whoAmI;
+                    int who = mnpc.npc.whoAmI;
                     if (who < 0) {
                         Remove();
                     }
@@ -165,7 +189,7 @@ namespace ExperienceAndClasses.Utilities.Containers {
                     return mplayer.player.dead;
                 }
                 else {
-                    bool dead = !nnpc.npc.active;
+                    bool dead = !mnpc.npc.active;
                     if (dead) {
                         Remove();
                     }
@@ -184,7 +208,7 @@ namespace ExperienceAndClasses.Utilities.Containers {
                     active = mplayer.player.active;
                 }
                 else {
-                    active = nnpc.npc.active;
+                    active = mnpc.npc.active;
                 }
                 if (!active) {
                     Remove();
@@ -200,6 +224,14 @@ namespace ExperienceAndClasses.Utilities.Containers {
         /// <returns></returns>
         public bool Equals(Thing other) {
             return (Index == other.Index);
+        }
+
+        public void Heal(uint amount) {
+            //TODO
+        }
+
+        public void Hurt(uint amount, Thing source) {
+            //TODO
         }
     }
 
