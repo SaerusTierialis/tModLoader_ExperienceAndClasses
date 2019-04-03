@@ -32,6 +32,8 @@ namespace ExperienceAndClasses.UI {
         /// </summary>
         public static Utilities.Containers.TimeSortedStatusList status_to_draw = new Utilities.Containers.TimeSortedStatusList(SLOTS);
 
+        private static int number_buffs_prior = 0;
+
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Initialize ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         protected override void InitializeState() {
             needs_redraw_complete = true;
@@ -57,64 +59,67 @@ namespace ExperienceAndClasses.UI {
         public void Update() {
             StatusIcon icon;
 
-            //update?
-            if (needs_redraw_complete || needs_redraw_times_only) {
-                //remake list of statuses to show?
-                if (needs_redraw_complete) {
-                    //remake status_to_draw
-                    status_to_draw.Clear();
-                    List <Systems.Status> instances_applied = ExperienceAndClasses.LOCAL_MPLAYER.Statuses.GetAllApply();
-                    Systems.Status.IDs id_skip = Systems.Status.IDs.NONE;
-                    foreach (Systems.Status status in instances_applied) {
-                        //default to not in ui
-                        status.was_in_ui = false;
+            //number of buffs changed?
+            int number_buffs = Main.LocalPlayer.CountBuffs();
+            bool number_buff_changed = (number_buffs_prior == number_buffs);
 
-                        //add to ui? (set was_in_ui if added)
-                        if (status.ID != id_skip) {
-                            switch (status.specific_ui_type) {
-                                case Systems.Status.UI_TYPES.NONE:
-                                    //do nothing and skip any other instances of this status
-                                    id_skip = status.ID;
-                                    break;
-                                case Systems.Status.UI_TYPES.ALL_APPLY:
-                                    //show all instances applied
-                                    status_to_draw.Add(status);
-                                    status.was_in_ui = true;
-                                    break;
-                                case Systems.Status.UI_TYPES.ONE:
-                                    //show just first instance applied
-                                    status_to_draw.Add(status);
-                                    status.was_in_ui = true;
-                                    id_skip = status.ID; //skip other instances of this status
-                                    break;
+            //need to remake list of status to show?
+            if (needs_redraw_complete) {
+                status_to_draw.Clear();
+                List<Systems.Status> instances_applied = ExperienceAndClasses.LOCAL_MPLAYER.Statuses.GetAllApply();
+                Systems.Status.IDs id_skip = Systems.Status.IDs.NONE;
+                foreach (Systems.Status status in instances_applied) {
+                    //default to not in ui
+                    status.was_in_ui = false;
 
-                                default:
-                                    Utilities.Commons.Error("Unsupported UI_TYPES: " + status.specific_ui_type);
-                                    break;
-                            }
+                    //add to ui? (set was_in_ui if added)
+                    if (status.ID != id_skip) {
+                        switch (status.specific_ui_type) {
+                            case Systems.Status.UI_TYPES.NONE:
+                                //do nothing and skip any other instances of this status
+                                id_skip = status.ID;
+                                break;
+                            case Systems.Status.UI_TYPES.ALL_APPLY:
+                                //show all instances applied
+                                status_to_draw.Add(status);
+                                status.was_in_ui = true;
+                                break;
+                            case Systems.Status.UI_TYPES.ONE:
+                                //show just first instance applied
+                                status_to_draw.Add(status);
+                                status.was_in_ui = true;
+                                id_skip = status.ID; //skip other instances of this status
+                                break;
+
+                            default:
+                                Utilities.Commons.Error("Unsupported UI_TYPES: " + status.specific_ui_type);
+                                break;
                         }
-                    }
-
-                    //clear all icons
-                    foreach (StatusIcon i in icons) {
-                        i.active = false;
-                    }
-
-                    //set icon statuses
-                    int counter = Main.LocalPlayer.CountBuffs();
-                    foreach (Systems.Status status in status_to_draw) {
-                        icon = icons[counter++];
-                        icon.active = true;
-                        icon.SetStatus(status);
-                        icon.Update();
                     }
                 }
-                else {
-                    //just update text
-                    foreach (StatusIcon i in icons) {
-                        if (i.active) {
-                            i.Update();
-                        }
+            }
+
+            //update positions of icons (and text)
+            if (needs_redraw_complete || number_buff_changed) {
+                //clear all icons
+                foreach (StatusIcon i in icons) {
+                    i.active = false;
+                }
+
+                //set icon statuses
+                int counter = number_buffs;
+                foreach (Systems.Status status in status_to_draw) {
+                    icon = icons[counter++];
+                    icon.active = true;
+                    icon.SetStatus(status);
+                    icon.Update();
+                }
+            }
+            else if (needs_redraw_times_only) {
+                //just update text
+                foreach (StatusIcon i in icons) {
+                    if (i.active) {
+                        i.Update();
                     }
                 }
             }
