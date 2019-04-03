@@ -192,6 +192,15 @@ namespace ExperienceAndClasses.Utilities.Containers {
                 return active;
             }
         }
+
+        /// <summary>
+        /// Checks if the things are the same thing :)
+        /// </summary>
+        /// <param name="other"></param>
+        /// <returns></returns>
+        public bool Equals(Thing other) {
+            return (Index == other.Index);
+        }
     }
 
     /// <summary>
@@ -512,7 +521,7 @@ namespace ExperienceAndClasses.Utilities.Containers {
                             //there can be one instance per owner (players and/or npcs)
                             //get current key if any instances from same owner (could be npc-owned so can't just use index as key)
                             foreach (Systems.Status s in instances.Values) {
-                                if (status.owner.Index == s.owner.Index) {
+                                if (status.owner.Equals(s.owner)) {
                                     key_temp = s.Instance_ID;
                                     break;
                                 }
