@@ -445,8 +445,22 @@ namespace ExperienceAndClasses.Systems {
             }
 
             //calcualte end time
-            if (specific_duration_type == DURATION_TYPES.TIMED) {
-                time_end = ExperienceAndClasses.Now.AddSeconds(seconds_remaining);
+            switch (specific_duration_type) {
+                case (DURATION_TYPES.TIMED):
+                    time_end = ExperienceAndClasses.Now.AddSeconds(seconds_remaining);
+                    break;
+
+                case (DURATION_TYPES.INSTANT):
+                    time_end = DateTime.MinValue;
+                    break;
+
+                case (DURATION_TYPES.TOGGLE):
+                    time_end = DateTime.MaxValue;
+                    break;
+
+                default:
+                    Utilities.Commons.Error("Unsupported DURATION_TYPES: " + specific_duration_type);
+                    break;
             }
 
             //periodic effect time (not stored in status itself because timer should be across instances of the status)
