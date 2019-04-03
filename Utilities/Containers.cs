@@ -20,6 +20,9 @@ namespace ExperienceAndClasses.Utilities.Containers {
         }
     }
 
+    /// <summary>
+    /// Sorts by time_end with later times at the end of list. Supports duplicate time_end (toggle duration status all have same time_end)
+    /// </summary>
     public class TimeSortedStatusList : List<Systems.Status> {
 
         public TimeSortedStatusList() {}
