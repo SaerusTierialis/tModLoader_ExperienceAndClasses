@@ -77,38 +77,52 @@ namespace ExperienceAndClasses.Utilities.Containers {
         /// To the server, all NPC are local.
         /// To the clients, their own player is local (not NPCs).
         /// </summary>
-        public bool Local { get; private set; }
+        public readonly bool Local;
 
         public Thing(MPlayer mplayer) {
             Is_Player = true;
             Is_Npc = false;
+
             this.mplayer = mplayer;
             mnpc = null;
+
             Index = (ushort)whoAmI;
-            Add();
-        }
 
-        public Thing(MNPC mnpc) {
-            Is_Player = false;
-            Is_Npc = true;
-            mplayer = null;
-            this.mnpc = mnpc;
-            Index = (ushort)(Main.maxPlayers + whoAmI);
-            Add();
-        }
-
-        private void Add() {
-            //is this local?
-            if ( (Netmode.IS_SINGLEPLAYER) ||
-                 (Netmode.IS_CLIENT && Is_Player && (whoAmI == Main.LocalPlayer.whoAmI)) ||
-                 (Netmode.IS_SERVER && Is_Npc) ) {
+            if ((Netmode.IS_SINGLEPLAYER) || (Netmode.IS_CLIENT && (whoAmI == Main.LocalPlayer.whoAmI))) {
+                //singleplayer OR this is the local player on a client
                 Local = true;
             }
             else {
                 Local = false;
             }
 
-            //add to things
+            Add();
+        }
+
+        public Thing(MNPC mnpc) {
+            Is_Player = false;
+            Is_Npc = true;
+
+            mplayer = null;
+            this.mnpc = mnpc;
+
+            Index = (ushort)(Main.maxPlayers + whoAmI);
+
+            if (!Netmode.IS_CLIENT) {
+                //singleplayer OR this is an npc on the server
+                Local = true;
+            }
+            else {
+                Local = false;
+            }
+
+            Add();
+        }
+
+        /// <summary>
+        /// Add to Things
+        /// </summary>
+        private void Add() {
             if (Things.ContainsKey(Index)) {
                 Things[Index] = this;
             }
