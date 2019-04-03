@@ -18,6 +18,8 @@ namespace ExperienceAndClasses {
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Instance Vars (non-syncing, non-save/load) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
+        public Utilities.Containers.Thing thing { get; private set; }
+
         public bool Is_Local_Player { get; private set; }
 
         /// <summary>
@@ -146,6 +148,9 @@ namespace ExperienceAndClasses {
         /// instanced arrays must be initialized here (also called during cloning, etc)
         /// </summary>
         public override void Initialize() {
+            //for targeting
+            thing = new Utilities.Containers.Thing(this);
+
             //defaults
             Is_Local_Player = false;
             Allow_Secondary = false;

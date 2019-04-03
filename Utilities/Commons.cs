@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
 using Terraria;
 using Terraria.ID;
 using Terraria.Localization;
@@ -200,5 +201,8 @@ namespace ExperienceAndClasses.Utilities {
             return false;
         }
 
+        public static T CreateObjectFromName<T>(String name) {
+            return (T)(Assembly.GetExecutingAssembly().CreateInstance(typeof(T).FullName + "+" + name));
+        }
     }
 }

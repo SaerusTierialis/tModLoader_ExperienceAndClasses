@@ -235,7 +235,7 @@ namespace ExperienceAndClasses.UI {
         /// <param name="status"></param>
         public void SetStatus(Systems.Status status) {
             this.status = status;
-            icon.SetImage(status.Texture());
+            icon.SetImage(status.Texture);
         }
 
         public void Update() {

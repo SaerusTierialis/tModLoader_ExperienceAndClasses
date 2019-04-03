@@ -52,6 +52,149 @@ namespace ExperienceAndClasses.Utilities.Containers {
     }
 
     /// <summary>
+    /// Can contain a player or an npc.
+    /// Maintains a SortedDictionary of all things sorted by their Index.
+    /// Index is identical for clients/server so this can be references in sync
+    /// </summary>
+    public class Thing {
+        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Static ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+        public static SortedDictionary<ushort, Thing> Things { get; private set; } = new SortedDictionary<ushort, Thing>();
+
+        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Instance ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+        public bool Is_Player { get; private set; } = false;
+        public MPlayer mplayer { get; private set; } = null;
+
+        public bool Is_Npc { get; private set; } = false;
+        public MNPC nnpc { get; private set; } = null;
+
+        /// <summary>
+        /// A reference index which is identical across clients/server. This Thing is Thing[Index].
+        /// </summary>
+        public ushort Index { get; private set; }
+
+        /// <summary>
+        /// In singleplayer, all things are local.
+        /// 
+        /// To the server, all NPC are local.
+        /// To the clients, their own player is local (not NPCs).
+        /// </summary>
+        public bool Local { get; private set; }
+
+        public Thing(MPlayer mplayer) {
+            Is_Player = true;
+            this.mplayer = mplayer;
+            Add();
+        }
+
+        public Thing(MNPC mnpc) {
+            Is_Npc = true;
+            this.nnpc = mnpc;
+            Add();
+        }
+
+        private void Add() {
+            //set Thing_Index
+            if (Is_Npc) {
+                Index = (ushort)(Main.maxPlayers + whoAmI);
+            }
+            else {
+                Index = (ushort)whoAmI;
+            }
+
+            //is this local?
+            if ( (Netmode.IS_SINGLEPLAYER) ||
+                 (Netmode.IS_CLIENT && Is_Player && (whoAmI == Main.LocalPlayer.whoAmI)) ||
+                 (Netmode.IS_SERVER && Is_Npc) ) {
+                Local = true;
+            }
+            else {
+                Local = false;
+            }
+
+            //add to things
+            if (Things.ContainsKey(Index)) {
+                Things[Index] = this;
+            }
+            else {
+                Things.Add(Index, this);
+            }
+        }
+
+        private void Remove() {
+            Things.Remove(Index);
+        }
+
+        /// <summary>
+        /// Returns the StatusList of the thing
+        /// </summary>
+        public StatusList Statuses {
+            get {
+                if (Is_Player) {
+                    return mplayer.Statuses;
+                }
+                else {
+                    return nnpc.Statuses;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Returns the player or npc index (player.whoAmI or npc.whoAmI)
+        /// </summary>
+        public int whoAmI {
+            get {
+                if (Is_Player) {
+                    return mplayer.player.whoAmI;
+                }
+                else {
+                    int who = nnpc.npc.whoAmI;
+                    if (who < 0) {
+                        Remove();
+                    }
+                    return who;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Returns whether the thing is alive. If an NPC is found to be dead, it is removed from Things.
+        /// </summary>
+        public bool Dead {
+            get {
+                if (Is_Player) {
+                    return mplayer.player.dead;
+                }
+                else {
+                    bool dead = !nnpc.npc.active;
+                    if (dead) {
+                        Remove();
+                    }
+                    return dead;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Returns whether the thing is active. If not, the thing is removed from Things.
+        /// </summary>
+        public bool Active {
+            get {
+                bool active;
+                if (Is_Player) {
+                    active = mplayer.player.active;
+                }
+                else {
+                    active = nnpc.npc.active;
+                }
+                if (!active) {
+                    Remove();
+                }
+                return active;
+            }
+        }
+    }
+
+    /// <summary>
     /// A container for status instances on a single target.
     /// </summary>
     public class StatusList {
@@ -206,12 +349,7 @@ namespace ExperienceAndClasses.Utilities.Containers {
                         //include best per owner
                         bests = new SortedDictionary<ushort, Systems.Status>();
                         foreach (Systems.Status status in instances) {
-                            if (status.owner_is_player) {
-                                key = (ushort)status.owner_index;
-                            }
-                            else {
-                                key = (ushort)(Main.maxPlayers + status.owner_index);
-                            }
+                            key = status.owner.Index;
                             if (bests.TryGetValue(key, out best)) {
                                 if (status.IsBetterThan(best)) {
                                     bests[key] = status;
@@ -374,7 +512,7 @@ namespace ExperienceAndClasses.Utilities.Containers {
                             //there can be one instance per owner (players and/or npcs)
                             //get current key if any instances from same owner (could be npc-owned so can't just use index as key)
                             foreach (Systems.Status s in instances.Values) {
-                                if ((status.owner_is_player == s.owner_is_player) && (status.owner_index == s.owner_index)) {
+                                if (status.owner.Index == s.owner.Index) {
                                     key_temp = s.Instance_ID;
                                     break;
                                 }

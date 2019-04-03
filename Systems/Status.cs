@@ -102,9 +102,8 @@ namespace ExperienceAndClasses.Systems {
 
         static Status() {
             LOOKUP = new Status[(ushort)Status.IDs.NUMBER_OF_IDs];
-            string[] IDs = Enum.GetNames(typeof(IDs));
             for (byte i = 0; i < LOOKUP.Length; i++) {
-                LOOKUP[i] = (Status)(Assembly.GetExecutingAssembly().CreateInstance(typeof(Status).FullName + "+" + IDs[i]));
+                LOOKUP[i] = Utilities.Commons.CreateObjectFromName<Status>(Enum.GetName(typeof(IDs), i));
             }
         }
 
@@ -201,6 +200,11 @@ namespace ExperienceAndClasses.Systems {
         public bool specific_allow_merge { get; protected set; } = true;
 
         /// <summary>
+        /// When merging, merge durations too (use highest) | default is true
+        /// </summary>
+        protected bool specific_merge_duration = true;
+
+        /// <summary>
         /// sync in multiplayer mode | default is true
         /// </summary>
         protected bool specific_syncs = true;
@@ -234,6 +238,11 @@ namespace ExperienceAndClasses.Systems {
         /// when merging, add to stack count | default is FALSE
         /// </summary>
         protected bool specific_autostack_on_merge = false;
+
+        /// <summary>
+        /// Max stacks when autostack is used
+        /// </summary>
+        protected ushort specific_max_stacks = 0;
 
         /// <summary>
         /// remove if owner died | default is FALSE
@@ -272,35 +281,24 @@ namespace ExperienceAndClasses.Systems {
         public ushort ID_num { get; private set; }
         public byte Instance_ID { get; private set; }
 
-        //target
-        protected bool target_is_player; //else NPC
-        protected int target_index;
-        protected MPlayer target_mplayer;
-        protected MNPC target_mnpc;
+        /// <summary>
+        /// could be player or npc
+        /// </summary>
+        public Utilities.Containers.Thing target { get; private set; }
 
-        //owner
-        public bool owner_is_player { get; private set; } //else NPC
-        public int owner_index { get; private set; }
-        protected MPlayer owner_mplayer;
-        protected MNPC owner_mnpc;
+        /// <summary>
+        /// could be player or npc
+        /// </summary>
+        public Utilities.Containers.Thing owner { get; private set; }
 
-        //generic
+        /// <summary>
+        /// Time to end the status (for duration status). Instant status use DateTime.MinValue and toggle status use DateTime.MaxValue.
+        /// </summary>
         public DateTime time_end { get; private set; }
 
         /// <summary>
-        /// the local client is the owner (always false for server)
+        /// data to automatically sync
         /// </summary>
-        protected bool locally_owned;
-
-        /// <summary>
-        /// the local client is the target (always false for server)
-        /// </summary>
-        protected bool locally_targeted;
-
-        /// <summary>
-        /// is this client (or server) responsible for enforcing duration
-        /// </summary>
-        private bool local_enforce_duration;
         protected Dictionary<AUTOSYNC_DATA_TYPES, float> autosync_data;
 
         /// <summary>
@@ -314,8 +312,15 @@ namespace ExperienceAndClasses.Systems {
         /// </summary>
         public bool was_in_ui = false;
 
-        //set during init
-        private int texture_index = TEXTURE_INDEX_NONE; 
+        /// <summary>
+        /// set during init and used in Texture
+        /// </summary>
+        private int texture_index = TEXTURE_INDEX_NONE;
+
+        /// <summary>
+        /// local is responsible for enforcing end time (false if not duration type)
+        /// </summary>
+        private bool local_enforce_duration = false;
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Core Constructor ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -338,15 +343,17 @@ namespace ExperienceAndClasses.Systems {
         }
 
         /// <summary>
-        /// Returns the status texture (default texture if not set)
+        /// Status icon texture (default texture if not set)
         /// </summary>
         /// <returns></returns>
-        public Texture2D Texture() {
-            if (texture_index == TEXTURE_INDEX_NONE) {
-                return Utilities.Textures.TEXTURE_STATUS_DEFAULT;
-            }
-            else {
-                return Textures[texture_index];
+        public Texture2D Texture {
+            get {
+                if (texture_index == TEXTURE_INDEX_NONE) {
+                    return Utilities.Textures.TEXTURE_STATUS_DEFAULT;
+                }
+                else {
+                    return Textures[texture_index];
+                }
             }
         }
 
@@ -365,17 +372,10 @@ namespace ExperienceAndClasses.Systems {
             }
 
             //remove
-            Utilities.Containers.StatusList statuses;
-            if (target_is_player) {
-                statuses = target_mplayer.Statuses;
-            }
-            else {
-                statuses = target_mnpc.Statuses;
-            }
-            statuses.Remove(this);
+            target.Statuses.Remove(this);
 
             //if timed-effect and no more instances of this status, clear timer
-            if ((specific_effect_type == EFFECT_TYPES.TIMED) && !statuses.Contains(ID)) {
+            if ((specific_effect_type == EFFECT_TYPES.TIMED) && !target.Statuses.Contains(ID)) {
                 Times_Next_Timed_Effect.Remove(ID);
             }
 
@@ -390,103 +390,6 @@ namespace ExperienceAndClasses.Systems {
             //remove everywhere else (send end packet)
             if (specific_syncs) {
                 //TODO - send remove packet
-            }
-        }
-
-        protected void Add(int target_index, int owner_index, float seconds_remaining = 0f, Dictionary<AUTOSYNC_DATA_TYPES, float> sync_data = null, bool target_is_player = true, bool owner_is_player = true, float seconds_until_effect = 0f) {
-            //valid target (stop if not)
-            if ((target_is_player && !specific_target_can_be_player) || (!target_is_player && !specific_target_can_be_npc)) {
-                Utilities.Commons.Error("Invalid target for " + specific_name);
-                return;
-            }
-
-            //valid owner (stop if not)
-            if ((owner_is_player && !specific_owner_can_be_player) || (!owner_is_player && !specific_owner_can_be_npc)) {
-                Utilities.Commons.Error("Invalid owner for " + specific_name);
-                return;
-            }
-
-            //target
-            this.target_is_player = target_is_player;
-            this.target_index = target_index;
-            if (target_is_player) {
-                target_mplayer = Main.player[target_index].GetModPlayer<MPlayer>();
-            }
-            else {
-                target_mnpc = Main.npc[target_index].GetGlobalNPC<MNPC>();
-            }
-
-            //owner
-            this.owner_is_player = owner_is_player;
-            this.owner_index = owner_index;
-            if (owner_is_player) {
-                owner_mplayer = Main.player[owner_index].GetModPlayer<MPlayer>();
-            }
-            else {
-                owner_mnpc = Main.npc[owner_index].GetGlobalNPC<MNPC>();
-            }
-
-            //local client is owner (false for server)
-            if (owner_is_player && !Utilities.Netmode.IS_SERVER && (owner_index == Main.LocalPlayer.whoAmI)) {
-                locally_owned = true;
-            }
-
-            //local client is target (false for server)
-            if (target_is_player && !Utilities.Netmode.IS_SERVER && (target_index == Main.LocalPlayer.whoAmI)) {
-                locally_targeted = true;
-            }
-
-            //start
-            OnStart();
-
-            //do effect if instant
-            if (specific_duration_type == DURATION_TYPES.INSTANT) {
-                DoEffect();
-            }
-
-            //calcualte end time
-            switch (specific_duration_type) {
-                case (DURATION_TYPES.TIMED):
-                    time_end = ExperienceAndClasses.Now.AddSeconds(seconds_remaining);
-                    break;
-
-                case (DURATION_TYPES.INSTANT):
-                    time_end = DateTime.MinValue;
-                    break;
-
-                case (DURATION_TYPES.TOGGLE):
-                    time_end = DateTime.MaxValue;
-                    break;
-
-                default:
-                    Utilities.Commons.Error("Unsupported DURATION_TYPES: " + specific_duration_type);
-                    break;
-            }
-
-            //periodic effect time (not stored in status itself because timer should be across instances of the status)
-            if (specific_effect_type == EFFECT_TYPES.TIMED) {
-                if (Times_Next_Timed_Effect.ContainsKey(ID)) {
-                    //had a timer so update it
-                    Times_Next_Timed_Effect[ID] = ExperienceAndClasses.Now.AddSeconds(seconds_until_effect);
-                }
-                else {
-                    //did not already have timer so start one with first effect now
-                    Times_Next_Timed_Effect.Add(ID, ExperienceAndClasses.Now);
-                }
-            }
-
-            //locally enforce duration?
-            if (specific_effect_type == EFFECT_TYPES.TIMED) {               //has a duration, AND
-                if (!specific_syncs ||                                      //not shared with other clients, OR
-                    (!target_is_player && !Utilities.Netmode.IS_CLIENT) ||  //target is npc and this is server or singleplayer, OR
-                    locally_targeted) {                                     //target is the local client
-                    local_enforce_duration = true;
-                }
-            }
-            
-            //sync
-            if (specific_syncs) {
-                //TODO
             }
         }
 
@@ -551,60 +454,48 @@ namespace ExperienceAndClasses.Systems {
             //requirements: server/singleplayer (not client) checks
             if (!Utilities.Netmode.IS_CLIENT) {
                 //remove if owner player leaves
-                if ((specific_remove_if_owner_player_leaves || (specific_duration_type == DURATION_TYPES.TOGGLE)) && owner_is_player && !owner_mplayer.player.active) {
+                if ((specific_remove_if_owner_player_leaves || (specific_duration_type == DURATION_TYPES.TOGGLE)) && owner.Is_Player && !owner.Active) {
                     return true;
                 }
 
                 //remove if owner died
                 if (specific_remove_on_owner_death) {
-                    if (owner_is_player && owner_mplayer.player.dead) { //player owner died
-                        return true;
-                    }
-                    else if (!Main.npc[owner_index].active) { //npc owner died
+                    if (owner.Dead) {
                         return true;
                     }
                 }
 
                 //remove if target died
                 if (specific_remove_on_target_death) {
-                    if (target_is_player && target_mplayer.player.dead) { //player target died
-                        return true;
-                    }
-                    else if (!Main.npc[target_index].active) { //npc target died
+                    if (target.Dead) {
                         return true;
                     }
                 }
 
                 //remove if target lacks required status
                 if (specific_target_required_status != IDs.NONE) {
-                    if (target_is_player && !target_mplayer.Statuses.Contains(specific_target_required_status)) {
-                        return true;
-                    }
-                    else if (target_mnpc.Statuses.Contains(specific_target_required_status)) {
+                    if (!target.Statuses.Contains(specific_target_required_status)) {
                         return true;
                     }
                 }
 
                 //remove if target has antirequisite status
                 if (specific_target_antirequisite_status != IDs.NONE) {
-                    if (target_is_player && target_mplayer.Statuses.Contains(specific_target_antirequisite_status)) {
-                        return true;
-                    }
-                    else if (target_mnpc.Statuses.Contains(specific_target_antirequisite_status)) {
+                    if (target.Statuses.Contains(specific_target_antirequisite_status)) {
                         return true;
                     }
                 }
             }
 
             //requirements: local
-            if (locally_owned) { //owner is always player if locally_owned
+            if (owner.Is_Player && owner.Local) { //owner is always player if locally_owned
                 //required status
-                if ((specific_owner_player_required_status != IDs.NONE) && !owner_mplayer.Statuses.Contains(specific_owner_player_required_status)) {
+                if ((specific_owner_player_required_status != IDs.NONE) && !owner.Statuses.Contains(specific_owner_player_required_status)) {
                     return true;
                 }
 
                 //required passive
-                if ((specific_owner_player_required_passive != Systems.Passive.IDs.NONE) && !owner_mplayer.Passives.Contains(specific_owner_player_required_passive)) {
+                if ((specific_owner_player_required_passive != Systems.Passive.IDs.NONE) && !owner.mplayer.Passives.Contains(specific_owner_player_required_passive)) {
                     return true;
                 }
 
@@ -630,31 +521,54 @@ namespace ExperienceAndClasses.Systems {
 
         /// <summary>
         /// Merges passed status into this one. Returns false if no improvements were made.
+        /// If improvements were made, then the owner is set to the owner of the merged in status and autostack may occur.
         /// </summary>
         /// <param name="status"></param>
         /// <returns></returns>
         public bool Merge(Status status) {
-            //TODO track if improvements would be made
+            //track if improvements would be made
+            bool improved = false;
 
-            //TODO - autosync
+            //allowed to merge? (shouldn't be called if not allowed, but might as well check)
+            if (specific_allow_merge) {
+                //autosync data
+                foreach (AUTOSYNC_DATA_TYPES type in specific_autosync_data_types) {
+                    if (autosync_data[type] < status.autosync_data[type]) {
+                        autosync_data[type] = status.autosync_data[type];
+                        improved = true;
+                    }
+                }
 
-            //TODO - duration (if timed)
-            if (specific_duration_type == DURATION_TYPES.TIMED) {
+                //duration (if timed and specific_merge_duration)
+                if (specific_merge_duration && (specific_duration_type == DURATION_TYPES.TIMED)) {
+                    if (status.time_end.CompareTo(time_end) > 0) {
+                        time_end = status.time_end;
+                        improved = true;
+                    }
+                }
 
+                //optional override
+                if (OnMerge(status)) {
+                    improved = true;
+                }
+
+                //if improved...
+                if (improved) {
+                    //copy new owner
+                    owner = status.owner;
+
+                    //add stack if autostack (and not maxed)
+                    if (specific_autostack_on_merge && (autosync_data[AUTOSYNC_DATA_TYPES.STACKS] < specific_max_stacks)) {
+                        autosync_data[AUTOSYNC_DATA_TYPES.STACKS] += 1f;
+                    }
+                }
+
+                //sync
+                if (specific_syncs) {
+                    //TODO
+                }
             }
-
-            //TODO stack?
-
-            //copy owner
-            owner_is_player = status.owner_is_player;
-            owner_index = status.owner_index;
-            owner_mnpc = status.owner_mnpc;
-            owner_mplayer = status.owner_mplayer;
-
-            //optional override
-            OnMerge(status);
-
-            return false;
+            return improved;
         }
 
         /// <summary>
@@ -722,7 +636,88 @@ namespace ExperienceAndClasses.Systems {
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Instance Methods To Override (Required) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
+        protected static void Create(IDs id, Utilities.Containers.Thing target, Utilities.Containers.Thing owner, Dictionary<AUTOSYNC_DATA_TYPES, float> sync_data = null, float seconds_remaining = 0f, float seconds_until_effect = 0f) {
+            //create instance
+            Status status = Utilities.Commons.CreateObjectFromName<Status>(Enum.GetName(typeof(IDs), id));
+            
+            //valid target (stop if not)
+            if ((target.Is_Player && !status.specific_target_can_be_player) || (target.Is_Npc && !status.specific_target_can_be_npc)) {
+                Utilities.Commons.Error("Invalid target for " + status.specific_name);
+                return;
+            }
 
+            //valid owner (stop if not)
+            if ((owner.Is_Player && !status.specific_owner_can_be_player) || (owner.Is_Npc && !status.specific_owner_can_be_npc)) {
+                Utilities.Commons.Error("Invalid owner for " + status.specific_name);
+                return;
+            }
+
+            //target
+            status.target = target;
+
+            //owner
+            status.owner = owner;
+
+            //calcualte end time
+            switch (status.specific_duration_type) {
+                case (DURATION_TYPES.TIMED):
+                    status.time_end = ExperienceAndClasses.Now.AddSeconds(seconds_remaining);
+                    break;
+
+                case (DURATION_TYPES.INSTANT):
+                    status.time_end = DateTime.MinValue;
+                    break;
+
+                case (DURATION_TYPES.TOGGLE):
+                    status.time_end = DateTime.MaxValue;
+                    break;
+
+                default:
+                    Utilities.Commons.Error("Unsupported DURATION_TYPES: " + status.specific_duration_type);
+                    break;
+            }
+
+            //start
+            status.OnStart();
+
+            //do effect if instant
+            if (status.specific_duration_type == DURATION_TYPES.INSTANT) {
+                status.DoEffect();
+            }
+            else {
+                //not instant... do duration stuff
+
+                //periodic effect time (not stored in status itself because timer should be across instances of the status)
+                if (status.specific_effect_type == EFFECT_TYPES.TIMED) {
+                    if (Times_Next_Timed_Effect.ContainsKey(id)) {
+                        //had a timer so update it
+                        Times_Next_Timed_Effect[id] = ExperienceAndClasses.Now.AddSeconds(seconds_until_effect);
+                    }
+                    else {
+                        //did not already have timer so start one with first effect now
+                        Times_Next_Timed_Effect.Add(id, ExperienceAndClasses.Now);
+                    }
+                }
+
+                //locally enforce duration?
+                if (status.specific_effect_type == EFFECT_TYPES.TIMED) {    //has a duration, AND
+                    if (!status.specific_syncs ||                           //not shared with other clients, OR
+                        target.Local) {                                     //target is the local client OR this is server and target is npc
+
+                        status.local_enforce_duration = true;
+
+                    }
+                }
+            }
+
+            //attach to target (may cause merge or overwrite)
+            target.Statuses.Add(status);
+
+            //sync
+            if (status.specific_syncs) {
+                //TODO
+            }
+        }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Instance Methods To Override (Optional) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         //these are for any additional status-specific code
@@ -730,7 +725,14 @@ namespace ExperienceAndClasses.Systems {
         protected virtual void Effect() {}
         protected virtual bool ShouldRemove() { return false; }
         protected virtual bool ShouldRemoveLocal() { return false; }
-        protected virtual void OnMerge(Status status) {}
+
+        /// <summary>
+        /// Return true to mark the merge as an improvement. False leaves the value as it was.
+        /// Called after merging autosync data and duration, but before (potentially) setting new owner and autostacking.
+        /// </summary>
+        /// <param name="status"></param>
+        /// <returns></returns>
+        protected virtual bool OnMerge(Status status) { return false; }
 
         /// <summary>
         /// Called when status is removed (not when merged over)
