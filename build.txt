@@ -7,3 +7,4 @@ includePDB = true
 hideCode = false
 hideResources  = false
 includeSource = true
+languageVersion = 6
