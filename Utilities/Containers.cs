@@ -61,16 +61,15 @@ namespace ExperienceAndClasses.Utilities.Containers {
         public static SortedDictionary<ushort, Thing> Things { get; private set; } = new SortedDictionary<ushort, Thing>();
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Instance ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-        public bool Is_Player { get; private set; } = false;
-        private MPlayer mplayer = null;
-
-        public bool Is_Npc { get; private set; } = false;
-        private MNPC mnpc = null;
+        public readonly bool Is_Player;
+        private readonly MPlayer mplayer;
+        public readonly bool Is_Npc;
+        private readonly MNPC mnpc;
 
         /// <summary>
         /// A reference index which is identical across clients/server. This Thing is Thing[Index].
         /// </summary>
-        public ushort Index { get; private set; }
+        public readonly ushort Index;
 
         /// <summary>
         /// In singleplayer, all things are local.
@@ -82,25 +81,23 @@ namespace ExperienceAndClasses.Utilities.Containers {
 
         public Thing(MPlayer mplayer) {
             Is_Player = true;
+            Is_Npc = false;
             this.mplayer = mplayer;
+            mnpc = null;
+            Index = (ushort)whoAmI;
             Add();
         }
 
         public Thing(MNPC mnpc) {
+            Is_Player = false;
             Is_Npc = true;
+            mplayer = null;
             this.mnpc = mnpc;
+            Index = (ushort)(Main.maxPlayers + whoAmI);
             Add();
         }
 
         private void Add() {
-            //set Thing_Index
-            if (Is_Npc) {
-                Index = (ushort)(Main.maxPlayers + whoAmI);
-            }
-            else {
-                Index = (ushort)whoAmI;
-            }
-
             //is this local?
             if ( (Netmode.IS_SINGLEPLAYER) ||
                  (Netmode.IS_CLIENT && Is_Player && (whoAmI == Main.LocalPlayer.whoAmI)) ||
