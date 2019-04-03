@@ -75,6 +75,8 @@ namespace ExperienceAndClasses {
         /// Container of statuses on this player
         /// </summary>
         public Utilities.Containers.StatusList Statuses { get; private set; }
+        public List<Systems.Status> Statuses_DrawBack;
+        public List<Systems.Status> Statuses_DrawFront;
 
         public List<Systems.Passive.IDs> Passives { get; private set; }
 
@@ -156,6 +158,8 @@ namespace ExperienceAndClasses {
             minions = new List<Projectile>();
             slot_minions = new List<Projectile>();
             Statuses = new Utilities.Containers.StatusList();
+            Statuses_DrawBack = new List<Systems.Status>();
+            Statuses_DrawFront = new List<Systems.Status>();
             Progression = 0;
             Extra_XP = 0;
             Passives = new List<Systems.Passive.IDs>();
@@ -679,6 +683,22 @@ namespace ExperienceAndClasses {
             DrawData data = new DrawData(texture, new Vector2(drawX, drawY), Color.Green);
             Main.playerDrawData.Add(data);
             */
+
+            MPlayer mplayer = drawInfo.drawPlayer.GetModPlayer<MPlayer>();
+            if (is_behind) {
+                List<Systems.Status> statuses = mplayer.Statuses_DrawBack;
+                foreach (Systems.Status status in statuses) {
+                    //TODO
+                    //status.DrawEffectBack(drawInfo);
+                }
+            }
+            else {
+                List<Systems.Status> statuses = mplayer.Statuses_DrawFront;
+                foreach (Systems.Status status in statuses) {
+                    //TODO
+                    //status.DrawEffectFront(drawInfo);
+                }
+            }
         }
 
         public static readonly PlayerLayer MiscEffectsBehind = new PlayerLayer("ExperienceAndClasses", "MiscEffectsBack", PlayerLayer.MiscEffectsBack, delegate (PlayerDrawInfo drawInfo) {
@@ -886,10 +906,11 @@ namespace ExperienceAndClasses {
         }
 
         private void ApplyStatuses() {
+            //reset attributes from status
             Attributes_Status = new int[(byte)Systems.Attribute.IDs.NUMBER_OF_IDs];
-            foreach (List<Systems.Status> s in Statuses.GetAllStatuses()) {
-                //TODO
-            }
+
+            //process statuses
+            Systems.Status.ProcessStatuses(Statuses);
         }
         
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Ability ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/

@@ -229,18 +229,17 @@ namespace ExperienceAndClasses.UI {
             RecalculateChildren();
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="status"></param>
         public void SetStatus(Systems.Status status) {
             this.status = status;
-
-            //TODO set texture
-
-            Update();
+            icon.SetImage(status.Texture());
         }
 
         public void Update() {
-            //TODO make duration string
-            string str = "1 s";
-
+            string str = status.GetIconDurationString();
             if (!str.Equals(prior_text)) {
                 text.SetText(str);
                 text.Recalculate();

@@ -30,13 +30,12 @@ namespace ExperienceAndClasses.UI {
         /// <summary>
         /// sorted by float duration remaining
         /// </summary>
-        public static SortedList<float, Systems.Status> status_to_draw;
+        public static Utilities.Containers.TimeSortedStatusList status_to_draw = new Utilities.Containers.TimeSortedStatusList(SLOTS);
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Initialize ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         protected override void InitializeState() {
-            needs_redraw_complete = false;
+            needs_redraw_complete = true;
             needs_redraw_times_only = false;
-            status_to_draw = new SortedList<float, Systems.Status>();
 
             icons = new StatusIcon[SLOTS];
             for (byte i = 0; i < icons.Length; i++) icons[i] = new StatusIcon();
@@ -56,6 +55,71 @@ namespace ExperienceAndClasses.UI {
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Methods ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         public void Update() {
+            StatusIcon icon;
+
+            //update?
+            if (needs_redraw_complete || needs_redraw_times_only) {
+                //remake list of statuses to show?
+                if (needs_redraw_complete) {
+                    //remake status_to_draw
+                    status_to_draw.Clear();
+                    List <Systems.Status> instances_applied = ExperienceAndClasses.LOCAL_MPLAYER.Statuses.GetAllApply();
+                    Systems.Status.IDs id_skip = Systems.Status.IDs.NONE;
+                    foreach (Systems.Status status in instances_applied) {
+                        //default to not in ui
+                        status.was_in_ui = false;
+
+                        //add to ui? (set was_in_ui if added)
+                        if (status.ID != id_skip) {
+                            switch (status.specific_ui_type) {
+                                case Systems.Status.UI_TYPES.NONE:
+                                    //do nothing and skip any other instances of this status
+                                    id_skip = status.ID;
+                                    break;
+                                case Systems.Status.UI_TYPES.ALL_APPLY:
+                                    //show all instances applied
+                                    status_to_draw.Add(status);
+                                    status.was_in_ui = true;
+                                    break;
+                                case Systems.Status.UI_TYPES.ONE:
+                                    //show just first instance applied
+                                    status_to_draw.Add(status);
+                                    status.was_in_ui = true;
+                                    id_skip = status.ID; //skip other instances of this status
+                                    break;
+
+                                default:
+                                    Utilities.Commons.Error("Unsupported UI_TYPES: " + status.specific_ui_type);
+                                    break;
+                            }
+                        }
+                    }
+
+                    //clear all icons
+                    foreach (StatusIcon i in icons) {
+                        i.active = false;
+                    }
+
+                    //set icon statuses
+                    int counter = Main.LocalPlayer.CountBuffs();
+                    foreach (Systems.Status status in status_to_draw) {
+                        icon = icons[counter++];
+                        icon.active = true;
+                        icon.SetStatus(status);
+                        icon.Update();
+                    }
+                }
+                else {
+                    //just update text
+                    foreach (StatusIcon i in icons) {
+                        if (i.active) {
+                            i.Update();
+                        }
+                    }
+                }
+            }
+
+            /*
             //TODO - redraw (complete and times only)
 
             int number_buffs = 0;
@@ -80,6 +144,7 @@ namespace ExperienceAndClasses.UI {
                     icons[i].active = false;
                 }
             }
+            */
 
         }
 

@@ -57,7 +57,7 @@ namespace ExperienceAndClasses.Systems {
         /// <summary>
         /// Limit on how many instances can be on a single target
         /// </summary>
-        protected enum LIMIT_TYPES : byte {
+        public enum LIMIT_TYPES : byte {
             MANY, //up to limit of container
             ONE_PER_OWNER,
             ONE,
@@ -66,7 +66,7 @@ namespace ExperienceAndClasses.Systems {
         /// <summary>
         /// Which instances to apply if there are multiple
         /// </summary>
-        protected enum APPLY_TYPES : byte {
+        public enum APPLY_TYPES : byte {
             ALL,
             BEST_PER_OWNER,
             BEST,
@@ -75,7 +75,7 @@ namespace ExperienceAndClasses.Systems {
         /// <summary>
         /// Which instances to show in UI
         /// </summary>
-        protected enum UI_TYPES : byte {
+        public enum UI_TYPES : byte {
             NONE,
             ONE, //even if more than one is taking effect, only one of these is shown (first applied by instance id)
             ALL_APPLY, //all that are being applied
@@ -87,6 +87,11 @@ namespace ExperienceAndClasses.Systems {
         /// this texture index value indicates that there is no texture
         /// </summary>
         private static int TEXTURE_INDEX_NONE = -1;
+
+        /// <summary>
+        /// Used in IsBetterThan for order of priority
+        /// </summary>
+        private readonly AUTOSYNC_DATA_TYPES[] AUTOSYNC_COMPARE_IN_ORDER = { AUTOSYNC_DATA_TYPES.MAGNITUDE1, AUTOSYNC_DATA_TYPES.MAGNITUDE2, AUTOSYNC_DATA_TYPES.STACKS, AUTOSYNC_DATA_TYPES.RANGE };
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Auto-Populated Lookup ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -109,6 +114,13 @@ namespace ExperienceAndClasses.Systems {
         /// contains one element per status that has a texture, these status contain texture_index
         /// </summary>
         private static List<Texture2D> Textures = new List<Texture2D>();
+
+        /// <summary>
+        /// timers for timed-effect statuses
+        /// (not stored in status itself because timer should be across instances of the status)
+        /// (cleared when there are no more instances of a status)
+        /// </summary>
+        private static SortedDictionary<IDs, DateTime> Times_Next_Timed_Effect = new SortedDictionary<IDs, DateTime>();
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Instance Vars Status-Specific ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         //all of these begin with "specific_" and have a description including the default value to make adding more statuses easier
@@ -171,22 +183,22 @@ namespace ExperienceAndClasses.Systems {
         /// <summary>
         /// frequency of effect if effect type is timed | default is 1 second
         /// </summary>
-        protected float specific_effect_update_frequency_sec = 1f;
+        protected float specific_timed_effect_sec = 1f;
 
         /// <summary>
         /// instance limitation type | default is many (up to a max of whatever the status container is set to hold)
         /// </summary>
-        protected LIMIT_TYPES specific_limit_type = LIMIT_TYPES.MANY;
+        public LIMIT_TYPES specific_limit_type { get; protected set; } = LIMIT_TYPES.MANY;
 
         /// <summary>
         /// when there are multiple instances, the apply type determines which take effect | default is BEST_PER_OWNER
         /// </summary>
-        protected APPLY_TYPES specific_apply_type = APPLY_TYPES.BEST_PER_OWNER;
+        public APPLY_TYPES specific_apply_type = APPLY_TYPES.BEST_PER_OWNER;
 
         /// <summary>
-        /// when a status would replace another, merges best of both status autosync fields instead (sets owner to latest owner) (there is an additional status-specific merge method that is also called) | default is TRUE
+        /// when a status would replace another, merges best of both status autosync fields and take the longer remaining duration instead (sets owner to latest owner) (there is an additional status-specific merge method that is also called) | default is TRUE
         /// </summary>
-        protected bool specific_allow_merge = true;
+        public bool specific_allow_merge { get; protected set; } = true;
 
         /// <summary>
         /// sync in multiplayer mode | default is true
@@ -196,7 +208,7 @@ namespace ExperienceAndClasses.Systems {
         /// <summary>
         /// ui display type | default is ALL_APPLY (all that are allowed to apply based on APPLY_TYPES)
         /// </summary>
-        protected UI_TYPES specific_ui_type = UI_TYPES.ALL_APPLY;
+        public UI_TYPES specific_ui_type = UI_TYPES.ALL_APPLY;
 
         /// <summary>
         /// remove if the local client is the owner and does not have specified status | default is none
@@ -238,6 +250,21 @@ namespace ExperienceAndClasses.Systems {
         /// </summary>
         protected bool specific_remove_if_owner_player_leaves = false;
 
+        /// <summary>
+        /// remove if owner is local player and they are not pressing this key | default is null
+        /// </summary>
+        protected ModHotKey specific_remove_if_key_not_pressed = null;
+
+        /// <summary>
+        /// has a visual drawn behind target (uses DrawEffectBack) | default is false
+        /// </summary>
+        protected bool specified_has_visual_back = false;
+
+        /// <summary>
+        /// has a visual drawn in front of target (uses DrawEffectFront) | default is false
+        /// </summary>
+        protected bool specified_has_visual_front = false;
+
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Instance Vars Generic ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         //ID
@@ -252,23 +279,40 @@ namespace ExperienceAndClasses.Systems {
         protected MNPC target_mnpc;
 
         //owner
-        protected bool owner_is_player; //else NPC
-        protected int owner_index;
+        public bool owner_is_player { get; private set; } //else NPC
+        public int owner_index { get; private set; }
         protected MPlayer owner_mplayer;
-        protected MNPC owner_MNPC;
+        protected MNPC owner_mnpc;
 
         //generic
-        private DateTime time_end, time_next_effect;
-        protected bool locally_owned; //the local client is the owner (always false for server)
-        private bool local_enforce_duration; //is this client (or server) responsible for enforcing duration
+        public DateTime time_end { get; private set; }
+
+        /// <summary>
+        /// the local client is the owner (always false for server)
+        /// </summary>
+        protected bool locally_owned;
+
+        /// <summary>
+        /// the local client is the target (always false for server)
+        /// </summary>
+        protected bool locally_targeted;
+
+        /// <summary>
+        /// is this client (or server) responsible for enforcing duration
+        /// </summary>
+        private bool local_enforce_duration;
         protected Dictionary<AUTOSYNC_DATA_TYPES, float> autosync_data;
 
-        //for UI
-        public string Time_Remaining_String { get; private set; }
-        private int time_remaining_min = -1;
-        private int time_remaining_sec = -1;
-        private long time_remaining_ticks = long.MaxValue;
-        public bool draw = false;
+        /// <summary>
+        /// effect was applied (or test in case of timed effect) in latest cycle
+        /// </summary>
+        private bool applied = false;
+
+        /// <summary>
+        /// had a ui icon the last time it was applied (can be left true when applied is false so check "applied && in_ui")
+        /// note that a status cannot have a ui icon without being applied
+        /// </summary>
+        public bool was_in_ui = false;
 
         //set during init
         private int texture_index = TEXTURE_INDEX_NONE; 
@@ -279,7 +323,6 @@ namespace ExperienceAndClasses.Systems {
             ID = id;
             ID_num = (ushort)id;
             Instance_ID = Utilities.Containers.StatusList.UNASSIGNED_INSTANCE_KEY;
-            Time_Remaining_String = "";
         }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Instance Methods ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
@@ -316,21 +359,31 @@ namespace ExperienceAndClasses.Systems {
         }
 
         protected void RemoveLocally() {
-            //if this was being drawn, need complete redraw
-            if (draw) {
+            //if this was being drawn, need ui update
+            if (applied && was_in_ui) {
                 UI.UIStatus.needs_redraw_complete = true;
             }
 
             //remove
+            Utilities.Containers.StatusList statuses;
             if (target_is_player) {
-                target_mplayer.Statuses.Remove(this);
+                statuses = target_mplayer.Statuses;
             }
             else {
-                target_mnpc.Statuses.Remove(this);
+                statuses = target_mnpc.Statuses;
             }
+            statuses.Remove(this);
+
+            //if timed-effect and no more instances of this status, clear timer
+            if ((specific_effect_type == EFFECT_TYPES.TIMED) && !statuses.Contains(ID)) {
+                Times_Next_Timed_Effect.Remove(ID);
+            }
+
+            //end
+            OnEnd();
         }
 
-        protected void RemoveEverywhere() {
+        public void RemoveEverywhere() {
             //remove locally
             RemoveLocally();
 
@@ -340,9 +393,87 @@ namespace ExperienceAndClasses.Systems {
             }
         }
 
-        protected void Add(int target_index, int owner_index, Dictionary<AUTOSYNC_DATA_TYPES, float> sync_data = null, bool target_is_player = true, bool owner_is_player = true) {
-            //TODO
-            //check if target is valid
+        protected void Add(int target_index, int owner_index, float seconds_remaining = 0f, Dictionary<AUTOSYNC_DATA_TYPES, float> sync_data = null, bool target_is_player = true, bool owner_is_player = true, float seconds_until_effect = 0f) {
+            //valid target (stop if not)
+            if ((target_is_player && !specific_target_can_be_player) || (!target_is_player && !specific_target_can_be_npc)) {
+                Utilities.Commons.Error("Invalid target for " + specific_name);
+                return;
+            }
+
+            //valid owner (stop if not)
+            if ((owner_is_player && !specific_owner_can_be_player) || (!owner_is_player && !specific_owner_can_be_npc)) {
+                Utilities.Commons.Error("Invalid owner for " + specific_name);
+                return;
+            }
+
+            //target
+            this.target_is_player = target_is_player;
+            this.target_index = target_index;
+            if (target_is_player) {
+                target_mplayer = Main.player[target_index].GetModPlayer<MPlayer>();
+            }
+            else {
+                target_mnpc = Main.npc[target_index].GetGlobalNPC<MNPC>();
+            }
+
+            //owner
+            this.owner_is_player = owner_is_player;
+            this.owner_index = owner_index;
+            if (owner_is_player) {
+                owner_mplayer = Main.player[owner_index].GetModPlayer<MPlayer>();
+            }
+            else {
+                owner_mnpc = Main.npc[owner_index].GetGlobalNPC<MNPC>();
+            }
+
+            //local client is owner (false for server)
+            if (owner_is_player && !Utilities.Netmode.IS_SERVER && (owner_index == Main.LocalPlayer.whoAmI)) {
+                locally_owned = true;
+            }
+
+            //local client is target (false for server)
+            if (target_is_player && !Utilities.Netmode.IS_SERVER && (target_index == Main.LocalPlayer.whoAmI)) {
+                locally_targeted = true;
+            }
+
+            //start
+            OnStart();
+
+            //do effect if instant
+            if (specific_duration_type == DURATION_TYPES.INSTANT) {
+                DoEffect();
+            }
+
+            //calcualte end time
+            if (specific_duration_type == DURATION_TYPES.TIMED) {
+                time_end = ExperienceAndClasses.Now.AddSeconds(seconds_remaining);
+            }
+
+            //periodic effect time (not stored in status itself because timer should be across instances of the status)
+            if (specific_effect_type == EFFECT_TYPES.TIMED) {
+                if (Times_Next_Timed_Effect.ContainsKey(ID)) {
+                    //had a timer so update it
+                    Times_Next_Timed_Effect[ID] = ExperienceAndClasses.Now.AddSeconds(seconds_until_effect);
+                }
+                else {
+                    //did not already have timer so start one with first effect now
+                    Times_Next_Timed_Effect.Add(ID, ExperienceAndClasses.Now);
+                }
+            }
+
+            //locally enforce duration?
+            if (specific_effect_type == EFFECT_TYPES.TIMED) {               //has a duration, AND
+                if (!specific_syncs ||                                      //not shared with other clients, OR
+                    (!target_is_player && !Utilities.Netmode.IS_CLIENT) ||  //target is npc and this is server or singleplayer, OR
+                    locally_targeted) {                                     //target is the local client
+                    local_enforce_duration = true;
+                }
+            }
+            
+            //sync
+            if (specific_syncs) {
+                //TODO
+            }
         }
 
         /// <summary>
@@ -350,42 +481,41 @@ namespace ExperienceAndClasses.Systems {
         /// </summary>
         /// <param name="now"></param>
         /// <returns></returns>
-        public bool PreUpdate() {
+        public bool Update() {
             //remove?
-            bool remove = PreUpdate_CheckRemoval();
+            bool remove = CheckRemoval();
             if (remove) {
                 RemoveEverywhere();
             }
             else {
-                //new string for ui?
-                if (draw) {
-                    TimeSpan time_remain = time_end.Subtract(ExperienceAndClasses.Now);
-                    time_remaining_ticks = time_remain.Ticks;
-                    int time_remaining_min_now = time_remain.Minutes;
-                    int time_remaining_sec_now = time_remain.Seconds;
-                    if ((time_remaining_min_now != time_remaining_min) || (time_remaining_sec_now != time_remaining_sec)) {
-                        time_remaining_min = time_remaining_min_now;
-                        time_remaining_sec = time_remaining_sec_now;
-                        if (time_remaining_min > 0) {
-                            Time_Remaining_String = time_remaining_min + " min";
-                        }
-                        else {
-                            Time_Remaining_String = time_remaining_sec + " sec";
-                        }
-                        //a new string was created so ui must update
-                        UI.UIStatus.needs_redraw_times_only = true;
-                    }
-                }
+                //override method
+                OnUpdate();
 
-                //set as not part of UI
-                draw = false;
-
-                //TODO
-
+                //default to not applied during this cycle
+                applied = false;
             }
 
             //return removal
             return remove;
+        }
+
+        public String GetIconDurationString() {
+            if (specific_duration_type == DURATION_TYPES.TIMED) {
+
+                TimeSpan time_remain = time_end.Subtract(ExperienceAndClasses.Now);
+                int time_remaining_min = time_remain.Minutes;
+                int time_remaining_sec = time_remain.Seconds;
+
+                if (time_remaining_min > 0) {
+                    return time_remaining_min + " min";
+                }
+                else {
+                    return time_remaining_sec + " sec";
+                }
+            }
+            else {
+                return "";
+            }
         }
 
         /// <summary>
@@ -393,7 +523,12 @@ namespace ExperienceAndClasses.Systems {
         /// </summary>
         /// <param name="now"></param>
         /// <returns></returns>
-        private bool PreUpdate_CheckRemoval() {
+        private bool CheckRemoval() {
+            //remove if duration type is instant (shouldn't happen)
+            if (specific_duration_type == DURATION_TYPES.INSTANT) {
+                return true;
+            }
+
             //remove if this client/server is responsible for the duration (else update time remaining if target is a player)
             if (local_enforce_duration && (ExperienceAndClasses.Now.CompareTo(time_end) >= 0)) { //timeup
                 return true;
@@ -463,6 +598,11 @@ namespace ExperienceAndClasses.Systems {
                 if (ShouldRemoveLocal()) {
                     return true;
                 }
+
+                //key press
+                if (specific_remove_if_key_not_pressed != null && !specific_remove_if_key_not_pressed.Current) {
+                    return true;
+                }
             }
 
             //status-specific check
@@ -474,19 +614,96 @@ namespace ExperienceAndClasses.Systems {
             return false;
         }
 
-        public bool IsBetterThan(Status status) {
-            if (ID != status.ID) {
-                //different types of status
-                return false;
+        /// <summary>
+        /// Merges passed status into this one. Returns false if no improvements were made.
+        /// </summary>
+        /// <param name="status"></param>
+        /// <returns></returns>
+        public bool Merge(Status status) {
+            //TODO track if improvements would be made
+
+            //TODO - autosync
+
+            //TODO - duration (if timed)
+            if (specific_duration_type == DURATION_TYPES.TIMED) {
+
             }
-            else if (autosync_data.Count == 0) {
-                //no autosync data to check
-                return false;
-            }
-            //TODO - compare each autosync_data
-            //TODO - check duration if response for durations
+
+            //TODO stack?
+
+            //copy owner
+            owner_is_player = status.owner_is_player;
+            owner_index = status.owner_index;
+            owner_mnpc = status.owner_mnpc;
+            owner_mplayer = status.owner_mplayer;
+
+            //optional override
+            OnMerge(status);
 
             return false;
+        }
+
+        /// <summary>
+        /// Checks the following in order: MAGNITUDE1 > MAGNITUDE2 > STACKS > RANGE > remaining_duration
+        /// The first non-tie determines which is "better"
+        /// Default is false
+        /// </summary>
+        /// <param name="status"></param>
+        /// <returns></returns>
+        public bool IsBetterThan(Status status) {
+            if (ID != status.ID) {
+                //different types of status (shouldn't happen if used correctly)
+                return false;
+            }
+
+            //auto sync fields
+            double value_this, value_other;
+            if (autosync_data.Count != 0) {
+                foreach (AUTOSYNC_DATA_TYPES type_test in AUTOSYNC_COMPARE_IN_ORDER) {
+                    if (specific_autosync_data_types.Contains(type_test)) {
+                        value_this = autosync_data[type_test];
+                        value_other = status.autosync_data[type_test];
+                        if (value_this > value_other) {
+                            return true;
+                        }
+                        else if (value_this < value_other) {
+                            return false;
+                        }
+                    }
+                }
+            }
+            
+            //remaining duration
+            if (specific_duration_type == DURATION_TYPES.TIMED) {
+                if (time_end.CompareTo(status.time_end) >= 0) {
+                    return true;
+                }
+                else {
+                    return false;
+                }
+            }
+
+            //default
+            return false;
+        }
+
+        private void DoEffect() {
+            //effect was applied (or tested if timed effect) on latest cycle
+            applied = true;
+
+            //do effect
+            if (specific_effect_type == EFFECT_TYPES.CONSTANT) {
+                Effect();
+            }
+            else if (specific_effect_type == EFFECT_TYPES.TIMED) {
+                if (ExperienceAndClasses.Now.CompareTo(Times_Next_Timed_Effect[ID]) >= 0) {
+                    //call effect
+                    Effect();
+
+                    //calculate next time of effect
+                    Times_Next_Timed_Effect[ID].AddSeconds(specific_timed_effect_sec);
+                }
+            }
         }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Instance Methods To Override (Required) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
@@ -496,59 +713,75 @@ namespace ExperienceAndClasses.Systems {
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Instance Methods To Override (Optional) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         //these are for any additional status-specific code
         protected virtual void OnStart() {}
-        protected virtual void OnUpdate() {}
-        protected virtual void OnEnd() {}
-        protected virtual void DoEffect() {}
+        protected virtual void Effect() {}
         protected virtual bool ShouldRemove() { return false; }
         protected virtual bool ShouldRemoveLocal() { return false; }
-        protected virtual void Merge() {}
+        protected virtual void OnMerge(Status status) {}
+
+        /// <summary>
+        /// Called when status is removed (not when merged over)
+        /// </summary>
+        protected virtual void OnEnd() { }
+
+        /// <summary>
+        /// Called on every cycles (even if effect is not done) 
+        /// </summary>
+        protected virtual void OnUpdate() { }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Static Methods ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
+        /// <summary>
+        /// Call on every cycle
+        /// </summary>
+        /// <param name="statuses"></param>
         public static void ProcessStatuses(Utilities.Containers.StatusList statuses) {
-            //reset ui status list
-            UI.UIStatus.status_to_draw = new SortedList<float, Status>();
-
-            bool removed;
-            Status reference;
-            SortedList<int, Status> best_per_owner;
-            Status best;
-            foreach (List<Status> status_list in statuses.GetAllStatuses()) {
-                reference = status_list[0];
-                best = reference;
-                best_per_owner = new SortedList<int, Status>();
-
-                foreach (Status status in status_list) {
-                    removed = status.PreUpdate();
-                    if (!removed) {
-
-                        switch (reference.specific_apply_type) {
-                            case APPLY_TYPES.ALL:
-                                status.DoEffect();
-                                if (reference.specific_ui_type == UI_TYPES.ALL_APPLY) {
-                                    status.draw = true;
-                                    UI.UIStatus.status_to_draw.Add(status.time_remaining_ticks, status);
-                                }
-                                break;
-                                break;
-                            case APPLY_TYPES.BEST_PER_OWNER:
-                                best_per_owner = new SortedList<int, Status>();
-                                break;
-                        }
-
-
-
-                    }
-                }
-
-
-
-
+            //update every instance of every status (may remove some)
+            foreach (Status status in statuses.GetAll()) {
+                status.Update();
             }
+
+            List<Status> apply = statuses.GetAllApply();
+            foreach (Status status in apply) {
+                status.DoEffect();
+            }
+
+
+
+            //TODO - do we need to update UI or draw?
         }
+
+        /// <summary>
+        /// Updates DrawFront and DrawBack lists if needed.
+        /// </summary>
+        /// <param name="mnpc"></param>
+        public static void UpdateVisuals(MNPC mnpc) {
+            //TODO
+        }
+
+        /// <summary>
+        /// Updates DrawFront and DrawBack lists if needed. Also updates UI list if needed.
+        /// </summary>
+        /// <param name="mplayer"></param>
+        public static void UpdateVisuals(MPlayer mplayer) {
+            //TODO
+        }
+
+        /// <summary>
+        /// Get the list of statuses to draw effects for
+        /// </summary>
+        /// <param name="statuses"></param>
+        /// <param name="get_front"></param>
+        /// <returns></returns>
+        private static List<Status> GetDrawList(Utilities.Containers.StatusList statuses, bool get_front) {
+            //TODO
+            return null;
+        }
+
+        
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Example ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
+        /*
         public class Heal : Status {
             public Heal() : base(IDs.Heal) {
                 //any overwrites
@@ -571,6 +804,7 @@ namespace ExperienceAndClasses.Systems {
             protected override void OnUpdate() { }
             protected override void OnEnd() { }
         }
+        */
 
     }
 }

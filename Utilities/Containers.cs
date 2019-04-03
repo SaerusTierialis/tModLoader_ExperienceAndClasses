@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Terraria;
 
 namespace ExperienceAndClasses.Utilities.Containers {
     /// <summary>
@@ -19,6 +20,34 @@ namespace ExperienceAndClasses.Utilities.Containers {
         }
     }
 
+    public class TimeSortedStatusList : List<Systems.Status> {
+
+        public TimeSortedStatusList() {}
+        public TimeSortedStatusList(int capacity) : base(capacity) {}
+
+        /// <summary>
+        /// Adds status sorting by end time
+        /// </summary>
+        /// <param name="status"></param>
+        public new void Add(Systems.Status status) {
+            //is full?
+            if (Count == Capacity) {
+                Commons.Error("A status icon cannot be displayed because there are not enough slots!");
+                return;
+            }
+
+            //insert before first status that is equal/later
+            for (int i=0; i<Count; i++) {
+                if (status.time_end.CompareTo(this.ElementAt<Systems.Status>(i).time_end) <= 0) {
+                    Insert(i, status);
+                    return;
+                }
+            }
+            //default to insert at end
+            Add(status);
+        }
+    }
+
     /// <summary>
     /// A container for status instances on a single target.
     /// </summary>
@@ -27,7 +56,7 @@ namespace ExperienceAndClasses.Utilities.Containers {
         public const byte UNASSIGNED_INSTANCE_KEY = byte.MaxValue;
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Variables ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-        private SortedList<Systems.Status.IDs, StatusInstances> statuses = new SortedList<Systems.Status.IDs, StatusInstances>((int)Systems.Status.IDs.NUMBER_OF_IDs);
+        private SortedDictionary<Systems.Status.IDs, StatusInstances> statuses = new SortedDictionary<Systems.Status.IDs, StatusInstances>();
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Methods ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -56,12 +85,13 @@ namespace ExperienceAndClasses.Utilities.Containers {
 
         /// <summary>
         /// Add status. Will create a new StatusInstances if needed. Will assign instance id if not set.
+        /// Instance IDs are assigned following LIMIT_TYPES
         /// </summary>
         /// <param name="status"></param>
         public void Add(Systems.Status status) {
             //add StatusInstances if there are no other instances of the status
             if (!Contains(status.ID)) {
-                statuses.Add(status.ID, new StatusInstances());
+                statuses.Add(status.ID, new StatusInstances(status));
             }
 
             //get the StatusInstances
@@ -70,7 +100,7 @@ namespace ExperienceAndClasses.Utilities.Containers {
                 //add the status
                 status_instances.AddStatus(status);
             else
-                Commons.Error("Failed to create StatusInstances for new status " + status.core_display_name);
+                Commons.Error("Failed to create StatusInstances for new status " + status.specific_name);
         }
 
         /// <summary>
@@ -103,13 +133,26 @@ namespace ExperienceAndClasses.Utilities.Containers {
         }
 
         /// <summary>
+        /// Remove all instances of specified status
+        /// </summary>
+        /// <param name="status_id"></param>
+        public void RemoveAll(Systems.Status.IDs status_id) {
+            StatusInstances status_instances;
+            if (statuses.TryGetValue(status_id, out status_instances)) {
+                foreach (Systems.Status status in status_instances.GetInstances()) {
+                    status.RemoveEverywhere();
+                }
+            }
+        }
+
+        /// <summary>
         /// Returns list of instances for each active status (empty if no statuses)
         /// </summary>
         /// <returns></returns>
-        public List<List<Systems.Status>> GetAllStatuses() {
-            List<List<Systems.Status>> list = new List<List<Systems.Status>>();
-            foreach (StatusInstances status in statuses.Values) {
-                list.Add(status.GetInstances());
+        public List<Systems.Status> GetAll() {
+            List<Systems.Status> list = new List<Systems.Status>();
+            foreach (StatusInstances status_type in statuses.Values) {
+                list.AddRange(status_type.GetInstances());
             }
             return list;
         }
@@ -119,7 +162,7 @@ namespace ExperienceAndClasses.Utilities.Containers {
         /// </summary>
         /// <param name="status_id"></param>
         /// <returns></returns>
-        public List<Systems.Status> GetStatuses(Systems.Status.IDs status_id) {
+        public List<Systems.Status> GetAllOfType(Systems.Status.IDs status_id) {
             StatusInstances status_instances;
             if (statuses.TryGetValue(status_id, out status_instances))
                 return status_instances.GetInstances();
@@ -127,11 +170,72 @@ namespace ExperienceAndClasses.Utilities.Containers {
                 return new List<Systems.Status>();
         }
 
+        /// <summary>
+        /// Returns list of instances that will apply their effect following the APPLY_TYPES rule of each status type
+        /// </summary>
+        /// <returns></returns>
+        public List<Systems.Status> GetAllApply() {
+            List<Systems.Status> instances, list = new List<Systems.Status>();
+            SortedDictionary<ushort, Systems.Status> bests;
+            ushort key;
+            Systems.Status best;
+            foreach (StatusInstances status_type in statuses.Values) {
+                instances = status_type.GetInstances();
+
+                switch (instances[0].specific_apply_type) {
+                    case Systems.Status.APPLY_TYPES.ALL:
+                        //include all
+                        list.AddRange(instances);
+                        break;
+
+                    case Systems.Status.APPLY_TYPES.BEST:
+                        //include single best instance
+                        best = instances[0];
+                        foreach (Systems.Status status in instances) {
+                            if (status.IsBetterThan(best)) {
+                                best = status;
+                            }
+                        }
+                        list.Add(best);
+                        break;
+
+                    case Systems.Status.APPLY_TYPES.BEST_PER_OWNER:
+                        //include best per owner
+                        bests = new SortedDictionary<ushort, Systems.Status>();
+                        foreach (Systems.Status status in instances) {
+                            if (status.owner_is_player) {
+                                key = (ushort)status.owner_index;
+                            }
+                            else {
+                                key = (ushort)(Main.maxPlayers + status.owner_index);
+                            }
+                            if (bests.TryGetValue(key, out best)) {
+                                if (status.IsBetterThan(best)) {
+                                    bests[key] = status;
+                                }
+                            }
+                            else {
+                                bests.Add(key, status);
+                            }
+                        }
+                        list.AddRange(bests.Values);
+
+                        break;
+
+                    default:
+                        Utilities.Commons.Error("Unsupported APPLY_TYPES:" + instances[0].specific_apply_type);
+                        break;
+                }
+
+            }
+            return list;
+        }
+
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ StatusInstances ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         /// <summary>
         /// Stores all instances of a single status type on a target. Statuses are assigned an instance id.
         /// 
-        /// Instances are stored in a storted list for fast lookup and to allow all instances to be returned as a list without needing to select from an array.
+        /// Instances are stored in a storted dictionary for fast lookup and to allow all instances to be returned as a list without needing to select from an array.
         /// 
         /// The keys for the stored list correspond with indices in a bool[]. This was done instead of a queue/stack of unique values because a default 
         /// bool[] can be constructed more quickly. However, adding instances when there are already several is slower with the array method because it
@@ -141,8 +245,27 @@ namespace ExperienceAndClasses.Utilities.Containers {
         /// </summary>
         private class StatusInstances {
             /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Variables ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-            private SortedList<byte, Systems.Status> instances = new SortedList<byte, Systems.Status>(UNASSIGNED_INSTANCE_KEY);
-            private bool[] key_taken = new bool[UNASSIGNED_INSTANCE_KEY]; //keys are 0 to (UNASSIGNED_INSTANCE_KEY - 1)
+            private SortedDictionary<byte, Systems.Status> instances;
+            private bool[] key_taken;
+            private Systems.Status.LIMIT_TYPES limit_type;
+
+            /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Constructor ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+            public StatusInstances(Systems.Status reference) {
+                //type
+                limit_type = reference.specific_limit_type;
+
+                //set capacity (save some space if LIMIT_TYPES.ONE)
+                byte capacity;
+                if (limit_type == Systems.Status.LIMIT_TYPES.ONE) {
+                    capacity = 1;
+                }
+                else {
+                    capacity = UNASSIGNED_INSTANCE_KEY;
+                }
+                key_taken = new bool[capacity];
+                instances = new SortedDictionary<byte, Systems.Status>();
+            }
 
             /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Methods ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -169,6 +292,7 @@ namespace ExperienceAndClasses.Utilities.Containers {
 
             /// <summary>
             /// Add status. Instance id will be assigned if not already set.
+            /// Keys are assigned following LIMIT_TYPES
             /// </summary>
             /// <param name="status"></param>
             public void AddStatus(Systems.Status status) {
@@ -213,6 +337,7 @@ namespace ExperienceAndClasses.Utilities.Containers {
 
             /// <summary>
             /// Assigns a key and adds the instance. Returns false if no keys available or status already has a key.
+            /// Keys are assigned following LIMIT_TYPES
             /// </summary>
             /// <param name="status"></param>
             /// <returns></returns>
@@ -222,19 +347,85 @@ namespace ExperienceAndClasses.Utilities.Containers {
                     return false;
                 }
                 else {
-                    //find first available key
-                    int key = Array.FindIndex<bool>(key_taken, i => i == false);
-                    if (key < 0) {
-                        //no keys available
-                        return false;
+
+                    int key_temp = -1;
+
+                    switch (limit_type) {
+                        case Systems.Status.LIMIT_TYPES.MANY:
+                            //no limit on instances
+                            //find first available key (any key is fine)
+                            key_temp = Array.FindIndex<bool>(key_taken, i => i == false);
+                            if (key_temp < 0) {
+                                //no more room - cannot add status!
+                                return false;
+                            }
+                            break;
+
+                        case Systems.Status.LIMIT_TYPES.ONE:
+                            //there can be only one instance
+                            //all instances use key 0
+                            key_temp = 0;
+                            break;
+
+                        case Systems.Status.LIMIT_TYPES.ONE_PER_OWNER:
+                            //there can be one instance per owner (players and/or npcs)
+                            //get current key if any instances from same owner (could be npc-owned so can't just use index as key)
+                            foreach (Systems.Status s in instances.Values) {
+                                if ((status.owner_is_player == s.owner_is_player) && (status.owner_index == s.owner_index)) {
+                                    key_temp = s.Instance_ID;
+                                    break;
+                                }
+                            }
+                            //if no instances from same owner...
+                            if (key_temp == -1) {
+                                //find first available key (any key is fine)
+                                key_temp = Array.FindIndex<bool>(key_taken, i => i == false);
+                                if (key_temp < 0) {
+                                    //no more room - cannot add status!
+                                    return false;
+                                }
+                            }
+                            break;
+
+                        default:
+                            //something not implemented
+                            Utilities.Commons.Error("Unsupported limit type: " + limit_type);
+                            return false;
                     }
-                    else {
-                        //assign key and add status
-                        status.SetInstanceID((byte)key);
-                        key_taken[key] = true;
-                        instances.Add(status.Instance_ID, status);
-                        return true;
+
+                    //key
+                    byte key = (byte)key_temp;
+
+                    //replace/merge if there is existing
+                    if (instances.ContainsKey(key)) {
+                        Systems.Status existing;
+                        if (instances.TryGetValue(key, out existing)) {
+                            //merge
+                            if (existing.specific_allow_merge) {
+                                if (!existing.Merge(status)) {
+                                    //no improvements would be made so no need to add update existing or add this status
+                                }
+                                else {
+                                    //send update for the merged instance to server/other clients
+                                    //TODO - send
+                                }
+                                return false;
+                            }
+                            else {
+                                //remove existing (merge not allowed)
+                                existing.RemoveEverywhere();
+                            }
+                        }
+                        else {
+                            Utilities.Commons.Error("Failed to get existing status: " + status.specific_name);
+                        }
                     }
+
+                    //assign key and add status
+                    status.SetInstanceID(key);
+                    key_taken[key_temp] = true;
+                    instances.Add(status.Instance_ID, status);
+                    return true;
                 }
             }
         }
