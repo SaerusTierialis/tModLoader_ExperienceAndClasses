@@ -63,6 +63,8 @@ namespace ExperienceAndClasses.UI {
             int number_buffs = Main.LocalPlayer.CountBuffs();
             bool number_buff_changed = (number_buffs_prior == number_buffs);
 
+            //TODO - needs_redraw_times_only at set intervals
+
             //need to remake list of status to show?
             if (needs_redraw_complete) {
                 status_to_draw.Clear();

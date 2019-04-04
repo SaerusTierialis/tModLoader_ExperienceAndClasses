@@ -768,14 +768,13 @@ namespace ExperienceAndClasses.Systems {
                 status.Update();
             }
 
+            //do effects
             List<Status> apply = statuses.GetAllApply();
             foreach (Status status in apply) {
                 status.DoEffect();
             }
 
-
-
-            //TODO - do we need to update UI or draw?
+            //TODO - draw visuals
         }
 
         /// <summary>
