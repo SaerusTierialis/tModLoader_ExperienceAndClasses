@@ -521,7 +521,7 @@ namespace ExperienceAndClasses.Systems {
 
         /// <summary>
         /// Merges passed status into this one. Returns false if no improvements were made.
-        /// If improvements were made, then the owner is set to the owner of the merged in status and autostack may occur.
+        /// If improvements were made, then the owner is set to the owner of the merged-in status, autostack may occur, and sync occurs.
         /// </summary>
         /// <param name="status"></param>
         /// <returns></returns>
@@ -727,7 +727,7 @@ namespace ExperienceAndClasses.Systems {
         protected virtual bool ShouldRemoveLocal() { return false; }
 
         /// <summary>
-        /// Return true to mark the merge as an improvement. False leaves the value as it was.
+        /// Return true to mark the merge as an improvement and trigger a sync. False leaves the value as it was.
         /// Called after merging autosync data and duration, but before (potentially) setting new owner and autostacking.
         /// </summary>
         /// <param name="status"></param>
