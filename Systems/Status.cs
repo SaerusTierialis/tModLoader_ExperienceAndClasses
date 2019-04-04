@@ -726,7 +726,7 @@ namespace ExperienceAndClasses.Systems {
             target.Statuses.Add(status);
 
             //sync
-            if (status.specific_syncs) {
+            if (status.specific_syncs && owner.Local) {
                 Utilities.PacketHandler.AddStatus.Send(status);
             }
         }
