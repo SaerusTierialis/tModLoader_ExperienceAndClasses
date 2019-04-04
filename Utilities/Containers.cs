@@ -174,6 +174,15 @@ namespace ExperienceAndClasses.Utilities.Containers {
         }
 
         /// <summary>
+        /// Checks if the thing has the status
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public bool HasStatus(Systems.Status.IDs id) {
+            return Statuses.Contains(id);
+        }
+
+        /// <summary>
         /// Returns the player or npc index (player.whoAmI or npc.whoAmI)
         /// </summary>
         public int whoAmI {

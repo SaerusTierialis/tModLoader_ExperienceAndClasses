@@ -922,10 +922,6 @@ namespace ExperienceAndClasses {
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Status ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-        public bool HasStatus(Systems.Status.IDs id) {
-            return Statuses.Contains(id);
-        }
-
         private void ApplyStatuses() {
             //reset attributes from status
             Attributes_Status = new int[(byte)Systems.Attribute.IDs.NUMBER_OF_IDs];

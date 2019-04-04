@@ -375,7 +375,7 @@ namespace ExperienceAndClasses.Systems {
             target.Statuses.Remove(this);
 
             //if timed-effect and no more instances of this status, clear timer
-            if ((specific_effect_type == EFFECT_TYPES.TIMED) && !target.Statuses.Contains(ID)) {
+            if ((specific_effect_type == EFFECT_TYPES.TIMED) && !target.HasStatus(ID)) {
                 Times_Next_Timed_Effect.Remove(ID);
             }
 
@@ -474,14 +474,14 @@ namespace ExperienceAndClasses.Systems {
 
                 //remove if target lacks required status
                 if (specific_target_required_status != IDs.NONE) {
-                    if (!target.Statuses.Contains(specific_target_required_status)) {
+                    if (!target.HasStatus(specific_target_required_status)) {
                         return true;
                     }
                 }
 
                 //remove if target has antirequisite status
                 if (specific_target_antirequisite_status != IDs.NONE) {
-                    if (target.Statuses.Contains(specific_target_antirequisite_status)) {
+                    if (target.HasStatus(specific_target_antirequisite_status)) {
                         return true;
                     }
                 }
@@ -490,7 +490,7 @@ namespace ExperienceAndClasses.Systems {
             //requirements: local
             if (owner.Is_Player && owner.Local) { //owner is always player if locally_owned
                 //required status
-                if ((specific_owner_player_required_status != IDs.NONE) && !owner.Statuses.Contains(specific_owner_player_required_status)) {
+                if ((specific_owner_player_required_status != IDs.NONE) && !owner.HasStatus(specific_owner_player_required_status)) {
                     return true;
                 }
 
