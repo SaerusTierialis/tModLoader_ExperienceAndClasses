@@ -615,6 +615,9 @@ namespace ExperienceAndClasses.Systems {
             return false;
         }
 
+        /// <summary>
+        /// Mark effect as done during this cycle. Do the effect if constant. Check/Update/Do for timed effects.
+        /// </summary>
         private void DoEffect() {
             //effect was applied (or tested if timed effect) on latest cycle
             applied = true;
@@ -636,6 +639,15 @@ namespace ExperienceAndClasses.Systems {
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Instance Methods To Override (Required) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
+        /// <summary>
+        /// Create and attach the status. If the owner is local and the status syncs, then a sync is triggered.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="target"></param>
+        /// <param name="owner"></param>
+        /// <param name="sync_data"></param>
+        /// <param name="seconds_remaining"></param>
+        /// <param name="seconds_until_effect"></param>
         protected static void Add(IDs id, Utilities.Containers.Thing target, Utilities.Containers.Thing owner, Dictionary<AUTOSYNC_DATA_TYPES, float> sync_data = null, float seconds_remaining = 0f, float seconds_until_effect = 0f) {
             //create instance
             Status status = Utilities.Commons.CreateObjectFromName<Status>(Enum.GetName(typeof(IDs), id));
