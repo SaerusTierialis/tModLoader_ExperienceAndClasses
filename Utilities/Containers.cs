@@ -490,10 +490,8 @@ namespace ExperienceAndClasses.Utilities.Containers {
             /// <param name="status"></param>
             public void AddStatus(Systems.Status status) {
                 if (status.Instance_ID == UNASSIGNED_INSTANCE_KEY) {
-                    //assign new key and add
-                    if (!AddNewStatus(status)) {
-                        Commons.Error("Cannot add instances of " + status.specific_name);
-                    }
+                    //assigns new key and then adds/replaces (merges if needed)
+                    AddNewStatus(status);
                 }
                 else {
                     //already has an instance id (is from another client)
@@ -529,15 +527,15 @@ namespace ExperienceAndClasses.Utilities.Containers {
             }
 
             /// <summary>
-            /// Assigns a key and adds the instance. Returns false if no keys available or status already has a key.
-            /// Keys are assigned following LIMIT_TYPES
+            /// Assigns a key and adds the instance. Keys are assigned following LIMIT_TYPES
             /// </summary>
             /// <param name="status"></param>
             /// <returns></returns>
-            private bool AddNewStatus(Systems.Status status) {
+            private void AddNewStatus(Systems.Status status) {
                 if (status.Instance_ID != UNASSIGNED_INSTANCE_KEY) {
                     //status already has key
-                    return false;
+                    Utilities.Commons.Error("AddNewStatus called incorrectly!");
+                    return;
                 }
                 else {
 
@@ -550,7 +548,8 @@ namespace ExperienceAndClasses.Utilities.Containers {
                             key_temp = Array.FindIndex<bool>(key_taken, i => i == false);
                             if (key_temp < 0) {
                                 //no more room - cannot add status!
-                                return false;
+                                Utilities.Commons.Error("Status instance limit reached for [" + status.ID + "] (this probably means that something went wrong, please report)");
+                                return;
                             }
                             break;
 
@@ -575,7 +574,8 @@ namespace ExperienceAndClasses.Utilities.Containers {
                                 key_temp = Array.FindIndex<bool>(key_taken, i => i == false);
                                 if (key_temp < 0) {
                                     //no more room - cannot add status!
-                                    return false;
+                                    Utilities.Commons.Error("Status instance limit reached for [" + status.ID + "] (this probably means that something went wrong, please report)");
+                                    return;
                                 }
                             }
                             break;
@@ -583,7 +583,7 @@ namespace ExperienceAndClasses.Utilities.Containers {
                         default:
                             //something not implemented
                             Utilities.Commons.Error("Unsupported limit type: " + limit_type);
-                            return false;
+                            return;
                     }
 
                     //key
@@ -595,14 +595,10 @@ namespace ExperienceAndClasses.Utilities.Containers {
                         if (instances.TryGetValue(key, out existing)) {
                             //merge
                             if (existing.specific_allow_merge) {
-                                if (!existing.Merge(status)) {
-                                    //no improvements would be made so no need to add update existing or add this status
-                                }
-                                else {
-                                    //send update for the merged instance to server/other clients
-                                    //TODO - send
-                                }
-                                return false;
+                                //try to merge, will sync if anything changed
+                                existing.Merge(status);
+                                //even if merge does nothing, this status does not need to be added (either it's worse or it's redundant)
+                                return;
                             }
                             else {
                                 //remove existing (merge not allowed)
@@ -618,7 +614,7 @@ namespace ExperienceAndClasses.Utilities.Containers {
                     status.SetInstanceID(key);
                     key_taken[key_temp] = true;
                     instances.Add(status.Instance_ID, status);
-                    return true;
+                    return;
                 }
             }
         }
