@@ -810,6 +810,15 @@ namespace ExperienceAndClasses {
             Class_Primary = Systems.Class.LOOKUP[Utilities.Commons.TryGet<byte>(tag, "eac_class_current_primary", Class_Primary.ID_num)];
             Class_Secondary = Systems.Class.LOOKUP[Utilities.Commons.TryGet<byte>(tag, "eac_class_current_secondary", Class_Secondary.ID_num)];
 
+            //class still enabled?
+            if (!Class_Secondary.Allowed) {
+                Class_Secondary = Systems.Class.LOOKUP[(byte)Systems.Class.IDs.None];
+            }
+            if (!Class_Primary.Allowed) {
+                Class_Primary = Class_Secondary;
+                Class_Secondary = Systems.Class.LOOKUP[(byte)Systems.Class.IDs.None];
+            }
+
             //class unlocked
             List<bool> class_unlock_loaded = Utilities.Commons.TryGet<List<bool>>(tag, "eac_class_unlock", new List<bool>());
             for (byte i = 0; i < class_unlock_loaded.Count; i++) {

@@ -80,6 +80,7 @@ namespace ExperienceAndClasses.Systems {
         public byte Max_Level { get; protected set; } = 0;
         public Items.Unlock Unlock_Item { get; protected set; } = null;
         public bool Has_Texture { get; protected set; } = false;
+        public bool Allowed { get; protected set; } = false;
 
         public Class(IDs id) {
             //defaults
@@ -424,6 +425,7 @@ namespace ExperienceAndClasses.Systems {
                 Gives_Allocation_Attributes = true;
                 Power_Scaling = PowerScaling.LOOKUP[(byte)power_scaling];
                 Has_Texture = true;
+                Allowed = true;
             }
         }
 
@@ -456,6 +458,7 @@ namespace ExperienceAndClasses.Systems {
 
         public class New : Class {
             public New() : base(IDs.New) {
+                Allowed = true;
             }
         }
 
@@ -463,6 +466,7 @@ namespace ExperienceAndClasses.Systems {
             public None() : base(IDs.None) {
                 Name = "None";
                 Description = "";
+                Allowed = true;
             }
         }
 
