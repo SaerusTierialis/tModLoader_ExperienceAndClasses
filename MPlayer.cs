@@ -791,6 +791,10 @@ namespace ExperienceAndClasses {
         }
 
         public override void Load(TagCompound tag) {
+            //this is the local mplayer (at least for a moment)
+            MPlayer backup = ExperienceAndClasses.LOCAL_MPLAYER;
+            ExperienceAndClasses.LOCAL_MPLAYER = this;
+
             //get version in case needed
             Load_Version = Utilities.Commons.TryGet<int[]>(tag, "eac_version", new int[3]);
 
@@ -882,6 +886,9 @@ namespace ExperienceAndClasses {
                 Utilities.Commons.TryGet<float>(tag, "eac_ui_hud_left", UI.Constants.DEFAULT_UI_HUD_LEFT),
                 Utilities.Commons.TryGet<float>(tag, "eac_ui_hud_top", UI.Constants.DEFAULT_UI_HUD_TOP),
                 Utilities.Commons.TryGet<bool>(tag, "eac_ui_hud_auto", UI.Constants.DEFAULT_UI_HUD_AUTO));
+
+            //if this is a client loading (or singleplayer), then this will become the local mplayer again when entering the world
+            ExperienceAndClasses.LOCAL_MPLAYER = backup;
         }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Misc ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
