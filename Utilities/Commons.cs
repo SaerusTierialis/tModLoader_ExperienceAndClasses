@@ -201,7 +201,8 @@ namespace ExperienceAndClasses.Utilities {
             return false;
         }
 
-        public static T CreateObjectFromName<T>(String name) {
+        public static T CreateObjectFromName<T>(string name) {
+            Commons.Error(typeof(T).FullName + "+" + name);
             return (T)(Assembly.GetExecutingAssembly().CreateInstance(typeof(T).FullName + "+" + name));
         }
     }

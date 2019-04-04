@@ -127,12 +127,12 @@ namespace ExperienceAndClasses.Systems {
         /// <summary>
         /// name of status | leave if not shown in ui
         /// </summary>
-        public string specific_name = "default_name";
+        public string specific_name { get; protected set; } = "default_name";
 
         /// <summary>
         /// description of status (mouse-over text) | leave if not shown in ui
         /// </summary>
-        public string specific_description = "default_description";
+        public string specific_description { get; protected set; } = "default_description";
 
         /// <summary>
         /// path to status icon | leave null if not shown in ui
@@ -142,7 +142,7 @@ namespace ExperienceAndClasses.Systems {
         /// <summary>
         /// list of autosync data types | leave null if not using any
         /// </summary>
-        protected List<AUTOSYNC_DATA_TYPES> specific_autosync_data_types = null;
+        protected List<AUTOSYNC_DATA_TYPES> specific_autosync_data_types = new List<AUTOSYNC_DATA_TYPES>();
 
         /// <summary>
         /// allow target to be player | default is TRUE
@@ -192,7 +192,7 @@ namespace ExperienceAndClasses.Systems {
         /// <summary>
         /// when there are multiple instances, the apply type determines which take effect | default is BEST_PER_OWNER
         /// </summary>
-        public APPLY_TYPES specific_apply_type = APPLY_TYPES.BEST_PER_OWNER;
+        public APPLY_TYPES specific_apply_type { get; protected set; } = APPLY_TYPES.BEST_PER_OWNER;
 
         /// <summary>
         /// when a status would replace another, merges best of both status autosync fields and take the longer remaining duration instead (sets owner to latest owner) (there is an additional status-specific merge method that is also called) | default is TRUE
@@ -212,7 +212,7 @@ namespace ExperienceAndClasses.Systems {
         /// <summary>
         /// ui display type | default is ALL_APPLY (all that are allowed to apply based on APPLY_TYPES)
         /// </summary>
-        public UI_TYPES specific_ui_type = UI_TYPES.ALL_APPLY;
+        public UI_TYPES specific_ui_type { get; protected set; } = UI_TYPES.ALL_APPLY;
 
         /// <summary>
         /// remove if the local client is the owner and does not have specified status | default is none
@@ -565,7 +565,7 @@ namespace ExperienceAndClasses.Systems {
 
                 //sync
                 if (specific_syncs) {
-                    //TODO
+                    Utilities.PacketHandler.AddStatus.Send(this);
                 }
             }
             return improved;
@@ -715,7 +715,7 @@ namespace ExperienceAndClasses.Systems {
 
             //sync
             if (status.specific_syncs) {
-                //TODO
+                Utilities.PacketHandler.AddStatus.Send(status);
             }
         }
 

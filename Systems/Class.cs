@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using Terraria;
 using Terraria.ModLoader;
@@ -59,9 +60,8 @@ namespace ExperienceAndClasses.Systems {
         static Class() {
             Class_Locations = new byte[5, 7];
             LOOKUP = new Class[(byte)Class.IDs.NUMBER_OF_IDs];
-            string[] IDs = Enum.GetNames(typeof(IDs));
             for (byte i = 0; i < LOOKUP.Length; i++) {
-                LOOKUP[i] = (Class)(Assembly.GetExecutingAssembly().CreateInstance(typeof(Class).FullName + "+" + IDs[i]));
+                LOOKUP[i] = Utilities.Commons.CreateObjectFromName<Class>(Enum.GetName(typeof(IDs), i));
             }
         }
 
@@ -69,42 +69,30 @@ namespace ExperienceAndClasses.Systems {
 
         public IDs ID { get; protected set; }
         public byte ID_num { get; protected set; }
-        public string Name { get; protected set; }
-        public string Description { get; protected set; }
-        public byte Tier { get; protected set; }
+        public string Name { get; protected set; } = "Undefined_Name";
+        public string Description { get; protected set; } = "Undefined_Desc";
+        public byte Tier { get; protected set; } = 0;
         public Texture2D Texture { get; protected set; }
-        public Class Prereq { get; protected set; }
-        public PowerScaling Power_Scaling { get; protected set; }
-        public float[] Attribute_Growth { get; protected set; }
-        public bool Gives_Allocation_Attributes { get; protected set; }
-        public byte Max_Level { get; protected set; }
-        public Items.Unlock Unlock_Item { get; protected set; }
+        public Class Prereq { get; protected set; } = null;
+        public PowerScaling Power_Scaling { get; protected set; } = PowerScaling.LOOKUP[(byte)PowerScaling.IDs.None];
+        public float[] Attribute_Growth { get; protected set; } = Enumerable.Repeat(1f, (byte)Attribute.IDs.NUMBER_OF_IDs).ToArray();
+        public bool Gives_Allocation_Attributes { get; protected set; } = false;
+        public byte Max_Level { get; protected set; } = 0;
+        public Items.Unlock Unlock_Item { get; protected set; } = null;
+        public bool Has_Texture { get; protected set; } = false;
 
         public Class(IDs id) {
             //defaults
             ID = id;
             ID_num = (byte)id;
-            Name = "Undefined_Name";
-            Description = "Undefined_Desc";
-            Tier = 0;
-            Prereq = null;
-            Power_Scaling = PowerScaling.LOOKUP[(byte)PowerScaling.IDs.None];
-            Gives_Allocation_Attributes = false;
-            Max_Level = 0;
-            Unlock_Item = null;
-
-            Attribute_Growth = new float[(byte)Attribute.IDs.NUMBER_OF_IDs];
-            for (byte i = 0; i < Attribute_Growth.Length; i++) {
-                Attribute_Growth[i] = 1f;
-            }
         }
 
         public void LoadTexture() {
-            try {
+            if (Has_Texture) {
                 Texture = ModLoader.GetTexture("ExperienceAndClasses/Textures/Class/" + Name);
             }
-            catch {
-                //no texture loaded, set blank to prevent crash
+            else {
+                //no texture loaded, set blank
                 Texture = Utilities.Textures.TEXTURE_BLANK;
             }
         }
@@ -435,6 +423,7 @@ namespace ExperienceAndClasses.Systems {
             public RealClass(IDs id, PowerScaling.IDs power_scaling) : base(id) {
                 Gives_Allocation_Attributes = true;
                 Power_Scaling = PowerScaling.LOOKUP[(byte)power_scaling];
+                Has_Texture = true;
             }
         }
 

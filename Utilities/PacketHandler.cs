@@ -387,6 +387,10 @@ namespace ExperienceAndClasses.Utilities {
         public sealed class AddStatus : Handler {
             public static readonly Handler Instance = LOOKUP[(byte)Enum.Parse(typeof(PACKET_TYPE), MethodBase.GetCurrentMethod().DeclaringType.Name)];
 
+            public static void Send(Systems.Status status) {
+
+            }
+
             protected override void RecieveBody(BinaryReader reader, int origin, MPlayer origin_mplayer) {
                 //TODO
                 
