@@ -101,7 +101,7 @@ namespace ExperienceAndClasses.Systems {
             int sum = 0;
             
             for (byte i = 0; i< ExperienceAndClasses.LOCAL_MPLAYER.Class_Levels.Length; i++) {
-                if (ExperienceAndClasses.LOCAL_MPLAYER.Class_Unlocked[i] && Class.LOOKUP[i].Gives_Allocation_Attributes && Class.LOOKUP[i].Tier > 0) {
+                if (ExperienceAndClasses.LOCAL_MPLAYER.Class_Unlocked[i] && Class.LOOKUP[i].Gives_Allocation_Attributes && Class.LOOKUP[i].Tier > 0 && Class.LOOKUP[i].Enabled) {
                     sum += Math.Min(ExperienceAndClasses.LOCAL_MPLAYER.Class_Levels[i], Class.LOOKUP[i].Max_Level) * ALLOCATION_POINTS_PER_LEVEL_TIERS[Class.LOOKUP[i].Tier];
                 }
             }

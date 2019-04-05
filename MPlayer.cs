@@ -835,10 +835,10 @@ namespace ExperienceAndClasses {
             Class_Secondary = Systems.Class.LOOKUP[Utilities.Commons.TryGet<byte>(tag, "eac_class_current_secondary", Class_Secondary.ID_num)];
 
             //class still enabled?
-            if (!Class_Secondary.Allowed) {
+            if (!Class_Secondary.Enabled) {
                 Class_Secondary = Systems.Class.LOOKUP[(byte)Systems.Class.IDs.None];
             }
-            if (!Class_Primary.Allowed) {
+            if (!Class_Primary.Enabled) {
                 Class_Primary = Class_Secondary;
                 Class_Secondary = Systems.Class.LOOKUP[(byte)Systems.Class.IDs.None];
             }

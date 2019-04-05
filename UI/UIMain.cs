@@ -99,7 +99,7 @@ namespace ExperienceAndClasses.UI {
                 for (byte col = 0; col < Systems.Class.Class_Locations.GetLength(1); col++) {
                     id = Systems.Class.Class_Locations[row, col];
 
-                    if (id != (byte)Systems.Class.IDs.New) {
+                    if ((id != (byte)Systems.Class.IDs.New) && Systems.Class.LOOKUP[id].Enabled) {
                         button = new ClassButton(Systems.Class.LOOKUP[id]);
                         button.Left.Set((Constants.UI_PADDING * 2) + (col * (CLASS_BUTTON_SIZE + CLASS_COL_PADDING)), 0f);
                         button.Top.Set(panel_class.top_space + (Constants.UI_PADDING * 2) + (row * (CLASS_BUTTON_SIZE + CLASS_ROW_PADDING)), 0f);
