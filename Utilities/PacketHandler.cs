@@ -327,40 +327,6 @@ namespace ExperienceAndClasses.Utilities {
             }
         }
 
-        /*
-        public sealed class Heal : Handler {
-            private static readonly Handler Instance = LOOKUP[(byte)Enum.Parse(typeof(PACKET_TYPE), MethodBase.GetCurrentMethod().DeclaringType.Name)];
-
-            public static void Send(int target, int origin, int amount_life, int amount_mana) {
-                //get packet containing header
-                ModPacket packet = Instance.GetPacket(origin);
-
-                //specific content
-                packet.Write(target);
-                packet.Write(amount_life);
-                packet.Write(amount_mana);
-
-                //send
-                if (Utilities.Netmode.IS_SERVER) {
-                    packet.Send(target, origin);
-                }
-                else {
-                    packet.Send(-1, origin);
-                }
-            }
-
-            protected override void RecieveBody(BinaryReader reader, int origin, MPlayer origin_mplayer) {
-                //read
-                byte target = reader.ReadByte();
-                int amount_life = reader.ReadInt32();
-                int amount_mana = reader.ReadInt32();
-
-                //do or relay
-                Main.player[target].GetModPlayer<MPlayer>(ExperienceAndClasses.MOD).Heal(amount_life, amount_mana);
-            }
-        }
-        */
-
         public sealed class XP : Handler {
             private static readonly Handler Instance = LOOKUP[(byte)Enum.Parse(typeof(PACKET_TYPE), MethodBase.GetCurrentMethod().DeclaringType.Name)];
 
