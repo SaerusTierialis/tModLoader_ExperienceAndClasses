@@ -76,7 +76,7 @@ namespace ExperienceAndClasses.UI {
 
                     //add to ui? (set was_in_ui if added)
                     if (status.ID != id_skip) {
-                        switch (status.specific_ui_type) {
+                        switch (status.Specific_UI_Type) {
                             case Systems.Status.UI_TYPES.NONE:
                                 //do nothing and skip any other instances of this status
                                 id_skip = status.ID;
@@ -94,7 +94,7 @@ namespace ExperienceAndClasses.UI {
                                 break;
 
                             default:
-                                Utilities.Commons.Error("Unsupported UI_TYPES: " + status.specific_ui_type);
+                                Utilities.Commons.Error("Unsupported UI_TYPES: " + status.Specific_UI_Type);
                                 break;
                         }
                     }

@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -27,7 +28,7 @@ namespace ExperienceAndClasses.Systems {
         /// <summary>
         /// Auto-syncing data types available (always float)
         /// </summary>
-        protected enum AUTOSYNC_DATA_TYPES : byte {
+        public enum AUTOSYNC_DATA_TYPES : byte {
             MAGNITUDE1,
             MAGNITUDE2,
             RANGE,
@@ -37,9 +38,8 @@ namespace ExperienceAndClasses.Systems {
 
             NUMBER_OF_TYPES //leave this last
         }
-        protected static readonly IEnumerable<AUTOSYNC_DATA_TYPES> SYNC_DATA_TYPES_STRINGS = Enum.GetValues(typeof(AUTOSYNC_DATA_TYPES)).Cast<AUTOSYNC_DATA_TYPES>();
 
-        protected enum DURATION_TYPES : byte {
+        public enum DURATION_TYPES : byte {
             INSTANT,
             TIMED,
             TOGGLE,
@@ -48,7 +48,7 @@ namespace ExperienceAndClasses.Systems {
         /// <summary>
         /// Is there an OnUpdate effect? Is there a repeating timed effect?
         /// </summary>
-        protected enum EFFECT_TYPES : byte {
+        public enum EFFECT_TYPES : byte {
             NONE,
             CONSTANT,
             TIMED,
@@ -86,7 +86,7 @@ namespace ExperienceAndClasses.Systems {
         /// <summary>
         /// this texture index value indicates that there is no texture
         /// </summary>
-        private static int TEXTURE_INDEX_NONE = -1;
+        private const int TEXTURE_INDEX_NONE = -1;
 
         /// <summary>
         /// Used in IsBetterThan for order of priority
@@ -119,7 +119,7 @@ namespace ExperienceAndClasses.Systems {
         /// (not stored in status itself because timer should be across instances of the status)
         /// (cleared when there are no more instances of a status)
         /// </summary>
-        private static SortedDictionary<IDs, DateTime> Times_Next_Timed_Effect = new SortedDictionary<IDs, DateTime>();
+        public static SortedDictionary<IDs, DateTime> Times_Next_Timed_Effect { get; private set; } = new SortedDictionary<IDs, DateTime>();
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Instance Vars Status-Specific ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         //all of these begin with "specific_" and have a description including the default value to make adding more statuses easier
@@ -127,12 +127,12 @@ namespace ExperienceAndClasses.Systems {
         /// <summary>
         /// name of status | leave if not shown in ui
         /// </summary>
-        public string specific_name { get; protected set; } = "default_name";
+        public string Specific_Name { get; protected set; } = "default_name";
 
         /// <summary>
         /// description of status (mouse-over text) | leave if not shown in ui
         /// </summary>
-        public string specific_description { get; protected set; } = "default_description";
+        public string Specific_Description { get; protected set; } = "default_description";
 
         /// <summary>
         /// path to status icon | leave null if not shown in ui
@@ -142,7 +142,7 @@ namespace ExperienceAndClasses.Systems {
         /// <summary>
         /// list of autosync data types | leave null if not using any
         /// </summary>
-        protected List<AUTOSYNC_DATA_TYPES> specific_autosync_data_types = new List<AUTOSYNC_DATA_TYPES>();
+        public List<AUTOSYNC_DATA_TYPES> Specific_Autosync_Data_Types { get; protected set; } = new List<AUTOSYNC_DATA_TYPES>();
 
         /// <summary>
         /// allow target to be player | default is TRUE
@@ -167,7 +167,7 @@ namespace ExperienceAndClasses.Systems {
         /// <summary>
         /// duration type | default is timed
         /// </summary>
-        protected DURATION_TYPES specific_duration_type = DURATION_TYPES.TIMED;
+        public DURATION_TYPES Specific_Duration_Type { get; protected set; } = DURATION_TYPES.TIMED;
 
         /// <summary>
         /// duration in seconds if timed | default is 5 seconds
@@ -177,7 +177,7 @@ namespace ExperienceAndClasses.Systems {
         /// <summary>
         /// type of effect | default is constant
         /// </summary>
-        protected EFFECT_TYPES specific_effect_type = EFFECT_TYPES.CONSTANT;
+        public EFFECT_TYPES Specific_Effect_Type { get; protected set; } = EFFECT_TYPES.CONSTANT;
 
         /// <summary>
         /// frequency of effect if effect type is timed | default is 1 second
@@ -187,17 +187,17 @@ namespace ExperienceAndClasses.Systems {
         /// <summary>
         /// instance limitation type | default is many (up to a max of whatever the status container is set to hold)
         /// </summary>
-        public LIMIT_TYPES specific_limit_type { get; protected set; } = LIMIT_TYPES.MANY;
+        public LIMIT_TYPES Specific_Limit_Type { get; protected set; } = LIMIT_TYPES.MANY;
 
         /// <summary>
         /// when there are multiple instances, the apply type determines which take effect | default is BEST_PER_OWNER
         /// </summary>
-        public APPLY_TYPES specific_apply_type { get; protected set; } = APPLY_TYPES.BEST_PER_OWNER;
+        public APPLY_TYPES Specific_Apply_Type { get; protected set; } = APPLY_TYPES.BEST_PER_OWNER;
 
         /// <summary>
         /// when a status would replace another, merges best of both status autosync fields and take the longer remaining duration instead (sets owner to latest owner) (there is an additional status-specific merge method that is also called) | default is TRUE
         /// </summary>
-        public bool specific_allow_merge { get; protected set; } = true;
+        public bool Specific_Allow_Merge { get; protected set; } = true;
 
         /// <summary>
         /// When merging, merge durations too (use highest) | default is true
@@ -212,7 +212,7 @@ namespace ExperienceAndClasses.Systems {
         /// <summary>
         /// ui display type | default is ALL_APPLY (all that are allowed to apply based on APPLY_TYPES)
         /// </summary>
-        public UI_TYPES specific_ui_type { get; protected set; } = UI_TYPES.ALL_APPLY;
+        public UI_TYPES Specific_UI_Type { get; protected set; } = UI_TYPES.ALL_APPLY;
 
         /// <summary>
         /// remove if the local client is the owner and does not have specified status | default is none
@@ -277,7 +277,7 @@ namespace ExperienceAndClasses.Systems {
         /// <summary>
         /// The target player is considered channeling while it has a status with this set true. No effect for NPC targets. | default is false
         /// </summary>
-        public bool specific_target_channelling { get; protected set; } = false;
+        public bool Specific_Target_Channelling { get; protected set; } = false;
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Instance Vars Generic ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -289,17 +289,17 @@ namespace ExperienceAndClasses.Systems {
         /// <summary>
         /// could be player or npc
         /// </summary>
-        public Utilities.Containers.Thing target { get; private set; }
+        public Utilities.Containers.Thing Target { get; private set; }
 
         /// <summary>
         /// could be player or npc
         /// </summary>
-        public Utilities.Containers.Thing owner { get; private set; }
+        public Utilities.Containers.Thing Owner { get; private set; }
 
         /// <summary>
         /// Time to end the status (for duration status). Instant status use DateTime.MinValue and toggle status use DateTime.MaxValue.
         /// </summary>
-        public DateTime time_end { get; private set; }
+        public DateTime Time_End { get; private set; }
 
         /// <summary>
         /// data to automatically sync
@@ -377,10 +377,10 @@ namespace ExperienceAndClasses.Systems {
             }
 
             //remove
-            target.Statuses.Remove(this);
+            Target.Statuses.Remove(this);
 
             //if timed-effect and no more instances of this status, clear timer
-            if ((specific_effect_type == EFFECT_TYPES.TIMED) && !target.HasStatus(ID)) {
+            if ((Specific_Effect_Type == EFFECT_TYPES.TIMED) && !Target.HasStatus(ID)) {
                 Times_Next_Timed_Effect.Remove(ID);
             }
 
@@ -417,8 +417,8 @@ namespace ExperienceAndClasses.Systems {
                 applied = false;
 
                 //apply channel
-                if (specific_target_channelling && target.Is_Player) {
-                    target.MPlayer.channelling = true;
+                if (Specific_Target_Channelling && Target.Is_Player) {
+                    Target.MPlayer.channelling = true;
                 }
             }
 
@@ -427,9 +427,9 @@ namespace ExperienceAndClasses.Systems {
         }
 
         public String GetIconDurationString() {
-            if (specific_duration_type == DURATION_TYPES.TIMED) {
+            if (Specific_Duration_Type == DURATION_TYPES.TIMED) {
 
-                TimeSpan time_remain = time_end.Subtract(ExperienceAndClasses.Now);
+                TimeSpan time_remain = Time_End.Subtract(ExperienceAndClasses.Now);
                 int time_remaining_min = time_remain.Minutes;
                 int time_remaining_sec = time_remain.Seconds;
 
@@ -452,60 +452,60 @@ namespace ExperienceAndClasses.Systems {
         /// <returns></returns>
         private bool CheckRemoval() {
             //remove if duration type is instant (shouldn't happen)
-            if (specific_duration_type == DURATION_TYPES.INSTANT) {
+            if (Specific_Duration_Type == DURATION_TYPES.INSTANT) {
                 return true;
             }
 
             //remove if this client/server is responsible for the duration (else update time remaining if target is a player)
-            if (local_enforce_duration && (ExperienceAndClasses.Now.CompareTo(time_end) >= 0)) { //timeup
+            if (local_enforce_duration && (ExperienceAndClasses.Now.CompareTo(Time_End) >= 0)) { //timeup
                 return true;
             }
 
             //requirements: server/singleplayer (not client) checks
             if (!Utilities.Netmode.IS_CLIENT) {
                 //remove if owner player leaves
-                if ((specific_remove_if_owner_player_leaves || (specific_duration_type == DURATION_TYPES.TOGGLE)) && owner.Is_Player && !owner.Active) {
+                if ((specific_remove_if_owner_player_leaves || (Specific_Duration_Type == DURATION_TYPES.TOGGLE)) && Owner.Is_Player && !Owner.Active) {
                     return true;
                 }
 
                 //remove if owner died
                 if (specific_remove_on_owner_death) {
-                    if (owner.Dead) {
+                    if (Owner.Dead) {
                         return true;
                     }
                 }
 
                 //remove if target died
                 if (specific_remove_on_target_death) {
-                    if (target.Dead) {
+                    if (Target.Dead) {
                         return true;
                     }
                 }
 
                 //remove if target lacks required status
                 if (specific_target_required_status != IDs.NONE) {
-                    if (!target.HasStatus(specific_target_required_status)) {
+                    if (!Target.HasStatus(specific_target_required_status)) {
                         return true;
                     }
                 }
 
                 //remove if target has antirequisite status
                 if (specific_target_antirequisite_status != IDs.NONE) {
-                    if (target.HasStatus(specific_target_antirequisite_status)) {
+                    if (Target.HasStatus(specific_target_antirequisite_status)) {
                         return true;
                     }
                 }
             }
 
             //requirements: local
-            if (owner.Is_Player && owner.Local) { //owner is always player if locally_owned
+            if (Owner.Is_Player && Owner.Local) { //owner is always player if locally_owned
                 //required status
-                if ((specific_owner_player_required_status != IDs.NONE) && !owner.HasStatus(specific_owner_player_required_status)) {
+                if ((specific_owner_player_required_status != IDs.NONE) && !Owner.HasStatus(specific_owner_player_required_status)) {
                     return true;
                 }
 
                 //required passive
-                if ((specific_owner_player_required_passive != Systems.Passive.IDs.NONE) && !owner.MPlayer.Passives.Contains(specific_owner_player_required_passive)) {
+                if ((specific_owner_player_required_passive != Systems.Passive.IDs.NONE) && !Owner.MPlayer.Passives.Contains(specific_owner_player_required_passive)) {
                     return true;
                 }
 
@@ -536,13 +536,19 @@ namespace ExperienceAndClasses.Systems {
         /// <param name="status"></param>
         /// <returns></returns>
         public bool Merge(Status status) {
+            //should only ever be called by the owner
+            if (!Owner.Local) {
+                Utilities.Commons.Error("Merge status called by non-owner!");
+                return false;
+            }
+
             //track if improvements would be made
             bool improved = false;
 
             //allowed to merge? (shouldn't be called if not allowed, but might as well check)
-            if (specific_allow_merge) {
+            if (Specific_Allow_Merge) {
                 //autosync data
-                foreach (AUTOSYNC_DATA_TYPES type in specific_autosync_data_types) {
+                foreach (AUTOSYNC_DATA_TYPES type in Specific_Autosync_Data_Types) {
                     if (autosync_data[type] < status.autosync_data[type]) {
                         autosync_data[type] = status.autosync_data[type];
                         improved = true;
@@ -550,9 +556,9 @@ namespace ExperienceAndClasses.Systems {
                 }
 
                 //duration (if timed and specific_merge_duration)
-                if (specific_merge_duration && (specific_duration_type == DURATION_TYPES.TIMED)) {
-                    if (status.time_end.CompareTo(time_end) > 0) {
-                        time_end = status.time_end;
+                if (specific_merge_duration && (Specific_Duration_Type == DURATION_TYPES.TIMED)) {
+                    if (status.Time_End.CompareTo(Time_End) > 0) {
+                        Time_End = status.Time_End;
                         improved = true;
                     }
                 }
@@ -565,7 +571,7 @@ namespace ExperienceAndClasses.Systems {
                 //if improved...
                 if (improved) {
                     //copy new owner
-                    owner = status.owner;
+                    Owner = status.Owner;
 
                     //add stack if autostack (and not maxed)
                     if (specific_autostack_on_merge && (autosync_data[AUTOSYNC_DATA_TYPES.STACKS] < specific_max_stacks)) {
@@ -575,7 +581,7 @@ namespace ExperienceAndClasses.Systems {
 
                 //sync
                 if (specific_syncs) {
-                    Utilities.PacketHandler.AddStatus.Send(this);
+                    Utilities.PacketHandler.AddStatus.Send(this, Utilities.Netmode.WHO_AM_I);
                 }
             }
             return improved;
@@ -598,7 +604,7 @@ namespace ExperienceAndClasses.Systems {
             double value_this, value_other;
             if (autosync_data.Count != 0) {
                 foreach (AUTOSYNC_DATA_TYPES type_test in AUTOSYNC_COMPARE_IN_ORDER) {
-                    if (specific_autosync_data_types.Contains(type_test)) {
+                    if (Specific_Autosync_Data_Types.Contains(type_test)) {
                         value_this = autosync_data[type_test];
                         value_other = status.autosync_data[type_test];
                         if (value_this > value_other) {
@@ -612,8 +618,8 @@ namespace ExperienceAndClasses.Systems {
             }
             
             //remaining duration
-            if (specific_duration_type == DURATION_TYPES.TIMED) {
-                if (time_end.CompareTo(status.time_end) >= 0) {
+            if (Specific_Duration_Type == DURATION_TYPES.TIMED) {
+                if (Time_End.CompareTo(status.Time_End) >= 0) {
                     return true;
                 }
                 else {
@@ -633,10 +639,10 @@ namespace ExperienceAndClasses.Systems {
             applied = true;
 
             //do effect
-            if (specific_effect_type == EFFECT_TYPES.CONSTANT) {
+            if (Specific_Effect_Type == EFFECT_TYPES.CONSTANT) {
                 Effect();
             }
-            else if (specific_effect_type == EFFECT_TYPES.TIMED) {
+            else if (Specific_Effect_Type == EFFECT_TYPES.TIMED) {
                 if (ExperienceAndClasses.Now.CompareTo(Times_Next_Timed_Effect[ID]) >= 0) {
                     //call effect
                     Effect();
@@ -647,7 +653,19 @@ namespace ExperienceAndClasses.Systems {
             }
         }
 
-        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Instance Methods To Override (Required) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Shortcuts to Sync Data ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+        public double GetData(AUTOSYNC_DATA_TYPES key, float default_value = -1) {
+            float value = default_value;
+            if (!autosync_data.TryGetValue(key, out value)) {
+                Utilities.Commons.Error("Status attempted to access invalid sync data: " + ID + " " + key);
+            }
+            return value;
+        }
+
+        protected double Magitude1 { get { return GetData(AUTOSYNC_DATA_TYPES.MAGNITUDE1); } }
+
+        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Static Methods ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         /// <summary>
         /// Create and attach the status. If the owner is local and the status syncs, then a sync is triggered.
@@ -658,59 +676,69 @@ namespace ExperienceAndClasses.Systems {
         /// <param name="sync_data"></param>
         /// <param name="seconds_remaining"></param>
         /// <param name="seconds_until_effect"></param>
-        protected static void Add(IDs id, Utilities.Containers.Thing target, Utilities.Containers.Thing owner, Dictionary<AUTOSYNC_DATA_TYPES, float> sync_data = null, float seconds_remaining = 0f, float seconds_until_effect = 0f) {
+        public static void Add(IDs id, Utilities.Containers.Thing target, Utilities.Containers.Thing owner, Dictionary<AUTOSYNC_DATA_TYPES, float> sync_data = null, float seconds_remaining = 0f, float seconds_until_effect = 0f, byte instance_id = Utilities.Containers.StatusList.UNASSIGNED_INSTANCE_KEY, BinaryReader reader = null) {
             //create instance
             Status status = Utilities.Commons.CreateObjectFromName<Status>(Enum.GetName(typeof(IDs), id));
             
             //valid target (stop if not)
             if ((target.Is_Player && !status.specific_target_can_be_player) || (target.Is_Npc && !status.specific_target_can_be_npc)) {
-                Utilities.Commons.Error("Invalid target for " + status.specific_name);
+                Utilities.Commons.Error("Invalid target for " + status.Specific_Name);
                 return;
             }
 
             //valid owner (stop if not)
             if ((owner.Is_Player && !status.specific_owner_can_be_player) || (owner.Is_Npc && !status.specific_owner_can_be_npc)) {
-                Utilities.Commons.Error("Invalid owner for " + status.specific_name);
+                Utilities.Commons.Error("Invalid owner for " + status.Specific_Name);
                 return;
             }
 
+            //instance id
+            if (instance_id != Utilities.Containers.StatusList.UNASSIGNED_INSTANCE_KEY) {
+                status.SetInstanceID(instance_id);
+            }
+
             //target
-            status.target = target;
+            status.Target = target;
 
             //owner
-            status.owner = owner;
+            status.Owner = owner;
 
             //calcualte end time
-            switch (status.specific_duration_type) {
+            switch (status.Specific_Duration_Type) {
                 case (DURATION_TYPES.TIMED):
-                    status.time_end = ExperienceAndClasses.Now.AddSeconds(seconds_remaining);
+                    status.Time_End = ExperienceAndClasses.Now.AddSeconds(seconds_remaining);
                     break;
 
                 case (DURATION_TYPES.INSTANT):
-                    status.time_end = DateTime.MinValue;
+                    status.Time_End = DateTime.MinValue;
                     break;
 
                 case (DURATION_TYPES.TOGGLE):
-                    status.time_end = DateTime.MaxValue;
+                    status.Time_End = DateTime.MaxValue;
                     break;
 
                 default:
-                    Utilities.Commons.Error("Unsupported DURATION_TYPES: " + status.specific_duration_type);
+                    Utilities.Commons.Error("Unsupported DURATION_TYPES: " + status.Specific_Duration_Type);
                     break;
+            }
+
+            //read any custom stuff
+            if (reader != null) {
+                status.PacketRead(reader);
             }
 
             //start
             status.OnStart();
 
             //do effect if instant
-            if (status.specific_duration_type == DURATION_TYPES.INSTANT) {
+            if (status.Specific_Duration_Type == DURATION_TYPES.INSTANT) {
                 status.DoEffect();
             }
             else {
                 //not instant... do duration stuff
 
                 //periodic effect time (not stored in status itself because timer should be across instances of the status)
-                if (status.specific_effect_type == EFFECT_TYPES.TIMED) {
+                if (status.Specific_Effect_Type == EFFECT_TYPES.TIMED) {
                     if (Times_Next_Timed_Effect.ContainsKey(id)) {
                         //had a timer so update it
                         Times_Next_Timed_Effect[id] = ExperienceAndClasses.Now.AddSeconds(seconds_until_effect);
@@ -722,7 +750,7 @@ namespace ExperienceAndClasses.Systems {
                 }
 
                 //locally enforce duration?
-                if (status.specific_effect_type == EFFECT_TYPES.TIMED) {    //has a duration, AND
+                if (status.Specific_Effect_Type == EFFECT_TYPES.TIMED) {    //has a duration, AND
                     if (!status.specific_syncs ||                           //not shared with other clients, OR
                         target.Local) {                                     //target is the local client OR this is server and target is npc
 
@@ -736,8 +764,15 @@ namespace ExperienceAndClasses.Systems {
             target.Statuses.Add(status);
 
             //sync
-            if (status.specific_syncs && owner.Local) {
-                Utilities.PacketHandler.AddStatus.Send(status);
+            if (status.specific_syncs) {
+                if (owner.Local) {
+                    //sending local status (could be server if a status is evere created there)
+                    Utilities.PacketHandler.AddStatus.Send(status, Utilities.Netmode.WHO_AM_I);
+                }
+                else if (Utilities.Netmode.IS_SERVER) {
+                    //not local, relaying status to clients through server (can assume owner is player and is origin)
+                    Utilities.PacketHandler.AddStatus.Send(status, status.Owner.whoAmI);
+                }
             }
         }
 
@@ -765,6 +800,9 @@ namespace ExperienceAndClasses.Systems {
         /// Called on every cycles (even if effect is not done) 
         /// </summary>
         protected virtual void OnUpdate() { }
+
+        public virtual void PacketWrite(ModPacket packet) { }
+        public virtual void PacketRead(BinaryReader reader) { }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Static Methods ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -821,12 +859,12 @@ namespace ExperienceAndClasses.Systems {
         public class Heal : Status {
             public Heal() : base(IDs.Heal) {
                 //any overwrites
-                specific_name = "Heal"; //not needed unless displayed as a buff
+                Specific_Name = "Heal"; //not needed unless displayed as a buff
                 specific_texture_path = "ExperienceAndClasses/Textures/Status/Heal"; //not needed unless displayed as a buff
-                specific_duration_type = DURATION_TYPES.INSTANT;
+                Specific_Duration_Type = DURATION_TYPES.INSTANT;
 
                 //add any sync data types that will be used (for syncing)
-                specific_autosync_data_types.Add(AUTOSYNC_DATA_TYPES.MAGNITUDE1);
+                Specific_Autosync_Data_Types.Add(AUTOSYNC_DATA_TYPES.MAGNITUDE1);
             }
 
             //must inlcude a static add method with target/owner and any extra info

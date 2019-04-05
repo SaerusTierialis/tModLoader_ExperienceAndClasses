@@ -353,13 +353,78 @@ namespace ExperienceAndClasses.Utilities {
         public sealed class AddStatus : Handler {
             public static readonly Handler Instance = LOOKUP[(byte)Enum.Parse(typeof(PACKET_TYPE), MethodBase.GetCurrentMethod().DeclaringType.Name)];
 
-            public static void Send(Systems.Status status) {
-                //TODO
+            public static void Send(Systems.Status status, int origin) {
+                //get packet containing header
+                ModPacket packet = Instance.GetPacket(origin);
+
+                //1:  ID (ushort = uint16)
+                packet.Write(status.ID_num);
+
+                //2:  Instance ID (byte)
+                packet.Write(status.Instance_ID);
+
+                //3:  Owner (ushort)
+                packet.Write(status.Owner.Index);
+
+                //4:  Target (ushort)
+                packet.Write(status.Target.Index);
+
+                //5?:  time remaining if duration-type (float seconds)
+                if (status.Specific_Duration_Type == Systems.Status.DURATION_TYPES.TIMED) {
+                    packet.Write((float)status.Time_End.Subtract(ExperienceAndClasses.Now).TotalSeconds);
+                }
+
+                //6?:  time until next effect if timed (float seconds)
+                if (status.Specific_Effect_Type == Systems.Status.EFFECT_TYPES.TIMED) {
+                    packet.Write(Systems.Status.Times_Next_Timed_Effect[status.ID].Subtract(ExperienceAndClasses.Now).TotalSeconds);
+                }
+
+                //7+?: extra data values in enum order  (float[])
+                foreach (Systems.Status.AUTOSYNC_DATA_TYPES type in status.Specific_Autosync_Data_Types) {
+                    packet.Write(status.GetData(type));
+                }
+
+                //write any custom stuff
+                status.PacketWrite(packet);
             }
 
             protected override void RecieveBody(BinaryReader reader, int origin, MPlayer origin_mplayer) {
-                //TODO
-                
+                //1:  ID (ushort = uint16)
+                ushort id_num = reader.ReadUInt16();
+                Systems.Status reference = Systems.Status.LOOKUP[id_num];
+                Systems.Status.IDs id = reference.ID;
+
+                //2:  Instance ID (byte)
+                byte instance_id = reader.ReadByte();
+
+                //3:  Owner (ushort)
+                ushort owner_index = reader.ReadUInt16();
+                Utilities.Containers.Thing owner = Utilities.Containers.Thing.Things[owner_index];
+
+                //4:  Target (ushort)
+                ushort target_index = reader.ReadUInt16();
+                Utilities.Containers.Thing target = Utilities.Containers.Thing.Things[target_index];
+
+                //5?:  time remaining if duration-type (float seconds)
+                float duration_seconds = 0f;
+                if (reference.Specific_Duration_Type == Systems.Status.DURATION_TYPES.TIMED) {
+                    duration_seconds = reader.ReadSingle();
+                }
+
+                //6?:  time until next effect if timed (float seconds)
+                float effect_seconds = 0f;
+                if (reference.Specific_Effect_Type == Systems.Status.EFFECT_TYPES.TIMED) {
+                    effect_seconds = reader.ReadSingle();
+                }
+
+                //7+: extra data values in enum order  (float[])
+                Dictionary<Systems.Status.AUTOSYNC_DATA_TYPES, float> data = new Dictionary<Systems.Status.AUTOSYNC_DATA_TYPES, float>();
+                foreach (Systems.Status.AUTOSYNC_DATA_TYPES type in reference.Specific_Autosync_Data_Types) {
+                    data.Add(type, reader.ReadSingle());
+                }
+
+                //add (custom stuff is read there)
+                Systems.Status.Add(id, target, owner, data, duration_seconds, effect_seconds, instance_id, reader);
             }
         }
 

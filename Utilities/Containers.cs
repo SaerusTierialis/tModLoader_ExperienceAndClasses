@@ -41,7 +41,7 @@ namespace ExperienceAndClasses.Utilities.Containers {
 
             //insert before first status that is equal/later
             for (int i=0; i<Count; i++) {
-                if (status.time_end.CompareTo(this.ElementAt<Systems.Status>(i).time_end) <= 0) {
+                if (status.Time_End.CompareTo(this.ElementAt<Systems.Status>(i).Time_End) <= 0) {
                     Insert(i, status);
                     return;
                 }
@@ -307,7 +307,7 @@ namespace ExperienceAndClasses.Utilities.Containers {
                 //add the status
                 status_instances.AddStatus(status);
             else
-                Commons.Error("Failed to create StatusInstances for new status " + status.specific_name);
+                Commons.Error("Failed to create StatusInstances for new status " + status.Specific_Name);
         }
 
         /// <summary>
@@ -357,7 +357,7 @@ namespace ExperienceAndClasses.Utilities.Containers {
         /// </summary>
         public void RemoveChannelling() {
             foreach (Systems.Status.IDs id in statuses.Keys) {
-                if (Systems.Status.LOOKUP[(ushort)id].specific_target_channelling) {
+                if (Systems.Status.LOOKUP[(ushort)id].Specific_Target_Channelling) {
                     RemoveAll(id);
                 }
             }
@@ -400,7 +400,7 @@ namespace ExperienceAndClasses.Utilities.Containers {
             foreach (StatusInstances status_type in statuses.Values) {
                 instances = status_type.GetInstances();
 
-                switch (instances[0].specific_apply_type) {
+                switch (instances[0].Specific_Apply_Type) {
                     case Systems.Status.APPLY_TYPES.ALL:
                         //include all
                         list.AddRange(instances);
@@ -421,7 +421,7 @@ namespace ExperienceAndClasses.Utilities.Containers {
                         //include best per owner
                         bests = new SortedDictionary<ushort, Systems.Status>();
                         foreach (Systems.Status status in instances) {
-                            key = status.owner.Index;
+                            key = status.Owner.Index;
                             if (bests.TryGetValue(key, out best)) {
                                 if (status.IsBetterThan(best)) {
                                     bests[key] = status;
@@ -436,7 +436,7 @@ namespace ExperienceAndClasses.Utilities.Containers {
                         break;
 
                     default:
-                        Utilities.Commons.Error("Unsupported APPLY_TYPES:" + instances[0].specific_apply_type);
+                        Utilities.Commons.Error("Unsupported APPLY_TYPES:" + instances[0].Specific_Apply_Type);
                         break;
                 }
 
@@ -466,7 +466,7 @@ namespace ExperienceAndClasses.Utilities.Containers {
 
             public StatusInstances(Systems.Status reference) {
                 //type
-                limit_type = reference.specific_limit_type;
+                limit_type = reference.Specific_Limit_Type;
 
                 //set capacity (save some space if LIMIT_TYPES.ONE)
                 byte capacity;
@@ -583,7 +583,7 @@ namespace ExperienceAndClasses.Utilities.Containers {
                             //there can be one instance per owner (players and/or npcs)
                             //get current key if any instances from same owner (could be npc-owned so can't just use index as key)
                             foreach (Systems.Status s in instances.Values) {
-                                if (status.owner.Equals(s.owner)) {
+                                if (status.Owner.Equals(s.Owner)) {
                                     key_temp = s.Instance_ID;
                                     break;
                                 }
@@ -614,7 +614,7 @@ namespace ExperienceAndClasses.Utilities.Containers {
                         Systems.Status existing;
                         if (instances.TryGetValue(key, out existing)) {
                             //merge
-                            if (existing.specific_allow_merge) {
+                            if (existing.Specific_Allow_Merge) {
                                 //try to merge, will sync if anything changed
                                 existing.Merge(status);
                                 //even if merge does nothing, this status does not need to be added (either it's worse or it's redundant)
@@ -626,7 +626,7 @@ namespace ExperienceAndClasses.Utilities.Containers {
                             }
                         }
                         else {
-                            Utilities.Commons.Error("Failed to get existing status: " + status.specific_name);
+                            Utilities.Commons.Error("Failed to get existing status: " + status.Specific_Name);
                         }
                     }
 
