@@ -207,7 +207,7 @@ namespace ExperienceAndClasses.Systems {
         /// <summary>
         /// sync in multiplayer mode | default is true
         /// </summary>
-        protected bool specific_syncs = true;
+        public bool Specific_Syncs { get; protected set; } = true;
 
         /// <summary>
         /// ui display type | default is ALL_APPLY (all that are allowed to apply based on APPLY_TYPES)
@@ -371,13 +371,26 @@ namespace ExperienceAndClasses.Systems {
         }
 
         protected void RemoveLocally() {
-            //if this was being drawn, need ui update
-            if (applied && was_in_ui) {
-                UI.UIStatus.needs_redraw_complete = true;
-            }
-
             //remove
             Target.Statuses.Remove(this);
+
+            //UI and visuals
+            if (applied) {
+                if (was_in_ui) {
+                    //if this was being drawn, need ui update
+                    UI.UIStatus.needs_redraw_complete = true;
+                }
+
+                if (!Utilities.Netmode.IS_SERVER) {
+                    //if not server and this status had visuals, update the visual lists
+                    if (specific_has_visual_back) {
+                        Target.needs_update_status_visuals_back = true;
+                    }
+                    if (specific_has_visual_front) {
+                        Target.needs_update_status_visuals_front = true;
+                    }
+                }
+            }
 
             //if timed-effect and no more instances of this status, clear timer
             if ((Specific_Effect_Type == EFFECT_TYPES.TIMED) && !Target.HasStatus(ID)) {
@@ -393,8 +406,15 @@ namespace ExperienceAndClasses.Systems {
             RemoveLocally();
 
             //remove everywhere else (send end packet)
-            if (specific_syncs) {
-                //TODO - send remove packet
+            if (Specific_Syncs) {
+                if (Owner.Local) {
+                    //sending local status (could be server if a status is evere created there)
+                    Utilities.PacketHandler.RemoveStatus.Send(this, Utilities.Netmode.WHO_AM_I);
+                }
+                else if (Utilities.Netmode.IS_SERVER) {
+                    //not local, relaying status to clients through server (can assume owner is player and is origin)
+                    Utilities.PacketHandler.RemoveStatus.Send(this, Owner.whoAmI);
+                }
             }
         }
 
@@ -580,7 +600,7 @@ namespace ExperienceAndClasses.Systems {
                 }
 
                 //sync
-                if (specific_syncs) {
+                if (Specific_Syncs) {
                     Utilities.PacketHandler.AddStatus.Send(this, Utilities.Netmode.WHO_AM_I);
                 }
             }
@@ -634,7 +654,7 @@ namespace ExperienceAndClasses.Systems {
         /// <summary>
         /// Mark effect as done during this cycle. Do the effect if constant. Check/Update/Do for timed effects.
         /// </summary>
-        private void DoEffect() {
+        public void DoEffect() {
             //effect was applied (or tested if timed effect) on latest cycle
             applied = true;
 
@@ -722,9 +742,9 @@ namespace ExperienceAndClasses.Systems {
                     break;
             }
 
-            //read any custom stuff
+            //read any extra stuff
             if (reader != null) {
-                status.PacketRead(reader);
+                status.PacketAddRead(reader);
             }
 
             //start
@@ -751,7 +771,7 @@ namespace ExperienceAndClasses.Systems {
 
                 //locally enforce duration?
                 if (status.Specific_Effect_Type == EFFECT_TYPES.TIMED) {    //has a duration, AND
-                    if (!status.specific_syncs ||                           //not shared with other clients, OR
+                    if (!status.Specific_Syncs ||                           //not shared with other clients, OR
                         target.Local) {                                     //target is the local client OR this is server and target is npc
 
                         status.local_enforce_duration = true;
@@ -763,8 +783,18 @@ namespace ExperienceAndClasses.Systems {
             //attach to target (may cause merge or overwrite)
             target.Statuses.Add(status);
 
+            //visuals (update occurs during next ProcessStatuses so applied is accurate)
+            if (!Utilities.Netmode.IS_SERVER) {
+                if (status.specific_has_visual_back) {
+                    status.Target.needs_update_status_visuals_back = true;
+                }
+                if (status.specific_has_visual_front) {
+                    status.Target.needs_update_status_visuals_front = true;
+                }
+            }
+
             //sync
-            if (status.specific_syncs) {
+            if (status.Specific_Syncs) {
                 if (owner.Local) {
                     //sending local status (could be server if a status is evere created there)
                     Utilities.PacketHandler.AddStatus.Send(status, Utilities.Netmode.WHO_AM_I);
@@ -801,58 +831,11 @@ namespace ExperienceAndClasses.Systems {
         /// </summary>
         protected virtual void OnUpdate() { }
 
-        public virtual void PacketWrite(ModPacket packet) { }
-        public virtual void PacketRead(BinaryReader reader) { }
+        public virtual void PacketAddWrite(ModPacket packet) { }
+        public virtual void PacketAddRead(BinaryReader reader) { }
 
-        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Static Methods ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-
-        /// <summary>
-        /// Call on every cycle
-        /// </summary>
-        /// <param name="statuses"></param>
-        public static void ProcessStatuses(Utilities.Containers.StatusList statuses) {
-            //update every instance of every status (may remove some)
-            foreach (Status status in statuses.GetAll()) {
-                status.Update();
-            }
-
-            //do effects
-            List<Status> apply = statuses.GetAllApply();
-            foreach (Status status in apply) {
-                status.DoEffect();
-            }
-
-            //TODO - draw visuals
-        }
-
-        /// <summary>
-        /// Updates DrawFront and DrawBack lists if needed.
-        /// </summary>
-        /// <param name="mnpc"></param>
-        public static void UpdateVisuals(MNPC mnpc) {
-            //TODO
-        }
-
-        /// <summary>
-        /// Updates DrawFront and DrawBack lists if needed. Also updates UI list if needed.
-        /// </summary>
-        /// <param name="mplayer"></param>
-        public static void UpdateVisuals(MPlayer mplayer) {
-            //TODO
-        }
-
-        /// <summary>
-        /// Get the list of statuses to draw effects for
-        /// </summary>
-        /// <param name="statuses"></param>
-        /// <param name="get_front"></param>
-        /// <returns></returns>
-        private static List<Status> GetDrawList(Utilities.Containers.StatusList statuses, bool get_front) {
-            //TODO
-            return null;
-        }
-
-        
+        public virtual void PacketRemoveWrite(ModPacket packet) { }
+        public virtual void PacketRemoveRead(BinaryReader reader) { }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Example ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 

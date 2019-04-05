@@ -384,8 +384,11 @@ namespace ExperienceAndClasses.Utilities {
                     packet.Write(status.GetData(type));
                 }
 
-                //write any custom stuff
-                status.PacketWrite(packet);
+                //write any extra stuff
+                status.PacketAddWrite(packet);
+
+                //send
+                packet.Send(-1, origin);
             }
 
             protected override void RecieveBody(BinaryReader reader, int origin, MPlayer origin_mplayer) {
@@ -423,7 +426,7 @@ namespace ExperienceAndClasses.Utilities {
                     data.Add(type, reader.ReadSingle());
                 }
 
-                //add (custom stuff is read there)
+                //add (PacketAddRead is in there, will relay to clients if needed)
                 Systems.Status.Add(id, target, owner, data, duration_seconds, effect_seconds, instance_id, reader);
             }
         }
@@ -431,9 +434,47 @@ namespace ExperienceAndClasses.Utilities {
         public sealed class RemoveStatus : Handler {
             public static readonly Handler Instance = LOOKUP[(byte)Enum.Parse(typeof(PACKET_TYPE), MethodBase.GetCurrentMethod().DeclaringType.Name)];
 
-            protected override void RecieveBody(BinaryReader reader, int origin, MPlayer origin_mplayer) {
-                //TODO
+            public static void Send(Systems.Status status, int origin) {
+                //get packet containing header
+                ModPacket packet = Instance.GetPacket(origin);
 
+                //1:  ID (ushort = uint16)
+                packet.Write(status.ID_num);
+
+                //2:  Instance ID (byte)
+                packet.Write(status.Instance_ID);
+
+                //3:  Target (ushort)
+                packet.Write(status.Target.Index);
+
+                //write any extra stuff
+                status.PacketRemoveWrite(packet);
+
+                //send
+                packet.Send(-1, origin);
+            }
+
+            protected override void RecieveBody(BinaryReader reader, int origin, MPlayer origin_mplayer) {
+                //1:  ID (ushort = uint16)
+                ushort id_num = reader.ReadUInt16();
+                Systems.Status reference = Systems.Status.LOOKUP[id_num];
+                Systems.Status.IDs id = reference.ID;
+
+                //2:  Instance ID (byte)
+                byte instance_id = reader.ReadByte();
+
+                //3:  Target (ushort)
+                ushort target_index = reader.ReadUInt16();
+                Utilities.Containers.Thing target = Utilities.Containers.Thing.Things[target_index];
+
+                //get status
+                Systems.Status status = target.Statuses.Get(id, instance_id);
+
+                //read any extra stuff
+                status.PacketRemoveRead(reader);
+
+                //remove (and relay to clients)
+                status.RemoveEverywhere();
             }
         }
 
@@ -441,7 +482,7 @@ namespace ExperienceAndClasses.Utilities {
             public static readonly Handler Instance = LOOKUP[(byte)Enum.Parse(typeof(PACKET_TYPE), MethodBase.GetCurrentMethod().DeclaringType.Name)];
 
             protected override void RecieveBody(BinaryReader reader, int origin, MPlayer origin_mplayer) {
-                //TODO
+                //TODO - could be for NPC
 
             }
         }

@@ -79,6 +79,16 @@ namespace ExperienceAndClasses.Utilities.Containers {
         /// </summary>
         public readonly bool Local;
 
+        /// <summary>
+        /// Update status front visuals on next cycle
+        /// </summary>
+        public bool needs_update_status_visuals_front = false;
+
+        /// <summary>
+        /// Update status back visuals on next cycle
+        /// </summary>
+        public bool needs_update_status_visuals_back = false;
+
         public Thing(MPlayer mplayer) {
             Is_Player = true;
             Is_Npc = false;
@@ -253,6 +263,42 @@ namespace ExperienceAndClasses.Utilities.Containers {
         public void Hurt(uint amount, Thing source) {
             //TODO
         }
+
+        /// <summary>
+        /// Called at the end of ProcessStatuses so "status.applied" is accurate
+        /// </summary>
+        public void StatusUpdateVisuals() {
+            if (needs_update_status_visuals_front) {
+                //TODO
+            }
+
+            if (needs_update_status_visuals_back) {
+                //TODO
+            }
+
+            needs_update_status_visuals_front = false;
+            needs_update_status_visuals_back = false;
+        }
+
+        /// <summary>
+        /// Call on every cycle
+        /// </summary>
+        /// <param name="statuses"></param>
+        public void ProcessStatuses() {
+            //update every instance of every status (may remove some)
+            foreach (Systems.Status status in Statuses.GetAll()) {
+                status.Update();
+            }
+
+            //do effects
+            List<Systems.Status> apply = Statuses.GetAllApply();
+            foreach (Systems.Status status in apply) {
+                status.DoEffect();
+            }
+
+            //update visuals
+            StatusUpdateVisuals();
+        }
     }
 
     /// <summary>
@@ -360,6 +406,27 @@ namespace ExperienceAndClasses.Utilities.Containers {
                 if (Systems.Status.LOOKUP[(ushort)id].Specific_Target_Channelling) {
                     RemoveAll(id);
                 }
+            }
+        }
+
+        /// <summary>
+        /// Remove all sync instances in preparation for repopulating from full sync status list
+        /// </summary>
+        public void RemoveAllSync(Thing target) {
+            //directly remove all instances on sync statuses (doesn't sync, OnEnd, etc.)
+            foreach (Systems.Status.IDs id in statuses.Keys) {
+                if (!Systems.Status.LOOKUP[(ushort)id].Specific_Syncs) {
+                    statuses.Remove(id);
+                }
+            }
+            if (!Utilities.Netmode.IS_SERVER) {
+                if (target.Local) {
+                    //need to update ui
+                    UI.UIStatus.needs_redraw_complete = true;
+                }
+                //need to update visuals
+                target.needs_update_status_visuals_front = true;
+                target.needs_update_status_visuals_back = true;
             }
         }
 

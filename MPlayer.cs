@@ -947,7 +947,7 @@ namespace ExperienceAndClasses {
             Attributes_Status = new int[(byte)Systems.Attribute.IDs.NUMBER_OF_IDs];
 
             //process statuses
-            Systems.Status.ProcessStatuses(Statuses);
+            thing.ProcessStatuses();
         }
         
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Ability ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
