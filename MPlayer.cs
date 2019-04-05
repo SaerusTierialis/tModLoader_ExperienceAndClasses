@@ -18,6 +18,9 @@ namespace ExperienceAndClasses {
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Instance Vars (non-syncing, non-save/load) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
+        /// <summary>
+        /// Thing can be a player or an NPC and is used by the Status and Ability systems.
+        /// </summary>
         public Utilities.Containers.Thing thing { get; private set; }
 
         public bool Is_Local_Player { get; private set; }
