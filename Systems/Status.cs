@@ -267,12 +267,17 @@ namespace ExperienceAndClasses.Systems {
         /// <summary>
         /// has a visual drawn behind target (uses DrawEffectBack) | default is false
         /// </summary>
-        protected bool specified_has_visual_back = false;
+        protected bool specific_has_visual_back = false;
 
         /// <summary>
         /// has a visual drawn in front of target (uses DrawEffectFront) | default is false
         /// </summary>
-        protected bool specified_has_visual_front = false;
+        protected bool specific_has_visual_front = false;
+
+        /// <summary>
+        /// The target player is considered channeling while it has a status with this set true. No effect for NPC targets. | default is false
+        /// </summary>
+        protected bool specific_target_channelling = false;
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Instance Vars Generic ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -410,6 +415,11 @@ namespace ExperienceAndClasses.Systems {
 
                 //default to not applied during this cycle
                 applied = false;
+
+                //apply channel
+                if (specific_target_channelling && target.Is_Player) {
+                    target.MPlayer.channelling = true;
+                }
             }
 
             //return removal
