@@ -268,12 +268,14 @@ namespace ExperienceAndClasses.Utilities.Containers {
         /// Called at the end of ProcessStatuses so "status.applied" is accurate
         /// </summary>
         public void StatusUpdateVisuals() {
-            if (needs_update_status_visuals_front) {
-                //TODO
-            }
+            if (!Utilities.Netmode.IS_SERVER) {
+                if (needs_update_status_visuals_front) {
+                    //TODO
+                }
 
-            if (needs_update_status_visuals_back) {
-                //TODO
+                if (needs_update_status_visuals_back) {
+                    //TODO
+                }
             }
 
             needs_update_status_visuals_front = false;
