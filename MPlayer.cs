@@ -26,7 +26,7 @@ namespace ExperienceAndClasses {
         /// <summary>
         /// Cannot attack, use items, or use abilities while channeling. Set false at the beginning of update and then set to true by sources of channel on each cycle.
         /// </summary>
-        public bool channeling;
+        public bool channelling;
 
         public bool Is_Local_Player { get; private set; }
 
@@ -176,7 +176,7 @@ namespace ExperienceAndClasses {
             Progression = 0;
             Extra_XP = 0;
             Passives = new List<Systems.Passive.IDs>();
-            channeling = false;
+            channelling = false;
 
             //ui
             loaded_ui_main = new Utilities.Containers.LoadedUIData();
@@ -266,7 +266,7 @@ namespace ExperienceAndClasses {
                 use_speed_melee = use_speed_ranged = use_speed_magic = use_speed_throwing = use_speed_minion = use_speed_tool = 1f;
                 ability_delay_reduction = 1f;
                 tool_power = 1f;
-                channeling = false; //TODO prevent attack/item use/ability use
+                channelling = false; //TODO prevent attack/item use/ability use
             }
 
             //Systems.Status.Heal.Add(player, this, 10);
@@ -471,9 +471,9 @@ namespace ExperienceAndClasses {
 
         public override void Hurt(bool pvp, bool quiet, double damage, int hitDirection, bool crit) {
             base.Hurt(pvp, quiet, damage, hitDirection, crit);
-            if (channeling) {
-                Statuses.RemoveChanelling();
-                channeling = false;
+            if (channelling) {
+                Statuses.RemoveChannelling();
+                channelling = false;
             }
         }
 

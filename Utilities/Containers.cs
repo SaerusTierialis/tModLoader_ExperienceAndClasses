@@ -355,9 +355,9 @@ namespace ExperienceAndClasses.Utilities.Containers {
         /// <summary>
         /// Remove all chanelling statuses
         /// </summary>
-        public void RemoveChanelling() {
+        public void RemoveChannelling() {
             foreach (Systems.Status.IDs id in statuses.Keys) {
-                if (Systems.Status.LOOKUP[(ushort)id].specific_target_channeling) {
+                if (Systems.Status.LOOKUP[(ushort)id].specific_target_channelling) {
                     RemoveAll(id);
                 }
             }
