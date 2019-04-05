@@ -277,7 +277,7 @@ namespace ExperienceAndClasses.Systems {
         /// <summary>
         /// The target player is considered channeling while it has a status with this set true. No effect for NPC targets. | default is false
         /// </summary>
-        protected bool specific_target_channelling = false;
+        public bool specific_target_channeling { get; protected set; } = false;
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Instance Vars Generic ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -417,8 +417,8 @@ namespace ExperienceAndClasses.Systems {
                 applied = false;
 
                 //apply channel
-                if (specific_target_channelling && target.Is_Player) {
-                    target.MPlayer.channelling = true;
+                if (specific_target_channeling && target.Is_Player) {
+                    target.MPlayer.channeling = true;
                 }
             }
 

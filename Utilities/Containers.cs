@@ -353,6 +353,17 @@ namespace ExperienceAndClasses.Utilities.Containers {
         }
 
         /// <summary>
+        /// Remove all chanelling statuses
+        /// </summary>
+        public void RemoveChanelling() {
+            foreach (Systems.Status.IDs id in statuses.Keys) {
+                if (Systems.Status.LOOKUP[(ushort)id].specific_target_channeling) {
+                    RemoveAll(id);
+                }
+            }
+        }
+
+        /// <summary>
         /// Returns list of instances for each active status (empty if no statuses)
         /// </summary>
         /// <returns></returns>
