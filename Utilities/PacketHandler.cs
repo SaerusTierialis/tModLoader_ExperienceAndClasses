@@ -133,19 +133,20 @@ namespace ExperienceAndClasses.Utilities {
         public sealed class ForceFull : Handler {
             private static readonly Handler Instance = LOOKUP[(byte)Enum.Parse(typeof(PACKET_TYPE), MethodBase.GetCurrentMethod().DeclaringType.Name)];
 
-            public static void Send(int target, int origin, byte primary_id, byte primary_level, byte secondary_id, byte secondary_level, int[] attributes, bool afk_status, bool in_combat, int player_progression) {
+            public static void Send(MPlayer mplayer) {
                 //get packet containing header
+                int origin = mplayer.player.whoAmI;
                 ModPacket packet = Instance.GetPacket(origin);
 
                 //specific content
-                ForceClass.WritePacketBody(packet, primary_id, primary_level, secondary_id, secondary_level);
-                SyncAttribute.WritePacketBody(packet, attributes);
-                AFK.WritePacketBody(packet, afk_status);
-                InCombat.WritePacketBody(packet, in_combat);
-                Progression.WritePacketBody(packet, player_progression);
+                ForceClass.WritePacketBody(packet, mplayer.Class_Primary.ID_num, mplayer.Class_Primary_Level_Effective, mplayer.Class_Secondary.ID_num, mplayer.Class_Secondary_Level_Effective);
+                SyncAttribute.WritePacketBody(packet, mplayer.Attributes_Sync);
+                AFK.WritePacketBody(packet, mplayer.AFK);
+                InCombat.WritePacketBody(packet, mplayer.IN_COMBAT);
+                Progression.WritePacketBody(packet, mplayer.Progression);
 
                 //send
-                packet.Send(target, origin);
+                packet.Send(-1, origin);
             }
 
             protected override void RecieveBody(BinaryReader reader, int origin, MPlayer origin_mplayer) {
@@ -154,8 +155,14 @@ namespace ExperienceAndClasses.Utilities {
                 LOOKUP[(byte)PACKET_TYPE.AFK].Recieve(reader, origin);
                 LOOKUP[(byte)PACKET_TYPE.InCombat].Recieve(reader, origin);
                 LOOKUP[(byte)PACKET_TYPE.Progression].Recieve(reader, origin);
-                if (!origin_mplayer.initialized)
+
+                if (!origin_mplayer.initialized) {
                     origin_mplayer.initialized = true;
+                }
+
+                if (Utilities.Netmode.IS_SERVER) {
+                    Send(origin_mplayer);
+                }
             }
         }
 
@@ -357,6 +364,24 @@ namespace ExperienceAndClasses.Utilities {
                 //get packet containing header
                 ModPacket packet = Instance.GetPacket(origin);
 
+                //write status
+                StatusWrite(packet, status);
+
+                //send
+                packet.Send(-1, origin);
+            }
+
+            protected override void RecieveBody(BinaryReader reader, int origin, MPlayer origin_mplayer) {
+                StatusRead(reader, false);
+            }
+
+            /// <summary>
+            /// set_statuses prevents target from being written
+            /// </summary>
+            /// <param name="packet"></param>
+            /// <param name="status"></param>
+            /// <param name="set_statuses"></param>
+            public static void StatusWrite(ModPacket packet, Systems.Status status, bool set_statuses = false) {
                 //1:  ID (ushort = uint16)
                 packet.Write(status.ID_num);
 
@@ -366,8 +391,10 @@ namespace ExperienceAndClasses.Utilities {
                 //3:  Owner (ushort)
                 packet.Write(status.Owner.Index);
 
-                //4:  Target (ushort)
-                packet.Write(status.Target.Index);
+                if (!set_statuses) {
+                    //4:  Target (ushort)
+                    packet.Write(status.Target.Index);
+                }
 
                 //5?:  time remaining if duration-type (float seconds)
                 if (status.Specific_Duration_Type == Systems.Status.DURATION_TYPES.TIMED) {
@@ -386,12 +413,15 @@ namespace ExperienceAndClasses.Utilities {
 
                 //write any extra stuff
                 status.PacketAddWrite(packet);
-
-                //send
-                packet.Send(-1, origin);
             }
 
-            protected override void RecieveBody(BinaryReader reader, int origin, MPlayer origin_mplayer) {
+            /// <summary>
+            /// set_statuses prevents OnStart and creation sync, also prevents writing target
+            /// must provide target if set_statuses
+            /// </summary>
+            /// <param name="reader"></param>
+            /// <param name="set_statuses"></param>
+            public static void StatusRead(BinaryReader reader, bool set_statuses = false, Utilities.Containers.Thing target = null) {
                 //1:  ID (ushort = uint16)
                 ushort id_num = reader.ReadUInt16();
                 Systems.Status reference = Systems.Status.LOOKUP[id_num];
@@ -404,9 +434,12 @@ namespace ExperienceAndClasses.Utilities {
                 ushort owner_index = reader.ReadUInt16();
                 Utilities.Containers.Thing owner = Utilities.Containers.Thing.Things[owner_index];
 
-                //4:  Target (ushort)
-                ushort target_index = reader.ReadUInt16();
-                Utilities.Containers.Thing target = Utilities.Containers.Thing.Things[target_index];
+                //don't write target in set_statuses (written once at start of large packet)
+                if (!set_statuses) {
+                    //4:  Target (ushort)
+                    ushort target_index = reader.ReadUInt16();
+                    target = Utilities.Containers.Thing.Things[target_index];
+                }
 
                 //5?:  time remaining if duration-type (float seconds)
                 float duration_seconds = 0f;
@@ -420,14 +453,15 @@ namespace ExperienceAndClasses.Utilities {
                     effect_seconds = reader.ReadSingle();
                 }
 
-                //7+: extra data values in enum order  (float[])
+                //7+?: extra data values in enum order  (float[])
                 Dictionary<Systems.Status.AUTOSYNC_DATA_TYPES, float> data = new Dictionary<Systems.Status.AUTOSYNC_DATA_TYPES, float>();
                 foreach (Systems.Status.AUTOSYNC_DATA_TYPES type in reference.Specific_Autosync_Data_Types) {
                     data.Add(type, reader.ReadSingle());
                 }
 
                 //add (PacketAddRead is in there, will relay to clients if needed)
-                Systems.Status.Add(id, target, owner, data, duration_seconds, effect_seconds, instance_id, reader);
+                //does not sync if set_statuses
+                Systems.Status.Add(id, target, owner, data, duration_seconds, effect_seconds, instance_id, reader, set_statuses);
             }
         }
 
@@ -481,9 +515,57 @@ namespace ExperienceAndClasses.Utilities {
         public sealed class SetStatuses : Handler {
             public static readonly Handler Instance = LOOKUP[(byte)Enum.Parse(typeof(PACKET_TYPE), MethodBase.GetCurrentMethod().DeclaringType.Name)];
 
-            protected override void RecieveBody(BinaryReader reader, int origin, MPlayer origin_mplayer) {
-                //TODO - could be for NPC
+            public static void Send(Utilities.Containers.Thing target) {
+                //origin
+                int origin;
+                if (target.Is_Player) {
+                    origin = target.whoAmI;
+                }
+                else {
+                    origin = -1;
+                }
 
+                //get packet containing header
+                ModPacket packet = Instance.GetPacket(origin);
+
+                //1: write target (ushort)
+                packet.Write(target.Index);
+
+                //get all sync statuses
+                List<Systems.Status> statuses = target.GetAllSyncStatuses();
+
+                //2: write number of sync statuses (ushort)
+                packet.Write((ushort)statuses.Count);
+
+                //3+: write each status
+                foreach (Systems.Status status in statuses) {
+                    AddStatus.StatusWrite(packet, status, true);
+                }
+
+                //send
+                packet.Send(-1, origin);
+            }
+
+            protected override void RecieveBody(BinaryReader reader, int origin, MPlayer origin_mplayer) {
+                //1: read target
+                ushort target_index = reader.ReadUInt16();
+                Utilities.Containers.Thing target = Utilities.Containers.Thing.Things[target_index];
+
+                //2: read number of statuses
+                ushort number_statuses = reader.ReadUInt16();
+
+                //clear all sync statuses
+                target.RemoveAllSyncStatuses();
+
+                //3+: reach each status (readds sync statuses)
+                for(int i=0; i< number_statuses; i++) {
+                    AddStatus.StatusRead(reader, true, target);
+                }
+
+                //relay to clients if this is server
+                if (Utilities.Netmode.IS_SERVER) {
+                    Send(target);
+                }
             }
         }
 

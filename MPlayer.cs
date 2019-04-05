@@ -81,13 +81,6 @@ namespace ExperienceAndClasses {
         /// </summary>
         public List<Projectile> slot_minions { get; private set; }
 
-        /// <summary>
-        /// Container of statuses on this player
-        /// </summary>
-        public Utilities.Containers.StatusList Statuses { get; private set; }
-        public List<Systems.Status> Statuses_DrawBack;
-        public List<Systems.Status> Statuses_DrawFront;
-
         public List<Systems.Passive.IDs> Passives { get; private set; }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Instance Vars (saved/loaded) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
@@ -170,9 +163,6 @@ namespace ExperienceAndClasses {
             show_xp = true;
             minions = new List<Projectile>();
             slot_minions = new List<Projectile>();
-            Statuses = new Utilities.Containers.StatusList();
-            Statuses_DrawBack = new List<Systems.Status>();
-            Statuses_DrawFront = new List<Systems.Status>();
             Progression = 0;
             Extra_XP = 0;
             Passives = new List<Systems.Passive.IDs>();
@@ -268,8 +258,6 @@ namespace ExperienceAndClasses {
                 tool_power = 1f;
                 channelling = false; //TODO prevent attack/item use/ability use
             }
-
-            //Systems.Status.Heal.Add(player, this, 10);
         }
 
         public override void PostUpdateEquips() {
@@ -472,7 +460,7 @@ namespace ExperienceAndClasses {
         public override void Hurt(bool pvp, bool quiet, double damage, int hitDirection, bool crit) {
             base.Hurt(pvp, quiet, damage, hitDirection, crit);
             if (channelling) {
-                Statuses.RemoveChannelling();
+                thing.Statuses.RemoveChannelling();
                 channelling = false;
             }
         }
@@ -509,35 +497,34 @@ namespace ExperienceAndClasses {
             else {
                 //partial sync
                 MPlayer clone = clientPlayer as MPlayer;
-                Byte me = (byte)player.whoAmI;
 
                 //class and class levels
                 if ((clone.Class_Primary.ID_num != Class_Primary.ID_num) || (clone.Class_Secondary.ID_num != Class_Secondary.ID_num) ||
                     (clone.Class_Primary_Level_Effective != Class_Primary_Level_Effective) || (clone.Class_Secondary_Level_Effective != Class_Secondary_Level_Effective)) {
-                    Utilities.PacketHandler.ForceClass.Send(-1, me, Class_Primary.ID_num, Class_Primary_Level_Effective, Class_Secondary.ID_num, Class_Secondary_Level_Effective);
+                    Utilities.PacketHandler.ForceClass.Send(-1, player.whoAmI, Class_Primary.ID_num, Class_Primary_Level_Effective, Class_Secondary.ID_num, Class_Secondary_Level_Effective);
                 }
 
                 //final attribute
                 for (byte i=0; i<(byte)Systems.Attribute.IDs.NUMBER_OF_IDs; i++) {
                     if (clone.Attributes_Sync[i] != Attributes_Sync[i]) {
-                        Utilities.PacketHandler.SyncAttribute.Send(-1, me, Attributes_Sync);
+                        Utilities.PacketHandler.SyncAttribute.Send(-1, player.whoAmI, Attributes_Sync);
                         break;
                     }
                 }
 
                 //measure of character progression
                 if (clone.Progression != Progression) {
-                    Utilities.PacketHandler.Progression.Send(-1, me, Progression);
+                    Utilities.PacketHandler.Progression.Send(-1, player.whoAmI, Progression);
                 }
 
                 //afk
                 if (clone.AFK != AFK) {
-                    Utilities.PacketHandler.AFK.Send(-1, me, AFK);
+                    Utilities.PacketHandler.AFK.Send(-1, player.whoAmI, AFK);
                 }
 
                 //combat
                 if (clone.IN_COMBAT != IN_COMBAT) {
-                    Utilities.PacketHandler.InCombat.Send(-1, me, IN_COMBAT);
+                    Utilities.PacketHandler.InCombat.Send(-1, player.whoAmI, IN_COMBAT);
                 }
 
             }
@@ -559,7 +546,9 @@ namespace ExperienceAndClasses {
         /// </summary>
         private void FullSync() {
             //send one packet with everything needed
-            Utilities.PacketHandler.ForceFull.Send(-1, (byte)player.whoAmI, Class_Primary.ID_num, Class_Primary_Level_Effective, Class_Secondary.ID_num, Class_Secondary_Level_Effective, Attributes_Sync, AFK, IN_COMBAT, Progression);
+            Utilities.PacketHandler.ForceFull.Send(this);
+            //send all non-sync statuses
+            Utilities.PacketHandler.SetStatuses.Send(thing);
         }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Sync Force Commands ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
@@ -709,6 +698,9 @@ namespace ExperienceAndClasses {
             Main.playerDrawData.Add(data);
             */
 
+
+
+            /*
             MPlayer mplayer = drawInfo.drawPlayer.GetModPlayer<MPlayer>();
             if (is_behind) {
                 List<Systems.Status> statuses = mplayer.Statuses_DrawBack;
@@ -724,6 +716,7 @@ namespace ExperienceAndClasses {
                     //status.DrawEffectFront(drawInfo);
                 }
             }
+            */
         }
 
         public static readonly PlayerLayer MiscEffectsBehind = new PlayerLayer("ExperienceAndClasses", "MiscEffectsBack", PlayerLayer.MiscEffectsBack, delegate (PlayerDrawInfo drawInfo) {

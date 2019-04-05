@@ -68,7 +68,7 @@ namespace ExperienceAndClasses.UI {
             //need to remake list of status to show?
             if (needs_redraw_complete) {
                 status_to_draw.Clear();
-                List<Systems.Status> instances_applied = ExperienceAndClasses.LOCAL_MPLAYER.Statuses.GetAllApply();
+                List<Systems.Status> instances_applied = ExperienceAndClasses.LOCAL_MPLAYER.thing.Statuses.GetAllApply();
                 Systems.Status.IDs id_skip = Systems.Status.IDs.NONE;
                 foreach (Systems.Status status in instances_applied) {
                     //default to not in ui

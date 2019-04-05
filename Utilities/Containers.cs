@@ -65,6 +65,9 @@ namespace ExperienceAndClasses.Utilities.Containers {
         private readonly MPlayer mplayer;
         public readonly bool Is_Npc;
         private readonly MNPC mnpc;
+        public readonly Utilities.Containers.StatusList Statuses;
+        private readonly List<Systems.Status> Statuses_DrawBack;
+        private readonly List<Systems.Status> Statuses_DrawFront;
 
         /// <summary>
         /// A reference index which is identical across clients/server. This Thing is Thing[Index].
@@ -106,6 +109,10 @@ namespace ExperienceAndClasses.Utilities.Containers {
                 Local = false;
             }
 
+            Statuses = new Utilities.Containers.StatusList();
+            Statuses_DrawBack = new List<Systems.Status>();
+            Statuses_DrawFront = new List<Systems.Status>();
+
             Add();
         }
 
@@ -125,6 +132,10 @@ namespace ExperienceAndClasses.Utilities.Containers {
             else {
                 Local = false;
             }
+
+            Statuses = new Utilities.Containers.StatusList();
+            Statuses_DrawBack = new List<Systems.Status>();
+            Statuses_DrawFront = new List<Systems.Status>();
 
             Add();
         }
@@ -167,20 +178,6 @@ namespace ExperienceAndClasses.Utilities.Containers {
 
         private void Remove() {
             Things.Remove(Index);
-        }
-
-        /// <summary>
-        /// Returns the StatusList of the thing
-        /// </summary>
-        public StatusList Statuses {
-            get {
-                if (Is_Player) {
-                    return mplayer.Statuses;
-                }
-                else {
-                    return mnpc.Statuses;
-                }
-            }
         }
 
         /// <summary>
@@ -301,6 +298,41 @@ namespace ExperienceAndClasses.Utilities.Containers {
             //update visuals
             StatusUpdateVisuals();
         }
+
+        /// <summary>
+        /// Remove all sync instances in preparation for repopulating from full sync status list
+        /// </summary>
+        public void RemoveAllSyncStatuses() {
+            //directly remove all instances of sync statuses (DeleteAll doesn't sync, OnEnd, etc.)
+            foreach (Systems.Status.IDs id in Statuses.Keys) {
+                if (Systems.Status.LOOKUP[(ushort)id].Specific_Syncs) {
+                    Statuses.DeleteAll(id);
+                }
+            }
+            if (!Utilities.Netmode.IS_SERVER) {
+                if (Local) {
+                    //need to update ui
+                    UI.UIStatus.needs_redraw_complete = true;
+                }
+                //need to update visuals
+                needs_update_status_visuals_front = true;
+                needs_update_status_visuals_back = true;
+            }
+        }
+
+        /// <summary>
+        /// Returns a list of every instance of every syncing status on the thing
+        /// </summary>
+        /// <returns></returns>
+        public List<Systems.Status> GetAllSyncStatuses() {
+            List<Systems.Status> statuses = new List<Systems.Status>();
+            foreach (Systems.Status.IDs id in Statuses.Keys) {
+                if (Systems.Status.LOOKUP[(ushort)id].Specific_Syncs) {
+                    statuses.AddRange(Statuses.GetAllOfType(id));
+                }
+            }
+            return statuses;
+        }
     }
 
     /// <summary>
@@ -314,6 +346,12 @@ namespace ExperienceAndClasses.Utilities.Containers {
         private SortedDictionary<Systems.Status.IDs, StatusInstances> statuses = new SortedDictionary<Systems.Status.IDs, StatusInstances>();
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Methods ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+        public ICollection<Systems.Status.IDs> Keys {
+            get {
+                return statuses.Keys;
+            }
+        }
 
         /// <summary>
         /// Check if there are any instances of the specified type
@@ -341,9 +379,10 @@ namespace ExperienceAndClasses.Utilities.Containers {
         /// <summary>
         /// Add status. Will create a new StatusInstances if needed. Will assign instance id if not set.
         /// Instance IDs are assigned following LIMIT_TYPES
+        /// Returns whether the status was added (false if an error occured OR if it would merge but the merge is not an improvement)
         /// </summary>
         /// <param name="status"></param>
-        public void Add(Systems.Status status) {
+        public bool Add(Systems.Status status) {
             //add StatusInstances if there are no other instances of the status
             if (!Contains(status.ID)) {
                 statuses.Add(status.ID, new StatusInstances(status));
@@ -351,11 +390,14 @@ namespace ExperienceAndClasses.Utilities.Containers {
 
             //get the StatusInstances
             StatusInstances status_instances;
-            if (statuses.TryGetValue(status.ID, out status_instances))
+            if (statuses.TryGetValue(status.ID, out status_instances)) {
                 //add the status
-                status_instances.AddStatus(status);
-            else
+                return status_instances.AddStatus(status);
+            }
+            else {
                 Commons.Error("Failed to create StatusInstances for new status " + status.Specific_Name);
+                return false;
+            }
         }
 
         /// <summary>
@@ -401,6 +443,16 @@ namespace ExperienceAndClasses.Utilities.Containers {
         }
 
         /// <summary>
+        /// Attempts to delete all instances of specified type. Does not call "remove" methods.
+        /// </summary>
+        /// <param name="status_id"></param>
+        public void DeleteAll(Systems.Status.IDs status_id) {
+            if (!statuses.Remove(status_id)) {
+                Utilities.Commons.Error("Tried to delete all instances of [" + status_id + "] when there were none!");
+            }
+        }
+
+        /// <summary>
         /// Remove all chanelling statuses
         /// </summary>
         public void RemoveChannelling() {
@@ -408,27 +460,6 @@ namespace ExperienceAndClasses.Utilities.Containers {
                 if (Systems.Status.LOOKUP[(ushort)id].Specific_Target_Channelling) {
                     RemoveAll(id);
                 }
-            }
-        }
-
-        /// <summary>
-        /// Remove all sync instances in preparation for repopulating from full sync status list
-        /// </summary>
-        public void RemoveAllSync(Thing target) {
-            //directly remove all instances on sync statuses (doesn't sync, OnEnd, etc.)
-            foreach (Systems.Status.IDs id in statuses.Keys) {
-                if (!Systems.Status.LOOKUP[(ushort)id].Specific_Syncs) {
-                    statuses.Remove(id);
-                }
-            }
-            if (!Utilities.Netmode.IS_SERVER) {
-                if (target.Local) {
-                    //need to update ui
-                    UI.UIStatus.needs_redraw_complete = true;
-                }
-                //need to update visuals
-                target.needs_update_status_visuals_front = true;
-                target.needs_update_status_visuals_back = true;
             }
         }
 
@@ -573,32 +604,6 @@ namespace ExperienceAndClasses.Utilities.Containers {
             }
 
             /// <summary>
-            /// Add status. Instance id will be assigned if not already set.
-            /// Keys are assigned following LIMIT_TYPES
-            /// </summary>
-            /// <param name="status"></param>
-            public void AddStatus(Systems.Status status) {
-                if (status.Instance_ID == UNASSIGNED_INSTANCE_KEY) {
-                    //assigns new key and then adds/replaces (merges if needed)
-                    AddNewStatus(status);
-                }
-                else {
-                    //already has an instance id (is from another client)
-                    if (instances.ContainsKey(status.Instance_ID)) {
-                        //replace existing instance
-                        instances[status.Instance_ID] = status;
-                    }
-                    else {
-                        //add another instance
-                        instances.Add(status.Instance_ID, status);
-                    }
-
-                    //be certain that key is marked as taken
-                    key_taken[status.Instance_ID] = true;
-                }
-            }
-
-            /// <summary>
             /// Removes instance by id
             /// </summary>
             /// <param name="instance_id"></param>
@@ -616,15 +621,39 @@ namespace ExperienceAndClasses.Utilities.Containers {
             }
 
             /// <summary>
+            /// Add status. Instance ID will be assigned if not already set.
+            /// Keys are assigned following LIMIT_TYPES
+            /// If the Instance ID is already set then it will always overwrite
+            /// Returns whether the status was added (false if an error occured OR if it would merge but the merge is not an improvement)
+            /// </summary>
+            /// <param name="status"></param>
+            public bool AddStatus(Systems.Status status) {
+                bool added = true;
+                if (status.Instance_ID == UNASSIGNED_INSTANCE_KEY) {
+                    //assigns new key and then adds/replaces (merges if needed)
+                    added = AddNewStatus(status);
+                }
+                else {
+                    //already has an instance id (is from another client)
+                    instances[status.Instance_ID] = status;
+
+                    //be certain that key is marked as taken
+                    key_taken[status.Instance_ID] = true;
+                }
+                return added;
+            }
+
+            /// <summary>
             /// Assigns a key and adds the instance. Keys are assigned following LIMIT_TYPES
+            /// Returns whether the status was added (false if an error occured OR if it would merge but the merge is not an improvement)
             /// </summary>
             /// <param name="status"></param>
             /// <returns></returns>
-            private void AddNewStatus(Systems.Status status) {
+            private bool AddNewStatus(Systems.Status status) {
                 if (status.Instance_ID != UNASSIGNED_INSTANCE_KEY) {
                     //status already has key
                     Utilities.Commons.Error("AddNewStatus called incorrectly!");
-                    return;
+                    return false;
                 }
                 else {
 
@@ -638,7 +667,7 @@ namespace ExperienceAndClasses.Utilities.Containers {
                             if (key_temp < 0) {
                                 //no more room - cannot add status!
                                 Utilities.Commons.Error("Status instance limit reached for [" + status.ID + "] (this probably means that something went wrong, please report)");
-                                return;
+                                return false;
                             }
                             break;
 
@@ -664,7 +693,7 @@ namespace ExperienceAndClasses.Utilities.Containers {
                                 if (key_temp < 0) {
                                     //no more room - cannot add status!
                                     Utilities.Commons.Error("Status instance limit reached for [" + status.ID + "] (this probably means that something went wrong, please report)");
-                                    return;
+                                    return false;
                                 }
                             }
                             break;
@@ -672,7 +701,7 @@ namespace ExperienceAndClasses.Utilities.Containers {
                         default:
                             //something not implemented
                             Utilities.Commons.Error("Unsupported limit type: " + limit_type);
-                            return;
+                            return false;
                     }
 
                     //key
@@ -683,19 +712,21 @@ namespace ExperienceAndClasses.Utilities.Containers {
                         Systems.Status existing;
                         if (instances.TryGetValue(key, out existing)) {
                             //merge
-                            if (existing.Specific_Allow_Merge) {
-                                //try to merge, will sync if anything changed
-                                existing.Merge(status);
-                                //even if merge does nothing, this status does not need to be added (either it's worse or it's redundant)
-                                return;
+                            if (status.Specific_Allow_Merge) {
+                                //try to merge
+                                if (!status.Merge(existing)) {
+                                    //no improvments made so don't bother adding
+                                    return false;
+                                }
                             }
                             else {
-                                //remove existing (merge not allowed)
+                                //remove existing prior to adding new (merge not allowed)
                                 existing.RemoveEverywhere();
                             }
                         }
                         else {
                             Utilities.Commons.Error("Failed to get existing status: " + status.Specific_Name);
+                            return false;
                         }
                     }
 
@@ -703,7 +734,7 @@ namespace ExperienceAndClasses.Utilities.Containers {
                     status.SetInstanceID(key);
                     key_taken[key_temp] = true;
                     instances.Add(status.Instance_ID, status);
-                    return;
+                    return true;
                 }
             }
         }

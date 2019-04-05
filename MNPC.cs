@@ -10,20 +10,8 @@ using Terraria.ModLoader;
 namespace ExperienceAndClasses {
     public class MNPC : GlobalNPC {
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Variables ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-
-        public Utilities.Containers.StatusList Statuses { get; private set; }
-        public List<Systems.Status> Statuses_DrawBack;
-        public List<Systems.Status> Statuses_DrawFront;
         public NPC npc { get; private set; }
         public Utilities.Containers.Thing thing { get; private set; }
-
-        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Constructor ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-
-        public MNPC() {
-            Statuses = new Utilities.Containers.StatusList();
-            Statuses_DrawBack = new List<Systems.Status>();
-            Statuses_DrawFront = new List<Systems.Status>();
-        }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Overrides ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 

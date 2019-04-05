@@ -550,14 +550,14 @@ namespace ExperienceAndClasses.Systems {
         }
 
         /// <summary>
-        /// Merges passed status into this one. Returns false if no improvements were made.
-        /// If improvements were made, then the owner is set to the owner of the merged-in status, autostack may occur, and sync occurs.
+        /// Call on new status and pass the existing status. Returns false if no improvements were made.
+        /// If improvements were made, autostack
         /// </summary>
-        /// <param name="status"></param>
+        /// <param name="existing"></param>
         /// <returns></returns>
-        public bool Merge(Status status) {
+        public bool Merge(Status existing) {
             //should only ever be called by the owner
-            if (!Owner.Local) {
+            if (!existing.Owner.Local) {
                 Utilities.Commons.Error("Merge status called by non-owner!");
                 return false;
             }
@@ -569,39 +569,38 @@ namespace ExperienceAndClasses.Systems {
             if (Specific_Allow_Merge) {
                 //autosync data
                 foreach (AUTOSYNC_DATA_TYPES type in Specific_Autosync_Data_Types) {
-                    if (autosync_data[type] < status.autosync_data[type]) {
-                        autosync_data[type] = status.autosync_data[type];
+                    if (autosync_data[type] > existing.autosync_data[type]) {
                         improved = true;
+                    }
+                    else {
+                        autosync_data[type] = existing.autosync_data[type];
                     }
                 }
 
                 //duration (if timed and specific_merge_duration)
                 if (specific_merge_duration && (Specific_Duration_Type == DURATION_TYPES.TIMED)) {
-                    if (status.Time_End.CompareTo(Time_End) > 0) {
-                        Time_End = status.Time_End;
+                    if (Time_End.CompareTo(existing.Time_End) > 0) {
                         improved = true;
+                    }
+                    else {
+                        Time_End = existing.Time_End;
                     }
                 }
 
                 //optional override
-                if (OnMerge(status)) {
+                if (MergeCheck(existing)) {
                     improved = true;
                 }
 
                 //if improved...
                 if (improved) {
-                    //copy new owner
-                    Owner = status.Owner;
-
                     //add stack if autostack (and not maxed)
                     if (specific_autostack_on_merge && (autosync_data[AUTOSYNC_DATA_TYPES.STACKS] < specific_max_stacks)) {
                         autosync_data[AUTOSYNC_DATA_TYPES.STACKS] += 1f;
                     }
-                }
 
-                //sync
-                if (Specific_Syncs) {
-                    Utilities.PacketHandler.AddStatus.Send(this, Utilities.Netmode.WHO_AM_I);
+                    //optional override
+                    OnMerge();
                 }
             }
             return improved;
@@ -696,7 +695,7 @@ namespace ExperienceAndClasses.Systems {
         /// <param name="sync_data"></param>
         /// <param name="seconds_remaining"></param>
         /// <param name="seconds_until_effect"></param>
-        public static void Add(IDs id, Utilities.Containers.Thing target, Utilities.Containers.Thing owner, Dictionary<AUTOSYNC_DATA_TYPES, float> sync_data = null, float seconds_remaining = 0f, float seconds_until_effect = 0f, byte instance_id = Utilities.Containers.StatusList.UNASSIGNED_INSTANCE_KEY, BinaryReader reader = null) {
+        public static void Add(IDs id, Utilities.Containers.Thing target, Utilities.Containers.Thing owner, Dictionary<AUTOSYNC_DATA_TYPES, float> sync_data = null, float seconds_remaining = 0f, float seconds_until_effect = 0f, byte instance_id = Utilities.Containers.StatusList.UNASSIGNED_INSTANCE_KEY, BinaryReader reader = null, bool set_statuses = false) {
             //create instance
             Status status = Utilities.Commons.CreateObjectFromName<Status>(Enum.GetName(typeof(IDs), id));
             
@@ -723,6 +722,11 @@ namespace ExperienceAndClasses.Systems {
             //owner
             status.Owner = owner;
 
+            //autosync data
+            if (sync_data != null) {
+                status.autosync_data = sync_data;
+            }
+
             //calcualte end time
             switch (status.Specific_Duration_Type) {
                 case (DURATION_TYPES.TIMED):
@@ -747,41 +751,50 @@ namespace ExperienceAndClasses.Systems {
                 status.PacketAddRead(reader);
             }
 
-            //start
-            status.OnStart();
+            //attach to target (may cause merge or overwrite)
+            if (!target.Statuses.Add(status)) {
+                //not added for any reaon, stop
+                //typically this would mean that merge was performance and was not an improvement
+                //could mean an error occured
+                return;
+            }
+
+            //periodic effect time (not stored in status itself because timer should be across instances of the status)
+            if (status.Specific_Effect_Type == EFFECT_TYPES.TIMED) {
+
+                DateTime time_next;
+                if (seconds_until_effect != 0) {
+                    //use provided time
+                    time_next = ExperienceAndClasses.Now.AddSeconds(seconds_until_effect);
+                }
+                else {
+                    //no provided time so do first effect asap
+                    time_next = ExperienceAndClasses.Now;
+                }
+
+                Times_Next_Timed_Effect[id] = time_next;
+            }
+
+            //locally enforce duration?
+            if (status.Specific_Duration_Type == DURATION_TYPES.TIMED) {    //has a duration, AND
+                if (!status.Specific_Syncs ||                               //not shared with other clients, OR
+                    target.Local) {                                         //target is the local client OR this is server and target is npc
+
+                    status.local_enforce_duration = true;
+
+                }
+            }
+
+            //if this is from SetStatuses, don't start events (unless it's instant)
+            if (!set_statuses || (status.Specific_Duration_Type == DURATION_TYPES.INSTANT)) {
+                //start
+                status.OnStart();
+            }
 
             //do effect if instant
             if (status.Specific_Duration_Type == DURATION_TYPES.INSTANT) {
                 status.DoEffect();
             }
-            else {
-                //not instant... do duration stuff
-
-                //periodic effect time (not stored in status itself because timer should be across instances of the status)
-                if (status.Specific_Effect_Type == EFFECT_TYPES.TIMED) {
-                    if (Times_Next_Timed_Effect.ContainsKey(id)) {
-                        //had a timer so update it
-                        Times_Next_Timed_Effect[id] = ExperienceAndClasses.Now.AddSeconds(seconds_until_effect);
-                    }
-                    else {
-                        //did not already have timer so start one with first effect now
-                        Times_Next_Timed_Effect.Add(id, ExperienceAndClasses.Now);
-                    }
-                }
-
-                //locally enforce duration?
-                if (status.Specific_Effect_Type == EFFECT_TYPES.TIMED) {    //has a duration, AND
-                    if (!status.Specific_Syncs ||                           //not shared with other clients, OR
-                        target.Local) {                                     //target is the local client OR this is server and target is npc
-
-                        status.local_enforce_duration = true;
-
-                    }
-                }
-            }
-
-            //attach to target (may cause merge or overwrite)
-            target.Statuses.Add(status);
 
             //visuals (update occurs during next ProcessStatuses so applied is accurate)
             if (!Utilities.Netmode.IS_SERVER) {
@@ -793,10 +806,10 @@ namespace ExperienceAndClasses.Systems {
                 }
             }
 
-            //sync
-            if (status.Specific_Syncs) {
+            //sync (unless set_statuses)
+            if (!set_statuses && status.Specific_Syncs) {
                 if (owner.Local) {
-                    //sending local status (could be server if a status is evere created there)
+                    //sending local status (could be server if a status is ever created there - npc owned status)
                     Utilities.PacketHandler.AddStatus.Send(status, Utilities.Netmode.WHO_AM_I);
                 }
                 else if (Utilities.Netmode.IS_SERVER) {
@@ -815,11 +828,14 @@ namespace ExperienceAndClasses.Systems {
 
         /// <summary>
         /// Return true to mark the merge as an improvement and trigger a sync. False leaves the value as it was.
-        /// Called after merging autosync data and duration, but before (potentially) setting new owner and autostacking.
+        /// Called on new status, passed the existing status
+        /// Called after merging autosync data and duration, but before (potentially) autostacking.
         /// </summary>
         /// <param name="status"></param>
         /// <returns></returns>
-        protected virtual bool OnMerge(Status status) { return false; }
+        protected virtual bool MergeCheck(Status status) { return false; }
+
+        protected virtual void OnMerge() { }
 
         /// <summary>
         /// Called when status is removed (not when merged over)
