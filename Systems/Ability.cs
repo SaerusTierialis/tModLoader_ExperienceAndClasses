@@ -432,12 +432,47 @@ namespace ExperienceAndClasses.Systems {
 
         private byte CalculateLevel() {
             //calculate for primary
-            Systems.Class c = Systems.Class.LOOKUP[(byte)Specific_Required_Class_ID];
-            
-            
+            byte level_primary = 0;
+            byte levels = 0;
+            Systems.Class c = ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary;
+            if (c.ID == Specific_Required_Class_ID) {
+                level_primary = ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary_Level_Effective;
+            }
+            else {
+                levels = ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary_Level_Effective;
+                c = c.Prereq;
+                while (c != null) {
+                    levels += c.Max_Level;
+                    if (c.ID == Specific_Required_Class_ID) {
+                        level_primary = levels;
+                        break;
+                    }
+                    c = c.Prereq;
+                }
+            }
 
+            //calculate for secondary
+            byte level_secondary = 0;
+            levels = 0;
+            c = ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary;
+            if (c.ID == Specific_Required_Class_ID) {
+                level_secondary = ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary_Level_Effective;
+            }
+            else {
+                levels = ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary_Level_Effective;
+                c = c.Prereq;
+                while (c != null) {
+                    levels += c.Max_Level;
+                    if (c.ID == Specific_Required_Class_ID) {
+                        level_secondary = levels;
+                        break;
+                    }
+                    c = c.Prereq;
+                }
+            }
 
-            //TODO
+            //use highest level (could still be 0 if not correct class)
+            level = Math.Max(level_primary, level_secondary);
 
             return level;
         }
