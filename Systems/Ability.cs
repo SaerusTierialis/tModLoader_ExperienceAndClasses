@@ -82,6 +82,10 @@ namespace ExperienceAndClasses.Systems {
 
         protected List<Systems.Status.IDs> specific_antirequisite_statuses = new List<Status.IDs>();
 
+        /// <summary>
+        /// Set this for channel
+        /// </summary>
+        protected bool specific_is_channelling = false;
         protected bool specific_can_be_used_while_channelling = false;
 
         public Systems.Class.IDs Specific_Required_Class_ID { get; protected set; } = Systems.Class.IDs.None;
@@ -94,19 +98,85 @@ namespace ExperienceAndClasses.Systems {
         protected float specific_radius_level_multiplier = 0;
 
         protected float specific_power_base = 0f;
-        protected bool specific_power_base_add_weapon_damage_if_type = false; //if weapon matches type, add its per-hit damage to base power
-        protected bool specific_power_base_add_weapon_dpt_if_type = false; //if weapon matches type, add its damage-per-use-time to base power
-        protected bool specific_power_apply_bonus_highest = false; //apply highest of type bonuses
-        protected bool specific_power_apply_bonus_all = false; //apply all bonuses
+        /// <summary>
+        /// if weapon matches type, add its per-hit damage to base power
+        /// </summary>
+        protected bool specific_power_base_add_weapon_damage_if_type = false;
+        /// <summary>
+        /// if weapon matches type, add its damage-per-use-time to base power
+        /// </summary>
+        protected bool specific_power_base_add_weapon_dpt_if_type = false;
+        /// <summary>
+        /// apply highest of type bonuses
+        /// </summary>
+        protected bool specific_power_apply_bonus_highest = false;
+        /// <summary>
+        /// apply all type bonuses
+        /// </summary>
+        protected bool specific_power_apply_bonus_all = false;
+        /// <summary>
+        /// 0 is no bonus, 0.01 is a 1%/point bonus, etc.
+        /// </summary>
         protected float[] specific_power_attribute_multipliers = new float[(byte)Systems.Attribute.IDs.NUMBER_OF_IDs];
-        protected float specific_power_level_multiplier = 0; //final multiplier (compounds)
+        /// <summary>
+        /// final multiplier (compounds other bonuses)
+        /// </summary>
+        protected float specific_power_level_multiplier = 0;
 
         protected bool specific_type_melee = false;
         protected bool specific_type_ranged = false;
         protected bool specific_type_throwing = false;
         protected bool specific_type_minion = false;
         protected bool specific_type_magic = false;
-        protected bool specific_type_holy = false;
+        protected bool specific_type_holy = false;  //note: there are no holy weapons, but MPlayer has a holy_power stat
+
+        /// <summary>
+        /// Max number of targets (not including self if specific_targets_self_always).
+        /// This max is SEPARATE for friendly and hostile target.
+        /// When selection is limited by this max, the closest targets to the position_target are used.
+        /// Set 0 if self is the only target to save time.
+        /// </summary>
+        protected ushort specific_targets_max = 0;
+        /// <summary>
+        /// self can be included as a friednly target but it is not guarenteed and does count towards max
+        /// </summary>
+        protected bool specific_targets_self = true;
+        /// <summary>
+        /// ALWAYS include self as a friendly target, does not count towards max
+        /// </summary>
+        protected bool specific_targets_self_always = true;
+        /// <summary>
+        /// targets can include players
+        /// </summary>
+        protected bool specific_targets_player = true;
+        /// <summary>
+        /// targets can include NPCs
+        /// </summary>
+        protected bool specific_targets_npc = true;
+        /// <summary>
+        /// targets can be friendly
+        /// </summary>
+        protected bool specific_targets_friedly = true;
+        /// <summary>
+        /// targets can be hostile
+        /// </summary>
+        protected bool specific_targets_hostile = true;
+        /// <summary>
+        /// target position must have sight of target
+        /// </summary>
+        protected bool specific_targets_require_line_of_sight_position = true;
+        /// <summary>
+        /// player must have sight of target
+        /// </summary>
+        protected bool specific_targets_require_line_of_sight_player = true;
+        /// <summary>
+        /// required unless Systems.Status.IDs.NONE
+        /// </summary>
+        protected Systems.Status.IDs specific_targets_require_status = Systems.Status.IDs.NONE;
+        /// <summary>
+        /// antirequisit unless Systems.Status.IDs.NONE
+        /// </summary>
+        protected Systems.Status.IDs specific_targets_antirequisite_status = Systems.Status.IDs.NONE;
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Instance Vars Generic (between activations) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -118,6 +188,7 @@ namespace ExperienceAndClasses.Systems {
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Instance Vars Generic (within activation) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
+        //these are set by each PreActivate (and some also when creating UI text)
         protected byte level;
         private float range, radius, power;
         private ushort cost_mana, cost_resource;
@@ -125,6 +196,9 @@ namespace ExperienceAndClasses.Systems {
         private Vector2 position_player, position_cursor, position_target;
         private float position_target_distance;
         private bool target_position_valid;
+        protected string custom_use_fail_message;
+        protected List<Utilities.Containers.Thing> targets_friendly;
+        protected List<Utilities.Containers.Thing> targets_hostile;
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Core Constructor ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -136,8 +210,13 @@ namespace ExperienceAndClasses.Systems {
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Public Instance Methods ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         public void Activate() {
-            //check if activation is allowed, else show message
-            USE_RESULT result = TryUse();
+            //check if activation is allowed, otherwise show message
+            //pre-calculates:
+            //costs
+            //positions
+            //targets
+            //cooldown
+            USE_RESULT result = PreActivate();
             if (result != USE_RESULT.SUCCESS) {
                 FailMessage(result);
                 return;
@@ -147,78 +226,13 @@ namespace ExperienceAndClasses.Systems {
 
         }
 
-        /// <summary>
-        /// Checks if ability can be used and returns true if USE_RESULT.SUCCESS
-        /// </summary>
-        public bool CanUse {
-            get {
-                return TryUse() == USE_RESULT.SUCCESS;
-            }
-        }
-
-        /// <summary>
-        /// Returns true even if reduced to zero so long as there was a value to begin with 
-        /// </summary>
-        public bool HasManaCost {
-            get {
-                return (specific_mana_cost_flat > 0 || specific_mana_cost_percent > 0);
-            }
-        }
-
-        /// <summary>
-        /// Returns true even if reduced to zero so long as there was a value to begin with 
-        /// </summary>
-        public bool HasResourceCost {
-            get {
-                return (Specific_Resource != null) && (specific_resource_cost_flat > 0 || specific_resource_cost_percent > 0);
-            }
-        }
-
-        /// <summary>
-        /// Returns true even if reduced to zero so long as there was a value to begin with 
-        /// </summary>
-        public bool HasCooldown {
-            get {
-                return (specific_cooldown_seconds > 0);
-            }
-        }
-
-        /// <summary>
-        /// Calculates and returns mana cost. For use outside of Ability.
-        /// </summary>
-        public ushort CostMana {
-            get {
-                return CalculateManaCost();
-            }
-        }
-
-        /// <summary>
-        /// Calculates and returns resource cost. For use outside of Ability.
-        /// </summary>
-        public ushort CostResource {
-            get {
-                return CalculateResourceCost();
-            }
-        }
-
-        /// <summary>
-        /// Calculates and returns cooldown in seconds. For use outside of Ability.
-        /// </summary>
-        public float CooldownSeconds {
-            get {
-                return CalculateCooldown();
-            }
-        }
-
-        public byte Level {
-            get {
-                return CalculateLevel();
-            }
+        public string GetUIText() {
+            return "TODO";
         }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Generic Calculations ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         // These calculate and return a value + set the variable for use elsewhere
-        // Called by public lookups and during TryUse() - i.e., automatically called during activation
+        // Called by public lookups and during PreActivate() - i.e., automatically called during activation
 
         private ushort CalculateManaCost() {
             //mana cost
@@ -251,7 +265,8 @@ namespace ExperienceAndClasses.Systems {
                 //100% delay reduction = 50% of base cooldown
                 cooldown_seconds /= ExperienceAndClasses.LOCAL_MPLAYER.ability_delay_reduction;
             }
-            return CalculateCooldown();
+            cooldown_seconds = ModifyCooldown(cooldown_seconds);
+            return cooldown_seconds;
         }
 
         private void CalculatePosition() {
@@ -477,9 +492,77 @@ namespace ExperienceAndClasses.Systems {
             return level;
         }
 
+        private void CalculateTargets() {
+            targets_friendly = new List<Utilities.Containers.Thing>();
+            targets_hostile = new List<Utilities.Containers.Thing>();
+
+            Utilities.Containers.Thing self = ExperienceAndClasses.LOCAL_MPLAYER.thing;
+
+            if (specific_targets_max > 0) {
+                //create list of all valid friendly and hostile targets
+                bool can_be_targeted, is_friendly;
+                float distance;
+
+                SortedDictionary<float, Utilities.Containers.Thing> friendly = new SortedDictionary<float, Utilities.Containers.Thing>();
+                SortedDictionary<float, Utilities.Containers.Thing> hostile = new SortedDictionary<float, Utilities.Containers.Thing>();
+
+                foreach (Utilities.Containers.Thing thing in Utilities.Containers.Thing.Things.Values) {
+                    //check if friendly
+                    is_friendly = self.IsFriendlyTo(thing);
+
+                    //get distance to position_target
+                    distance = thing.DistanceTo(position_target);
+
+                    //standard requirements
+                    if ((!specific_targets_player && thing.Is_Player) ||                                            //can't be player?
+                        (!specific_targets_npc && thing.Is_Npc) ||                                                  //can't be npc?
+                        (!specific_targets_friedly && is_friendly) ||                                               //can't be friendly?
+                        (!specific_targets_hostile && !is_friendly) ||                                              //can't be hostile?
+                        (distance > radius) ||                                             //too far?
+                        (specific_targets_require_line_of_sight_player && !thing.HasSightOf(position_player)) ||    //needs sight of player?
+                        (specific_targets_require_line_of_sight_position && !thing.HasSightOf(position_target)) ||  //needs sight of position?
+                        (specific_targets_self_always && (thing.Index == self.Index)) ||                            //self_always and this is self (added at end instead)
+                        (!thing.HasStatus(specific_targets_require_status)) ||                                      //doesn't have required status?
+                        (thing.HasStatus(specific_targets_antirequisite_status))                                    //has antirequisite status?
+                        ) {
+                        can_be_targeted = false;
+                    }
+                    else {
+                        can_be_targeted = true;
+                    }
+
+                    //ability-specific modification
+                    can_be_targeted = ModifyCanBeTarget(thing, can_be_targeted);
+
+                    //add as an option
+                    if (is_friendly) {
+                        friendly.Add(distance, thing);
+                    }
+                    else {
+                        hostile.Add(distance, thing);
+                    }
+                }
+
+                //copy to lists and reduce to closest targets (specific_targets_max)
+                targets_friendly = friendly.Values.ToList();
+                if (targets_friendly.Count > specific_targets_max) {
+                    targets_friendly.RemoveRange(specific_targets_max, targets_friendly.Count - specific_targets_max + 1);
+                }
+                targets_hostile = hostile.Values.ToList();
+                if (targets_hostile.Count > specific_targets_max) {
+                    targets_hostile.RemoveRange(specific_targets_max, targets_hostile.Count - specific_targets_max + 1);
+                }
+            }
+
+            //always add self? (ignores max)
+            if (specific_targets_self_always) {
+                targets_friendly.Add(self);
+            }
+        }
+
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Private Instance Methods ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-            private USE_RESULT TryUse() {
+        private USE_RESULT PreActivate() {
             //level (calculates for use later in activation)
             if (CalculateLevel() < 1) {
                 return USE_RESULT.FAIL_CLASS_LEVEL;
@@ -517,7 +600,7 @@ namespace ExperienceAndClasses.Systems {
 
             //cooldown (calculates for use later in activation)
             CalculateCooldown();
-            if (HasCooldown && (Time_Cooldown_End.CompareTo(ExperienceAndClasses.Now) > 0)) {
+            if (Time_Cooldown_End.CompareTo(ExperienceAndClasses.Now) > 0) {
                 return USE_RESULT.FAIL_ON_COOLDOWN;
             }
 
@@ -537,11 +620,13 @@ namespace ExperienceAndClasses.Systems {
 
             //targets (calculates for use later in activation)
             CalculateRadius();
-            //TODO get targets
-            //TODO check min # targets
-            //TODO FAIL_NO_TARGET
+            CalculateTargets();
+            if (targets_friendly.Count == 0 && targets_hostile.Count == 0) {
+                return USE_RESULT.FAIL_NO_TARGET;
+            }
 
             //ability-specific fail
+            custom_use_fail_message = "Requirements Not Met";
             if (!MeetsSpecificUseRequirements()) {
                 return USE_RESULT.FAIL_SPECIFIC;
             }
@@ -606,7 +691,7 @@ namespace ExperienceAndClasses.Systems {
                             break;
 
                         case USE_RESULT.FAIL_SPECIFIC:
-                            message = "Requirements Not Met";
+                            message = custom_use_fail_message;
                             break;
 
                         case USE_RESULT.SUCCESS:
@@ -628,7 +713,8 @@ namespace ExperienceAndClasses.Systems {
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Private Override Methods ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         /// <summary>
-        /// If false, TryUse returns USE_RESULT.FAIL_SPECIFIC
+        /// If false, PreActivate returns USE_RESULT.FAIL_SPECIFIC.
+        /// Set custom_use_fail_message to show a non-default message.
         /// </summary>
         /// <returns></returns>
         protected virtual bool MeetsSpecificUseRequirements() { return true; }
@@ -640,6 +726,8 @@ namespace ExperienceAndClasses.Systems {
         protected virtual float ModifyRadius(float radius) { return radius; }
         protected virtual float ModifyPowerBase(float power) { return power; }
         protected virtual float ModifyPowerFinal(float power) { return power; }
+        protected virtual float ModifyCooldown(float cooldown_seconds) { return cooldown_seconds; }
+        protected virtual bool ModifyCanBeTarget(Utilities.Containers.Thing target, bool can_be_targeted) { return can_be_targeted; }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Warrior ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         public class Block : Ability {

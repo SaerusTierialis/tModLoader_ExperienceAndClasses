@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Xna.Framework;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -332,6 +333,58 @@ namespace ExperienceAndClasses.Utilities.Containers {
                 }
             }
             return statuses;
+        }
+
+        public bool IsHostileTo(Thing other) {
+            return !IsFriendlyTo(other);
+        }
+
+        public bool IsFriendlyTo(Thing other) {
+            if (Is_Player && other.Is_Player) {
+                //both players
+                Player us = MPlayer.player;
+                Player them = other.MPlayer.player;
+                if (us.hostile && them.hostile && ((us.team == 0) || (us.team != them.team)) && (whoAmI != them.whoAmI) {
+                    //pvp hostile
+                    //both have pvp enabled, not on same team (or is on no team), not the sample player
+                    return false;
+                }
+                else {
+                    return true;
+                }
+            }
+            else if (Is_Player && other.Is_Npc) {
+                //this is player, that is npc
+                return other.MNPC.npc.friendly;
+            }
+            else if (Is_Npc && other.Is_Player) {
+                //this is npc, that is player
+                return MNPC.npc.friendly;
+            }
+            else {
+                //both npc
+                //both hostile or both friendly
+                return (MNPC.npc.friendly == other.MNPC.npc.friendly);
+            }
+        }
+
+        public Vector2 Position {
+            get {
+                if (Is_Player) {
+                    return mplayer.player.position;
+                }
+                else {
+                    return mnpc.npc.position;
+                }
+            }
+        }
+
+        public float DistanceTo(Vector2 position) {
+            return Vector2.Distance(Position, position);
+        }
+
+        public bool HasSightOf(Vector2 position) {
+            return Collision.CanHitLine(Position, 0, 0, position, 0, 0);
         }
     }
 
