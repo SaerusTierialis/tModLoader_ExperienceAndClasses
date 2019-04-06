@@ -219,7 +219,7 @@ namespace ExperienceAndClasses.Utilities {
                 //read
                 int[] attributes = new int[(byte)Systems.Attribute.IDs.NUMBER_OF_IDs];
                 for (byte i = 0; i < (byte)Systems.Attribute.IDs.NUMBER_OF_IDs; i++) {
-                    attributes[i] = reader.ReadInt16();
+                    attributes[i] = reader.ReadInt32();
                 }
 
                 //set
