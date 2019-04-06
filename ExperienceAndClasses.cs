@@ -34,6 +34,10 @@ namespace ExperienceAndClasses {
 
         public static UI.UIStateCombo[] UIs = new UI.UIStateCombo[0]; //set on entering world
 
+        public static ModHotKey[] HOTKEY_ABILITY_PRIMARY = new ModHotKey[4];
+        public static ModHotKey[] HOTKEY_ABILITY_SECONDARY = new ModHotKey[4];
+        public static ModHotKey HOTKEY_ALTERNATE_EFFECT;
+
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Variables ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         public static bool inventory_state = false;
@@ -54,6 +58,15 @@ namespace ExperienceAndClasses {
 
             //hotkeys
             HOTKEY_UI = RegisterHotKey("Show Class Interface", "P");
+            HOTKEY_ALTERNATE_EFFECT = RegisterHotKey("Ability Alternate Effect", "LeftShift");
+            HOTKEY_ABILITY_PRIMARY[0] = RegisterHotKey("Primary Class Ability 1", "Q");
+            HOTKEY_ABILITY_PRIMARY[1] = RegisterHotKey("Primary Class Ability 2", "E");
+            HOTKEY_ABILITY_PRIMARY[2] = RegisterHotKey("Primary Class Ability 3", "R");
+            HOTKEY_ABILITY_PRIMARY[3] = RegisterHotKey("Primary Class Ability 4", "F");
+            HOTKEY_ABILITY_SECONDARY[0] = RegisterHotKey("Secondary Class Ability 1", "Z");
+            HOTKEY_ABILITY_SECONDARY[1] = RegisterHotKey("Secondary Class Ability 2", "X");
+            HOTKEY_ABILITY_SECONDARY[2] = RegisterHotKey("Secondary Class Ability 3", "C");
+            HOTKEY_ABILITY_SECONDARY[3] = RegisterHotKey("Secondary Class Ability 4", "V");
 
             //Textures
             if (!Utilities.Netmode.IS_SERVER) {
@@ -69,6 +82,9 @@ namespace ExperienceAndClasses {
 
             //hotkeys
             HOTKEY_UI = null;
+            HOTKEY_ALTERNATE_EFFECT = null;
+            HOTKEY_ABILITY_PRIMARY = new ModHotKey[4];
+            HOTKEY_ABILITY_SECONDARY = new ModHotKey[4];
 
         }
 
