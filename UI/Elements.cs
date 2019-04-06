@@ -696,11 +696,11 @@ namespace ExperienceAndClasses.UI {
                 if (button_auto != null) {
                     if (auto) {
                         button_auto.SetImage(Utilities.Textures.TEXTURE_CORNER_BUTTON_AUTO);
-                        button_auto.hoverText = "Hide In Inventory";
+                        button_auto.hoverText = "Show With Inventory";
                     }
                     else {
                         button_auto.SetImage(Utilities.Textures.TEXTURE_CORNER_BUTTON_NO_AUTO);
-                        button_auto.hoverText = "Always Show";
+                        button_auto.hoverText = "Manual";
                     }
                 }
             }
