@@ -101,8 +101,8 @@ namespace ExperienceAndClasses.Systems {
         public static Status[] LOOKUP { get; private set; }
 
         static Status() {
-            LOOKUP = new Status[(ushort)Status.IDs.NUMBER_OF_IDs];
-            for (byte i = 0; i < LOOKUP.Length; i++) {
+            LOOKUP = new Status[(ushort)IDs.NUMBER_OF_IDs];
+            for (ushort i = 0; i < LOOKUP.Length; i++) {
                 LOOKUP[i] = Utilities.Commons.CreateObjectFromName<Status>(Enum.GetName(typeof(IDs), i));
             }
         }

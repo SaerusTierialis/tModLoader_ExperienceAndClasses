@@ -390,7 +390,7 @@ namespace ExperienceAndClasses.UI {
             Top.Set(0f, 0f);
             Width.Set(width, 0f);
             Height.Set(height, 0f);
-            BackgroundColor = UI.Constants.COLOR_UI_PANEL_HIGHLIGHT;
+            BackgroundColor = UI.Constants.COLOUR_UI_PANEL_HIGHLIGHT;
 
             float top = ((height - (Main.fontMouseText.MeasureString("A").Y * scale)) / 2f) + UI.Constants.UI_PADDING;
             title = new UIText(attribute.Name_Short.ToUpper(), scale);
@@ -746,7 +746,7 @@ namespace ExperienceAndClasses.UI {
             }
 
             if (any_buttons) {
-                button_panel = new DragableUIPanel(1, Utilities.Textures.TEXTURE_CORNER_BUTTON_SIZE + Constants.UI_PADDING * 2f - BUTTON_PANEL_EDGE_SPACE, Constants.COLOR_UI_PANEL_BACKGROUND, UI, false, false, false, false);
+                button_panel = new DragableUIPanel(1, Utilities.Textures.TEXTURE_CORNER_BUTTON_SIZE + Constants.UI_PADDING * 2f - BUTTON_PANEL_EDGE_SPACE, Constants.COLOUR_UI_PANEL_BACKGROUND, UI, false, false, false, false);
                 button_panel.Top.Set(BUTTON_PANEL_EDGE_SPACE, 0f);
                 button_panel.BorderColor = Color.Transparent;
                 Append(button_panel);

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.GameInput;
 using Terraria.ModLoader;
@@ -65,11 +66,10 @@ namespace ExperienceAndClasses {
         /// </summary>
         private int Allocation_Points_Total;
 
-        public float heal_damage; //TODO
+        public float holy_power; //TODO
         public float dodge_chance; //TODO
         public float ability_delay_reduction; //TODO
         public float use_speed_melee, use_speed_ranged, use_speed_magic, use_speed_throwing, use_speed_minion, use_speed_tool;
-        public float tool_power;
 
         /// <summary>
         /// List of minions including sentries. Includes each part of multi-part minions. Updates on CheckMinions().
@@ -123,7 +123,9 @@ namespace ExperienceAndClasses {
         /// <summary>
         /// Earning XP when all active classes are maxed stores the extra here
         /// </summary>
-        public uint Extra_XP;
+        public uint extra_xp;
+
+        public bool show_ability_fail_messages;
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Instance Vars (syncing) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -146,7 +148,7 @@ namespace ExperienceAndClasses {
         public bool IN_COMBAT { get; private set; } //TODO local set
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Initialize ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-
+        
         /// <summary>
         /// instanced arrays must be initialized here (also called during cloning, etc)
         /// </summary>
@@ -166,7 +168,7 @@ namespace ExperienceAndClasses {
             minions = new List<Projectile>();
             slot_minions = new List<Projectile>();
             Progression = 0;
-            Extra_XP = 0;
+            extra_xp = 0;
             Passives = new List<Systems.Passive>();
             Abilities_Primary = new Systems.Ability[ExperienceAndClasses.NUMBER_ABILITY_SLOTS_PER_CLASS];
             Abilities_Secondary = new Systems.Ability[ExperienceAndClasses.NUMBER_ABILITY_SLOTS_PER_CLASS];
@@ -202,11 +204,13 @@ namespace ExperienceAndClasses {
             Allocation_Points_Total = 0;
 
             //stats
-            heal_damage = 1f;
+            holy_power = 1f;
             dodge_chance = 0f;
             use_speed_melee = use_speed_ranged = use_speed_magic = use_speed_throwing = use_speed_minion = use_speed_tool = 1f;
             ability_delay_reduction = 1f;
-            tool_power = 1f;
+
+            //ability
+            show_ability_fail_messages = true;
         }
 
         /// <summary>
@@ -255,11 +259,10 @@ namespace ExperienceAndClasses {
             base.PreUpdate();
             if (initialized) {
                 //defaults before update
-                heal_damage = 1f;
+                holy_power = 1f;
                 dodge_chance = 0f;
                 use_speed_melee = use_speed_ranged = use_speed_magic = use_speed_throwing = use_speed_minion = use_speed_tool = 1f;
                 ability_delay_reduction = 1f;
-                tool_power = 1f;
                 channelling = false; //TODO prevent attack/item use/ability use
             }
         }
@@ -289,7 +292,6 @@ namespace ExperienceAndClasses {
             if (Is_Local_Player) {
                 //ui //TODO only update if something changed
                 UI.UIStatus.Instance.Update();
-                
             }
         }
 
@@ -803,7 +805,8 @@ namespace ExperienceAndClasses {
                 {"eac_attribute_allocation", attributes_allocated },
                 {"eac_wof", Defeated_WOF },
                 {"eac_settings_show_xp", show_xp},
-                {"eac_extra_xp", Extra_XP},
+                {"eac_extra_xp", extra_xp},
+                {"eac_show_ability_fail_messages", show_ability_fail_messages},
             };
         }
 
@@ -822,7 +825,7 @@ namespace ExperienceAndClasses {
             Allow_Secondary = Utilities.Commons.TryGet<bool>(tag, "eac_class_subclass_unlocked", Allow_Secondary);
 
             //extra xp pool
-            Extra_XP = Utilities.Commons.TryGet<uint>(tag, "eac_extra_xp", Extra_XP);
+            extra_xp = Utilities.Commons.TryGet<uint>(tag, "eac_extra_xp", extra_xp);
 
             //settings
             show_xp = Utilities.Commons.TryGet<bool>(tag, "eac_settings_show_xp", show_xp);
@@ -903,6 +906,9 @@ namespace ExperienceAndClasses {
                 Utilities.Commons.TryGet<float>(tag, "eac_ui_hud_left", UI.Constants.DEFAULT_UI_HUD_LEFT),
                 Utilities.Commons.TryGet<float>(tag, "eac_ui_hud_top", UI.Constants.DEFAULT_UI_HUD_TOP),
                 Utilities.Commons.TryGet<bool>(tag, "eac_ui_hud_auto", UI.Constants.DEFAULT_UI_HUD_AUTO));
+
+            //ability
+            show_ability_fail_messages = Utilities.Commons.TryGet<bool>(tag, "eac_show_ability_fail_messages", show_ability_fail_messages);
 
             //if this is a client loading (or singleplayer), then this will become the local mplayer again when entering the world
             ExperienceAndClasses.LOCAL_MPLAYER = backup;

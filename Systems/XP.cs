@@ -132,14 +132,14 @@ namespace ExperienceAndClasses.Systems {
                     }
                     else {
                         //shouldn't be reachable unless something is changed later
-                        ExperienceAndClasses.LOCAL_MPLAYER.Extra_XP = Math.Max(ExperienceAndClasses.LOCAL_MPLAYER.Extra_XP, ExperienceAndClasses.LOCAL_MPLAYER.Extra_XP + xp); //prevent overflow
+                        ExperienceAndClasses.LOCAL_MPLAYER.extra_xp = Math.Max(ExperienceAndClasses.LOCAL_MPLAYER.extra_xp, ExperienceAndClasses.LOCAL_MPLAYER.extra_xp + xp); //prevent overflow
                         return;
                     }
 
                     LocalCheckDoLevelup();
                 }
                 else {
-                    ExperienceAndClasses.LOCAL_MPLAYER.Extra_XP = Math.Max(ExperienceAndClasses.LOCAL_MPLAYER.Extra_XP, ExperienceAndClasses.LOCAL_MPLAYER.Extra_XP + xp); //prevent overflow
+                    ExperienceAndClasses.LOCAL_MPLAYER.extra_xp = Math.Max(ExperienceAndClasses.LOCAL_MPLAYER.extra_xp, ExperienceAndClasses.LOCAL_MPLAYER.extra_xp + xp); //prevent overflow
                 }
             }
 

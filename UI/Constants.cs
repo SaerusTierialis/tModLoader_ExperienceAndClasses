@@ -10,14 +10,15 @@ namespace ExperienceAndClasses.UI {
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Colours ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-        public static readonly Color COLOR_UI_PANEL_BACKGROUND = new Color(73, 94, 171, 200);
-        public static readonly Color COLOR_UI_PANEL_HIGHLIGHT = new Color(103, 124, 201, 200);
-        public static readonly Color COLOR_SUBPANEL = new Color(73, 94, 200, 200);
-        public static readonly Color COLOR_BAR_UI = new Color(COLOR_UI_PANEL_BACKGROUND.R, COLOR_UI_PANEL_BACKGROUND.G, COLOR_UI_PANEL_BACKGROUND.B, 50);
+        public static readonly Color COLOUR_UI_PANEL_BACKGROUND = new Color(73, 94, 171, 200);
+        public static readonly Color COLOUR_UI_PANEL_HIGHLIGHT = new Color(103, 124, 201, 200);
+        public static readonly Color COLOUR_SUBPANEL = new Color(73, 94, 200, 200);
+        public static readonly Color COLOUR_BAR_UI = new Color(COLOUR_UI_PANEL_BACKGROUND.R, COLOUR_UI_PANEL_BACKGROUND.G, COLOUR_UI_PANEL_BACKGROUND.B, 50);
 
         public static readonly Color COLOUR_CLASS_PRIMARY = new Color(128, 255, 0, 200);
         public static readonly Color COLOUR_CLASS_SECONDARY = new Color(250, 220, 0, 200);
 
+        public static readonly Color COLOUR_MESSAGE_ABILITY_FAIL = new Color(163, 73, 164);
         public static readonly Color COLOUR_MESSAGE_ERROR = new Color(255, 25, 25);
         public static readonly Color COLOUR_MESSAGE_SUCCESS = new Color(25, 255, 25);
         public static readonly Color COLOUR_MESSAGE_TRACE = new Color(255, 0, 255);

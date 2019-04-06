@@ -289,13 +289,13 @@ namespace ExperienceAndClasses.Systems {
             Main.NewText("You have unlocked " + Name + "!", UI.Constants.COLOUR_MESSAGE_ANNOUNCE);
 
             //add extra xp (after penalty)
-            uint extra_xp_add = (uint)(ExperienceAndClasses.LOCAL_MPLAYER.Extra_XP * Systems.XP.EXTRA_XP_POOL_MULTIPLIER);
+            uint extra_xp_add = (uint)(ExperienceAndClasses.LOCAL_MPLAYER.extra_xp * Systems.XP.EXTRA_XP_POOL_MULTIPLIER);
             if (extra_xp_add > 0) {
                 //add xp
                 Systems.XP.Adjusting.LocalAddXPToClass(ID_num, extra_xp_add);
 
                 //clear pool
-                ExperienceAndClasses.LOCAL_MPLAYER.Extra_XP = 0;
+                ExperienceAndClasses.LOCAL_MPLAYER.extra_xp = 0;
 
                 //levelup?
                 LocalCheckDoLevelup();

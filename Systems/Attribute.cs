@@ -343,7 +343,7 @@ namespace ExperienceAndClasses.Systems {
                         //healing
                         bpp = SPIRIT_HEAL;
                         bf = bpp * points;
-                        mplayer.heal_damage += bf;
+                        mplayer.holy_power += bf;
                         if (mplayer.Is_Local_Player) Bonus += "\n+" + bf + "% healing (" + bpp + " per point)";
 
                         break;

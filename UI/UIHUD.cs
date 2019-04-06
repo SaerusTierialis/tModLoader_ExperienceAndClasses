@@ -27,7 +27,7 @@ namespace ExperienceAndClasses.UI {
         protected override void InitializeState() {
             needs_first_arrange = true;
 
-            panel = new DragableUIPanel(WIDTH, HEIGHT, Constants.COLOR_BAR_UI, this, false, ExperienceAndClasses.LOCAL_MPLAYER.loaded_ui_hud.AUTO);
+            panel = new DragableUIPanel(WIDTH, HEIGHT, Constants.COLOUR_BAR_UI, this, false, ExperienceAndClasses.LOCAL_MPLAYER.loaded_ui_hud.AUTO);
 
             xp_bar_primary = new XPBar(WIDTH - (Constants.UI_PADDING * 2), Systems.Class.LOOKUP[(byte)Systems.Class.IDs.Novice]);
             xp_bar_primary.Left.Set(Constants.UI_PADDING, 0f);
