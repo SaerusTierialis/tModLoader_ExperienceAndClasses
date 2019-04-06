@@ -220,9 +220,14 @@ namespace ExperienceAndClasses.Systems {
         protected IDs specific_owner_player_required_status = IDs.NONE;
 
         /// <summary>
-        /// remove if the local client is the owner and does not have specified passive ability | default is none
+        /// remove if the local client is the owner and does not have specified passive ability | default is null
         /// </summary>
-        protected Systems.Passive.IDs specific_owner_player_required_passive = Systems.Passive.IDs.NONE;
+        protected Systems.Passive specific_owner_player_required_passive = null;
+
+        /// <summary>
+        /// remove if the local client is the owner and does not have specified passive ability | default is null
+        /// </summary>
+        protected Systems.Ability specific_owner_player_required_ability = null;
 
         /// <summary>
         /// remove if target DOES NOT have specified status (checked by server) | default is none
@@ -525,7 +530,12 @@ namespace ExperienceAndClasses.Systems {
                 }
 
                 //required passive
-                if ((specific_owner_player_required_passive != Systems.Passive.IDs.NONE) && !Owner.MPlayer.Passives.Contains(specific_owner_player_required_passive)) {
+                if ((specific_owner_player_required_passive != null) && !Owner.MPlayer.Passives.Contains(specific_owner_player_required_passive)) {
+                    return true;
+                }
+
+                //required ability
+                if ((specific_owner_player_required_ability != null) && !Owner.MPlayer.Abilities_Primary.Contains(specific_owner_player_required_ability) && !Owner.MPlayer.Abilities_Secondary.Contains(specific_owner_player_required_ability)) {
                     return true;
                 }
 

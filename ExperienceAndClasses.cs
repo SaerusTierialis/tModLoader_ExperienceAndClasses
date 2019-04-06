@@ -34,8 +34,9 @@ namespace ExperienceAndClasses {
 
         public static UI.UIStateCombo[] UIs = new UI.UIStateCombo[0]; //set on entering world
 
-        public static ModHotKey[] HOTKEY_ABILITY_PRIMARY = new ModHotKey[4];
-        public static ModHotKey[] HOTKEY_ABILITY_SECONDARY = new ModHotKey[4];
+        public const byte NUMBER_ABILITY_SLOTS_PER_CLASS = 4;
+        public static ModHotKey[] HOTKEY_ABILITY_PRIMARY = new ModHotKey[NUMBER_ABILITY_SLOTS_PER_CLASS];
+        public static ModHotKey[] HOTKEY_ABILITY_SECONDARY = new ModHotKey[NUMBER_ABILITY_SLOTS_PER_CLASS];
         public static ModHotKey HOTKEY_ALTERNATE_EFFECT;
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Variables ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
@@ -83,8 +84,8 @@ namespace ExperienceAndClasses {
             //hotkeys
             HOTKEY_UI = null;
             HOTKEY_ALTERNATE_EFFECT = null;
-            HOTKEY_ABILITY_PRIMARY = new ModHotKey[4];
-            HOTKEY_ABILITY_SECONDARY = new ModHotKey[4];
+            HOTKEY_ABILITY_PRIMARY = new ModHotKey[NUMBER_ABILITY_SLOTS_PER_CLASS];
+            HOTKEY_ABILITY_SECONDARY = new ModHotKey[NUMBER_ABILITY_SLOTS_PER_CLASS];
 
         }
 

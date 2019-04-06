@@ -81,8 +81,10 @@ namespace ExperienceAndClasses {
         /// </summary>
         public List<Projectile> slot_minions { get; private set; }
 
-        public List<Systems.Passive.IDs> Passives { get; private set; }
+        public List<Systems.Passive> Passives { get; private set; }
 
+        public Systems.Ability[] Abilities_Primary { get; private set; }
+        public Systems.Ability[] Abilities_Secondary { get; private set; }
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Instance Vars (saved/loaded) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         //Class_Primary and Class_Secondary also save/load (specifically the .ID)
@@ -165,7 +167,9 @@ namespace ExperienceAndClasses {
             slot_minions = new List<Projectile>();
             Progression = 0;
             Extra_XP = 0;
-            Passives = new List<Systems.Passive.IDs>();
+            Passives = new List<Systems.Passive>();
+            Abilities_Primary = new Systems.Ability[ExperienceAndClasses.NUMBER_ABILITY_SLOTS_PER_CLASS];
+            Abilities_Secondary = new Systems.Ability[ExperienceAndClasses.NUMBER_ABILITY_SLOTS_PER_CLASS];
             channelling = false;
 
             //ui
@@ -186,7 +190,7 @@ namespace ExperienceAndClasses {
             //default class selection
             Class_Primary = Systems.Class.LOOKUP[(byte)Systems.Class.IDs.Novice];
             Class_Secondary = Systems.Class.LOOKUP[(byte)Systems.Class.IDs.None];
-
+            
             //initialize attributes
             Attributes_Class = new int[(byte)Systems.Attribute.IDs.NUMBER_OF_IDs];
             Attributes_Allocated = new int[(byte)Systems.Attribute.IDs.NUMBER_OF_IDs];
