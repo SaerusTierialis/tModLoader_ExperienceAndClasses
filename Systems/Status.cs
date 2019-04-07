@@ -7,6 +7,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Terraria;
+using Terraria.ID;
 using Terraria.ModLoader;
 
 namespace ExperienceAndClasses.Systems {
@@ -256,6 +257,16 @@ namespace ExperienceAndClasses.Systems {
         protected bool specific_remove_on_owner_death = false;
 
         /// <summary>
+        /// remove if owner is frozen, petrified, etc. | default is FALSE
+        /// </summary>
+        protected bool specific_remove_on_owner_immobilized = false;
+
+        /// <summary>
+        /// remove if owner silenced | default is FALSE
+        /// </summary>
+        protected bool specific_remove_on_owner_silenced = false;
+
+        /// <summary>
         /// remove if target died | default is TRUE
         /// </summary>
         protected bool specific_remove_on_target_death = true;
@@ -493,27 +504,42 @@ namespace ExperienceAndClasses.Systems {
                 return true;
             }
 
-            //requirements: server/singleplayer (not client) checks
-            if (!Utilities.Netmode.IS_CLIENT) {
-                //remove if owner player leaves
-                if ((specific_remove_if_owner_player_leaves || (Specific_Duration_Type == DURATION_TYPES.TOGGLE)) && Owner.Is_Player && !Owner.Active) {
+            //requirements: everyone...
+            //remove if owner player leaves
+            if ((specific_remove_if_owner_player_leaves || (Specific_Duration_Type == DURATION_TYPES.TOGGLE)) && Owner.Is_Player && !Owner.Active) {
+                return true;
+            }
+
+            //remove if owner died
+            if (specific_remove_on_owner_death) {
+                if (Owner.Dead) {
                     return true;
                 }
+            }
 
-                //remove if owner died
-                if (specific_remove_on_owner_death) {
-                    if (Owner.Dead) {
-                        return true;
-                    }
+            //remove if target died
+            if (specific_remove_on_target_death) {
+                if (Target.Dead) {
+                    return true;
                 }
+            }
 
-                //remove if target died
-                if (specific_remove_on_target_death) {
-                    if (Target.Dead) {
-                        return true;
-                    }
+            //owner immobilized
+            if (specific_remove_on_owner_immobilized) {
+                if (Owner.HasBuff(BuffID.Stoned) || Owner.HasBuff(BuffID.Frozen)) {
+                    return true;
                 }
+            }
 
+            //owner silenced
+            if (specific_remove_on_owner_immobilized) {
+                if (Owner.HasBuff(BuffID.Silenced)) {
+                    return true;
+                }
+            }
+
+            //requirements: local
+            if (Owner.Is_Player && Owner.Local) { //owner is always player if locally_owned
                 //remove if target lacks required status
                 if (specific_target_required_status != IDs.NONE) {
                     if (!Target.HasStatus(specific_target_required_status)) {
@@ -527,10 +553,7 @@ namespace ExperienceAndClasses.Systems {
                         return true;
                     }
                 }
-            }
 
-            //requirements: local
-            if (Owner.Is_Player && Owner.Local) { //owner is always player if locally_owned
                 //required status
                 if ((specific_owner_player_required_status != IDs.NONE) && !Owner.HasStatus(specific_owner_player_required_status)) {
                     return true;
@@ -895,10 +918,12 @@ namespace ExperienceAndClasses.Systems {
                 specific_timed_effect_sec = 0.1f;
                 specific_owner_player_required_ability = ability_id;
                 specific_remove_if_key_not_pressed = Systems.Ability.LOOKUP[(ushort)specific_owner_player_required_ability].hotkey;
+                specific_remove_on_owner_death = true;
+                specific_remove_on_owner_immobilized = true;
+                specific_remove_on_owner_silenced = true;
             }
 
             protected override void EffectTimed() {
-                Main.NewText("EffectTimed");
                 if (Target.MPlayer.player.statMana > mana_cost_per_timed_effect) {
                     Target.MPlayer.player.statMana -= mana_cost_per_timed_effect;
                 }

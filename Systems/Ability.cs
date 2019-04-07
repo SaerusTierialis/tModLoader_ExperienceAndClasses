@@ -570,6 +570,11 @@ namespace ExperienceAndClasses.Systems {
                 SortedDictionary<float, Utilities.Containers.Thing> hostile = new SortedDictionary<float, Utilities.Containers.Thing>();
 
                 foreach (Utilities.Containers.Thing thing in Utilities.Containers.Thing.Things.Values) {
+                    //don't target dead things or inactive
+                    if (thing.Dead || !thing.Active) {
+                        continue;
+                    }
+
                     //check if friendly
                     is_friendly = self.IsFriendlyTo(thing);
 

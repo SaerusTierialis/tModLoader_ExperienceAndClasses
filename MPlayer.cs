@@ -12,6 +12,7 @@ namespace ExperienceAndClasses {
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Constants ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         private const long TICKS_PER_FULL_SYNC = TimeSpan.TicksPerMinute * 2;
+        private const float CHANNELLING_SPEED_MULTIPLIER = 0.99f;
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Static Vars ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -269,26 +270,26 @@ namespace ExperienceAndClasses {
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Update ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-        public override void PreUpdate() {
-            base.PreUpdate();
-            if (initialized) {
-                //defaults before update
-                holy_power = 1f;
-                dodge_chance = 0f;
-                use_speed_melee = use_speed_ranged = use_speed_magic = use_speed_throwing = use_speed_minion = use_speed_tool = 1f;
-                ability_delay_reduction = 1f;
-                channelling = false; //TODO prevent attack/item use/ability use
-            }
-        }
-
         /// <summary>
         /// this is after buff updates
         /// </summary>
         public override void PostUpdateEquips() {
             base.PostUpdateEquips();
             if (initialized) {
+                //reset
+                holy_power = 1f;
+                dodge_chance = 0f;
+                use_speed_melee = use_speed_ranged = use_speed_magic = use_speed_throwing = use_speed_minion = use_speed_tool = 1f;
+                ability_delay_reduction = 1f;
+                channelling = false; //TODO prevent attack/item use/ability use
+
                 ApplyStatuses();
                 ApplyAttributes();
+
+                //channelling slow
+                if (channelling) {
+                    player.velocity *= CHANNELLING_SPEED_MULTIPLIER;
+                }
             }
         }
 
@@ -470,9 +471,13 @@ namespace ExperienceAndClasses {
             }
         }
 
-        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Hotkeys ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Keys ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         public override void ProcessTriggers(TriggersSet triggersSet) {
+            if (channelling) {
+                player.controlUseItem = false;
+            }
+
             if (ExperienceAndClasses.HOTKEY_UI.JustPressed) {
                 UI.UIMain.Instance.Visibility = !UI.UIMain.Instance.Visibility;
             }

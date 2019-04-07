@@ -60,7 +60,7 @@ namespace ExperienceAndClasses {
 
             //hotkeys
             HOTKEY_UI = RegisterHotKey("Show Class Interface", "P");
-            HOTKEY_ACTIVATE = RegisterHotKey("Activate Ability", "Space");
+            HOTKEY_ACTIVATE = RegisterHotKey("Activate Ability", "LeftCtrl");
             HOTKEY_ALTERNATE_EFFECT = RegisterHotKey("Ability Alternate Effect", "LeftShift");
             HOTKEY_ABILITY_PRIMARY[0] = RegisterHotKey("Primary Class Ability 1", "Q");
             HOTKEY_ABILITY_PRIMARY[1] = RegisterHotKey("Primary Class Ability 2", "E");

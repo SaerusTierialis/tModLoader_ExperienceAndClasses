@@ -26,10 +26,11 @@ namespace ExperienceAndClasses {
             return base.NewInstance(npc);
         }
 
-        public override void AI(NPC npc) {
-            thing.ProcessStatuses(); //TODO find a better place for this?
-            base.AI(npc);
+        public override void ResetEffects(NPC npc) {
+            base.ResetEffects(npc);
+            //thing.ProcessStatuses(); //TODO fix issue
         }
+
 
     }
 }

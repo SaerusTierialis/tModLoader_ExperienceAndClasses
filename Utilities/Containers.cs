@@ -386,6 +386,19 @@ namespace ExperienceAndClasses.Utilities.Containers {
         public bool HasSightOf(Vector2 position) {
             return Collision.CanHit(Position, 0, 0, position, 0, 0);
         }
+
+        public bool HasBuff(int buff_id) {
+            if (Is_Player) {
+                return mplayer.player.HasBuff(buff_id);
+            }
+            else if (Is_Npc) {
+                return mnpc.npc.HasBuff(buff_id);
+            }
+            else {
+                Utilities.Commons.Error("Unknown thing type");
+                return false;
+            }
+        }
     }
 
     /// <summary>
@@ -508,12 +521,15 @@ namespace ExperienceAndClasses.Utilities.Containers {
         /// <summary>
         /// Remove all chanelling statuses
         /// </summary>
-        public void RemoveChannelling() {
+        public bool RemoveChannelling() {
+            bool any_removed = false;
             foreach (Systems.Status.IDs id in statuses.Keys) {
                 if (Systems.Status.LOOKUP[(ushort)id].Specific_Target_Channelling) {
                     RemoveAll(id);
+                    any_removed = true;
                 }
             }
+            return any_removed;
         }
 
         /// <summary>
