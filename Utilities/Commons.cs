@@ -202,7 +202,6 @@ namespace ExperienceAndClasses.Utilities {
         }
 
         public static T CreateObjectFromName<T>(string name) {
-            Commons.Error(typeof(T).FullName + "+" + name);
             return (T)(Assembly.GetExecutingAssembly().CreateInstance(typeof(T).FullName + "+" + name));
         }
     }
