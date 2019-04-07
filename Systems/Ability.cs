@@ -1,5 +1,6 @@
 ﻿using ExperienceAndClasses.Utilities.Containers;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,7 +13,7 @@ namespace ExperienceAndClasses.Systems {
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Constants (and readonly) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         public enum IDs : ushort {
-            Block,
+            Warrior_Block,
 
 
             NUMBER_OF_IDs, //leave this second to last
@@ -69,6 +70,8 @@ namespace ExperienceAndClasses.Systems {
         public string Specific_Name { get; protected set; } = "default_name";
         protected string specific_description = "default_description";
 
+        protected string specific_texture_path = null;
+
         /// <summary>
         /// default is TARGET_POSITION_TYPE.NONE
         /// </summary>
@@ -76,6 +79,9 @@ namespace ExperienceAndClasses.Systems {
 
         protected float specific_mana_cost_flat = 0;
         protected float specific_mana_cost_percent = 0f;
+        /// <summary>
+        /// default is true
+        /// </summary>
         protected bool specific_mana_apply_reduction = true;
 
         protected Systems.Resource.IDs specific_resource = Systems.Resource.IDs.NONE;
@@ -83,6 +89,9 @@ namespace ExperienceAndClasses.Systems {
         protected float specific_resource_cost_percent = 0f;
 
         protected float specific_cooldown_seconds = 0f;
+        /// <summary>
+        /// default is true
+        /// </summary>
         protected bool specific_cooldown_apply_reduction = true;
 
         protected List<Systems.Status.IDs> specific_antirequisite_statuses = new List<Status.IDs>();
@@ -91,8 +100,14 @@ namespace ExperienceAndClasses.Systems {
         /// adds description of channelling to the UI text | default is false
         /// </summary>
         protected bool specific_is_channelling = false;
+        /// <summary>
+        /// default is false
+        /// </summary>
         protected bool specific_can_be_used_while_channelling = false;
 
+        /// <summary>
+        /// default is none
+        /// </summary>
         public Systems.Class.IDs Specific_Required_Class_ID { get; protected set; } = Systems.Class.IDs.None;
         public byte Specific_Required_Class_Level { get; protected set; } = 0;
 
@@ -194,6 +209,10 @@ namespace ExperienceAndClasses.Systems {
 
         public ModHotKey hotkey = null;
 
+        public bool Unlocked { get; private set; } = false;
+
+        public Texture2D Texture { get; private set; } = null;
+
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Instance Vars Generic (within activation) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         //these are set by each PreActivate (and some also when creating UI text)
@@ -218,7 +237,24 @@ namespace ExperienceAndClasses.Systems {
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Public Instance Methods ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
+        /// <summary>
+        /// Run once during init
+        /// </summary>
+        public void LoadTexture() {
+            if (specific_texture_path != null) {
+                Texture = ModLoader.GetTexture(specific_texture_path);
+            }
+            else {
+                Texture = Utilities.Textures.TEXTURE_ABILITY_DEFAULT;
+            }
+        }
+
         public void Activate() {
+            //if not unlocked, don't do anything
+            if (!Unlocked) {
+                return;
+            }
+
             //check if activation is allowed, otherwise show message
             //pre-calculates:
             //costs
@@ -269,6 +305,15 @@ namespace ExperienceAndClasses.Systems {
 
         public string GetUIText() {
             return "TODO";
+        }
+
+        public void SetUnlock() {
+            if(CalculateLevel() > 0) {
+                Unlocked = true;
+            }
+            else {
+                Unlocked = false;
+            }
         }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Generic Calculations ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
@@ -799,7 +844,39 @@ namespace ExperienceAndClasses.Systems {
             }
         }
 
-        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Private Override Methods ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Protected Methods ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+        /// <summary>
+        /// Checks local player for passive, sets variable, and returns whether passive was present
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="id"></param>
+        /// <param name="variable"></param>
+        /// <param name="value_if_has_passive"></param>
+        /// <param name="value_default"></param>
+        /// <returns></returns>
+        protected static bool CheckPassiveSetVar<T>(Systems.Passive.IDs id, out T variable, T value_if_has_passive, T value_default) {
+            if (ExperienceAndClasses.LOCAL_MPLAYER.Passives.Contains(id)) {
+                variable = value_if_has_passive;
+                return true;
+            }
+            else {
+                variable = value_default;
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Shortcut for CheckPassiveSetVar when just setting a bool true if contained, false if not
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="varible"></param>
+        /// <returns></returns>
+        protected static bool CheckPassiveSetVar(Systems.Passive.IDs id, out bool varible) {
+            return CheckPassiveSetVar<bool>(id, out varible, true, false);
+        }
+
+        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Override Methods ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         /// <summary>
         /// If false, PreActivate returns USE_RESULT.FAIL_SPECIFIC.
@@ -822,17 +899,34 @@ namespace ExperienceAndClasses.Systems {
         protected virtual void DoEffectTargetFriendly(Utilities.Containers.Thing target) { }
         protected virtual void DoEffectTargetHostile(Utilities.Containers.Thing target) { }
 
+        /// <summary>
+        /// called after repopulating MPlayer passives
+        /// </summary>
+        public virtual void UpdatePassives() { }
+
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Warrior ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-        public class Block : Ability {
-            public Block() : base(IDs.Block) {
+        public class Warrior_Block : Ability {
+            private static bool apply_perfect_block = false;
+
+            public Warrior_Block() : base(IDs.Warrior_Block) {
                 Specific_Name = "Block";
                 Specific_Required_Class_ID = Systems.Class.IDs.Warrior;
                 Specific_Required_Class_Level = 1;
                 specific_is_channelling = true;
-                
+                specific_mana_cost_flat = 10;
+                specific_cooldown_seconds = 5;
             }
+
+            public override void UpdatePassives() {
+                CheckPassiveSetVar(Systems.Passive.IDs.Warrior_BlockPerfect, out apply_perfect_block);
+            }
+
             protected override void DoEffectTargetFriendly(Thing target) {
-                Systems.Status.Block.CreateNew(target);
+                float defense_bonus = ExperienceAndClasses.LOCAL_MPLAYER.Attributes_Final[(byte)Systems.Attribute.IDs.Vitality] / 2f;
+                Systems.Status.Warrior_Block.CreateNew(target, defense_bonus);
+                if (apply_perfect_block) {
+                    Systems.Status.Warrior_BlockPerfect.CreateNew(target, defense_bonus);
+                }
             }
         }
 

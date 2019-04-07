@@ -18,7 +18,8 @@ namespace ExperienceAndClasses.Systems {
         /// inlcudes NUMBER_OF_IDs and NONE
         /// </summary>
         public enum IDs : ushort {
-            Block,
+            Warrior_Block,
+            Warrior_BlockPerfect,
 
             //insert here
 
@@ -222,12 +223,12 @@ namespace ExperienceAndClasses.Systems {
         protected IDs specific_owner_player_required_status = IDs.NONE;
 
         /// <summary>
-        /// remove if the local client is the owner and does not have specified passive ability | default is null
+        /// remove if the local client is the owner and does not have specified passive ability | default is NONE
         /// </summary>
         protected Systems.Passive.IDs specific_owner_player_required_passive = Systems.Passive.IDs.NONE;
 
         /// <summary>
-        /// remove if the local client is the owner and does not have specified passive ability | default is null
+        /// remove if the local client is the owner and does not have specified passive ability | default is NONE
         /// </summary>
         protected Systems.Ability.IDs specific_owner_player_required_ability = Systems.Ability.IDs.NONE;
 
@@ -565,7 +566,7 @@ namespace ExperienceAndClasses.Systems {
                 }
 
                 //required ability
-                if ((specific_owner_player_required_ability != Systems.Ability.IDs.NONE) && !Owner.MPlayer.Abilities_Primary.Contains(Systems.Ability.LOOKUP[(byte)specific_owner_player_required_ability]) && !Owner.MPlayer.Abilities_Secondary.Contains(Systems.Ability.LOOKUP[(byte)specific_owner_player_required_ability])) {
+                if ((specific_owner_player_required_ability != Systems.Ability.IDs.NONE) && !Owner.MPlayer.HasAbility(specific_owner_player_required_ability)) {
                     return true;
                 }
 
@@ -675,7 +676,7 @@ namespace ExperienceAndClasses.Systems {
                     }
                 }
             }
-            
+
             //remaining duration
             if (Specific_Duration_Type == DURATION_TYPES.TIMED) {
                 if (Time_End.CompareTo(status.Time_End) >= 0) {
@@ -719,7 +720,7 @@ namespace ExperienceAndClasses.Systems {
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Shortcuts to Sync Data ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-        public double GetData(AUTOSYNC_DATA_TYPES key, float default_value = -1) {
+        public float GetData(AUTOSYNC_DATA_TYPES key, float default_value = 0f) {
             float value = default_value;
             if (!autosync_data.TryGetValue(key, out value)) {
                 Utilities.Commons.Error("Status attempted to access invalid sync data: " + ID + " " + key);
@@ -727,7 +728,10 @@ namespace ExperienceAndClasses.Systems {
             return value;
         }
 
-        protected double Magitude1 { get { return GetData(AUTOSYNC_DATA_TYPES.MAGNITUDE1); } }
+        protected float Magitude1 { get { return GetData(AUTOSYNC_DATA_TYPES.MAGNITUDE1); } }
+        protected float Magitude2 { get { return GetData(AUTOSYNC_DATA_TYPES.MAGNITUDE2); } }
+        protected float Range { get { return GetData(AUTOSYNC_DATA_TYPES.RANGE); } }
+        protected float Stacks { get { return GetData(AUTOSYNC_DATA_TYPES.STACKS); } }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Static Methods ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -743,7 +747,7 @@ namespace ExperienceAndClasses.Systems {
         public static void Add(IDs id, Utilities.Containers.Thing target, Utilities.Containers.Thing owner, Dictionary<AUTOSYNC_DATA_TYPES, float> sync_data = null, float seconds_remaining = 0f, float seconds_until_effect = 0f, byte instance_id = Utilities.Containers.StatusList.UNASSIGNED_INSTANCE_KEY, BinaryReader reader = null, bool set_statuses = false) {
             //create instance
             Status status = Utilities.Commons.CreateObjectFromName<Status>(Enum.GetName(typeof(IDs), id));
-            
+
             //valid target (stop if not)
             if ((target.Is_Player && !status.specific_target_can_be_player) || (target.Is_Npc && !status.specific_target_can_be_npc)) {
                 Utilities.Commons.Error("Invalid target for " + status.Specific_Name);
@@ -866,7 +870,7 @@ namespace ExperienceAndClasses.Systems {
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Instance Methods To Override (Optional) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         //these are for any additional status-specific code
-        protected virtual void OnStart() {}
+        protected virtual void OnStart() { }
         protected virtual void OnEnd() { }
         protected virtual bool ShouldRemove() { return false; }
         protected virtual bool ShouldRemoveLocal() { return false; }
@@ -905,10 +909,11 @@ namespace ExperienceAndClasses.Systems {
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Templates ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-        public abstract class ChannelWithCost : Status {
+        public abstract class ChannelManaCostSync : Status {
             protected ushort mana_cost_per_timed_effect = 5;
 
-            public ChannelWithCost(IDs id, Systems.Ability.IDs ability_id) : base(id) {
+            public ChannelManaCostSync(IDs id, Systems.Ability.IDs ability_id) : base(id) {
+                Specific_Syncs = true;
                 specific_target_can_be_npc = false;
                 Specific_Duration_Type = DURATION_TYPES.TOGGLE;
                 Specific_Limit_Type = LIMIT_TYPES.ONE;
@@ -932,33 +937,70 @@ namespace ExperienceAndClasses.Systems {
             }
         }
 
+        public abstract class TimedConstantSync : Status {
+            public TimedConstantSync(IDs id, float duration_seconds = 1f) : base(id) {
+                Specific_Syncs = true;
+                Specific_Duration_Type = DURATION_TYPES.TIMED;
+                Specific_Effect_Type = EFFECT_TYPES.CONSTANT;
+                if (duration_seconds > 1) {
+                    Specific_UI_Type = UI_TYPES.ONE;
+                }
+                else {
+                    Specific_UI_Type = UI_TYPES.NONE;
+                }
+                specific_duration_sec = duration_seconds;
+            }
+        }
+
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Warrior ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-        public class Block : ChannelWithCost {
-            public Block() : base(IDs.Block, Systems.Ability.IDs.Block) {
-                //any overwrites
-                Specific_Name = "Block"; //not needed unless displayed as a buff
-                //specific_texture_path = "ExperienceAndClasses/Textures/Status/Heal"; //not needed unless displayed as a buff
+        public class Warrior_Block : ChannelManaCostSync {
+            public Warrior_Block() : base(IDs.Warrior_Block, Systems.Ability.IDs.Warrior_Block) {
+                Specific_Name = "Block";
+                //specific_texture_path = "ExperienceAndClasses/Textures/Status/Block";
 
                 //add any sync data types that will be used (for syncing)
-                //Specific_Autosync_Data_Types.Add(AUTOSYNC_DATA_TYPES.MAGNITUDE1);
+                Specific_Autosync_Data_Types.Add(AUTOSYNC_DATA_TYPES.MAGNITUDE1);
             }
 
             protected override void EffectConstant() {
-                Target.MPlayer.player.statDefense *= 2;
+                Target.MPlayer.player.statDefense += (int)Magitude1;
             }
 
             //must inlcude a static add method with target/owner and any extra info
-            public static void CreateNew(Utilities.Containers.Thing owner) {
-                Add(IDs.Block, owner, owner);
-
-                /*
-                Add(IDs.Block, target, owner, new Dictionary<AUTOSYNC_DATA_TYPES, float> {
-                    { AUTOSYNC_DATA_TYPES.MAGNITUDE1, magnitude }
+            public static void CreateNew(Utilities.Containers.Thing owner, float defense_bonus) {
+                Add(IDs.Warrior_Block, owner, owner, new Dictionary<AUTOSYNC_DATA_TYPES, float> {
+                    { AUTOSYNC_DATA_TYPES.MAGNITUDE1, defense_bonus }
                 });
-                */
             }
         }
+
+        public class Warrior_BlockPerfect : TimedConstantSync {
+            public const float duration_seconds = 0.5f;
+
+            public Warrior_BlockPerfect() : base(IDs.Warrior_BlockPerfect, duration_seconds) {
+                specific_owner_player_required_ability = Systems.Ability.IDs.Warrior_Block;
+                //TODO add passive
+                specific_remove_on_owner_death = true;
+                specific_remove_on_owner_immobilized = true;
+                specific_remove_on_owner_silenced = true;
+
+                //add any sync data types that will be used (for syncing)
+                Specific_Autosync_Data_Types.Add(AUTOSYNC_DATA_TYPES.MAGNITUDE1);
+            }
+
+            protected override void EffectConstant() {
+                Target.MPlayer.player.statDefense += (int)Magitude1;
+            }
+
+            //must inlcude a static add method with target/owner and any extra info
+            public static void CreateNew(Utilities.Containers.Thing owner, float defense_bonus) {
+                Add(IDs.Warrior_BlockPerfect, owner, owner, new Dictionary<AUTOSYNC_DATA_TYPES, float> {
+                    { AUTOSYNC_DATA_TYPES.MAGNITUDE1, defense_bonus }
+                });
+            }
+        }
+
 
     }
 }

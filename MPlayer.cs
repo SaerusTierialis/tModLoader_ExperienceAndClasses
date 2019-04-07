@@ -228,7 +228,7 @@ namespace ExperienceAndClasses {
             channelling = false;
 
             //test
-            Abilities_Primary[0] = Systems.Ability.LOOKUP[(ushort)Systems.Ability.IDs.Block];
+            Abilities_Primary[0] = Systems.Ability.LOOKUP[(ushort)Systems.Ability.IDs.Warrior_Block];
             Abilities_Primary[0].hotkey = ExperienceAndClasses.HOTKEY_ABILITY_PRIMARY[0];
 
             Resources.Add(Systems.Resource.IDs.Bloodforce);
@@ -416,6 +416,15 @@ namespace ExperienceAndClasses {
 
             //calclate progression value
             LocalProgressionUpdate();
+
+            //populate passives
+            //TODO
+
+            //populate resources
+            //TODO
+
+            //populate abilities (and check unlocked + check passive)
+            //TODO
 
             //update UI
             UI.UIMain.Instance.UpdateClassInfo();
@@ -1011,6 +1020,17 @@ namespace ExperienceAndClasses {
             else {
                 return false;
             }
+        }
+
+        public bool HasAbility(Systems.Ability.IDs id) {
+            foreach (Systems.Ability[] abilities in new Systems.Ability[][] { Abilities_Primary , Abilities_Primary_Alt , Abilities_Secondary, Abilities_Secondary_Alt }) {
+                foreach (Systems.Ability ability in abilities) {
+                    if ((ability != null) && (ability.Unlocked) && (ability.ID == id)) {
+                        return true;
+                    }
+                }
+            }
+            return false;
         }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Status ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
