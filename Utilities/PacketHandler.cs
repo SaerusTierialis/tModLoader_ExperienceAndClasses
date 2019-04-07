@@ -402,7 +402,7 @@ namespace ExperienceAndClasses.Utilities {
                 }
 
                 //6?:  time until next effect if timed (float seconds)
-                if (status.Specific_Effect_Type == Systems.Status.EFFECT_TYPES.TIMED) {
+                if ((status.Specific_Effect_Type == Systems.Status.EFFECT_TYPES.TIMED) || (status.Specific_Effect_Type == Systems.Status.EFFECT_TYPES.CONSTANT_AND_TIMED)) {
                     packet.Write(Systems.Status.Times_Next_Timed_Effect[status.ID].Subtract(ExperienceAndClasses.Now).TotalSeconds);
                 }
 
@@ -449,7 +449,7 @@ namespace ExperienceAndClasses.Utilities {
 
                 //6?:  time until next effect if timed (float seconds)
                 float effect_seconds = 0f;
-                if (reference.Specific_Effect_Type == Systems.Status.EFFECT_TYPES.TIMED) {
+                if ((reference.Specific_Effect_Type == Systems.Status.EFFECT_TYPES.TIMED) || (reference.Specific_Effect_Type == Systems.Status.EFFECT_TYPES.CONSTANT_AND_TIMED)) {
                     effect_seconds = reader.ReadSingle();
                 }
 

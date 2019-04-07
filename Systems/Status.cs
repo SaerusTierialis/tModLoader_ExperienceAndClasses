@@ -52,6 +52,7 @@ namespace ExperienceAndClasses.Systems {
             NONE,
             CONSTANT,
             TIMED,
+            CONSTANT_AND_TIMED,
         }
 
         /// <summary>
@@ -403,7 +404,7 @@ namespace ExperienceAndClasses.Systems {
             }
 
             //if timed-effect and no more instances of this status, clear timer
-            if ((Specific_Effect_Type == EFFECT_TYPES.TIMED) && !Target.HasStatus(ID)) {
+            if (((Specific_Effect_Type == EFFECT_TYPES.TIMED) || (Specific_Effect_Type == EFFECT_TYPES.CONSTANT_AND_TIMED)) && !Target.HasStatus(ID)) {
                 Times_Next_Timed_Effect.Remove(ID);
             }
 
@@ -679,13 +680,13 @@ namespace ExperienceAndClasses.Systems {
             }
 
             //do effect
-            if (Specific_Effect_Type == EFFECT_TYPES.CONSTANT) {
-                Effect();
+            if ((Specific_Effect_Type == EFFECT_TYPES.CONSTANT) || (Specific_Effect_Type == EFFECT_TYPES.CONSTANT_AND_TIMED)) {
+                EffectConstant();
             }
-            else if (Specific_Effect_Type == EFFECT_TYPES.TIMED) {
+            if ((Specific_Effect_Type == EFFECT_TYPES.TIMED) || (Specific_Effect_Type == EFFECT_TYPES.CONSTANT_AND_TIMED)) {
                 if (ExperienceAndClasses.Now.CompareTo(Times_Next_Timed_Effect[ID]) >= 0) {
                     //call effect
-                    Effect();
+                    EffectTimed();
 
                     //calculate next time of effect
                     Times_Next_Timed_Effect[ID] = Times_Next_Timed_Effect[ID].AddSeconds(specific_timed_effect_sec);
@@ -781,7 +782,7 @@ namespace ExperienceAndClasses.Systems {
             }
 
             //periodic effect time (not stored in status itself because timer should be across instances of the status)
-            if (status.Specific_Effect_Type == EFFECT_TYPES.TIMED) {
+            if ((status.Specific_Effect_Type == EFFECT_TYPES.TIMED) || (status.Specific_Effect_Type == EFFECT_TYPES.CONSTANT_AND_TIMED)) {
 
                 DateTime time_next;
                 if (seconds_until_effect != 0) {
@@ -843,9 +844,19 @@ namespace ExperienceAndClasses.Systems {
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Instance Methods To Override (Optional) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         //these are for any additional status-specific code
         protected virtual void OnStart() {}
-        protected virtual void Effect() {}
+        protected virtual void OnEnd() { }
         protected virtual bool ShouldRemove() { return false; }
         protected virtual bool ShouldRemoveLocal() { return false; }
+
+        /// <summary>
+        /// Effects occur after updating buffs and equipment.
+        /// </summary>
+        protected virtual void EffectConstant() { }
+
+        /// <summary>
+        /// Effects occur after updating buffs and equipment.
+        /// </summary>
+        protected virtual void EffectTimed() { }
 
         /// <summary>
         /// Return true to mark the merge as an improvement and trigger a sync. False leaves the value as it was.
@@ -857,11 +868,6 @@ namespace ExperienceAndClasses.Systems {
         protected virtual bool MergeCheck(Status status) { return false; }
 
         protected virtual void OnMerge() { }
-
-        /// <summary>
-        /// Called when status is removed (not when merged over)
-        /// </summary>
-        protected virtual void OnEnd() { }
 
         /// <summary>
         /// Called on every cycles (even if effect is not done) 
@@ -876,33 +882,46 @@ namespace ExperienceAndClasses.Systems {
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Templates ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
+        public abstract class ChannelWithCost : Status {
+            protected ushort mana_cost_per_timed_effect = 5;
 
+            public ChannelWithCost(IDs id, Systems.Ability.IDs ability_id) : base(id) {
+                specific_target_can_be_npc = false;
+                Specific_Duration_Type = DURATION_TYPES.TOGGLE;
+                Specific_Limit_Type = LIMIT_TYPES.ONE;
+                Specific_Effect_Type = EFFECT_TYPES.CONSTANT_AND_TIMED;
+                Specific_UI_Type = UI_TYPES.ONE;
+                Specific_Target_Channelling = true;
+                specific_timed_effect_sec = 0.1f;
+                specific_owner_player_required_ability = ability_id;
+                specific_remove_if_key_not_pressed = Systems.Ability.LOOKUP[(ushort)specific_owner_player_required_ability].hotkey;
+            }
+
+            protected override void EffectTimed() {
+                Main.NewText("EffectTimed");
+                if (Target.MPlayer.player.statMana > mana_cost_per_timed_effect) {
+                    Target.MPlayer.player.statMana -= mana_cost_per_timed_effect;
+                }
+                else {
+                    RemoveEverywhere();
+                }
+            }
+        }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Warrior ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-        public class Block : Status {
-            public Block() : base(IDs.Block) {
+        public class Block : ChannelWithCost {
+            public Block() : base(IDs.Block, Systems.Ability.IDs.Block) {
                 //any overwrites
                 Specific_Name = "Block"; //not needed unless displayed as a buff
                 //specific_texture_path = "ExperienceAndClasses/Textures/Status/Heal"; //not needed unless displayed as a buff
-                Specific_Duration_Type = DURATION_TYPES.TOGGLE;
-                Specific_Limit_Type = LIMIT_TYPES.ONE;
-                Specific_Effect_Type = EFFECT_TYPES.CONSTANT;
-                Specific_UI_Type = UI_TYPES.ONE;
-                specific_owner_player_required_ability = Systems.Ability.IDs.Block;
-                specific_remove_if_key_not_pressed = Systems.Ability.LOOKUP[(ushort)specific_owner_player_required_ability].hotkey;
-                Specific_Target_Channelling = true;
 
                 //add any sync data types that will be used (for syncing)
                 //Specific_Autosync_Data_Types.Add(AUTOSYNC_DATA_TYPES.MAGNITUDE1);
             }
 
-            protected override void OnStart() {
-                Main.NewText("START");
-            }
-
-            protected override void OnEnd() {
-                Main.NewText("END");
+            protected override void EffectConstant() {
+                Target.MPlayer.player.statDefense *= 2;
             }
 
             //must inlcude a static add method with target/owner and any extra info
