@@ -48,7 +48,7 @@ namespace ExperienceAndClasses.Utilities.Containers {
                 }
             }
             //default to insert at end
-            Add(status);
+            base.Add(status);
         }
     }
 
