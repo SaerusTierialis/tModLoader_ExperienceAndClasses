@@ -1001,6 +1001,18 @@ namespace ExperienceAndClasses {
             Progression = player_progression;
         }
 
+        public bool UseMana(int cost) {
+            if (player.statMana >= cost) {
+                player.statMana -= cost;
+                player.netMana = true;
+                player.manaRegenDelay = Math.Min(200, player.manaRegenDelay + 50);
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Status ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         private void ApplyStatuses() {
@@ -1010,33 +1022,6 @@ namespace ExperienceAndClasses {
             //process statuses
             thing.ProcessStatuses();
         }
-        
-        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Ability ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-
-        /*
-        public void Heal(int amount_life, int amount_mana) {
-            if (Is_Local_Player) {
-                Main.NewText("do " + amount_life + " " + amount_mana);
-
-                //life
-                amount_life = Math.Min(amount_life, player.statLifeMax2 - player.statLife);
-                if (amount_life > 0) {
-                    player.statLife += amount_life;
-                    player.HealEffect(amount_life, true);
-                }
-
-                //mana
-                amount_mana = Math.Min(amount_mana, player.statManaMax2 - player.statMana);
-                if (amount_mana > 0) {
-                    player.statMana += amount_mana;
-                    player.ManaEffect(amount_mana);
-                }
-            }
-            else {
-                Utilities.PacketHandler.Heal.Send((byte)player.whoAmI, (byte)Main.LocalPlayer.whoAmI, amount_life, amount_mana);
-            }
-        }
-        */
 
     }
 }

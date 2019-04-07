@@ -207,6 +207,7 @@ namespace ExperienceAndClasses.Systems {
         protected string custom_use_fail_message;
         protected List<Utilities.Containers.Thing> targets_friendly;
         protected List<Utilities.Containers.Thing> targets_hostile;
+        protected bool has_mana_cost;
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Core Constructor ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -241,9 +242,10 @@ namespace ExperienceAndClasses.Systems {
                 Time_Cooldown_End = ExperienceAndClasses.Now.AddSeconds(cooldown_seconds);
             }
 
-            //take mana
-            if (cost_mana > 0) {
-                Main.LocalPlayer.statMana = Math.Max(0, Main.LocalPlayer.statMana - cost_mana);
+            //take mana (even if reduced to free, do this to stop regen)
+            if (has_mana_cost) {
+                if (cost_mana < 0) cost_mana = 0;
+                ExperienceAndClasses.LOCAL_MPLAYER.UseMana(cost_mana);
             }
 
             //take resource
@@ -274,6 +276,8 @@ namespace ExperienceAndClasses.Systems {
         // Called by public lookups and during PreActivate() - i.e., automatically called during activation
 
         private ushort CalculateManaCost() {
+            //has a mana cost (even if somehow reduced to free)
+            has_mana_cost = (specific_mana_cost_flat > 0) || (specific_mana_cost_percent > 0);
             //mana cost
             float cost_mana_base = ModifyCostManaBase(specific_mana_cost_flat + (specific_mana_cost_percent * ExperienceAndClasses.LOCAL_MPLAYER.player.statManaMax2));
             if (specific_mana_apply_reduction) {

@@ -924,11 +924,10 @@ namespace ExperienceAndClasses.Systems {
             }
 
             protected override void EffectTimed() {
-                if (Target.MPlayer.player.statMana > mana_cost_per_timed_effect) {
-                    Target.MPlayer.player.statMana -= mana_cost_per_timed_effect;
-                }
-                else {
-                    RemoveEverywhere();
+                if (Target.Local) {
+                    if (!Target.MPlayer.UseMana(mana_cost_per_timed_effect)) {
+                        RemoveEverywhere();
+                    }
                 }
             }
         }
