@@ -586,7 +586,7 @@ namespace ExperienceAndClasses.Systems {
                         (!specific_targets_npc && thing.Is_Npc) ||                                                  //can't be npc?
                         (!specific_targets_friedly && is_friendly) ||                                               //can't be friendly?
                         (!specific_targets_hostile && !is_friendly) ||                                              //can't be hostile?
-                        (distance > radius) ||                                             //too far?
+                        (distance > radius) ||                                                                      //too far?
                         (specific_targets_require_line_of_sight_player && !thing.HasSightOf(position_player)) ||    //needs sight of player?
                         (specific_targets_require_line_of_sight_position && !thing.HasSightOf(position_target)) ||  //needs sight of position?
                         (specific_targets_self_always && (thing.Index == self.Index)) ||                            //self_always and this is self (added at end instead)
