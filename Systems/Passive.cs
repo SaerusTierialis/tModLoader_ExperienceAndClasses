@@ -14,7 +14,7 @@ namespace ExperienceAndClasses.Systems {
         /// </summary>
         public enum IDs : ushort {
             Warrior_BlockPerfect,
-
+            BloodKnight_Resoruce_Bloodforce,
 
             NUMBER_OF_IDs, //leave this second to last
             NONE, //leave this last
@@ -52,11 +52,17 @@ namespace ExperienceAndClasses.Systems {
         /// </summary>
         protected Systems.Status.IDs specific_status = Systems.Status.IDs.NONE;
 
+        /// <summary>
+        /// Having this status automatically enables this resource | default is NONE
+        /// </summary>
+        protected Systems.Resource.IDs specific_resource = Systems.Resource.IDs.NONE;
+
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Instance Vars Generic ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         public IDs ID { get; private set; } = IDs.NONE;
         public ushort ID_num { get; private set; } = (ushort)IDs.NONE;
         public Texture2D Texture { get; private set; } = null;
+        public bool Unlocked { get; private set; } = false;
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Core Constructor ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -80,55 +86,67 @@ namespace ExperienceAndClasses.Systems {
         }
 
         /// <summary>
-        /// Check if class/level requirement is met
+        /// Check if is correct (also sets Unlocked)
         /// </summary>
-        public bool Unlocked {
-            get {
-                bool unlocked = false;
+        public bool CorrectClass() {
+            bool correct_class = false;
+            Unlocked = false;
 
-                //check primary
-                Systems.Class c = ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary;
-                if (c.ID == Specific_Required_Class_ID) {
-                    if (ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary_Level_Effective >= Specific_Required_Class_Level) {
-                        unlocked = true;
-                    }
+            //check primary
+            Systems.Class c = ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary;
+            if (c.ID == Specific_Required_Class_ID) {
+                correct_class = true;
+                if (ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary_Level_Effective >= Specific_Required_Class_Level) {
+                    Unlocked = true;
                 }
-                else {
-                    c = c.Prereq;
-                    while (c != null) {
-                        if (c.ID == Specific_Required_Class_ID) {
-                            unlocked = true;
-                            break;
-                        }
-                    }
-                }
-
-                //check secondary
-                c = ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary;
-                if (c.ID == Specific_Required_Class_ID) {
-                    if (ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary_Level_Effective >= Specific_Required_Class_Level) {
-                        unlocked = true;
-                    }
-                }
-                else {
-                    c = c.Prereq;
-                    while (c != null) {
-                        if (c.ID == Specific_Required_Class_ID) {
-                            unlocked = true;
-                            break;
-                        }
-                    }
-                }
-
-                if (unlocked) {
-                    AddStatus();
-                }
-
-                return unlocked;
             }
+            else {
+                c = c.Prereq;
+                while (c != null) {
+                    if (c.ID == Specific_Required_Class_ID) {
+                        correct_class = true;
+                        Unlocked = true;
+                        break;
+                    }
+                    c = c.Prereq;
+                }
+            }
+
+            //check secondary
+            c = ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary;
+            if (c.ID == Specific_Required_Class_ID) {
+                correct_class = true;
+                if (ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary_Level_Effective >= Specific_Required_Class_Level) {
+                    Unlocked = true;
+                }
+            }
+            else {
+                c = c.Prereq;
+                while (c != null) {
+                    if (c.ID == Specific_Required_Class_ID) {
+                        correct_class = true;
+                        Unlocked = true;
+                        break;
+                    }
+                    c = c.Prereq;
+                }
+            }
+            //either was correct class
+            return correct_class;
+        }
+
+        public void Apply() {
+            EnableResource();
+            AddStatus();
         }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Private Methods ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+        private void EnableResource() {
+            if (specific_resource != Systems.Resource.IDs.NONE) {
+                ExperienceAndClasses.LOCAL_MPLAYER.Resources.Add(specific_resource, Systems.Resource.LOOKUP[(byte)specific_resource]);
+            }
+        }
 
         private void AddStatus() {
             if (specific_status != Systems.Status.IDs.NONE) {
@@ -144,8 +162,21 @@ namespace ExperienceAndClasses.Systems {
         public class Warrior_BlockPerfect : Passive {
             public Warrior_BlockPerfect() : base(IDs.Warrior_BlockPerfect) {
                 Specific_Name = "Perfect Block";
+                specific_description = "TODO";
                 Specific_Required_Class_ID = Systems.Class.IDs.Warrior;
                 Specific_Required_Class_Level = 10;
+            }
+        }
+
+        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Blood Knight ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+        public class BloodKnight_Resoruce_Bloodforce : Passive {
+            public BloodKnight_Resoruce_Bloodforce() : base(IDs.BloodKnight_Resoruce_Bloodforce) {
+                Specific_Name = "Bloodforce";
+                specific_description = "TODO";
+                Specific_Required_Class_ID = Systems.Class.IDs.BloodKnight;
+                Specific_Required_Class_Level = 1;
+                specific_resource = Systems.Resource.IDs.Bloodforce;
             }
         }
 

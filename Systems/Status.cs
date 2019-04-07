@@ -566,7 +566,7 @@ namespace ExperienceAndClasses.Systems {
                 }
 
                 //required passive
-                if ((specific_owner_player_required_passive != Systems.Passive.IDs.NONE) && !Owner.MPlayer.Passives.Contains(specific_owner_player_required_passive)) {
+                if ((specific_owner_player_required_passive != Systems.Passive.IDs.NONE) && !Owner.MPlayer.Passives.ContainsUnlocked(specific_owner_player_required_passive)) {
                     return true;
                 }
 
@@ -979,13 +979,14 @@ namespace ExperienceAndClasses.Systems {
         /// Passives that do more than just modify an ability are implemented as an AutoPassive status
         /// </summary>
         public abstract class AutoPassive : Status {
-            public AutoPassive(IDs id, Systems.Passive.IDs id_passive, bool sync, EFFECT_TYPES effect = EFFECT_TYPES.CONSTANT) : base(id) {
+            public AutoPassive(IDs id, Systems.Passive.IDs id_passive, bool sync, EFFECT_TYPES effect = EFFECT_TYPES.CONSTANT, float timed_effect_seconds = 3f) : base(id) {
                 Specific_Is_AutoPassive = true;
 
                 Specific_Syncs = sync;
                 specific_owner_player_required_passive = id_passive;
                 Specific_Duration_Type = DURATION_TYPES.TOGGLE;
                 Specific_Effect_Type = effect;
+                specific_timed_effect_sec = timed_effect_seconds;
                 Specific_UI_Type = UI_TYPES.NONE;
                 Specific_Limit_Type = LIMIT_TYPES.ONE;
                 specific_remove_on_owner_death = false;

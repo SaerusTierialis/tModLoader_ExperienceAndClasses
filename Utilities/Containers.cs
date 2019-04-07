@@ -52,35 +52,51 @@ namespace ExperienceAndClasses.Utilities.Containers {
         }
     }
 
-    public class LevelSortedPassives : List<Systems.Passive.IDs> {
-        public LevelSortedPassives() { }
+    public class LevelSortedPassives : List<Systems.Passive> {
+        private const int DEFAULT_CAPACITY = 100;
+
+        public LevelSortedPassives() : base(DEFAULT_CAPACITY) { }
         public LevelSortedPassives(int capacity) : base(capacity) { }
 
         /// <summary>
         /// Adds status sorting by end time
         /// </summary>
         /// <param name="status"></param>
-        public new void Add(Systems.Passive.IDs passive_id) {
+        public new void Add(Systems.Passive passive) {
             //is full?
             if (Count == Capacity) {
-                Commons.Error("A passive cannot be displayed because there are not enough slots!");
+                Commons.Error("A passive cannot be added because there are not enough slots!");
                 return;
             }
 
             //insert before first status that is equal/later
-            Systems.Passive passive = Systems.Passive.LOOKUP[(ushort)passive_id];
-            Systems.Passive p;
-
             for (int i = 0; i < Count; i++) {
-                p = Systems.Passive.LOOKUP[(ushort)this[i]];
-                if ((Systems.Class.LOOKUP[(byte)p.Specific_Required_Class_ID].Tier > Systems.Class.LOOKUP[(byte)passive.Specific_Required_Class_ID].Tier) ||
-                    (p.Specific_Required_Class_Level >= passive.Specific_Required_Class_Level)){
-                    Insert(i, passive_id);
+                if ((Systems.Class.LOOKUP[(byte)this[i].Specific_Required_Class_ID].Tier > Systems.Class.LOOKUP[(byte)passive.Specific_Required_Class_ID].Tier) ||
+                    (this[i].Specific_Required_Class_Level >= passive.Specific_Required_Class_Level)){
+                    Insert(i, passive);
                     return;
                 }
             }
             //default to insert at end
-            base.Add(passive_id);
+            base.Add(passive);
+        }
+
+        public bool Contains(Systems.Passive.IDs id) {
+            foreach (Systems.Passive passive in this) {
+                if (passive.ID == id) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public bool ContainsUnlocked(Systems.Passive.IDs id) {
+            foreach (Systems.Passive passive in this) {
+                if ((passive.ID == id) && passive.Unlocked) {
+                    return true;
+                }
+            }
+            return false;
         }
     }
 

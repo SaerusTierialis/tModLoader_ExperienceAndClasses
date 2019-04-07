@@ -81,6 +81,8 @@ namespace ExperienceAndClasses.Systems {
         public Items.Unlock Unlock_Item { get; protected set; } = null;
         public bool Has_Texture { get; protected set; } = false;
         public bool Enabled { get; protected set; } = false;
+        public Systems.Ability.IDs[] AbilitiesID { get; protected set; } = Enumerable.Repeat(Systems.Ability.IDs.NONE, ExperienceAndClasses.NUMBER_ABILITY_SLOTS_PER_CLASS).ToArray();
+        public Systems.Ability.IDs[] AbilitiesID_Alt { get; protected set; } = Enumerable.Repeat(Systems.Ability.IDs.NONE, ExperienceAndClasses.NUMBER_ABILITY_SLOTS_PER_CLASS).ToArray();
 
         public Class(IDs id) {
             //defaults
@@ -411,6 +413,38 @@ namespace ExperienceAndClasses.Systems {
         }
 
         /// <summary>
+        /// Returns class abilities in array the size of NUMBER_ABILITY_SLOTS_PER_CLASS.
+        /// Also updates the passives and unlock status of returned abilities.
+        /// </summary>
+        /// <param name="alternate"></param>
+        /// <returns></returns>
+        public Systems.Ability[] GetAbilities(bool primary, bool alternate) {
+            Systems.Ability.IDs id;
+            Systems.Ability[] abilities = new Systems.Ability[ExperienceAndClasses.NUMBER_ABILITY_SLOTS_PER_CLASS];
+            for (int i = 0; i < AbilitiesID.Length; i++) {
+                if (alternate) {
+                    id = AbilitiesID_Alt[i];
+                }
+                else {
+                    id = AbilitiesID[i];
+                }
+
+                if (id != Systems.Ability.IDs.NONE) {
+                    abilities[i] = Systems.Ability.LOOKUP[(ushort)id];
+                    abilities[i].UpdatePassives();
+                    abilities[i].UpdateUnlock();
+                    if (primary) {
+                        abilities[i].hotkey = ExperienceAndClasses.HOTKEY_ABILITY_PRIMARY[i];
+                    }
+                    else {
+                        abilities[i].hotkey = ExperienceAndClasses.HOTKEY_ABILITY_SECONDARY[i];
+                    }
+                }
+            }
+            return abilities;
+        }
+
+        /// <summary>
         /// Check if local player meets extra requirements for tier 3
         /// </summary>
         /// <returns></returns>
@@ -451,6 +485,10 @@ namespace ExperienceAndClasses.Systems {
                 Unlock_Item = ExperienceAndClasses.MOD.GetItem<Items.Unlock_Tier3>();
                 Max_Level = TIER_MAX_LEVELS[Tier];
                 Prereq = LOOKUP[(byte)prereq];
+                AbilitiesID[0] = Prereq.AbilitiesID[0];
+                AbilitiesID[1] = Prereq.AbilitiesID[1];
+                AbilitiesID_Alt[0] = Prereq.AbilitiesID_Alt[0];
+                AbilitiesID_Alt[1] = Prereq.AbilitiesID_Alt[1];
             }
         }
 
@@ -505,6 +543,8 @@ namespace ExperienceAndClasses.Systems {
                 Attribute_Growth[(byte)Attribute.IDs.Power] = 2;
                 Attribute_Growth[(byte)Attribute.IDs.Vitality] = 3;
                 Attribute_Growth[(byte)Attribute.IDs.Dexterity] = 2;
+
+                AbilitiesID[0] = Systems.Ability.IDs.Warrior_Block;
             }
         }
 

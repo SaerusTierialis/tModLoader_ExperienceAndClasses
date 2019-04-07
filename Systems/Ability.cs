@@ -72,7 +72,7 @@ namespace ExperienceAndClasses.Systems {
 
         protected string specific_texture_path = null;
 
-        /// <summary>
+        /// <summary>a
         /// default is TARGET_POSITION_TYPE.NONE
         /// </summary>
         protected TARGET_POSITION_TYPE specific_target_position_type = TARGET_POSITION_TYPE.NONE;
@@ -307,7 +307,7 @@ namespace ExperienceAndClasses.Systems {
             return "TODO";
         }
 
-        public void SetUnlock() {
+        public void UpdateUnlock() {
             if(CalculateLevel() > 0) {
                 Unlocked = true;
             }
@@ -712,7 +712,7 @@ namespace ExperienceAndClasses.Systems {
 
             if (CalculateResourceCost() > 0) {
                 //doesn't have the resource
-                if (!ExperienceAndClasses.LOCAL_MPLAYER.Resources.Contains(specific_resource)) {
+                if (!ExperienceAndClasses.LOCAL_MPLAYER.Resources.ContainsKey(specific_resource)) {
                     return USE_RESULT.FAIL_MISSING_RESOURCE;
                 }
 
@@ -856,7 +856,7 @@ namespace ExperienceAndClasses.Systems {
         /// <param name="value_default"></param>
         /// <returns></returns>
         protected static bool CheckPassiveSetVar<T>(Systems.Passive.IDs id, out T variable, T value_if_has_passive, T value_default) {
-            if (ExperienceAndClasses.LOCAL_MPLAYER.Passives.Contains(id)) {
+            if (ExperienceAndClasses.LOCAL_MPLAYER.Passives.ContainsUnlocked(id)) {
                 variable = value_if_has_passive;
                 return true;
             }

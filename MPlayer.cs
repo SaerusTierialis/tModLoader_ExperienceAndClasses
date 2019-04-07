@@ -94,7 +94,7 @@ namespace ExperienceAndClasses {
         public Systems.Ability[] Abilities_Secondary { get; private set; }
         public Systems.Ability[] Abilities_Secondary_Alt { get; private set; }
 
-        public List<Systems.Resource.IDs> Resources { get; private set; }
+        public Dictionary<Systems.Resource.IDs, Systems.Resource> Resources { get; private set; }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Instance Vars (saved/loaded) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -220,18 +220,12 @@ namespace ExperienceAndClasses {
             //ability
             show_ability_fail_messages = true;
             Passives = new Utilities.Containers.LevelSortedPassives();
-            Resources = new List<Systems.Resource.IDs>();
+            Resources = new Dictionary<Systems.Resource.IDs, Systems.Resource>();
             Abilities_Primary = new Systems.Ability[ExperienceAndClasses.NUMBER_ABILITY_SLOTS_PER_CLASS];
             Abilities_Primary_Alt = new Systems.Ability[ExperienceAndClasses.NUMBER_ABILITY_SLOTS_PER_CLASS];
             Abilities_Secondary = new Systems.Ability[ExperienceAndClasses.NUMBER_ABILITY_SLOTS_PER_CLASS];
             Abilities_Secondary_Alt = new Systems.Ability[ExperienceAndClasses.NUMBER_ABILITY_SLOTS_PER_CLASS];
             channelling = false;
-
-            //test
-            Abilities_Primary[0] = Systems.Ability.LOOKUP[(ushort)Systems.Ability.IDs.Warrior_Block];
-            Abilities_Primary[0].hotkey = ExperienceAndClasses.HOTKEY_ABILITY_PRIMARY[0];
-
-            Resources.Add(Systems.Resource.IDs.Bloodforce);
         }
 
         /// <summary>
@@ -348,23 +342,25 @@ namespace ExperienceAndClasses {
         }
 
         public static void LocalUpdateAll() {
+            MPlayer local = ExperienceAndClasses.LOCAL_MPLAYER;
+
             //prevent secondary without primary class (move secondary to primary)
-            if ((ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary.ID_num == (byte)Systems.Class.IDs.New) || (ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary.ID_num == (byte)Systems.Class.IDs.None)) {
-                ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary = ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary;
-                ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary = Systems.Class.LOOKUP[(byte)Systems.Class.IDs.None];
+            if ((local.Class_Primary.ID_num == (byte)Systems.Class.IDs.New) || (local.Class_Primary.ID_num == (byte)Systems.Class.IDs.None)) {
+                local.Class_Primary = local.Class_Secondary;
+                local.Class_Secondary = Systems.Class.LOOKUP[(byte)Systems.Class.IDs.None];
             }
 
             //any "new" class should be set
-            if (ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary.ID_num == (byte)Systems.Class.IDs.New) {
-                ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary = Systems.Class.LOOKUP[(byte)Systems.Class.IDs.Novice];
+            if (local.Class_Primary.ID_num == (byte)Systems.Class.IDs.New) {
+                local.Class_Primary = Systems.Class.LOOKUP[(byte)Systems.Class.IDs.Novice];
             }
-            if (ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary.ID_num == (byte)Systems.Class.IDs.New) {
-                ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary = Systems.Class.LOOKUP[(byte)Systems.Class.IDs.None];
+            if (local.Class_Secondary.ID_num == (byte)Systems.Class.IDs.New) {
+                local.Class_Secondary = Systems.Class.LOOKUP[(byte)Systems.Class.IDs.None];
             }
 
             //clear secondary if not allowed
-            if (!ExperienceAndClasses.LOCAL_MPLAYER.Allow_Secondary) {
-                ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary = Systems.Class.LOOKUP[(byte)Systems.Class.IDs.None];
+            if (!local.Allow_Secondary) {
+                local.Class_Secondary = Systems.Class.LOOKUP[(byte)Systems.Class.IDs.None];
             }
 
             //effective levels
@@ -377,94 +373,101 @@ namespace ExperienceAndClasses {
                 sum_primary = 0;
                 sum_secondary = 0;
 
-                c = ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary;
+                c = local.Class_Primary;
                 while ((c != null) && (c.Tier > 0)) {
-                    sum_primary += (c.Attribute_Growth[id] * Math.Min(ExperienceAndClasses.LOCAL_MPLAYER.Class_Levels[c.ID_num], c.Max_Level));
+                    sum_primary += (c.Attribute_Growth[id] * Math.Min(local.Class_Levels[c.ID_num], c.Max_Level));
                     c = c.Prereq;
                 }
 
-                c = ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary;
+                c = local.Class_Secondary;
                 while ((c != null) && (c.Tier > 0)) {
-                    sum_secondary += (c.Attribute_Growth[id] * Math.Min(ExperienceAndClasses.LOCAL_MPLAYER.Class_Levels[c.ID_num], c.Max_Level));
+                    sum_secondary += (c.Attribute_Growth[id] * Math.Min(local.Class_Levels[c.ID_num], c.Max_Level));
                     c = c.Prereq;
                 }
 
-                if (ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary_Level_Effective > 0) {
-                    ExperienceAndClasses.LOCAL_MPLAYER.Attributes_Class[id] = (int)Math.Floor((sum_primary / Systems.Attribute.ATTRIBUTE_GROWTH_LEVELS * Systems.Attribute.SUBCLASS_PENALTY_ATTRIBUTE_MULTIPLIER_PRIMARY) +
+                if (local.Class_Secondary_Level_Effective > 0) {
+                    local.Attributes_Class[id] = (int)Math.Floor((sum_primary / Systems.Attribute.ATTRIBUTE_GROWTH_LEVELS * Systems.Attribute.SUBCLASS_PENALTY_ATTRIBUTE_MULTIPLIER_PRIMARY) +
                                                             (sum_secondary / Systems.Attribute.ATTRIBUTE_GROWTH_LEVELS * Systems.Attribute.SUBCLASS_PENALTY_ATTRIBUTE_MULTIPLIER_SECONDARY));
                 }
                 else {
-                    ExperienceAndClasses.LOCAL_MPLAYER.Attributes_Class[id] = (int)Math.Floor(sum_primary / Systems.Attribute.ATTRIBUTE_GROWTH_LEVELS);
+                    local.Attributes_Class[id] = (int)Math.Floor(sum_primary / Systems.Attribute.ATTRIBUTE_GROWTH_LEVELS);
                 }
             }
 
             //allocated attribute points
-            ExperienceAndClasses.LOCAL_MPLAYER.Allocation_Points_Total = Systems.Attribute.LocalAllocationPointTotal();
-            ExperienceAndClasses.LOCAL_MPLAYER.Allocation_Points_Spent = Systems.Attribute.LocalAllocationPointSpent();
-            ExperienceAndClasses.LOCAL_MPLAYER.Allocation_Points_Unallocated = ExperienceAndClasses.LOCAL_MPLAYER.Allocation_Points_Total - ExperienceAndClasses.LOCAL_MPLAYER.Allocation_Points_Spent;
+            local.Allocation_Points_Total = Systems.Attribute.LocalAllocationPointTotal();
+            local.Allocation_Points_Spent = Systems.Attribute.LocalAllocationPointSpent();
+            local.Allocation_Points_Unallocated = local.Allocation_Points_Total - local.Allocation_Points_Spent;
 
             //add allocation milestone
             int milestones;
             for (byte id = 0; id < (byte)Systems.Attribute.IDs.NUMBER_OF_IDs; id++) {
-                milestones = (int)Math.Floor(ExperienceAndClasses.LOCAL_MPLAYER.Attributes_Allocated[id] / 10.0);
-                ExperienceAndClasses.LOCAL_MPLAYER.Attributes_Allocated_Milestone[id] = (int)((milestones + 1.0) * milestones / 2.0);
+                milestones = (int)Math.Floor(local.Attributes_Allocated[id] / 10.0);
+                local.Attributes_Allocated_Milestone[id] = (int)((milestones + 1.0) * milestones / 2.0);
             }
 
             //sum attributes
             LocalAttributesCalculateSync();
-            ExperienceAndClasses.LOCAL_MPLAYER.CalculateAttributesFinal();
+            local.CalculateAttributesFinal();
 
             //calclate progression value
             LocalProgressionUpdate();
 
-            //populate passives
-            //TODO
+            //clear resources
+            local.Resources.Clear();
 
-            //populate resources
-            //TODO
+            //populate passives (also adds AutoPassive statuses AND resources AND sets passive.Unlocked)
+            local.Passives.Clear();
+            foreach (Systems.Passive p in Systems.Passive.LOOKUP) {
+                if (p.CorrectClass()) {
+                    //passives includes all for class including unlocked
+                    local.Passives.Add(p);
+                    if (p.Unlocked) {
+                        p.Apply();
+                    }
+                }
+            }
 
-            //populate abilities (and check unlocked + check passive)
-            //TODO
+            //populate abilities (and updates unlocked + updates passives + set hotkey)
+            local.Abilities_Primary = local.Class_Primary.GetAbilities(true, false);
+            local.Abilities_Primary_Alt = local.Class_Primary.GetAbilities(true, true);
+            local.Abilities_Secondary = local.Class_Secondary.GetAbilities(false, false);
+            local.Abilities_Secondary_Alt = local.Class_Secondary.GetAbilities(false, true);
 
             //update UI
             UI.UIMain.Instance.UpdateClassInfo();
             UI.UIHUD.Instance.Update();
-
-            //update class features
-            LocalUpdateClassInfo();
-        }
-
-        public static void LocalUpdateClassInfo() {
-            //TODO
         }
 
         public static void LocalCalculateEffectiveLevels() {
+            MPlayer local = ExperienceAndClasses.LOCAL_MPLAYER;
+
             //set current levels as default
-            ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary_Level_Effective = ExperienceAndClasses.LOCAL_MPLAYER.Class_Levels[ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary.ID_num];
-            ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary_Level_Effective = ExperienceAndClasses.LOCAL_MPLAYER.Class_Levels[ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary.ID_num];
+            local.Class_Primary_Level_Effective = local.Class_Levels[local.Class_Primary.ID_num];
+            local.Class_Secondary_Level_Effective = local.Class_Levels[local.Class_Secondary.ID_num];
 
             //level cap primary
-            if (ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary_Level_Effective > ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary.Max_Level) {
-                ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary_Level_Effective = ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary.Max_Level;
+            if (local.Class_Primary_Level_Effective > local.Class_Primary.Max_Level) {
+                local.Class_Primary_Level_Effective = local.Class_Primary.Max_Level;
             }
 
             //subclass secondary effective level penalty
-            if (ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary.Tier > ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary.Tier) {
+            if (local.Class_Secondary.Tier > local.Class_Primary.Tier) {
                 //subclass of higher tier limited to lv1
-                ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary_Level_Effective = 1;
+                local.Class_Secondary_Level_Effective = 1;
             }
-            else if (ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary.Tier == ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary.Tier) {
+            else if (local.Class_Secondary.Tier == local.Class_Primary.Tier) {
                 //subclass of same tier limited to half primary
-                ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary_Level_Effective = (byte)Math.Min(ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary_Level_Effective, ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary_Level_Effective / 2);
+                local.Class_Secondary_Level_Effective = (byte)Math.Min(local.Class_Secondary_Level_Effective, local.Class_Primary_Level_Effective / 2);
 
                 //prevent effective level 0 if using two level 1s of same tier
-                if (ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary.Tier > 0)
-                    ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary_Level_Effective = Math.Max(ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary_Level_Effective, (byte)1);
+                if (local.Class_Secondary.Tier > 0)
+                    local.Class_Secondary_Level_Effective = Math.Max(local.Class_Secondary_Level_Effective, (byte)1);
             }//subclass of lower tier has no penalty
 
             //level cap secondary
-            if (ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary_Level_Effective > ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary.Max_Level) {
-                ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary_Level_Effective = ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary.Max_Level;
+            if (local.Class_Secondary_Level_Effective > local.Class_Secondary.Max_Level) {
+                local.Class_Secondary_Level_Effective = local.Class_Secondary.Max_Level;
             }
         }
 
@@ -504,9 +507,14 @@ namespace ExperienceAndClasses {
                 UI.UIMain.Instance.Visibility = !UI.UIMain.Instance.Visibility;
             }
 
+            bool ability_key, ability_key_just;
             bool alternative_key = ExperienceAndClasses.HOTKEY_ALTERNATE_EFFECT.Current;
+            bool alternative_key_just = ExperienceAndClasses.HOTKEY_ALTERNATE_EFFECT.JustPressed;
             for (byte i=0; i<ExperienceAndClasses.NUMBER_ABILITY_SLOTS_PER_CLASS; i++) {
-                if (ExperienceAndClasses.HOTKEY_ABILITY_PRIMARY[i].JustPressed) {
+
+                ability_key = ExperienceAndClasses.HOTKEY_ABILITY_PRIMARY[i].Current;
+                ability_key_just = ExperienceAndClasses.HOTKEY_ABILITY_PRIMARY[i].JustPressed;
+                if ((ability_key_just || alternative_key_just) && ability_key) {
                     if (alternative_key && (Abilities_Primary_Alt[i] != null)) {
                         Abilities_Primary_Alt[i].Activate();
                     }
@@ -514,7 +522,10 @@ namespace ExperienceAndClasses {
                         Abilities_Primary[i].Activate();
                     }
                 }
-                if (ExperienceAndClasses.HOTKEY_ABILITY_SECONDARY[i].JustPressed) {
+
+                ability_key = ExperienceAndClasses.HOTKEY_ABILITY_SECONDARY[i].Current;
+                ability_key_just = ExperienceAndClasses.HOTKEY_ABILITY_SECONDARY[i].JustPressed;
+                if ((ability_key_just || alternative_key_just) && ability_key) {
                     if (alternative_key && (Abilities_Secondary_Alt[i] != null)) {
                         Abilities_Secondary_Alt[i].Activate();
                     }
