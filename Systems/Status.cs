@@ -17,7 +17,7 @@ namespace ExperienceAndClasses.Systems {
         /// inlcudes NUMBER_OF_IDs and NONE
         /// </summary>
         public enum IDs : ushort {
-            Heal,
+            Block,
 
             //insert here
 
@@ -411,7 +411,7 @@ namespace ExperienceAndClasses.Systems {
             RemoveLocally();
 
             //remove everywhere else (send end packet)
-            if (Specific_Syncs) {
+            if (Specific_Syncs && !Utilities.Netmode.IS_SINGLEPLAYER) {
                 if (Owner.Local) {
                     //sending local status (could be server if a status is evere created there)
                     Utilities.PacketHandler.RemoveStatus.Send(this, Utilities.Netmode.WHO_AM_I);
@@ -817,7 +817,7 @@ namespace ExperienceAndClasses.Systems {
             }
 
             //sync (unless set_statuses)
-            if (!set_statuses && status.Specific_Syncs) {
+            if (!set_statuses && status.Specific_Syncs && !Utilities.Netmode.IS_SINGLEPLAYER) {
                 if (owner.Local) {
                     //sending local status (could be server if a status is ever created there - npc owned status)
                     Utilities.PacketHandler.AddStatus.Send(status, Utilities.Netmode.WHO_AM_I);
@@ -863,24 +863,37 @@ namespace ExperienceAndClasses.Systems {
         public virtual void PacketRemoveWrite(ModPacket packet) { }
         public virtual void PacketRemoveRead(BinaryReader reader) { }
 
-        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Example ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Templates ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-        public class Heal : Status {
-            public Heal() : base(IDs.Heal) {
+
+
+        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Warrior ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+        public class Block : Status {
+            public Block() : base(IDs.Block) {
                 //any overwrites
-                Specific_Name = "Heal"; //not needed unless displayed as a buff
-                specific_texture_path = "ExperienceAndClasses/Textures/Status/Heal"; //not needed unless displayed as a buff
-                Specific_Duration_Type = DURATION_TYPES.INSTANT;
+                Specific_Name = "Block"; //not needed unless displayed as a buff
+                //specific_texture_path = "ExperienceAndClasses/Textures/Status/Heal"; //not needed unless displayed as a buff
+                Specific_Duration_Type = DURATION_TYPES.TOGGLE;
+                Specific_Limit_Type = LIMIT_TYPES.ONE;
+                Specific_Effect_Type = EFFECT_TYPES.CONSTANT;
+                Specific_UI_Type = UI_TYPES.ONE;
+                specific_owner_player_required_ability = Systems.Ability.IDs.Block;
+                specific_remove_if_key_not_pressed = Systems.Ability.LOOKUP[(ushort)specific_owner_player_required_ability].hotkey;
 
                 //add any sync data types that will be used (for syncing)
-                Specific_Autosync_Data_Types.Add(AUTOSYNC_DATA_TYPES.MAGNITUDE1);
+                //Specific_Autosync_Data_Types.Add(AUTOSYNC_DATA_TYPES.MAGNITUDE1);
             }
 
             //must inlcude a static add method with target/owner and any extra info
-            public static void CreateNew(Utilities.Containers.Thing target, Utilities.Containers.Thing owner, float magnitude) {
-                Add(IDs.Heal, target, owner, new Dictionary<AUTOSYNC_DATA_TYPES, float> {
+            public static void CreateNew(Utilities.Containers.Thing owner) {
+                Add(IDs.Block, owner, owner);
+
+                /*
+                Add(IDs.Block, target, owner, new Dictionary<AUTOSYNC_DATA_TYPES, float> {
                     { AUTOSYNC_DATA_TYPES.MAGNITUDE1, magnitude }
                 });
+                */
             }
         }
 

@@ -222,6 +222,8 @@ namespace ExperienceAndClasses {
 
             //test
             Abilities_Primary[0] = Systems.Ability.LOOKUP[(ushort)Systems.Ability.IDs.Block];
+            Abilities_Primary[0].hotkey = ExperienceAndClasses.HOTKEY_ABILITY_PRIMARY[0];
+
             Resources.Add(Systems.Resource.IDs.Bloodforce);
         }
 
@@ -279,6 +281,9 @@ namespace ExperienceAndClasses {
             }
         }
 
+        /// <summary>
+        /// this is after buff updates
+        /// </summary>
         public override void PostUpdateEquips() {
             base.PostUpdateEquips();
             if (initialized) {

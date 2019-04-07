@@ -1,9 +1,11 @@
-﻿using Microsoft.Xna.Framework;
+﻿using ExperienceAndClasses.Utilities.Containers;
+using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using Terraria;
 using Terraria.ID;
+using Terraria.ModLoader;
 
 namespace ExperienceAndClasses.Systems {
     public abstract class Ability {
@@ -189,6 +191,8 @@ namespace ExperienceAndClasses.Systems {
         public ushort ID_num { get; private set; } = (ushort)IDs.NONE;
 
         private DateTime Time_Cooldown_End = DateTime.MinValue;
+
+        public ModHotKey hotkey = null;
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Instance Vars Generic (within activation) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -818,8 +822,8 @@ namespace ExperienceAndClasses.Systems {
                 specific_is_channelling = true;
                 
             }
-            protected override void DoEffectMain() {
-                
+            protected override void DoEffectTargetFriendly(Thing target) {
+                Systems.Status.Block.CreateNew(target);
             }
         }
 
