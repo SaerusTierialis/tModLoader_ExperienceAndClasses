@@ -219,28 +219,36 @@ namespace ExperienceAndClasses.UI {
 
         //the panel behind the selected buttons prevents their use without this workaround
         private void PrimaryButtonLeft(UIMouseEvent evt, UIElement listeningElement) {
-            button_primary.Click(evt);
+            if (button_primary != null)
+                button_primary.Click(evt);
         }
         private void PrimaryButtonRight(UIMouseEvent evt, UIElement listeningElement) {
-            button_primary.RightClick(evt);
+            if (button_primary != null)
+                button_primary.RightClick(evt);
         }
         private void PrimaryButtonHover(UIMouseEvent evt, UIElement listeningElement) {
-            button_primary.MouseOver(evt);
+            if (button_primary != null)
+                button_primary.MouseOver(evt);
         }
         private void PrimaryButtonDeHover(UIMouseEvent evt, UIElement listeningElement) {
-            button_primary.MouseOut(evt);
+            if (button_primary != null)
+                button_primary.MouseOut(evt);
         }
         private void SecondaryButtonLeft(UIMouseEvent evt, UIElement listeningElement) {
-            button_secondary.Click(evt);
+            if (button_secondary != null)
+                button_secondary.Click(evt);
         }
         private void SecondaryButtonRight(UIMouseEvent evt, UIElement listeningElement) {
-            button_secondary.RightClick(evt);
+            if (button_secondary != null)
+                button_secondary.RightClick(evt);
         }
         private void SecondaryButtonHover(UIMouseEvent evt, UIElement listeningElement) {
-            button_secondary.MouseOver(evt);
+            if (button_secondary != null)
+                button_secondary.MouseOver(evt);
         }
         private void SecondaryButtonDeHover(UIMouseEvent evt, UIElement listeningElement) {
-            button_secondary.MouseOut(evt);
+            if (button_secondary != null)
+                button_secondary.MouseOut(evt);
         }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Events ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
