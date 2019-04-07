@@ -688,7 +688,7 @@ namespace ExperienceAndClasses.Systems {
                     Effect();
 
                     //calculate next time of effect
-                    Times_Next_Timed_Effect[ID].AddSeconds(specific_timed_effect_sec);
+                    Times_Next_Timed_Effect[ID] = Times_Next_Timed_Effect[ID].AddSeconds(specific_timed_effect_sec);
                 }
             }
         }
