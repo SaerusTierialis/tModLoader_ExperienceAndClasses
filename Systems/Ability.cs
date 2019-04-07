@@ -67,6 +67,9 @@ namespace ExperienceAndClasses.Systems {
         public string Specific_Name { get; protected set; } = "default_name";
         protected string specific_description = "default_description";
 
+        /// <summary>
+        /// default is TARGET_POSITION_TYPE.NONE
+        /// </summary>
         protected TARGET_POSITION_TYPE specific_target_position_type = TARGET_POSITION_TYPE.NONE;
 
         protected float specific_mana_cost_flat = 0;
@@ -217,14 +220,18 @@ namespace ExperienceAndClasses.Systems {
             //positions
             //targets
             //cooldown
-            Main.NewText("START");
             USE_RESULT result = PreActivate();
-            Main.NewText("result = " + result);
             if (result != USE_RESULT.SUCCESS) {
                 FailMessage(result);
                 return;
             }
-            
+
+            //calculate cooldown
+            CalculateCooldown();
+
+            //calculate power
+            CalculatePower();
+
             //set cooldown
             if (cooldown_seconds > 0) {
                 Time_Cooldown_End = ExperienceAndClasses.Now.AddSeconds(cooldown_seconds);
@@ -280,7 +287,7 @@ namespace ExperienceAndClasses.Systems {
                 cost_resource = 0;
             }
             else {
-                float cost_resource_base = ModifyCostResource(specific_resource_cost_flat + (specific_resource_cost_percent * Systems.Resource.LOOKUP[(byte)specific_resource].Capacity));
+                float cost_resource_base = specific_resource_cost_flat + (specific_resource_cost_percent * Systems.Resource.LOOKUP[(byte)specific_resource].Capacity);
                 cost_resource = (ushort)Math.Max(0, ModifyCostResource(cost_resource_base));
             }
             return cost_resource;
@@ -373,9 +380,8 @@ namespace ExperienceAndClasses.Systems {
                     (specific_type_throwing && item.thrown) ||
                     (specific_type_minion && (item.summon || item.sentry)) ||
                     (specific_type_magic && item.magic)) {
-
+                    
                     power += item.damage;
-
                 }
             }
 
@@ -394,7 +400,7 @@ namespace ExperienceAndClasses.Systems {
             }
 
             //base: modifications
-            power = ModifyPowerBase(specific_power_base);
+            power = ModifyPowerBase(power);
 
             //multiplier: initialize
             float multiplier = 1f;
@@ -485,8 +491,8 @@ namespace ExperienceAndClasses.Systems {
             power *= multiplier;
 
             //level multiplier (compounds other multiplier)
-            if (specific_power_level_multiplier > 0) {
-                power *= (specific_power_level_multiplier * level);
+            if (specific_power_level_multiplier > 0f) {
+                power *= (1f + (specific_power_level_multiplier * level));
             }
 
             //final modification
@@ -658,8 +664,7 @@ namespace ExperienceAndClasses.Systems {
                 }
             }
 
-            //cooldown (calculates for use later in activation)
-            CalculateCooldown();
+            //cooldown
             if (Time_Cooldown_End.CompareTo(ExperienceAndClasses.Now) > 0) {
                 return USE_RESULT.FAIL_ON_COOLDOWN;
             }
@@ -810,19 +815,11 @@ namespace ExperienceAndClasses.Systems {
                 Specific_Name = "Block";
                 Specific_Required_Class_ID = Systems.Class.IDs.Warrior;
                 Specific_Required_Class_Level = 1;
-                specific_target_position_type = TARGET_POSITION_TYPE.BETWEEN_SELF_AND_CURSOR;
-                specific_range_base = 500f;
-                specific_resource = Systems.Resource.IDs.Bloodforce;
-                specific_mana_cost_flat = 10;
-                specific_power_base = 5;
-                specific_power_base_add_weapon_damage_if_type = true;
-                specific_type_melee = true;
-                specific_power_attribute_multipliers[(byte)Systems.Attribute.IDs.Spirit] = 0.05f;
-                specific_power_level_multiplier = 0.01f;
+                specific_is_channelling = true;
+                
             }
             protected override void DoEffectMain() {
-                Main.NewText(level + " " + power);
-                Dust.NewDust(position_target, 5, 5, DustID.AmberBolt);
+                
             }
         }
 

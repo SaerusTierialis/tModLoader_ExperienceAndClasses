@@ -36,7 +36,26 @@ namespace ExperienceAndClasses.Systems {
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Instance Vars Generic ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
+        public IDs ID { get; private set; } = IDs.NONE;
+        public byte ID_num { get; private set; } = (byte)IDs.NONE;
         public ushort Amount = 0;
+
+        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Instance Methods ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+        public Resource(IDs id, ushort amount_default = 0) {
+            ID = id;
+            ID_num = (byte)ID;
+            Amount = amount_default;
+        }
+
+        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Resources ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+        public class Bloodforce : Resource {
+            public Bloodforce() : base(IDs.Bloodforce, 50) {
+                Name = "Bloodforce";
+                Capacity = 100;
+            }
+        }
 
     }
 }

@@ -222,6 +222,7 @@ namespace ExperienceAndClasses {
 
             //test
             Abilities_Primary[0] = Systems.Ability.LOOKUP[(ushort)Systems.Ability.IDs.Block];
+            Resources.Add(Systems.Resource.IDs.Bloodforce);
         }
 
         /// <summary>
