@@ -2,8 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Terraria;
 using Terraria.ID;
 
@@ -24,7 +22,9 @@ namespace ExperienceAndClasses.Systems {
             FAIL_CLASS_LEVEL,
             FAIL_NOT_ENOUGH_MANA,
             FAIL_NOT_ENOUGH_RESOURCE,
+            FAIL_MISSING_RESOURCE,
             FAIL_ON_COOLDOWN,
+            FAIL_RANGE,
             FAIL_LINE_OF_SIGHT,
             FAIL_NO_TARGET,
             FAIL_SILENCED,
@@ -73,7 +73,7 @@ namespace ExperienceAndClasses.Systems {
         protected float specific_mana_cost_percent = 0f;
         protected bool specific_mana_apply_reduction = true;
 
-        protected Systems.Resource Specific_Resource = null;
+        protected Systems.Resource.IDs specific_resource = Systems.Resource.IDs.NONE;
         protected float specific_resource_cost_flat = 0;
         protected float specific_resource_cost_percent = 0f;
 
@@ -83,7 +83,7 @@ namespace ExperienceAndClasses.Systems {
         protected List<Systems.Status.IDs> specific_antirequisite_statuses = new List<Status.IDs>();
 
         /// <summary>
-        /// Set this for channel
+        /// adds description of channelling to the UI text | default is false
         /// </summary>
         protected bool specific_is_channelling = false;
         protected bool specific_can_be_used_while_channelling = false;
@@ -99,27 +99,27 @@ namespace ExperienceAndClasses.Systems {
 
         protected float specific_power_base = 0f;
         /// <summary>
-        /// if weapon matches type, add its per-hit damage to base power
+        /// if weapon matches type, add its per-hit damage to base power | default is false
         /// </summary>
         protected bool specific_power_base_add_weapon_damage_if_type = false;
         /// <summary>
-        /// if weapon matches type, add its damage-per-use-time to base power
+        /// if weapon matches type, add its damage-per-use-time to base power | default is false
         /// </summary>
         protected bool specific_power_base_add_weapon_dpt_if_type = false;
         /// <summary>
-        /// apply highest of type bonuses
+        /// apply highest of type bonuses | default is false
         /// </summary>
         protected bool specific_power_apply_bonus_highest = false;
         /// <summary>
-        /// apply all type bonuses
+        /// apply all type bonuses | default is false
         /// </summary>
         protected bool specific_power_apply_bonus_all = false;
         /// <summary>
-        /// 0 is no bonus, 0.01 is a 1%/point bonus, etc.
+        /// 0 is no bonus, 0.01 is a 1%/point bonus, etc. | default is 0s
         /// </summary>
         protected float[] specific_power_attribute_multipliers = new float[(byte)Systems.Attribute.IDs.NUMBER_OF_IDs];
         /// <summary>
-        /// final multiplier (compounds other bonuses)
+        /// final multiplier (compounds other bonuses) | default is 0
         /// </summary>
         protected float specific_power_level_multiplier = 0;
 
@@ -135,46 +135,47 @@ namespace ExperienceAndClasses.Systems {
         /// This max is SEPARATE for friendly and hostile target.
         /// When selection is limited by this max, the closest targets to the position_target are used.
         /// Set 0 if self is the only target to save time.
+        /// | default is 0
         /// </summary>
         protected ushort specific_targets_max = 0;
         /// <summary>
-        /// self can be included as a friednly target but it is not guarenteed and does count towards max
+        /// self can be included as a friednly target but it is not guarenteed and does count towards max | default is true
         /// </summary>
         protected bool specific_targets_self = true;
         /// <summary>
-        /// ALWAYS include self as a friendly target, does not count towards max
+        /// ALWAYS include self as a friendly target, does not count towards max | default is true
         /// </summary>
         protected bool specific_targets_self_always = true;
         /// <summary>
-        /// targets can include players
+        /// targets can include players | default is true
         /// </summary>
         protected bool specific_targets_player = true;
         /// <summary>
-        /// targets can include NPCs
+        /// targets can include NPCs | default is true
         /// </summary>
         protected bool specific_targets_npc = true;
         /// <summary>
-        /// targets can be friendly
+        /// targets can be friendly | default is true
         /// </summary>
         protected bool specific_targets_friedly = true;
         /// <summary>
-        /// targets can be hostile
+        /// targets can be hostile | default is true
         /// </summary>
         protected bool specific_targets_hostile = true;
         /// <summary>
-        /// target position must have sight of target
+        /// target position must have sight of target | default is true
         /// </summary>
         protected bool specific_targets_require_line_of_sight_position = true;
         /// <summary>
-        /// player must have sight of target
+        /// player must have sight of target | default is false
         /// </summary>
-        protected bool specific_targets_require_line_of_sight_player = true;
+        protected bool specific_targets_require_line_of_sight_player = false;
         /// <summary>
-        /// required unless Systems.Status.IDs.NONE
+        /// required unless Systems.Status.IDs.NONE | default is Systems.Status.IDs.NONE
         /// </summary>
         protected Systems.Status.IDs specific_targets_require_status = Systems.Status.IDs.NONE;
         /// <summary>
-        /// antirequisit unless Systems.Status.IDs.NONE
+        /// antirequisit unless Systems.Status.IDs.NONE | default is Systems.Status.IDs.NONE
         /// </summary>
         protected Systems.Status.IDs specific_targets_antirequisite_status = Systems.Status.IDs.NONE;
 
@@ -195,7 +196,7 @@ namespace ExperienceAndClasses.Systems {
         private float cooldown_seconds;
         private Vector2 position_player, position_cursor, position_target;
         private float position_target_distance;
-        private bool target_position_valid;
+        private bool target_position_line_of_sight;
         protected string custom_use_fail_message;
         protected List<Utilities.Containers.Thing> targets_friendly;
         protected List<Utilities.Containers.Thing> targets_hostile;
@@ -216,14 +217,41 @@ namespace ExperienceAndClasses.Systems {
             //positions
             //targets
             //cooldown
+            Main.NewText("START");
             USE_RESULT result = PreActivate();
+            Main.NewText("result = " + result);
             if (result != USE_RESULT.SUCCESS) {
                 FailMessage(result);
                 return;
             }
+            
+            //set cooldown
+            if (cooldown_seconds > 0) {
+                Time_Cooldown_End = ExperienceAndClasses.Now.AddSeconds(cooldown_seconds);
+            }
 
+            //take mana
+            if (cost_mana > 0) {
+                Main.LocalPlayer.statMana = Math.Max(0, Main.LocalPlayer.statMana - cost_mana);
+            }
 
+            //take resource
+            if (cost_resource > 0) {
+                Systems.Resource.LOOKUP[(byte)specific_resource].Amount = (ushort)Math.Max(0, Systems.Resource.LOOKUP[(byte)specific_resource].Amount - cost_resource);
+            }
 
+            //do main effect
+            DoEffectMain();
+
+            //do friendly target effect
+            foreach (Utilities.Containers.Thing target in targets_friendly) {
+                DoEffectTargetFriendly(target);
+            }
+
+            //do hostile target effect
+            foreach (Utilities.Containers.Thing target in targets_hostile) {
+                DoEffectTargetHostile(target);
+            }
         }
 
         public string GetUIText() {
@@ -248,11 +276,11 @@ namespace ExperienceAndClasses.Systems {
 
         private ushort CalculateResourceCost() {
             //resource cost
-            if (Specific_Resource == null) {
+            if (specific_resource == Systems.Resource.IDs.NONE) {
                 cost_resource = 0;
             }
             else {
-                float cost_resource_base = ModifyCostResource(specific_resource_cost_flat + (specific_resource_cost_percent * Specific_Resource.Capacity));
+                float cost_resource_base = ModifyCostResource(specific_resource_cost_flat + (specific_resource_cost_percent * Systems.Resource.LOOKUP[(byte)specific_resource].Capacity));
                 cost_resource = (ushort)Math.Max(0, ModifyCostResource(cost_resource_base));
             }
             return cost_resource;
@@ -276,24 +304,46 @@ namespace ExperienceAndClasses.Systems {
             switch (specific_target_position_type) {
                 case TARGET_POSITION_TYPE.NONE:
                     position_target_distance = 0;
-                    target_position_valid = true;
+                    target_position_line_of_sight = true;
                     break;
                 case TARGET_POSITION_TYPE.SELF:
                     position_target = position_player;
                     position_target_distance = 0;
-                    target_position_valid = true;
+                    target_position_line_of_sight = true;
                     break;
                 case TARGET_POSITION_TYPE.CURSOR:
                     position_target = position_cursor;
                     position_target_distance = Vector2.Distance(position_player, position_target);
-                    target_position_valid = (position_target_distance <= range) && Collision.CanHitLine(position_player, 0, 0, position_target, 0, 0);
+                    target_position_line_of_sight = Collision.CanHit(position_player, 0, 0, position_target, 0, 0);
                     break;
                 case TARGET_POSITION_TYPE.BETWEEN_SELF_AND_CURSOR:
-                    //calculate position
-                    //TODO
+                    //first check if cursor is within range
+                    float distance_cursor = Vector2.Distance(position_player, position_cursor);
+                    if (distance_cursor > range) {
+                        //cursor is too far - try at full range
+                        position_target = Vector2.Lerp(position_player, position_cursor, range / distance_cursor);
+                        position_target_distance = Vector2.Distance(position_player, position_target) - 1f;
+                        target_position_line_of_sight = Collision.CanHit(position_player, 0, 0, position_target, 0, 0);
+                    }
+                    else {
+                        //cursor was within range so just check sight
+                        position_target = position_cursor;
+                        position_target_distance = distance_cursor;
+                        target_position_line_of_sight = Collision.CanHit(position_player, 0, 0, position_target, 0, 0);
+                    }
 
-                    position_target_distance = Vector2.Distance(position_player, position_target);
-                    target_position_valid = (position_target_distance <= range) && Collision.CanHitLine(position_player, 0, 0, position_target, 0, 0);
+                    if (!target_position_line_of_sight) {
+                        //can't see target, need to move closer
+                        Vector2 position_reference = position_target;
+                        for (float percent_dist=0.9f; percent_dist >= 0; percent_dist -= 0.1f) {
+                            position_target = Vector2.Lerp(position_player, position_reference, percent_dist);
+                            position_target_distance = Vector2.Distance(position_player, position_target) - 1f;
+                            target_position_line_of_sight = Collision.CanHit(position_player, 0, 0, position_target, 0, 0);
+                            if (target_position_line_of_sight) {
+                                break;
+                            }
+                        }
+                    }
                     break;
                 default:
                     Utilities.Commons.Error("Unsupported TARGET_POSITION_TYPE in [" + ID + "]: " + specific_target_position_type);
@@ -489,6 +539,9 @@ namespace ExperienceAndClasses.Systems {
             //use highest level (could still be 0 if not correct class)
             level = Math.Max(level_primary, level_secondary);
 
+            //subtract out levels required
+            level = (byte)(level - Specific_Required_Class_Level + 1);
+
             return level;
         }
 
@@ -593,9 +646,16 @@ namespace ExperienceAndClasses.Systems {
                 return USE_RESULT.FAIL_NOT_ENOUGH_MANA;
             }
 
-            //cost resource (calculates for use later in activation)
-            if ((Specific_Resource != null) && (Specific_Resource.Amount < CalculateResourceCost())) {
-                return USE_RESULT.FAIL_NOT_ENOUGH_RESOURCE;
+            if (CalculateResourceCost() > 0) {
+                //doesn't have the resource
+                if (!ExperienceAndClasses.LOCAL_MPLAYER.Resources.Contains(specific_resource)) {
+                    return USE_RESULT.FAIL_MISSING_RESOURCE;
+                }
+
+                //cost resource (calculates for use later in activation)
+                if (Systems.Resource.LOOKUP[(byte)specific_resource].Amount < cost_resource) {
+                    return USE_RESULT.FAIL_NOT_ENOUGH_RESOURCE;
+                }
             }
 
             //cooldown (calculates for use later in activation)
@@ -614,7 +674,10 @@ namespace ExperienceAndClasses.Systems {
             //target position (calculates for use later in activation)
             CalculateRange();
             CalculatePosition();
-            if (!target_position_valid) {
+            if (position_target_distance > range) {
+                return USE_RESULT.FAIL_RANGE;
+            }
+            else if (!target_position_line_of_sight) {
                 return USE_RESULT.FAIL_LINE_OF_SIGHT;
             }
 
@@ -655,11 +718,15 @@ namespace ExperienceAndClasses.Systems {
                             break;
 
                         case USE_RESULT.FAIL_NOT_ENOUGH_RESOURCE:
-                            message = "Not Enough " + Specific_Resource.Name;
+                            message = "Not Enough " + Systems.Resource.LOOKUP[(byte)specific_resource].Name;
                             break;
 
                         case USE_RESULT.FAIL_ON_COOLDOWN:
                             message = "Ability on Coolown";
+                            break;
+
+                        case USE_RESULT.FAIL_RANGE:
+                            message = "Out of Range";
                             break;
 
                         case USE_RESULT.FAIL_LINE_OF_SIGHT:
@@ -698,6 +765,10 @@ namespace ExperienceAndClasses.Systems {
                             Utilities.Commons.Error("FailMessage called for USE_RESULT.SUCCESS for [" + ID + "]: " + result);
                             return;
 
+                        case USE_RESULT.FAIL_MISSING_RESOURCE:
+                            Utilities.Commons.Error("Missing resource for [" + ID + "]: " + specific_resource);
+                            return;
+
                         default:
                             Utilities.Commons.Error("Unsupported USE_RESULT for [" + ID + "]: " + result);
                             return;
@@ -729,10 +800,29 @@ namespace ExperienceAndClasses.Systems {
         protected virtual float ModifyCooldown(float cooldown_seconds) { return cooldown_seconds; }
         protected virtual bool ModifyCanBeTarget(Utilities.Containers.Thing target, bool can_be_targeted) { return can_be_targeted; }
 
+        protected virtual void DoEffectMain() {}
+        protected virtual void DoEffectTargetFriendly(Utilities.Containers.Thing target) { }
+        protected virtual void DoEffectTargetHostile(Utilities.Containers.Thing target) { }
+
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Warrior ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         public class Block : Ability {
             public Block() : base(IDs.Block) {
-
+                Specific_Name = "Block";
+                Specific_Required_Class_ID = Systems.Class.IDs.Warrior;
+                Specific_Required_Class_Level = 1;
+                specific_target_position_type = TARGET_POSITION_TYPE.BETWEEN_SELF_AND_CURSOR;
+                specific_range_base = 500f;
+                specific_resource = Systems.Resource.IDs.Bloodforce;
+                specific_mana_cost_flat = 10;
+                specific_power_base = 5;
+                specific_power_base_add_weapon_damage_if_type = true;
+                specific_type_melee = true;
+                specific_power_attribute_multipliers[(byte)Systems.Attribute.IDs.Spirit] = 0.05f;
+                specific_power_level_multiplier = 0.01f;
+            }
+            protected override void DoEffectMain() {
+                Main.NewText(level + " " + power);
+                Dust.NewDust(position_target, 5, 5, DustID.AmberBolt);
             }
         }
 

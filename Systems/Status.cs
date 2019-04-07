@@ -222,12 +222,12 @@ namespace ExperienceAndClasses.Systems {
         /// <summary>
         /// remove if the local client is the owner and does not have specified passive ability | default is null
         /// </summary>
-        protected Systems.Passive specific_owner_player_required_passive = null;
+        protected Systems.Passive.IDs specific_owner_player_required_passive = Systems.Passive.IDs.NONE;
 
         /// <summary>
         /// remove if the local client is the owner and does not have specified passive ability | default is null
         /// </summary>
-        protected Systems.Ability specific_owner_player_required_ability = null;
+        protected Systems.Ability.IDs specific_owner_player_required_ability = Systems.Ability.IDs.NONE;
 
         /// <summary>
         /// remove if target DOES NOT have specified status (checked by server) | default is none
@@ -530,12 +530,12 @@ namespace ExperienceAndClasses.Systems {
                 }
 
                 //required passive
-                if ((specific_owner_player_required_passive != null) && !Owner.MPlayer.Passives.Contains(specific_owner_player_required_passive)) {
+                if ((specific_owner_player_required_passive != Systems.Passive.IDs.NONE) && !Owner.MPlayer.Passives.Contains(specific_owner_player_required_passive)) {
                     return true;
                 }
 
                 //required ability
-                if ((specific_owner_player_required_ability != null) && !Owner.MPlayer.Abilities_Primary.Contains(specific_owner_player_required_ability) && !Owner.MPlayer.Abilities_Secondary.Contains(specific_owner_player_required_ability)) {
+                if ((specific_owner_player_required_ability != Systems.Ability.IDs.NONE) && !Owner.MPlayer.Abilities_Primary.Contains(Systems.Ability.LOOKUP[(byte)specific_owner_player_required_ability]) && !Owner.MPlayer.Abilities_Secondary.Contains(Systems.Ability.LOOKUP[(byte)specific_owner_player_required_ability])) {
                     return true;
                 }
 

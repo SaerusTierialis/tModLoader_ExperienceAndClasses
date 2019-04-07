@@ -81,10 +81,15 @@ namespace ExperienceAndClasses {
         /// </summary>
         public List<Projectile> slot_minions { get; private set; }
 
-        public List<Systems.Passive> Passives { get; private set; }
+        public List<Systems.Passive.IDs> Passives { get; private set; }
 
         public Systems.Ability[] Abilities_Primary { get; private set; }
+        public Systems.Ability[] Abilities_Primary_Alt { get; private set; }
         public Systems.Ability[] Abilities_Secondary { get; private set; }
+        public Systems.Ability[] Abilities_Secondary_Alt { get; private set; }
+
+        public List<Systems.Resource.IDs> Resources { get; private set; }
+
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Instance Vars (saved/loaded) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         //Class_Primary and Class_Secondary also save/load (specifically the .ID)
@@ -169,10 +174,6 @@ namespace ExperienceAndClasses {
             slot_minions = new List<Projectile>();
             Progression = 0;
             extra_xp = 0;
-            Passives = new List<Systems.Passive>();
-            Abilities_Primary = new Systems.Ability[ExperienceAndClasses.NUMBER_ABILITY_SLOTS_PER_CLASS];
-            Abilities_Secondary = new Systems.Ability[ExperienceAndClasses.NUMBER_ABILITY_SLOTS_PER_CLASS];
-            channelling = false;
 
             //ui
             loaded_ui_main = new Utilities.Containers.LoadedUIData();
@@ -211,6 +212,16 @@ namespace ExperienceAndClasses {
 
             //ability
             show_ability_fail_messages = true;
+            Passives = new List<Systems.Passive.IDs>();
+            Resources = new List<Systems.Resource.IDs>();
+            Abilities_Primary = new Systems.Ability[ExperienceAndClasses.NUMBER_ABILITY_SLOTS_PER_CLASS];
+            Abilities_Primary_Alt = new Systems.Ability[ExperienceAndClasses.NUMBER_ABILITY_SLOTS_PER_CLASS];
+            Abilities_Secondary = new Systems.Ability[ExperienceAndClasses.NUMBER_ABILITY_SLOTS_PER_CLASS];
+            Abilities_Secondary_Alt = new Systems.Ability[ExperienceAndClasses.NUMBER_ABILITY_SLOTS_PER_CLASS];
+            channelling = false;
+
+            //test
+            Abilities_Primary[0] = Systems.Ability.LOOKUP[(ushort)Systems.Ability.IDs.Block];
         }
 
         /// <summary>
@@ -459,6 +470,27 @@ namespace ExperienceAndClasses {
             if (ExperienceAndClasses.HOTKEY_UI.JustPressed) {
                 UI.UIMain.Instance.Visibility = !UI.UIMain.Instance.Visibility;
             }
+
+            bool alternative_key = ExperienceAndClasses.HOTKEY_ALTERNATE_EFFECT.Current;
+            for (byte i=0; i<ExperienceAndClasses.NUMBER_ABILITY_SLOTS_PER_CLASS; i++) {
+                if (ExperienceAndClasses.HOTKEY_ABILITY_PRIMARY[i].JustPressed) {
+                    if (alternative_key && (Abilities_Primary_Alt[i] != null)) {
+                        Abilities_Primary_Alt[i].Activate();
+                    }
+                    else {
+                        Abilities_Primary[i].Activate();
+                    }
+                }
+                if (ExperienceAndClasses.HOTKEY_ABILITY_SECONDARY[i].JustPressed) {
+                    if (alternative_key && (Abilities_Secondary_Alt[i] != null)) {
+                        Abilities_Secondary_Alt[i].Activate();
+                    }
+                    else {
+                        Abilities_Secondary[i].Activate();
+                    }
+                }
+            }
+
         }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Combat ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/

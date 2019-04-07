@@ -18,7 +18,7 @@ namespace ExperienceAndClasses.UI {
         public static readonly Color COLOUR_CLASS_PRIMARY = new Color(128, 255, 0, 200);
         public static readonly Color COLOUR_CLASS_SECONDARY = new Color(250, 220, 0, 200);
 
-        public static readonly Color COLOUR_MESSAGE_ABILITY_FAIL = new Color(163, 73, 164);
+        public static readonly Color COLOUR_MESSAGE_ABILITY_FAIL = new Color(255, 73, 255);
         public static readonly Color COLOUR_MESSAGE_ERROR = new Color(255, 25, 25);
         public static readonly Color COLOUR_MESSAGE_SUCCESS = new Color(25, 255, 25);
         public static readonly Color COLOUR_MESSAGE_TRACE = new Color(255, 0, 255);

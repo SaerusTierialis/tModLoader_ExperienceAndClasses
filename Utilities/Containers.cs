@@ -344,7 +344,7 @@ namespace ExperienceAndClasses.Utilities.Containers {
                 //both players
                 Player us = MPlayer.player;
                 Player them = other.MPlayer.player;
-                if (us.hostile && them.hostile && ((us.team == 0) || (us.team != them.team)) && (whoAmI != them.whoAmI) {
+                if (us.hostile && them.hostile && ((us.team == 0) || (us.team != them.team)) && (whoAmI != them.whoAmI)) {
                     //pvp hostile
                     //both have pvp enabled, not on same team (or is on no team), not the sample player
                     return false;
@@ -384,7 +384,7 @@ namespace ExperienceAndClasses.Utilities.Containers {
         }
 
         public bool HasSightOf(Vector2 position) {
-            return Collision.CanHitLine(Position, 0, 0, position, 0, 0);
+            return Collision.CanHit(Position, 0, 0, position, 0, 0);
         }
     }
 
