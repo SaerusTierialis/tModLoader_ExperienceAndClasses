@@ -459,10 +459,10 @@ namespace ExperienceAndClasses.Systems {
                 int time_remaining_sec = time_remain.Seconds;
 
                 if (time_remaining_min > 0) {
-                    return time_remaining_min + " min";
+                    return time_remaining_min + " m";
                 }
                 else {
-                    return time_remaining_sec + " sec";
+                    return time_remaining_sec + " s";
                 }
             }
             else {
