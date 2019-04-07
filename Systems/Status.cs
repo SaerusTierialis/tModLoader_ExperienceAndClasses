@@ -317,6 +317,11 @@ namespace ExperienceAndClasses.Systems {
         private bool applied = false;
 
         /// <summary>
+        /// effect was applied last cycle
+        /// </summary>
+        private bool applied_last_cycle = false;
+
+        /// <summary>
         /// had a ui icon the last time it was applied (can be left true when applied is false so check "applied && in_ui")
         /// note that a status cannot have a ui icon without being applied
         /// </summary>
@@ -439,6 +444,7 @@ namespace ExperienceAndClasses.Systems {
                 OnUpdate();
 
                 //default to not applied during this cycle
+                applied_last_cycle = applied;
                 applied = false;
 
                 //apply channel
@@ -667,6 +673,11 @@ namespace ExperienceAndClasses.Systems {
             //effect was applied (or tested if timed effect) on latest cycle
             applied = true;
 
+            //if wasn't applied last time and has UI icon then update UI
+            if (!applied_last_cycle) {
+                UI.UIStatus.needs_redraw_complete = true;
+            }
+
             //do effect
             if (Specific_Effect_Type == EFFECT_TYPES.CONSTANT) {
                 Effect();
@@ -880,9 +891,18 @@ namespace ExperienceAndClasses.Systems {
                 Specific_UI_Type = UI_TYPES.ONE;
                 specific_owner_player_required_ability = Systems.Ability.IDs.Block;
                 specific_remove_if_key_not_pressed = Systems.Ability.LOOKUP[(ushort)specific_owner_player_required_ability].hotkey;
+                Specific_Target_Channelling = true;
 
                 //add any sync data types that will be used (for syncing)
                 //Specific_Autosync_Data_Types.Add(AUTOSYNC_DATA_TYPES.MAGNITUDE1);
+            }
+
+            protected override void OnStart() {
+                Main.NewText("START");
+            }
+
+            protected override void OnEnd() {
+                Main.NewText("END");
             }
 
             //must inlcude a static add method with target/owner and any extra info

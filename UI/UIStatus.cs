@@ -61,7 +61,8 @@ namespace ExperienceAndClasses.UI {
 
             //number of buffs changed?
             int number_buffs = Main.LocalPlayer.CountBuffs();
-            bool number_buff_changed = (number_buffs_prior == number_buffs);
+            bool number_buff_changed = (number_buffs_prior != number_buffs);
+            number_buffs_prior = number_buffs;
 
             //TODO - needs_redraw_times_only at set intervals
 
@@ -126,32 +127,9 @@ namespace ExperienceAndClasses.UI {
                 }
             }
 
-            /*
-            //TODO - redraw (complete and times only)
-
-            int number_buffs = 0;
-            foreach (int i in Main.LocalPlayer.buffType) {
-                if (i > 0)
-                    number_buffs++;
-            }
-
-            //TODO count status
-            int number_statuses = 0;
-
-            for (byte i = 0; i < icons.Length; i++) {
-                if (i < number_buffs) {
-                    icons[i].active = false;
-                }
-                else if (i < (number_buffs+ number_statuses)) {
-                    //TODO set status
-                    icons[i].active = true;
-                    icons[i].Update();
-                }
-                else {
-                    icons[i].active = false;
-                }
-            }
-            */
+            //don't need to update anymore
+            needs_redraw_complete = false;
+            needs_redraw_times_only = false;
 
         }
 
