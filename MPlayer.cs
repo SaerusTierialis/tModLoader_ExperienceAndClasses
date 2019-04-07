@@ -53,6 +53,11 @@ namespace ExperienceAndClasses {
         public int[] Attributes_Final { get; private set; }
 
         /// <summary>
+        /// bonus points from allocation miletones
+        /// </summary>
+        public int[] Attributes_Allocated_Milestone { get; private set; }
+
+        /// <summary>
         /// Available allocation points
         /// </summary>
         public int Allocation_Points_Unallocated { get; private set; }
@@ -146,7 +151,7 @@ namespace ExperienceAndClasses {
         public int Progression { get; private set; }
 
         /// <summary>
-        /// Class + Allocated
+        /// Class + Allocated + Allocated_Milestone
         /// </summary>
         public int[] Attributes_Sync { get; private set; }
 
@@ -198,6 +203,7 @@ namespace ExperienceAndClasses {
             //initialize attributes
             Attributes_Class = new int[(byte)Systems.Attribute.IDs.NUMBER_OF_IDs];
             Attributes_Allocated = new int[(byte)Systems.Attribute.IDs.NUMBER_OF_IDs];
+            Attributes_Allocated_Milestone = new int[(byte)Systems.Attribute.IDs.NUMBER_OF_IDs];
             Attributes_Sync = new int[(byte)Systems.Attribute.IDs.NUMBER_OF_IDs];
             Attributes_Status = new int[(byte)Systems.Attribute.IDs.NUMBER_OF_IDs];
             Attributes_Final = new int[(byte)Systems.Attribute.IDs.NUMBER_OF_IDs];
@@ -396,6 +402,13 @@ namespace ExperienceAndClasses {
             ExperienceAndClasses.LOCAL_MPLAYER.Allocation_Points_Total = Systems.Attribute.LocalAllocationPointTotal();
             ExperienceAndClasses.LOCAL_MPLAYER.Allocation_Points_Spent = Systems.Attribute.LocalAllocationPointSpent();
             ExperienceAndClasses.LOCAL_MPLAYER.Allocation_Points_Unallocated = ExperienceAndClasses.LOCAL_MPLAYER.Allocation_Points_Total - ExperienceAndClasses.LOCAL_MPLAYER.Allocation_Points_Spent;
+
+            //add allocation milestone
+            int milestones;
+            for (byte id = 0; id < (byte)Systems.Attribute.IDs.NUMBER_OF_IDs; id++) {
+                milestones = (int)Math.Floor(ExperienceAndClasses.LOCAL_MPLAYER.Attributes_Allocated[id] / 10.0);
+                ExperienceAndClasses.LOCAL_MPLAYER.Attributes_Allocated_Milestone[id] = (int)((milestones + 1.0) * milestones / 2.0);
+            }
 
             //sum attributes
             LocalAttributesCalculateSync();
@@ -654,6 +667,8 @@ namespace ExperienceAndClasses {
         private void CalculateAttributesFinal() {
             for (byte i = 0; i < (byte)Systems.Attribute.IDs.NUMBER_OF_IDs; i++) {
                 Attributes_Final[i] = Attributes_Sync[i] + Attributes_Status[i];
+
+
             }
         }
 
@@ -693,11 +708,11 @@ namespace ExperienceAndClasses {
         }
 
         /// <summary>
-        /// Calculates class + allocation
+        /// Calculates class + allocation + allocation milestone
         /// </summary>
         public static void LocalAttributesCalculateSync() {
             for (byte id = 0; id < (byte)Systems.Attribute.IDs.NUMBER_OF_IDs; id++) {
-                ExperienceAndClasses.LOCAL_MPLAYER.Attributes_Sync[id] = ExperienceAndClasses.LOCAL_MPLAYER.Attributes_Class[id] + ExperienceAndClasses.LOCAL_MPLAYER.Attributes_Allocated[id];
+                ExperienceAndClasses.LOCAL_MPLAYER.Attributes_Sync[id] = ExperienceAndClasses.LOCAL_MPLAYER.Attributes_Class[id] + ExperienceAndClasses.LOCAL_MPLAYER.Attributes_Allocated[id] + ExperienceAndClasses.LOCAL_MPLAYER.Attributes_Allocated_Milestone[id];
             }
         }
 

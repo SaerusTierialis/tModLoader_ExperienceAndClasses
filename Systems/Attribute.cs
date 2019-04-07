@@ -219,7 +219,7 @@ namespace ExperienceAndClasses.Systems {
         public void ApplyEffect(MPlayer mplayer, int points) {
             if (Active) {
 
-                if (mplayer.Is_Local_Player) Bonus = "";
+                if (mplayer.Is_Local_Player) Bonus = "\nAllocation Milestone Bonus: " + ExperienceAndClasses.LOCAL_MPLAYER.Attributes_Allocated_Milestone[ID];
                 float bf, bpp;
                 int bi;
 

@@ -464,7 +464,7 @@ namespace ExperienceAndClasses.UI {
 
             str = ExperienceAndClasses.LOCAL_MPLAYER.Attributes_Allocated[attribute.ID] + "+" +
                     ExperienceAndClasses.LOCAL_MPLAYER.Attributes_Class[attribute.ID] + "+" +
-                    ExperienceAndClasses.LOCAL_MPLAYER.Attributes_Status[attribute.ID];
+                    (ExperienceAndClasses.LOCAL_MPLAYER.Attributes_Status[attribute.ID] + ExperienceAndClasses.LOCAL_MPLAYER.Attributes_Allocated_Milestone[attribute.ID]);
 
             if ((Main.fontMouseText.MeasureString(str).X * SCALE_SUM) >= width_cutoff) {
                 sum_small.SetText(str);
