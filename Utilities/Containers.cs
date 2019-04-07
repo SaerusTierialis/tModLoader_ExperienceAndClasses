@@ -42,13 +42,45 @@ namespace ExperienceAndClasses.Utilities.Containers {
 
             //insert before first status that is equal/later
             for (int i=0; i<Count; i++) {
-                if (status.Time_End.CompareTo(this.ElementAt<Systems.Status>(i).Time_End) <= 0) {
+                if (status.Time_End.CompareTo(this[i].Time_End) <= 0) {
                     Insert(i, status);
                     return;
                 }
             }
             //default to insert at end
             base.Add(status);
+        }
+    }
+
+    public class LevelSortedPassives : List<Systems.Passive.IDs> {
+        public LevelSortedPassives() { }
+        public LevelSortedPassives(int capacity) : base(capacity) { }
+
+        /// <summary>
+        /// Adds status sorting by end time
+        /// </summary>
+        /// <param name="status"></param>
+        public new void Add(Systems.Passive.IDs passive_id) {
+            //is full?
+            if (Count == Capacity) {
+                Commons.Error("A passive cannot be displayed because there are not enough slots!");
+                return;
+            }
+
+            //insert before first status that is equal/later
+            Systems.Passive passive = Systems.Passive.LOOKUP[(ushort)passive_id];
+            Systems.Passive p;
+
+            for (int i = 0; i < Count; i++) {
+                p = Systems.Passive.LOOKUP[(ushort)this[i]];
+                if ((Systems.Class.LOOKUP[(byte)p.Specific_Required_Class_ID].Tier > Systems.Class.LOOKUP[(byte)passive.Specific_Required_Class_ID].Tier) ||
+                    (p.Specific_Required_Class_Level >= passive.Specific_Required_Class_Level)){
+                    Insert(i, passive_id);
+                    return;
+                }
+            }
+            //default to insert at end
+            base.Add(passive_id);
         }
     }
 

@@ -297,6 +297,11 @@ namespace ExperienceAndClasses.Systems {
         /// </summary>
         public bool Specific_Target_Channelling { get; protected set; } = false;
 
+        /// <summary>
+        /// AutoPassive is a speecial type of status that implements a passive with automatic multiplayer sync | default is false
+        /// </summary>
+        public bool Specific_Is_AutoPassive { get; protected set; } = false;
+
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Instance Vars Generic ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         //ID
@@ -718,6 +723,24 @@ namespace ExperienceAndClasses.Systems {
             }
         }
 
+        /// <summary>
+        /// Adds AutoPassive to local MPlayer
+        /// </summary>
+        public void AddAutoPassive(Utilities.Containers.Thing self) {
+            if (Utilities.Netmode.IS_SERVER) {
+                Utilities.Commons.Error("Called AddAutoPassive on server for [" + ID + "]");
+            }
+            else if (!Specific_Is_AutoPassive) {
+                Utilities.Commons.Error("Called AddAutoPassive for non-AutoPassive [" + ID + "]");
+            }
+            else if (!self.Local) {
+                Utilities.Commons.Error("Called AddAutoPassive for non-local self for [" + ID + "]");
+            }
+            else {
+                Add(ID, self, self);
+            }
+        }
+
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Shortcuts to Sync Data ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         public float GetData(AUTOSYNC_DATA_TYPES key, float default_value = 0f) {
@@ -949,6 +972,28 @@ namespace ExperienceAndClasses.Systems {
                     Specific_UI_Type = UI_TYPES.NONE;
                 }
                 specific_duration_sec = duration_seconds;
+            }
+        }
+
+        /// <summary>
+        /// Passives that do more than just modify an ability are implemented as an AutoPassive status
+        /// </summary>
+        public abstract class AutoPassive : Status {
+            public AutoPassive(IDs id, Systems.Passive.IDs id_passive, bool sync, EFFECT_TYPES effect = EFFECT_TYPES.CONSTANT) : base(id) {
+                Specific_Is_AutoPassive = true;
+
+                Specific_Syncs = sync;
+                specific_owner_player_required_passive = id_passive;
+                Specific_Duration_Type = DURATION_TYPES.TOGGLE;
+                Specific_Effect_Type = effect;
+                Specific_UI_Type = UI_TYPES.NONE;
+                Specific_Limit_Type = LIMIT_TYPES.ONE;
+                specific_remove_on_owner_death = false;
+                specific_remove_on_target_death = false;
+                specific_owner_can_be_npc = false;
+                specific_target_can_be_npc = false;
+                specific_owner_can_be_player = true;
+                specific_target_can_be_player = true;
             }
         }
 

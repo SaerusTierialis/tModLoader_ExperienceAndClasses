@@ -47,6 +47,11 @@ namespace ExperienceAndClasses.Systems {
         public Systems.Class.IDs Specific_Required_Class_ID { get; protected set; } = Systems.Class.IDs.None;
         public byte Specific_Required_Class_Level { get; protected set; } = 0;
 
+        /// <summary>
+        /// Status to automatically add when the passive is unlocked. The status must be an AutoPassive. | default is NONE
+        /// </summary>
+        protected Systems.Status.IDs specific_status = Systems.Status.IDs.NONE;
+
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Instance Vars Generic ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         public IDs ID { get; private set; } = IDs.NONE;
@@ -115,7 +120,22 @@ namespace ExperienceAndClasses.Systems {
                     }
                 }
 
+                if (unlocked) {
+                    AddStatus();
+                }
+
                 return unlocked;
+            }
+        }
+
+        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Private Methods ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+        private void AddStatus() {
+            if (specific_status != Systems.Status.IDs.NONE) {
+                Utilities.Containers.Thing self = ExperienceAndClasses.LOCAL_MPLAYER.thing;
+                if (!self.HasStatus(specific_status)) {
+                    Systems.Status.LOOKUP[(ushort)specific_status].AddAutoPassive(self);
+                }
             }
         }
 

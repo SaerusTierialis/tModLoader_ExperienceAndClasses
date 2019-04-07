@@ -87,7 +87,7 @@ namespace ExperienceAndClasses {
         /// </summary>
         public List<Projectile> slot_minions { get; private set; }
 
-        public List<Systems.Passive.IDs> Passives { get; private set; }
+        public Utilities.Containers.LevelSortedPassives Passives { get; private set; }
 
         public Systems.Ability[] Abilities_Primary { get; private set; }
         public Systems.Ability[] Abilities_Primary_Alt { get; private set; }
@@ -219,7 +219,7 @@ namespace ExperienceAndClasses {
 
             //ability
             show_ability_fail_messages = true;
-            Passives = new List<Systems.Passive.IDs>();
+            Passives = new Utilities.Containers.LevelSortedPassives();
             Resources = new List<Systems.Resource.IDs>();
             Abilities_Primary = new Systems.Ability[ExperienceAndClasses.NUMBER_ABILITY_SLOTS_PER_CLASS];
             Abilities_Primary_Alt = new Systems.Ability[ExperienceAndClasses.NUMBER_ABILITY_SLOTS_PER_CLASS];
