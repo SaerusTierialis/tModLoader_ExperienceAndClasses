@@ -302,6 +302,11 @@ namespace ExperienceAndClasses.Systems {
         /// </summary>
         public bool Specific_Is_AutoPassive { get; protected set; } = false;
 
+        /// <summary>
+        /// Allows target to end status with right click if status is in UI | default is false
+        /// </summary>
+        public bool Specific_Right_Click_End { get; protected set; } = false;
+
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Instance Vars Generic ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         //ID

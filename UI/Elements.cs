@@ -267,6 +267,12 @@ namespace ExperienceAndClasses.UI {
                 UIInfo.Instance.EndText(this);
             }
         }
+        public override void RightClick(UIMouseEvent evt) {
+            base.RightClick(evt);
+            if (active && status.Specific_Right_Click_End) {
+                status.RemoveEverywhere();
+            }
+        }
     }
 
     class XPBar : UIElement {
