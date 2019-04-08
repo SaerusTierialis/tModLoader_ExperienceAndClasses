@@ -99,7 +99,7 @@ namespace ExperienceAndClasses.Systems {
         /// <summary>
         /// adds description of channelling to the UI text | default is false
         /// </summary>
-        protected bool specific_is_channelling = false;
+        protected bool specific_show_channelling_in_tooltip = false;
         /// <summary>
         /// default is false
         /// </summary>
@@ -199,6 +199,8 @@ namespace ExperienceAndClasses.Systems {
         /// </summary>
         protected Systems.Status.IDs specific_targets_antirequisite_status = Systems.Status.IDs.NONE;
 
+        protected bool specific_show_level_in_tooltip = false;
+
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Instance Vars Generic (between activations) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         public IDs ID { get; private set; } = IDs.NONE;
@@ -212,6 +214,8 @@ namespace ExperienceAndClasses.Systems {
         public bool Unlocked { get; private set; } = false;
 
         public Texture2D Texture { get; private set; } = null;
+
+        public string Tooltip { get; private set; } = "default";
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Instance Vars Generic (within activation) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -313,6 +317,21 @@ namespace ExperienceAndClasses.Systems {
             }
             else {
                 Unlocked = false;
+            }
+        }
+
+        public void UpdateTooltip() {
+            Tooltip = "Required Class: " + Systems.Class.LOOKUP[(byte)Specific_Required_Class_ID].Name + "\n" +
+                        "Required Level: " + Specific_Required_Class_Level + "\n\n";
+
+            if (specific_show_level_in_tooltip) {
+                Tooltip += "Ability Level: " + level + "\n\n";
+            }
+
+            Tooltip += specific_description;
+
+            if (specific_show_channelling_in_tooltip) {
+                Tooltip += "\n\nChannelling abilities require that you hold down the key for a duration. Many of these abilities have a mana or resource cost while channelling. Death, damage, immobilization, and silence all interrupt channeling.";
             }
         }
 
@@ -911,9 +930,11 @@ namespace ExperienceAndClasses.Systems {
 
             public Warrior_Block() : base(IDs.Warrior_Block) {
                 Specific_Name = "Block";
+                specific_description = "Increases defense while channeling. Bonus defense equals half of " + Systems.Attribute.LOOKUP[(byte)Systems.Attribute.IDs.Vitality].Name + " to a maximum of the ability level.";
                 Specific_Required_Class_ID = Systems.Class.IDs.Warrior;
                 Specific_Required_Class_Level = 1;
-                specific_is_channelling = true;
+                specific_show_level_in_tooltip = true;
+                specific_show_channelling_in_tooltip = true;
                 specific_mana_cost_flat = 10;
                 specific_cooldown_seconds = 5;
             }
@@ -923,7 +944,8 @@ namespace ExperienceAndClasses.Systems {
             }
 
             protected override void DoEffectTargetFriendly(Thing target) {
-                float defense_bonus = ExperienceAndClasses.LOCAL_MPLAYER.Attributes_Final[(byte)Systems.Attribute.IDs.Vitality] / 2f;
+                float defense_bonus = Math.Min(level, ExperienceAndClasses.LOCAL_MPLAYER.Attributes_Final[(byte)Systems.Attribute.IDs.Vitality] / 2f);
+
                 Systems.Status.Warrior_Block.CreateNew(target, defense_bonus);
                 if (apply_perfect_block) {
                     Systems.Status.Warrior_BlockPerfect.CreateNew(target, defense_bonus);

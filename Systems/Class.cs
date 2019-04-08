@@ -433,6 +433,7 @@ namespace ExperienceAndClasses.Systems {
                     abilities[i] = Systems.Ability.LOOKUP[(ushort)id];
                     abilities[i].UpdatePassives();
                     abilities[i].UpdateUnlock();
+                    abilities[i].UpdateTooltip();
                     if (primary) {
                         abilities[i].hotkey = ExperienceAndClasses.HOTKEY_ABILITY_PRIMARY[i];
                     }
