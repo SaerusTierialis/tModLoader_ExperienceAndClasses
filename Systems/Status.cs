@@ -2,10 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -82,6 +78,25 @@ namespace ExperienceAndClasses.Systems {
             NONE,
             ONE, //even if more than one is taking effect, only one of these is shown (first applied by instance id)
             ALL_APPLY, //all that are being applied
+        }
+
+        private enum CHECK_REMOVE : byte {
+            DONT_REMOVE,
+            REMOVE_INSTANT,
+            REMOVE_DURATION,
+            REMOVE_OWNER_LEFT,
+            REMOVE_OWNER_DIED,
+            REMOVE_TARGET_DIED,
+            REMOVE_OWNER_IMMOBILIZED,
+            REMOVE_OWNER_SILENCED,
+            REMOVE_TARGET_REQUIRED_STATUS,
+            REMOVE_TARGET_ANTIREQ_STATUS,
+            REMOVE_OWNER_REQUIRED_STATUS,
+            REMOVE_OWNER_REQUIRED_ABILILITY,
+            REMOVE_OWNER_REQUIRED_PASSIVE,
+            REMOVE_LOCAL_SPECIFIC,
+            REMOVE_SPECIFIC,
+            REMOVE_KEY_NOT_PRESSED,
         }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Constants ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
@@ -458,9 +473,11 @@ namespace ExperienceAndClasses.Systems {
         /// <returns></returns>
         public bool Update() {
             //remove?
-            bool remove = CheckRemoval();
-            if (remove) {
+            CHECK_REMOVE remove = CheckRemoval();
+            if (remove != CHECK_REMOVE.DONT_REMOVE) {
+                //Main.NewText("Remove [" + ID + "] because " + remove);
                 RemoveEverywhere();
+                return true;
             }
             else {
                 //override method
@@ -474,10 +491,10 @@ namespace ExperienceAndClasses.Systems {
                 if (Specific_Target_Channelling && Target.Is_Player) {
                     Target.MPlayer.channelling = true;
                 }
-            }
 
-            //return removal
-            return remove;
+                //not removed
+                return false;
+            }
         }
 
         public String GetIconDurationString() {
@@ -504,48 +521,48 @@ namespace ExperienceAndClasses.Systems {
         /// </summary>
         /// <param name="now"></param>
         /// <returns></returns>
-        private bool CheckRemoval() {
+        private CHECK_REMOVE CheckRemoval() {
             //remove if duration type is instant (shouldn't happen)
             if (Specific_Duration_Type == DURATION_TYPES.INSTANT) {
-                return true;
+                return CHECK_REMOVE.REMOVE_INSTANT;
             }
             
             //remove if this client/server is responsible for the duration (else update time remaining if target is a player)
             if (local_enforce_duration && (ExperienceAndClasses.Now.CompareTo(Time_End) >= 0)) { //timeup
-                return true;
+                return CHECK_REMOVE.REMOVE_DURATION;
             }
 
             //requirements: everyone...
             //remove if owner player leaves
             if ((specific_remove_if_owner_player_leaves || (Specific_Duration_Type == DURATION_TYPES.TOGGLE)) && Owner.Is_Player && !Owner.Active) {
-                return true;
+                return CHECK_REMOVE.REMOVE_OWNER_LEFT;
             }
 
             //remove if owner died
             if (specific_remove_on_owner_death || Specific_Target_Channelling) {
                 if (Owner.Dead) {
-                    return true;
+                    return CHECK_REMOVE.REMOVE_OWNER_DIED;
                 }
             }
 
             //remove if target died
             if (specific_remove_on_target_death) {
                 if (Target.Dead) {
-                    return true;
+                    return CHECK_REMOVE.REMOVE_TARGET_DIED;
                 }
             }
 
             //owner immobilized
             if (specific_remove_on_owner_immobilized || Specific_Target_Channelling) {
                 if (Owner.HasBuff(BuffID.Stoned) || Owner.HasBuff(BuffID.Frozen)) {
-                    return true;
+                    return CHECK_REMOVE.REMOVE_OWNER_IMMOBILIZED;
                 }
             }
 
             //owner silenced
             if (specific_remove_on_owner_silenced || Specific_Target_Channelling) {
                 if (Owner.HasBuff(BuffID.Silenced)) {
-                    return true;
+                    return CHECK_REMOVE.REMOVE_OWNER_SILENCED;
                 }
             }
 
@@ -554,50 +571,50 @@ namespace ExperienceAndClasses.Systems {
                 //remove if target lacks required status
                 if (specific_target_required_status != IDs.NONE) {
                     if (!Target.HasStatus(specific_target_required_status)) {
-                        return true;
+                        return CHECK_REMOVE.REMOVE_TARGET_REQUIRED_STATUS;
                     }
                 }
 
                 //remove if target has antirequisite status
                 if (specific_target_antirequisite_status != IDs.NONE) {
                     if (Target.HasStatus(specific_target_antirequisite_status)) {
-                        return true;
+                        return CHECK_REMOVE.REMOVE_TARGET_ANTIREQ_STATUS;
                     }
                 }
 
                 //required status
                 if ((specific_owner_player_required_status != IDs.NONE) && !Owner.HasStatus(specific_owner_player_required_status)) {
-                    return true;
+                    return CHECK_REMOVE.REMOVE_OWNER_REQUIRED_STATUS;
                 }
 
                 //required passive
                 if ((specific_owner_player_required_passive != Systems.Passive.IDs.NONE) && !Owner.MPlayer.Passives.ContainsUnlocked(specific_owner_player_required_passive)) {
-                    return true;
+                    return CHECK_REMOVE.REMOVE_OWNER_REQUIRED_PASSIVE;
                 }
 
                 //required ability
                 if ((specific_owner_player_required_ability != Systems.Ability.IDs.NONE) && !Owner.MPlayer.HasAbility(specific_owner_player_required_ability)) {
-                    return true;
+                    return CHECK_REMOVE.REMOVE_OWNER_REQUIRED_ABILILITY;
                 }
 
                 //status-specific check
                 if (ShouldRemoveLocal()) {
-                    return true;
+                    return CHECK_REMOVE.REMOVE_LOCAL_SPECIFIC;
                 }
 
                 //key press
                 if (specific_remove_if_key_not_pressed != null && !specific_remove_if_key_not_pressed.Current) {
-                    return true;
+                    return CHECK_REMOVE.REMOVE_KEY_NOT_PRESSED;
                 }
             }
 
             //status-specific check
             if (ShouldRemove()) {
-                return true;
+                return CHECK_REMOVE.REMOVE_SPECIFIC;
             }
 
             //default to not remove
-            return false;
+            return CHECK_REMOVE.DONT_REMOVE;
         }
 
         /// <summary>
@@ -807,6 +824,9 @@ namespace ExperienceAndClasses.Systems {
             //calcualte end time
             switch (status.Specific_Duration_Type) {
                 case (DURATION_TYPES.TIMED):
+                    if (seconds_remaining == 0f) {
+                        seconds_remaining = status.specific_duration_sec;
+                    }
                     status.Time_End = ExperienceAndClasses.Now.AddSeconds(seconds_remaining);
                     break;
 
@@ -1025,11 +1045,11 @@ namespace ExperienceAndClasses.Systems {
         }
 
         public class Warrior_BlockPerfect : TimedConstantSync {
-            public const float duration_seconds = 0.5f;
+            public const float duration_seconds = 5f;
 
             public Warrior_BlockPerfect() : base(IDs.Warrior_BlockPerfect, duration_seconds) {
                 specific_owner_player_required_ability = Systems.Ability.IDs.Warrior_Block;
-                //TODO add passive
+                specific_owner_player_required_passive = Systems.Passive.IDs.Warrior_BlockPerfect;
                 specific_remove_on_owner_death = true;
                 specific_remove_on_owner_immobilized = true;
                 specific_remove_on_owner_silenced = true;
