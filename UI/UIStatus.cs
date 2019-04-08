@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Terraria;
 
 namespace ExperienceAndClasses.UI {
@@ -22,10 +23,13 @@ namespace ExperienceAndClasses.UI {
         private const byte ROWS = 5; //max number of statuses displayed is ((ROWS*COLUMNS) - #buffs)
         private const byte SLOTS = ROWS * COLUMNS;
 
+        private const float SECONDS_BETWEEN_UPDATE = 0.25f;
+
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Variables ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         private static StatusIcon[] icons;
         public static bool needs_redraw_complete;
         public static bool needs_redraw_times_only;
+        private static DateTime time_next_update;
 
         /// <summary>
         /// sorted by float duration remaining
@@ -38,6 +42,7 @@ namespace ExperienceAndClasses.UI {
         protected override void InitializeState() {
             needs_redraw_complete = true;
             needs_redraw_times_only = false;
+            time_next_update = DateTime.MinValue;
 
             icons = new StatusIcon[SLOTS];
             for (byte i = 0; i < icons.Length; i++) icons[i] = new StatusIcon();
@@ -64,7 +69,13 @@ namespace ExperienceAndClasses.UI {
             bool number_buff_changed = (number_buffs_prior != number_buffs);
             number_buffs_prior = number_buffs;
 
-            //TODO - needs_redraw_times_only at set intervals
+            //needs_redraw_times_only at set intervals
+            if (status_to_draw.Count > 0) {
+                if (ExperienceAndClasses.Now.CompareTo(time_next_update) > 0) {
+                    needs_redraw_times_only = true;
+                    time_next_update = ExperienceAndClasses.Now.AddSeconds(SECONDS_BETWEEN_UPDATE);
+                }
+            }
 
             //need to remake list of status to show?
             if (needs_redraw_complete) {
