@@ -447,6 +447,21 @@ namespace ExperienceAndClasses.Utilities.Containers {
                 return false;
             }
         }
+
+        public string Name {
+            get {
+                if (Is_Player) {
+                    return mplayer.player.name;
+                }
+                else if (Is_Npc) {
+                    return mnpc.npc.GetFullNetName().ToString();
+                }
+                else {
+                    Utilities.Commons.Error("Unknown thing type");
+                    return "Unknown";
+                }
+            }
+        }
     }
 
     /// <summary>
