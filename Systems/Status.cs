@@ -509,7 +509,7 @@ namespace ExperienceAndClasses.Systems {
             if (Specific_Duration_Type == DURATION_TYPES.INSTANT) {
                 return true;
             }
-
+            
             //remove if this client/server is responsible for the duration (else update time remaining if target is a player)
             if (local_enforce_duration && (ExperienceAndClasses.Now.CompareTo(Time_End) >= 0)) { //timeup
                 return true;
@@ -522,7 +522,7 @@ namespace ExperienceAndClasses.Systems {
             }
 
             //remove if owner died
-            if (specific_remove_on_owner_death) {
+            if (specific_remove_on_owner_death || Specific_Target_Channelling) {
                 if (Owner.Dead) {
                     return true;
                 }
@@ -536,14 +536,14 @@ namespace ExperienceAndClasses.Systems {
             }
 
             //owner immobilized
-            if (specific_remove_on_owner_immobilized) {
+            if (specific_remove_on_owner_immobilized || Specific_Target_Channelling) {
                 if (Owner.HasBuff(BuffID.Stoned) || Owner.HasBuff(BuffID.Frozen)) {
                     return true;
                 }
             }
 
             //owner silenced
-            if (specific_remove_on_owner_immobilized) {
+            if (specific_remove_on_owner_silenced || Specific_Target_Channelling) {
                 if (Owner.HasBuff(BuffID.Silenced)) {
                     return true;
                 }
@@ -951,9 +951,6 @@ namespace ExperienceAndClasses.Systems {
                 specific_timed_effect_sec = 0.1f;
                 specific_owner_player_required_ability = ability_id;
                 specific_remove_if_key_not_pressed = Systems.Ability.LOOKUP[(ushort)specific_owner_player_required_ability].hotkey;
-                specific_remove_on_owner_death = true;
-                specific_remove_on_owner_immobilized = true;
-                specific_remove_on_owner_silenced = true;
             }
 
             protected override void EffectTimed() {
