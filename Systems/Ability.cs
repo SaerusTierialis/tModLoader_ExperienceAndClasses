@@ -319,6 +319,7 @@ namespace ExperienceAndClasses.Systems {
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Generic Calculations ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         // These calculate and return a value + set the variable for use elsewhere
         // Called by public lookups and during PreActivate() - i.e., automatically called during activation
+        // The one exception is CalculateLevel, which is called during UpdateUnlock instead of on each activation
 
         private ushort CalculateManaCost() {
             //has a mana cost (even if somehow reduced to free)
@@ -681,7 +682,7 @@ namespace ExperienceAndClasses.Systems {
 
         private USE_RESULT PreActivate() {
             //level (calculates for use later in activation)
-            if (CalculateLevel() < 1) {
+            if (level < 1) {
                 return USE_RESULT.FAIL_CLASS_LEVEL;
             }
 
