@@ -1,9 +1,5 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Terraria.ModLoader;
 
 namespace ExperienceAndClasses.Systems {
@@ -18,6 +14,13 @@ namespace ExperienceAndClasses.Systems {
 
             NUMBER_OF_IDs, //leave this second to last
             NONE, //leave this last
+        }
+
+        public enum PASSIVE_TYPE : byte {
+            UNLOCK_RESOURCE,
+            ABILITY_UPGRADE,
+            BONUS,
+            OTHER,
         }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Auto-Populated Lookup ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
@@ -38,6 +41,8 @@ namespace ExperienceAndClasses.Systems {
 
         public string Specific_Name { get; protected set; } = "default_name";
         protected string specific_description = "default_description";
+
+        public PASSIVE_TYPE Specific_Type { get; protected set; } = PASSIVE_TYPE.ABILITY_UPGRADE;
 
         protected string specific_texture_path = null;
 
@@ -63,6 +68,8 @@ namespace ExperienceAndClasses.Systems {
         public ushort ID_num { get; private set; } = (ushort)IDs.NONE;
         public Texture2D Texture { get; private set; } = null;
         public bool Unlocked { get; private set; } = false;
+        protected string ability_name = "";
+        public string Tooltip { get; private set; } = "";
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Core Constructor ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -140,6 +147,10 @@ namespace ExperienceAndClasses.Systems {
             AddStatus();
         }
 
+        public void UpdateTooltip() {
+            //todo Tooltip
+        }
+
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Private Methods ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         private void EnableResource() {
@@ -157,12 +168,38 @@ namespace ExperienceAndClasses.Systems {
             }
         }
 
+        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Templates ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+        public class AbilityUgrade : Passive {
+            public AbilityUgrade(IDs id, Systems.Ability.IDs ability_id) : base(id) {
+                Specific_Type = PASSIVE_TYPE.ABILITY_UPGRADE;
+                ability_name = Systems.Ability.LOOKUP[(ushort)ability_id].Specific_Name;
+            }
+        }
+
+        /// <summary>
+        /// default name to match resource
+        /// </summary>
+        public class ResourceUnlock : Passive {
+            public ResourceUnlock(IDs id, Systems.Resource.IDs resource_id) : base(id) {
+                Specific_Name = Systems.Resource.LOOKUP[(byte)resource_id].Name;
+                Specific_Type = PASSIVE_TYPE.UNLOCK_RESOURCE;
+                specific_resource = resource_id;
+            }
+        }
+
+        public class Bonus : Passive {
+            public Bonus(IDs id) : base(id) {
+                Specific_Type = PASSIVE_TYPE.BONUS;
+            }
+        }
+
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Warrior ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-        public class Warrior_BlockPerfect : Passive {
-            public const float DURATION_SECONDS = 5f;
+        public class Warrior_BlockPerfect : AbilityUgrade {
+            public const float DURATION_SECONDS = 0.5f;
 
-            public Warrior_BlockPerfect() : base(IDs.Warrior_BlockPerfect) {
+            public Warrior_BlockPerfect() : base(IDs.Warrior_BlockPerfect, Systems.Ability.IDs.Warrior_Block) {
                 Specific_Name = "Perfect Block";
                 specific_description = "TODO";
                 Specific_Required_Class_ID = Systems.Class.IDs.Warrior;
@@ -172,13 +209,11 @@ namespace ExperienceAndClasses.Systems {
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Blood Knight ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-        public class BloodKnight_Resoruce_Bloodforce : Passive {
-            public BloodKnight_Resoruce_Bloodforce() : base(IDs.BloodKnight_Resoruce_Bloodforce) {
-                Specific_Name = "Bloodforce";
+        public class BloodKnight_Resoruce_Bloodforce : ResourceUnlock {
+            public BloodKnight_Resoruce_Bloodforce() : base(IDs.BloodKnight_Resoruce_Bloodforce, Systems.Resource.IDs.Bloodforce) {
                 specific_description = "TODO";
                 Specific_Required_Class_ID = Systems.Class.IDs.BloodKnight;
                 Specific_Required_Class_Level = 1;
-                specific_resource = Systems.Resource.IDs.Bloodforce;
             }
         }
 

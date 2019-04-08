@@ -427,6 +427,7 @@ namespace ExperienceAndClasses {
                     if (p.Unlocked) {
                         p.Apply();
                     }
+                    p.UpdateTooltip();
                 }
             }
 
