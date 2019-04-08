@@ -399,7 +399,7 @@ namespace ExperienceAndClasses.UI {
             BackgroundColor = UI.Constants.COLOUR_UI_PANEL_HIGHLIGHT;
 
             float top = ((height - (Main.fontMouseText.MeasureString("A").Y * scale)) / 2f) + UI.Constants.UI_PADDING;
-            title = new UIText(attribute.Name_Short.ToUpper(), scale);
+            title = new UIText(attribute.Specific_Name_Short.ToUpper(), scale);
             title.Left.Set(UI.Constants.UI_PADDING, 0f);
             title.Top.Set(top, 0f);
             Append(title);
@@ -440,7 +440,7 @@ namespace ExperienceAndClasses.UI {
         public void ClickAdd(UIMouseEvent evt, UIElement listeningElement) {
             if (!UIInfo.AllowClicks()) return;
 
-            ExperienceAndClasses.LOCAL_MPLAYER.LocalAttributeAllocationAddPoint(attribute.ID);
+            ExperienceAndClasses.LOCAL_MPLAYER.LocalAttributeAllocationAddPoint(attribute.ID_num);
         }
 
         public override void MouseUp(UIMouseEvent evt) {
@@ -459,18 +459,18 @@ namespace ExperienceAndClasses.UI {
         }
 
         public void Update() {
-            string str = "" + ExperienceAndClasses.LOCAL_MPLAYER.Attributes_Final[attribute.ID];
+            string str = "" + ExperienceAndClasses.LOCAL_MPLAYER.Attributes_Final[attribute.ID_num];
             final.SetText(str);
             final.Left.Set(left_final - (Main.fontMouseText.MeasureString(str).X * scale), 0f);
 
-            int allocation_cost = Systems.Attribute.AllocationPointCost(ExperienceAndClasses.LOCAL_MPLAYER.Attributes_Allocated[attribute.ID]);
+            int allocation_cost = Systems.Attribute.AllocationPointCost(ExperienceAndClasses.LOCAL_MPLAYER.Attributes_Allocated[attribute.ID_num]);
             cost.SetText("" + allocation_cost);
 
             float width_cutoff = final.Left.Pixels - sum.Left.Pixels;
 
-            str = ExperienceAndClasses.LOCAL_MPLAYER.Attributes_Allocated[attribute.ID] + "+" +
-                    ExperienceAndClasses.LOCAL_MPLAYER.Attributes_Class[attribute.ID] + "+" +
-                    (ExperienceAndClasses.LOCAL_MPLAYER.Attributes_Status[attribute.ID] + ExperienceAndClasses.LOCAL_MPLAYER.Attributes_Allocated_Milestone[attribute.ID]);
+            str = ExperienceAndClasses.LOCAL_MPLAYER.Attributes_Allocated[attribute.ID_num] + "+" +
+                    ExperienceAndClasses.LOCAL_MPLAYER.Attributes_Class[attribute.ID_num] + "+" +
+                    (ExperienceAndClasses.LOCAL_MPLAYER.Attributes_Status[attribute.ID_num] + ExperienceAndClasses.LOCAL_MPLAYER.Attributes_Allocated_Milestone[attribute.ID_num]);
 
             if ((Main.fontMouseText.MeasureString(str).X * SCALE_SUM) >= width_cutoff) {
                 sum_small.SetText(str);

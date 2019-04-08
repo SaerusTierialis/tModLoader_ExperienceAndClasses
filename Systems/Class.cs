@@ -513,7 +513,7 @@ namespace ExperienceAndClasses.Systems {
         }
 
         public class Explorer : Tier2 {
-            public Explorer() : base(IDs.Explorer, PowerScaling.IDs.Tool) {
+            public Explorer() : base(IDs.Explorer, PowerScaling.IDs.NonCombat) {
                 Name = "Explorer";
                 Description = "TODO_desc";
                 Max_Level = TIER_MAX_LEVELS[3]; //tier 2 class with tier 3 level cap
@@ -530,7 +530,7 @@ namespace ExperienceAndClasses.Systems {
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Tier 1 Classes ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         public class Novice : Tier1 {
-            public Novice() : base(IDs.Novice, PowerScaling.IDs.All) {
+            public Novice() : base(IDs.Novice, PowerScaling.IDs.AllCore) {
                 Name = "Novice";
                 Description = "TODO_desc";
                 Class_Locations[0, 3] = ID_num;
@@ -540,7 +540,7 @@ namespace ExperienceAndClasses.Systems {
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Tier 2 Classes ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         public class Warrior : Tier2 {
-            public Warrior() : base(IDs.Warrior, PowerScaling.IDs.Melee) {
+            public Warrior() : base(IDs.Warrior, PowerScaling.IDs.CloseRangeMelee) {
                 Name = "Warrior";
                 Description = "TODO_desc";
                 Class_Locations[1, 0] = ID_num;
@@ -553,7 +553,7 @@ namespace ExperienceAndClasses.Systems {
         }
 
         public class Ranger : Tier2 {
-            public Ranger() : base(IDs.Ranger, PowerScaling.IDs.Ranged) {
+            public Ranger() : base(IDs.Ranger, PowerScaling.IDs.Projectile) {
                 Name = "Ranger";
                 Description = "TODO_desc";
                 Class_Locations[1, 1] = ID_num;
@@ -564,7 +564,7 @@ namespace ExperienceAndClasses.Systems {
         }
 
         public class Mage : Tier2 {
-            public Mage() : base(IDs.Mage, PowerScaling.IDs.Magic) {
+            public Mage() : base(IDs.Mage, PowerScaling.IDs.AllCore) {
                 Name = "Mage";
                 Description = "TODO_desc";
                 Class_Locations[1, 2] = ID_num;
@@ -574,7 +574,7 @@ namespace ExperienceAndClasses.Systems {
         }
 
         public class Rogue : Tier2 {
-            public Rogue() : base(IDs.Rogue, PowerScaling.IDs.Rogue) {
+            public Rogue() : base(IDs.Rogue, PowerScaling.IDs.CloseRangeAll) {
                 Name = "Rogue";
                 Description = "TODO_desc";
                 Class_Locations[1, 3] = ID_num;
@@ -584,7 +584,7 @@ namespace ExperienceAndClasses.Systems {
         }
 
         public class Summoner : Tier2 {
-            public Summoner() : base(IDs.Summoner, PowerScaling.IDs.Minion) {
+            public Summoner() : base(IDs.Summoner, PowerScaling.IDs.MinionOnly) {
                 Name = "Summoner";
                 Description = "TODO_desc";
                 Class_Locations[1, 4] = ID_num;
@@ -594,7 +594,7 @@ namespace ExperienceAndClasses.Systems {
         }
 
         public class Cleric : Tier2 {
-            public Cleric() : base(IDs.Cleric, PowerScaling.IDs.All) {
+            public Cleric() : base(IDs.Cleric, PowerScaling.IDs.Holy_AllCore) {
                 Name = "Cleric";
                 Description = "TODO_desc";
                 Class_Locations[1, 5] = ID_num;
@@ -604,7 +604,7 @@ namespace ExperienceAndClasses.Systems {
         }
 
         public class Hybrid : Tier2 {
-            public Hybrid() : base(IDs.Hybrid, PowerScaling.IDs.All) {
+            public Hybrid() : base(IDs.Hybrid, PowerScaling.IDs.AllCore) {
                 Name = "Hybrid";
                 Description = "TODO_desc";
                 Class_Locations[1, 6] = ID_num;
@@ -620,7 +620,7 @@ namespace ExperienceAndClasses.Systems {
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Tier 3 Classes ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         public class BloodKnight : Tier3 {
-            public BloodKnight() : base(IDs.BloodKnight, PowerScaling.IDs.Melee, IDs.Warrior) {
+            public BloodKnight() : base(IDs.BloodKnight, PowerScaling.IDs.CloseRangeMelee, IDs.Warrior) {
                 Name = "Blood Knight";
                 Description = "TODO_desc";
                 Class_Locations[2, 0] = ID_num;
@@ -630,7 +630,7 @@ namespace ExperienceAndClasses.Systems {
         }
 
         public class Berserker : Tier3 {
-            public Berserker() : base(IDs.Berserker, PowerScaling.IDs.Melee, IDs.Warrior) {
+            public Berserker() : base(IDs.Berserker, PowerScaling.IDs.CloseRangeMelee, IDs.Warrior) {
                 Name = "Berserker";
                 Description = "TODO_desc";
                 Class_Locations[3, 0] = ID_num;
@@ -642,7 +642,7 @@ namespace ExperienceAndClasses.Systems {
         }
 
         public class Guardian : Tier3 {
-            public Guardian() : base(IDs.Guardian, PowerScaling.IDs.Melee, IDs.Warrior) {
+            public Guardian() : base(IDs.Guardian, PowerScaling.IDs.CloseRangeMelee, IDs.Warrior) {
                 Name = "Guardian";
                 Description = "TODO_desc";
                 Class_Locations[4, 0] = ID_num;
@@ -652,7 +652,7 @@ namespace ExperienceAndClasses.Systems {
         }
 
         public class Sniper : Tier3 {
-            public Sniper() : base(IDs.Sniper, PowerScaling.IDs.Ranged, IDs.Ranger) {
+            public Sniper() : base(IDs.Sniper, PowerScaling.IDs.Projectile, IDs.Ranger) {
                 Name = "Sniper";
                 Description = "TODO_desc";
                 Class_Locations[2, 1] = ID_num;
@@ -662,7 +662,7 @@ namespace ExperienceAndClasses.Systems {
         }
 
         public class Engineer : Tier3 {
-            public Engineer() : base(IDs.Engineer, PowerScaling.IDs.Ranged, IDs.Ranger) {
+            public Engineer() : base(IDs.Engineer, PowerScaling.IDs.Projectile, IDs.Ranger) {
                 Name = "Engineer";
                 Description = "TODO_desc";
                 Class_Locations[3, 1] = ID_num;
@@ -674,7 +674,7 @@ namespace ExperienceAndClasses.Systems {
         }
 
         public class Elementalist : Tier3 {
-            public Elementalist() : base(IDs.Elementalist, PowerScaling.IDs.Magic, IDs.Mage) {
+            public Elementalist() : base(IDs.Elementalist, PowerScaling.IDs.AllCore, IDs.Mage) {
                 Name = "Elementalist";
                 Description = "TODO_desc";
                 Class_Locations[2, 2] = ID_num;
@@ -684,7 +684,7 @@ namespace ExperienceAndClasses.Systems {
         }
 
         public class Sage : Tier3 {
-            public Sage() : base(IDs.Sage, PowerScaling.IDs.Magic, IDs.Mage) {
+            public Sage() : base(IDs.Sage, PowerScaling.IDs.AllCore, IDs.Mage) {
                 Name = "Sage";
                 Description = "TODO_desc";
                 Class_Locations[3, 2] = ID_num;
@@ -695,7 +695,7 @@ namespace ExperienceAndClasses.Systems {
         }
 
         public class Assassin : Tier3 {
-            public Assassin() : base(IDs.Assassin, PowerScaling.IDs.Rogue, IDs.Rogue) {
+            public Assassin() : base(IDs.Assassin, PowerScaling.IDs.CloseRangeAll, IDs.Rogue) {
                 Name = "Assassin";
                 Description = "TODO_desc";
                 Class_Locations[2, 3] = ID_num;
@@ -706,7 +706,7 @@ namespace ExperienceAndClasses.Systems {
         }
 
         public class Chrono : Tier3 {
-            public Chrono() : base(IDs.Chrono, PowerScaling.IDs.Rogue, IDs.Rogue) {
+            public Chrono() : base(IDs.Chrono, PowerScaling.IDs.Projectile, IDs.Ranger) {
                 Name = "Chrono";
                 Description = "TODO_desc";
                 Class_Locations[3, 3] = ID_num;
@@ -717,7 +717,7 @@ namespace ExperienceAndClasses.Systems {
         }
 
         public class Ninja : Tier3 {
-            public Ninja() : base(IDs.Ninja, PowerScaling.IDs.Throwing, IDs.Rogue) {
+            public Ninja() : base(IDs.Ninja, PowerScaling.IDs.AllCore, IDs.Rogue) {
                 Name = "Ninja";
                 Description = "TODO_desc";
                 Class_Locations[4, 3] = ID_num;
@@ -728,7 +728,7 @@ namespace ExperienceAndClasses.Systems {
         }
 
         public class SoulBinder : Tier3 {
-            public SoulBinder() : base(IDs.SoulBinder, PowerScaling.IDs.Minion, IDs.Summoner) {
+            public SoulBinder() : base(IDs.SoulBinder, PowerScaling.IDs.MinionOnly, IDs.Summoner) {
                 Name = "Soul Binder";
                 Description = "TODO_desc";
                 Class_Locations[2, 4] = ID_num;
@@ -739,7 +739,7 @@ namespace ExperienceAndClasses.Systems {
         }
 
         public class Hivemind : Tier3 {
-            public Hivemind() : base(IDs.Hivemind, PowerScaling.IDs.Minion, IDs.Summoner) {
+            public Hivemind() : base(IDs.Hivemind, PowerScaling.IDs.MinionOnly, IDs.Summoner) {
                 Name = "Hivemind";
                 Description = "TODO_desc";
                 Class_Locations[3, 4] = ID_num;
@@ -750,7 +750,7 @@ namespace ExperienceAndClasses.Systems {
         }
 
         public class Saint : Tier3 {
-            public Saint() : base(IDs.Saint, PowerScaling.IDs.All, IDs.Cleric) {
+            public Saint() : base(IDs.Saint, PowerScaling.IDs.Holy_AllCore, IDs.Cleric) {
                 Name = "Saint";
                 Description = "TODO_desc";
                 Class_Locations[2, 5] = ID_num;
@@ -760,7 +760,7 @@ namespace ExperienceAndClasses.Systems {
         }
 
         public class HybridPrime : Tier3 {
-            public HybridPrime() : base(IDs.HybridPrime, PowerScaling.IDs.All, IDs.Hybrid) {
+            public HybridPrime() : base(IDs.HybridPrime, PowerScaling.IDs.AllCore, IDs.Hybrid) {
                 Name = "Hybrid Prime";
                 Description = "TODO_desc";
                 Class_Locations[2, 6] = ID_num;

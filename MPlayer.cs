@@ -72,10 +72,14 @@ namespace ExperienceAndClasses {
         /// </summary>
         private int Allocation_Points_Total;
 
-        public float holy_power; //TODO
+        public float close_range_melee_damage; //TODO
+        public float close_range_nonmelee_damage; //TODO
+        public float melee_projectile_damage; //TODO
+        public float holy_damage; //TODO
+        public float holy_healing; //TODO
         public float dodge_chance; //TODO
         public float ability_delay_reduction; //TODO
-        public float use_speed_melee, use_speed_ranged, use_speed_magic, use_speed_throwing, use_speed_minion, use_speed_tool;
+        public float use_speed_melee, use_speed_ranged, use_speed_magic, use_speed_throwing, use_speed_minion, use_speed_weapon, use_speed_tool;
 
         /// <summary>
         /// List of minions including sentries. Includes each part of multi-part minions. Updates on CheckMinions().
@@ -213,9 +217,13 @@ namespace ExperienceAndClasses {
             Allocation_Points_Total = 0;
 
             //stats
-            holy_power = 1f;
+            close_range_melee_damage = 1f;
+            close_range_nonmelee_damage = 1f;
+            melee_projectile_damage = 1f;
+            holy_damage = 1f;
+            holy_healing = 1f;
             dodge_chance = 0f;
-            use_speed_melee = use_speed_ranged = use_speed_magic = use_speed_throwing = use_speed_minion = use_speed_tool = 1f;
+            use_speed_melee = use_speed_ranged = use_speed_magic = use_speed_throwing = use_speed_minion = use_speed_weapon = use_speed_tool = 0f;
             ability_delay_reduction = 1f;
 
             //ability
@@ -279,9 +287,13 @@ namespace ExperienceAndClasses {
             base.PostUpdateEquips();
             if (initialized) {
                 //reset
-                holy_power = 1f;
+                close_range_melee_damage = 1f;
+                close_range_nonmelee_damage = 1f;
+                melee_projectile_damage = 1f;
+                holy_damage = 1f;
+                holy_healing = 1f;
                 dodge_chance = 0f;
-                use_speed_melee = use_speed_ranged = use_speed_magic = use_speed_throwing = use_speed_minion = use_speed_tool = 1f;
+                use_speed_melee = use_speed_ranged = use_speed_magic = use_speed_throwing = use_speed_minion = use_speed_weapon = use_speed_tool = 0f;
                 ability_delay_reduction = 1f;
                 channelling = false; //TODO prevent attack/item use/ability use
 
@@ -751,26 +763,32 @@ namespace ExperienceAndClasses {
 
         //dexterity
         public override float UseTimeMultiplier(Item item) {
+            float multiplier = 1f;
+
             if (item.melee)
-                return base.UseTimeMultiplier(item) * use_speed_melee;
+                multiplier += use_speed_melee;
 
             if (item.ranged)
-                return base.UseTimeMultiplier(item) * use_speed_ranged;
+                multiplier += use_speed_ranged;
 
             if (item.magic)
-                return base.UseTimeMultiplier(item) * use_speed_magic;
+                multiplier += use_speed_magic;
 
             if (item.thrown)
-                return base.UseTimeMultiplier(item) * use_speed_throwing;
+                multiplier += use_speed_throwing;
 
             if (item.summon || item.sentry)
-                return base.UseTimeMultiplier(item) * use_speed_minion;
+                multiplier += use_speed_minion;
 
-            else if (item.hammer>0 || item.axe>0 || item.pick>0 || item.fishingPole>0)
-                return base.UseTimeMultiplier(item) * use_speed_tool;
+            if (item.hammer > 0 || item.axe > 0 || item.pick > 0 || item.fishingPole > 0) {
+                multiplier += use_speed_tool;
+            }
+            else if (item.damage > 0) {
+                //non-tool weapon
+                multiplier += use_speed_weapon;
+            }
 
-            else
-                return base.UseTimeMultiplier(item);
+            return base.UseTimeMultiplier(item) * multiplier;
         }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Drawing ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/

@@ -252,7 +252,7 @@ namespace ExperienceAndClasses.UI {
                 text += "\n";
             }
 
-            text += c.Description + "\n\n" + "DAMAGE TYPE: " + c.Power_Scaling.Name + "\n\nATTRIBUTES:";
+            text += c.Description + "\n\n" + "POWER SCALING:\nPrimary:   " + c.Power_Scaling.Primary_Types + "\nSecondary: " + c.Power_Scaling.Secondary_Types + "\n\nATTRIBUTES:";
 
             //attributes
             bool first = true;
@@ -266,7 +266,7 @@ namespace ExperienceAndClasses.UI {
                     attribute_names += "\n";
                     attribute_growth += "\n";
                 }
-                attribute_names += Systems.Attribute.LOOKUP[id].Name + ":";
+                attribute_names += Systems.Attribute.LOOKUP[id].Specifc_Name + ":";
 
                 for (byte i = 0; i < 5; i++) {
                     if (c.Attribute_Growth[id] >= (i + 1)) {
@@ -289,8 +289,8 @@ namespace ExperienceAndClasses.UI {
         }
 
         public void ShowTextAttribute(UIElement source, Systems.Attribute attribute) {
-            string title = attribute.Name;
-            string text = attribute.Description + "\n" + attribute.Bonus;
+            string title = attribute.Specifc_Name;
+            string text = attribute.Specific_Description + "\n" + attribute.Bonus;
             ShowText(source, title, text, WIDTH_ATTRIBUTE);
         }
 

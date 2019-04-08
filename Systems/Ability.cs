@@ -568,7 +568,7 @@ namespace ExperienceAndClasses.Systems {
                 }
 
                 if (specific_type_holy) {
-                    value = ExperienceAndClasses.LOCAL_MPLAYER.holy_power - 1f;
+                    value = ExperienceAndClasses.LOCAL_MPLAYER.holy_damage - 1f;
                     if (value > highest) {
                         highest = value;
                     }
@@ -599,7 +599,7 @@ namespace ExperienceAndClasses.Systems {
                     multiplier += (Main.LocalPlayer.magicDamage - 1f);
                 }
                 if (specific_type_holy) {
-                    multiplier += (ExperienceAndClasses.LOCAL_MPLAYER.holy_power - 1f);
+                    multiplier += (ExperienceAndClasses.LOCAL_MPLAYER.holy_damage - 1f);
                 }
             }
 
@@ -973,7 +973,7 @@ namespace ExperienceAndClasses.Systems {
 
             public Warrior_Block() : base(IDs.Warrior_Block) {
                 Specific_Name = "Block";
-                specific_description = "Increases defense while channeling. Bonus defense equals half of " + Systems.Attribute.LOOKUP[(byte)Systems.Attribute.IDs.Vitality].Name + " to a maximum of the ability level.";
+                specific_description = "Increases defense while channeling. Bonus defense equals half of " + Systems.Attribute.LOOKUP[(byte)Systems.Attribute.IDs.Vitality].Specifc_Name + " to a maximum of the ability level.";
                 Specific_Required_Class_ID = Systems.Class.IDs.Warrior;
                 Specific_Required_Class_Level = 1;
                 specific_show_level_in_tooltip = true;
