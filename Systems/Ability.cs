@@ -212,7 +212,7 @@ namespace ExperienceAndClasses.Systems {
         public ModHotKey hotkey = null;
         public bool hotkey_alternate = false;
         public bool hotkey_primary = true;
-        public byte hotkey_index = 0;
+        public int hotkey_index = 0;
 
         public bool Unlocked { get; private set; } = false;
 
