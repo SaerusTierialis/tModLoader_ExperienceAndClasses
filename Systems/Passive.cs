@@ -160,6 +160,8 @@ namespace ExperienceAndClasses.Systems {
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Warrior ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         public class Warrior_BlockPerfect : Passive {
+            public const float DURATION_SECONDS = 5f;
+
             public Warrior_BlockPerfect() : base(IDs.Warrior_BlockPerfect) {
                 Specific_Name = "Perfect Block";
                 specific_description = "TODO";

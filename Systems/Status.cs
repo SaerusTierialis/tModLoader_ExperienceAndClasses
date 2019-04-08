@@ -1045,9 +1045,7 @@ namespace ExperienceAndClasses.Systems {
         }
 
         public class Warrior_BlockPerfect : TimedConstantSync {
-            public const float duration_seconds = 5f;
-
-            public Warrior_BlockPerfect() : base(IDs.Warrior_BlockPerfect, duration_seconds) {
+            public Warrior_BlockPerfect() : base(IDs.Warrior_BlockPerfect, Systems.Passive.Warrior_BlockPerfect.DURATION_SECONDS) {
                 specific_owner_player_required_ability = Systems.Ability.IDs.Warrior_Block;
                 specific_owner_player_required_passive = Systems.Passive.IDs.Warrior_BlockPerfect;
                 specific_remove_on_owner_death = true;
