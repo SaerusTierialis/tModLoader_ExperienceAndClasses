@@ -440,6 +440,9 @@ namespace ExperienceAndClasses.Systems {
                     else {
                         abilities[i].hotkey = ExperienceAndClasses.HOTKEY_ABILITY_SECONDARY[i];
                     }
+                    abilities[i].hotkey_primary = primary;
+                    abilities[i].hotkey_alternate = alternate;
+                    abilities[i].hotkey_index = i;
                 }
             }
             return abilities;

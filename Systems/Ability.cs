@@ -210,6 +210,9 @@ namespace ExperienceAndClasses.Systems {
         private DateTime Time_Cooldown_End = DateTime.MinValue;
 
         public ModHotKey hotkey = null;
+        public bool hotkey_alternate = false;
+        public bool hotkey_primary = true;
+        public byte hotkey_index = 0;
 
         public bool Unlocked { get; private set; } = false;
 
@@ -230,7 +233,7 @@ namespace ExperienceAndClasses.Systems {
         protected string custom_use_fail_message;
         protected List<Utilities.Containers.Thing> targets_friendly;
         protected List<Utilities.Containers.Thing> targets_hostile;
-        protected bool has_mana_cost;
+        private ushort base_cost_mana, base_cost_resource;
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Core Constructor ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -283,7 +286,7 @@ namespace ExperienceAndClasses.Systems {
             }
 
             //take mana (even if reduced to free, do this to stop regen)
-            if (has_mana_cost) {
+            if (base_cost_mana > 0) {
                 if (cost_mana < 0) cost_mana = 0;
                 ExperienceAndClasses.LOCAL_MPLAYER.UseMana(cost_mana);
             }
@@ -324,14 +327,55 @@ namespace ExperienceAndClasses.Systems {
             Tooltip = "Required Class: " + Systems.Class.LOOKUP[(byte)Specific_Required_Class_ID].Name + "\n" +
                         "Required Level: " + Specific_Required_Class_Level + "\n\n";
 
+            Tooltip += specific_description + "\n";
+
+            string key_combo = "";
+            bool keys_not_set = false;
+            if (hotkey_alternate) {
+                if (ExperienceAndClasses.HOTKEY_ALTERNATE_EFFECT.GetAssignedKeys().Count > 0) {
+                    key_combo = ExperienceAndClasses.HOTKEY_ALTERNATE_EFFECT.GetAssignedKeys()[0];
+                }
+                else {
+                    keys_not_set = true;
+                    key_combo = "Alternate";
+                }
+                key_combo += " + ";
+            }
+            if (hotkey.GetAssignedKeys().Count > 0) {
+                key_combo += hotkey.GetAssignedKeys()[0];
+            }
+            else {
+                keys_not_set = true;
+                if (hotkey_primary) {
+                    key_combo += "Primary" + hotkey_index;
+                }
+                else {
+                    key_combo += "Secondary" + hotkey_index;
+                }
+            }
+            if (keys_not_set) {
+                key_combo += " (key not set)";
+            }
+            Tooltip += "\nHotkey: " + key_combo;
+
             if (specific_show_level_in_tooltip) {
-                Tooltip += "Ability Level: " + level + "\n\n";
+                Tooltip += "Ability Level: " + level + "\n";
             }
 
-            Tooltip += specific_description;
+            if (specific_cooldown_seconds > 0f) {
+                Tooltip += "Base Cooldown: " + specific_cooldown_seconds + " seconds\n";
+            }
+
+            if (base_cost_mana > 0) {
+                Tooltip += "Base Mana Cost: " + base_cost_mana + "\n";
+            }
+
+            if (base_cost_resource > 0) {
+                Tooltip += "Base " + Systems.Resource.LOOKUP[(byte)specific_resource].Name + " Cost: " + base_cost_resource + "\n";
+            }
 
             if (specific_show_channelling_in_tooltip) {
-                Tooltip += "\n\nChannelling abilities require that you hold down the key for a duration. Many of these abilities have a mana or resource cost while channelling. Death, damage, immobilization, and silence all interrupt channeling.";
+                Tooltip += "\nChannelling abilities require that you hold down the key for a duration. Many of these abilities have a mana or resource cost while channelling. Death, damage, immobilization, and silence all interrupt channeling.";
             }
         }
 
@@ -341,15 +385,13 @@ namespace ExperienceAndClasses.Systems {
         // The one exception is CalculateLevel, which is called during UpdateUnlock instead of on each activation
 
         private ushort CalculateManaCost() {
-            //has a mana cost (even if somehow reduced to free)
-            has_mana_cost = (specific_mana_cost_flat > 0) || (specific_mana_cost_percent > 0);
             //mana cost
-            float cost_mana_base = ModifyCostManaBase(specific_mana_cost_flat + (specific_mana_cost_percent * ExperienceAndClasses.LOCAL_MPLAYER.player.statManaMax2));
+            base_cost_mana = (ushort)ModifyCostManaBase(specific_mana_cost_flat + (specific_mana_cost_percent * ExperienceAndClasses.LOCAL_MPLAYER.player.statManaMax2));
             if (specific_mana_apply_reduction) {
-                cost_mana = (ushort)Math.Max(0, ModifyCostManaFinal(cost_mana_base * ExperienceAndClasses.LOCAL_MPLAYER.player.manaCost));
+                cost_mana = (ushort)Math.Max(0, ModifyCostManaFinal(base_cost_mana * ExperienceAndClasses.LOCAL_MPLAYER.player.manaCost));
             }
             else {
-                cost_mana = (ushort)Math.Max(0, ModifyCostManaFinal(cost_mana_base));
+                cost_mana = (ushort)Math.Max(0, ModifyCostManaFinal(base_cost_mana));
             }
             return cost_mana;
         }
@@ -357,11 +399,12 @@ namespace ExperienceAndClasses.Systems {
         private ushort CalculateResourceCost() {
             //resource cost
             if (specific_resource == Systems.Resource.IDs.NONE) {
+                base_cost_resource = 0;
                 cost_resource = 0;
             }
             else {
-                float cost_resource_base = specific_resource_cost_flat + (specific_resource_cost_percent * Systems.Resource.LOOKUP[(byte)specific_resource].Capacity);
-                cost_resource = (ushort)Math.Max(0, ModifyCostResource(cost_resource_base));
+                base_cost_resource = (ushort)(specific_resource_cost_flat + (specific_resource_cost_percent * Systems.Resource.LOOKUP[(byte)specific_resource].Capacity));
+                cost_resource = (ushort)Math.Max(0, ModifyCostResource(base_cost_resource));
             }
             return cost_resource;
         }
