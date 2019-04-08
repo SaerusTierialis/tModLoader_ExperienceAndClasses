@@ -1008,6 +1008,7 @@ namespace ExperienceAndClasses.Systems {
         public class Warrior_Block : ChannelManaCostSync {
             public Warrior_Block() : base(IDs.Warrior_Block, Systems.Ability.IDs.Warrior_Block) {
                 Specific_Name = "Block";
+                Specific_Description = "Defense increased while channelling";
                 //specific_texture_path = "ExperienceAndClasses/Textures/Status/Block";
 
                 //add any sync data types that will be used (for syncing)
