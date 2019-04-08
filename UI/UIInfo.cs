@@ -23,6 +23,7 @@ namespace ExperienceAndClasses.UI {
         private const float TEXT_SCALE_BUTTON = 1f;
         private const float TEXT_SCALE_BUTTON_HOVER = 1.1f;
         private const float TEXT_SCALE_BODY = 0.9f;
+        private const float TEXT_SCALE_BODY_STATUS = 1f;
 
         private const float WIDTH_CLASS = 400f;
         private const float WIDTH_ATTRIBUTE = 350f;
@@ -128,7 +129,7 @@ namespace ExperienceAndClasses.UI {
             EndText(source);
         }
 
-        private void ShowText(UIElement source, string title, string body, float width, string extra=null, float extra_left=0f, Texture2D texture=null, bool force=false, bool transparent = false) {
+        private void ShowText(UIElement source, string title, string body, float width, string extra=null, float extra_left=0f, Texture2D texture=null, bool force=false, bool transparent = false, float body_scale = TEXT_SCALE_BODY) {
             if (mode == MODE.HOVER || force) {
 
                 this.source = source;
@@ -189,7 +190,7 @@ namespace ExperienceAndClasses.UI {
                 panel.SetPosition(source.GetDimensions().X + source.Width.Pixels, source.GetDimensions().Y, true);
                 ui_text_body.Left.Set(Constants.UI_PADDING + add_left, 0f);
                 ui_text_body.Top.Set(Constants.UI_PADDING + panel.top_space, 0f);
-                ui_text_body.SetText(body);
+                ui_text_body.SetText(body, body_scale, false);
 
                 //extra
                 if (extra != null) {
@@ -301,7 +302,7 @@ namespace ExperienceAndClasses.UI {
         }
 
         public void ShowStatus(UIElement source, Systems.Status status) {
-            ShowText(source, null, status.Specific_Name + "\n" + status.Specific_Description, WIDTH_STATUS, null, 0, null, false, true);
+            ShowText(source, null, " \n" + status.Specific_Name + "\n" + status.Specific_Description, WIDTH_STATUS, null, 0, null, false, true, TEXT_SCALE_BODY_STATUS);
         }
 
         public void ShowUnlockClass(UIElement source, Systems.Class c) {

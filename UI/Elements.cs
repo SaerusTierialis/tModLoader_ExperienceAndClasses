@@ -189,12 +189,12 @@ namespace ExperienceAndClasses.UI {
     }
 
     class StatusIcon : UIElement {
-        private const float TEXT_SCALE = 0.65f;
+        private const float TEXT_SCALE = 0.75f;
         private const float TEXT_VERTICAL_SPACE = 2f;
 
         private readonly Color COLOUR_TRANSPARENT = new Color(128, 128, 128, 120);
         private readonly Color COLOUR_SOLID = new Color(255, 255, 255, 255);
-        private readonly Color COLOUR_TEXT = new Color(255, 255, 255, 128);
+        private readonly Color COLOUR_TEXT = new Color(128, 128, 128, 128);
 
         private UITransparantImage icon;
         private UIText text;
