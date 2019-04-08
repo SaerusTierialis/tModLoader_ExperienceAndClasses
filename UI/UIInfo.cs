@@ -128,10 +128,20 @@ namespace ExperienceAndClasses.UI {
             EndText(source);
         }
 
-        private void ShowText(UIElement source, string title, string body, float width, string extra=null, float extra_left=0f, Texture2D texture=null, bool force=false) {
+        private void ShowText(UIElement source, string title, string body, float width, string extra=null, float extra_left=0f, Texture2D texture=null, bool force=false, bool transparent = false) {
             if (mode == MODE.HOVER || force) {
 
                 this.source = source;
+
+                //colour
+                if (transparent) {
+                    panel.BackgroundColor = Color.Transparent;
+                    panel.BorderColor = Color.Transparent;
+                }
+                else {
+                    panel.BackgroundColor = Constants.COLOUR_UI_PANEL_BACKGROUND;
+                    panel.BorderColor = Color.Black;
+                }
 
                 //title
                 if (title == null) {
@@ -291,7 +301,7 @@ namespace ExperienceAndClasses.UI {
         }
 
         public void ShowStatus(UIElement source, Systems.Status status) {
-            ShowText(source, "TODO_status", "TODO_description", WIDTH_STATUS);
+            ShowText(source, null, status.Specific_Name + "\n" + status.Specific_Description, WIDTH_STATUS, null, 0, null, false, true);
         }
 
         public void ShowUnlockClass(UIElement source, Systems.Class c) {
