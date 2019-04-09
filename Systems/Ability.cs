@@ -356,7 +356,7 @@ namespace ExperienceAndClasses.Systems {
             if (keys_not_set) {
                 key_combo += " (key not set)";
             }
-            Tooltip += "\nHotkey: " + key_combo;
+            Tooltip += "\nHotkey: " + key_combo + "\n";
 
             if (specific_show_level_in_tooltip) {
                 Tooltip += "Ability Level: " + level + "\n";
