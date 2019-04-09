@@ -111,8 +111,8 @@ namespace ExperienceAndClasses.Systems {
             /// Add XP to local character (to primary/secondary/extra)
             /// </summary>
             /// <param name="xp"></param>
-            public static void LocalAddXP(uint xp) {
-                if (ExperienceAndClasses.LOCAL_MPLAYER.show_xp) {
+            public static void LocalAddXP(uint xp, bool can_show_xp_message = true) {
+                if (can_show_xp_message && ExperienceAndClasses.LOCAL_MPLAYER.show_xp) {
                     CombatText.NewText(Main.LocalPlayer.getRect(), UI.Constants.COLOUR_XP_BRIGHT, "+" + xp + " XP");
                 }
 

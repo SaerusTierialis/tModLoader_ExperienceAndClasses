@@ -53,7 +53,7 @@ namespace ExperienceAndClasses.Items {
 
         public override bool UseItem(Player player) {
             if (Systems.XP.Adjusting.LocalCanGainXP()) {
-                Systems.XP.Adjusting.LocalAddXP(GetXPValue());
+                Systems.XP.Adjusting.LocalAddXP(GetXPValue(), false);
                 return true;
             }
             else {
