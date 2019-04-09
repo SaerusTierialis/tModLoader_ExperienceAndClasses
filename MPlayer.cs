@@ -93,10 +93,10 @@ namespace ExperienceAndClasses {
 
         public Utilities.Containers.LevelSortedPassives Passives { get; private set; }
 
-        private Systems.Ability[] Abilities_Primary;
-        private Systems.Ability[] Abilities_Primary_Alt;
-        private Systems.Ability[] Abilities_Secondary;
-        private Systems.Ability[] Abilities_Secondary_Alt;
+        public Systems.Ability[] Abilities_Primary { get; private set; }
+        public Systems.Ability[] Abilities_Primary_Alt { get; private set; }
+        public Systems.Ability[] Abilities_Secondary { get; private set; }
+        public Systems.Ability[] Abilities_Secondary_Alt { get; private set; }
 
         public Dictionary<Systems.Resource.IDs, Systems.Resource> Resources { get; private set; }
 

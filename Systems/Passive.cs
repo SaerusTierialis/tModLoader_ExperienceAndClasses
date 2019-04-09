@@ -10,6 +10,7 @@ namespace ExperienceAndClasses.Systems {
         /// </summary>
         public enum IDs : ushort {
             Warrior_BlockPerfect,
+            Warrior_MoraleBoost,
             BloodKnight_Resoruce_Bloodforce,
 
             NUMBER_OF_IDs, //leave this second to last
@@ -17,7 +18,8 @@ namespace ExperienceAndClasses.Systems {
         }
 
         public enum PASSIVE_TYPE : byte {
-            UNLOCK_RESOURCE,
+            RESOURCE_UNLOCK,
+            RESOURCE_UPGRADE,
             ABILITY_UPGRADE,
             BONUS,
             OTHER,
@@ -62,6 +64,8 @@ namespace ExperienceAndClasses.Systems {
         /// </summary>
         protected Systems.Resource.IDs specific_resource = Systems.Resource.IDs.NONE;
 
+        protected Systems.Ability.IDs specific_ability = Systems.Ability.IDs.NONE;
+
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Instance Vars Generic ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         public IDs ID { get; private set; } = IDs.NONE;
@@ -84,11 +88,27 @@ namespace ExperienceAndClasses.Systems {
         /// Run once during init
         /// </summary>
         public void LoadTexture() {
-            if (specific_texture_path != null) {
-                Texture = ModLoader.GetTexture(specific_texture_path);
+            if (Specific_Type == PASSIVE_TYPE.ABILITY_UPGRADE) {
+                if (specific_ability != Systems.Ability.IDs.NONE) {
+                    Texture = Systems.Ability.LOOKUP[(ushort)specific_ability].Texture;
+                }
+                else {
+                    Texture = Utilities.Textures.TEXTURE_ABILITY_DEFAULT;
+                }
+            }
+            else if ((Specific_Type == PASSIVE_TYPE.RESOURCE_UNLOCK) || (Specific_Type == PASSIVE_TYPE.RESOURCE_UPGRADE)) {
+                if (specific_resource == Systems.Resource.IDs.NONE) {
+                    Texture = Systems.Resource.LOOKUP[(byte)specific_resource].Texture;
+                }
+                else {
+                    Texture = Utilities.Textures.TEXTURE_RESOURCE_DEFAULT;
+                }
+            }
+            else if (specific_texture_path == null) {
+                Texture = Utilities.Textures.TEXTURE_PASSIVE_DEFAULT;
             }
             else {
-                Texture = Utilities.Textures.TEXTURE_PASSIVE_DEFAULT;
+                Texture = ModLoader.GetTexture(specific_texture_path);
             }
         }
 
@@ -174,16 +194,24 @@ namespace ExperienceAndClasses.Systems {
             public AbilityUgrade(IDs id, Systems.Ability.IDs ability_id) : base(id) {
                 Specific_Type = PASSIVE_TYPE.ABILITY_UPGRADE;
                 ability_name = Systems.Ability.LOOKUP[(ushort)ability_id].Specific_Name;
+                specific_ability = ability_id;
             }
         }
 
         /// <summary>
-        /// default name to match resource
+        /// defaults the name to resource's name
         /// </summary>
         public class ResourceUnlock : Passive {
             public ResourceUnlock(IDs id, Systems.Resource.IDs resource_id) : base(id) {
-                Specific_Name = Systems.Resource.LOOKUP[(byte)resource_id].Name;
-                Specific_Type = PASSIVE_TYPE.UNLOCK_RESOURCE;
+                Specific_Name = Systems.Resource.LOOKUP[(byte)resource_id].Specific_Name;
+                Specific_Type = PASSIVE_TYPE.RESOURCE_UNLOCK;
+                specific_resource = resource_id;
+            }
+        }
+
+        public class ResourceUpdate : Passive {
+            public ResourceUpdate(IDs id, Systems.Resource.IDs resource_id) : base(id) {
+                Specific_Type = PASSIVE_TYPE.RESOURCE_UPGRADE;
                 specific_resource = resource_id;
             }
         }
@@ -207,13 +235,22 @@ namespace ExperienceAndClasses.Systems {
             }
         }
 
+        public class Warrior_MoraleBoost : AbilityUgrade {
+            public Warrior_MoraleBoost() : base(IDs.Warrior_MoraleBoost, Systems.Ability.IDs.Warrior_Block) {
+                Specific_Name = "Morale Boost";
+                specific_description = "TODO";
+                Specific_Required_Class_ID = Systems.Class.IDs.Warrior;
+                Specific_Required_Class_Level = 40;
+            }
+        }
+
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Blood Knight ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         public class BloodKnight_Resoruce_Bloodforce : ResourceUnlock {
             public BloodKnight_Resoruce_Bloodforce() : base(IDs.BloodKnight_Resoruce_Bloodforce, Systems.Resource.IDs.Bloodforce) {
                 specific_description = "TODO";
                 Specific_Required_Class_ID = Systems.Class.IDs.BloodKnight;
-                Specific_Required_Class_Level = 1;
+                Specific_Required_Class_Level = 100;
             }
         }
 

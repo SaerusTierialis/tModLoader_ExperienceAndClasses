@@ -70,9 +70,12 @@ namespace ExperienceAndClasses.Utilities.Containers {
             }
 
             //insert before first status that is equal/later
+            byte tier_prior, tier_new;
             for (int i = 0; i < Count; i++) {
-                if ((Systems.Class.LOOKUP[(byte)this[i].Specific_Required_Class_ID].Tier > Systems.Class.LOOKUP[(byte)passive.Specific_Required_Class_ID].Tier) ||
-                    (this[i].Specific_Required_Class_Level >= passive.Specific_Required_Class_Level)){
+                tier_prior = Systems.Class.LOOKUP[(byte)this[i].Specific_Required_Class_ID].Tier;
+                tier_new = Systems.Class.LOOKUP[(byte)passive.Specific_Required_Class_ID].Tier;
+                if ((tier_prior > tier_new) ||
+                    ((tier_prior == tier_new) && (this[i].Specific_Required_Class_Level >= passive.Specific_Required_Class_Level))){
                     Insert(i, passive);
                     return;
                 }

@@ -371,7 +371,7 @@ namespace ExperienceAndClasses.Systems {
             }
 
             if (base_cost_resource > 0) {
-                Tooltip += "Base " + Systems.Resource.LOOKUP[(byte)specific_resource].Name + " Cost: " + base_cost_resource + "\n";
+                Tooltip += "Base " + Systems.Resource.LOOKUP[(byte)specific_resource].Specific_Name + " Cost: " + base_cost_resource + "\n";
             }
 
             if (specific_show_channelling_in_tooltip) {
@@ -403,7 +403,7 @@ namespace ExperienceAndClasses.Systems {
                 cost_resource = 0;
             }
             else {
-                base_cost_resource = (ushort)(specific_resource_cost_flat + (specific_resource_cost_percent * Systems.Resource.LOOKUP[(byte)specific_resource].Capacity));
+                base_cost_resource = (ushort)(specific_resource_cost_flat + (specific_resource_cost_percent * Systems.Resource.LOOKUP[(byte)specific_resource].Specific_Capacity));
                 cost_resource = (ushort)Math.Max(0, ModifyCostResource(base_cost_resource));
             }
             return cost_resource;
@@ -845,7 +845,7 @@ namespace ExperienceAndClasses.Systems {
                             break;
 
                         case USE_RESULT.FAIL_NOT_ENOUGH_RESOURCE:
-                            message = "Not Enough " + Systems.Resource.LOOKUP[(byte)specific_resource].Name;
+                            message = "Not Enough " + Systems.Resource.LOOKUP[(byte)specific_resource].Specific_Name;
                             break;
 
                         case USE_RESULT.FAIL_ON_COOLDOWN:

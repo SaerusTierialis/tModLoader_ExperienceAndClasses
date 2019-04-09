@@ -32,6 +32,7 @@ namespace ExperienceAndClasses.UI {
         private const float WIDTH_UNLOCK = 300f;
         private const float WIDTH_RESET = 400f;
         private const float WIDTH_ABILITY = 400f;
+        private const float WIDTH_PASSIVE = 400f;
 
         private const float BUTTON_SEPARATION = 100f;
 
@@ -352,6 +353,10 @@ namespace ExperienceAndClasses.UI {
 
         public void ShowAbility(UIElement source, Systems.Ability ability) {
             ShowText(source, ability.Specific_Name, ability.Tooltip, WIDTH_ABILITY);
+        }
+
+        public void ShowPassive(UIElement source, Systems.Passive passive) {
+            ShowText(source, passive.Specific_Name, passive.Tooltip, WIDTH_PASSIVE);
         }
 
     }

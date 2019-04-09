@@ -50,7 +50,6 @@ namespace ExperienceAndClasses.UI {
         public const float SIZE_ABILITY_ICON = 30f;
         public const float SPACING_ABILITY_ICON = 2f;
 
-
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Variables ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         public DragableUIPanel panel { get; private set; }
 
@@ -64,6 +63,8 @@ namespace ExperienceAndClasses.UI {
 
         private AbilityIcon[] ability_primary, ability_secondary;
         private HelpTextPanel level_primary, level_secondary;
+
+        private ScrollPanel passives;
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Initialize ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         protected override void InitializeState() {
@@ -211,17 +212,22 @@ namespace ExperienceAndClasses.UI {
             }
 
             //unlock panel
-            DragableUIPanel panel_unlock = new DragableUIPanel(WIDTH_UNLOCK, HEIGHT_UNLOCK, Constants.COLOUR_SUBPANEL, this, false, false, false);
-            panel_unlock.Left.Set(panel_ability.Left.Pixels + panel_ability.Width.Pixels - 2f, 0f);
-            panel_unlock.Top.Set(Constants.UI_PADDING, 0f);
-            panel.Append(panel_unlock);
+            DragableUIPanel panel_passive = new DragableUIPanel(WIDTH_UNLOCK, HEIGHT_UNLOCK, Constants.COLOUR_SUBPANEL, this, false, false, false);
+            panel_passive.Left.Set(panel_ability.Left.Pixels + panel_ability.Width.Pixels - 2f, 0f);
+            panel_passive.Top.Set(Constants.UI_PADDING, 0f);
+            panel.Append(panel_passive);
 
-            //unlock title
-            panel_unlock.SetTitle("Passives", FONT_SCALE_TITLE, true, "TODO_help_text", "Passive Abilities");
+            //passives title
+            panel_passive.SetTitle("Passives", FONT_SCALE_TITLE, true, "TODO_help_text", "Passive Abilities");
+
+            //passives
+            passives = new ScrollPanel(panel_passive.Width.Pixels, panel_passive.Height.Pixels - panel_passive.top_space, this.UI, true);
+            passives.Top.Set(panel_passive.top_space, 0f);
+            panel_passive.Append(passives);
 
             //help panel
             DragableUIPanel panel_help = new DragableUIPanel(WIDTH_HELP, HEIGHT_HELP, Constants.COLOUR_SUBPANEL, this, false, false, false);
-            panel_help.Left.Set(panel_unlock.Left.Pixels, 0f);
+            panel_help.Left.Set(panel_passive.Left.Pixels, 0f);
             panel_help.Top.Set(HEIGHT - Constants.UI_PADDING - HEIGHT_HELP, 0f);
             panel.Append(panel_help);
 
@@ -265,30 +271,60 @@ namespace ExperienceAndClasses.UI {
             //primary effective level
             Systems.Class c = ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary;
             if (c != null && c.Tier > 0) {
-                level_primary.SetText(c.Name + " eLv." + ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary_Level_Effective);
+                level_primary.SetText(c.Name + " Lv." + ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary_Level_Effective);
             }
             else {
                 level_primary.SetText("No Primary Class");
             }
 
             //primary ability
-            for (byte i = 0; i < ability_primary.Length; i++) {
-                ability_primary[i].SetAbility(Systems.Ability.LOOKUP[(ushort)Systems.Ability.IDs.Warrior_Block]);
+            foreach (AbilityIcon icon in ability_primary) {
+                icon.active = false;
+            }
+            byte counter = 0;
+            Systems.Ability ability;
+            for (byte i = 0; i < ExperienceAndClasses.NUMBER_ABILITY_SLOTS_PER_CLASS; i++) {
+                ability = ExperienceAndClasses.LOCAL_MPLAYER.Abilities_Primary[i];
+                if (ability != null) {
+                    ability_primary[counter++].SetAbility(ability);
+                }
+                ability = ExperienceAndClasses.LOCAL_MPLAYER.Abilities_Primary_Alt[i];
+                if (ability != null) {
+                    ability_primary[counter++].SetAbility(ability);
+                }
             }
 
             //secondary effective level
             c = ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary;
             if (c != null && c.Tier > 0) {
-                level_secondary.SetText(c.Name + " eLv." + ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary_Level_Effective);
+                level_secondary.SetText(c.Name + " Lv." + ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary_Level_Effective);
             }
             else {
                 level_secondary.SetText("No Secondary Class");
             }
 
             //secondary ability
-            for (byte i = 0; i < ability_secondary.Length; i++) {
-                ability_secondary[i].SetAbility(Systems.Ability.LOOKUP[(ushort)Systems.Ability.IDs.Warrior_Block]);
+            foreach (AbilityIcon icon in ability_secondary) {
+                icon.active = false;
             }
+            counter = 0;
+            for (byte i = 0; i < ExperienceAndClasses.NUMBER_ABILITY_SLOTS_PER_CLASS; i++) {
+                ability = ExperienceAndClasses.LOCAL_MPLAYER.Abilities_Secondary[i];
+                if (ability != null) {
+                    ability_secondary[counter++].SetAbility(ability);
+                }
+                ability = ExperienceAndClasses.LOCAL_MPLAYER.Abilities_Secondary_Alt[i];
+                if (ability != null) {
+                    ability_secondary[counter++].SetAbility(ability);
+                }
+            }
+
+            //passives
+            List<UIElement> passive_icons = new List<UIElement>();
+            foreach (Systems.Passive passive in ExperienceAndClasses.LOCAL_MPLAYER.Passives) {
+                passive_icons.Add(new PassiveIcon(passive));
+            }
+            passives.SetItems(passive_icons);
         }
 
         private void UpdateAttributePoints() {

@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
+using System.Collections.Generic;
 using Terraria;
 using Terraria.GameContent.UI.Elements;
 using Terraria.UI;
@@ -90,10 +91,18 @@ namespace ExperienceAndClasses.UI {
 
             Height.Set((text_measure.Y * text_scale / 2f) + (Constants.UI_PADDING * 2) + 2f, 0f);
 
+            float width = text_measure.X * text_scale;
+            if (Width.Pixels < width)
+                Width.Set(width, 0f);
+
             if (hide_panel) {
                 BackgroundColor = Color.Transparent;
                 BorderColor = Color.Transparent;
             }
+        }
+
+        public void SetTextColour(Color colour) {
+            text.TextColor = colour;
         }
 
         public void SetText(string new_text) {
@@ -1041,7 +1050,7 @@ namespace ExperienceAndClasses.UI {
         public void Update() {
             if (active && (ability != null)) {
                 icon.SetImage(ability.Texture);
-                if (!ability.Unlocked) {
+                if (ability.Unlocked) {
                     icon.color = COLOUR_SOLID;
                 }
                 else {
@@ -1076,5 +1085,162 @@ namespace ExperienceAndClasses.UI {
             base.MouseOut(evt);
             UIInfo.Instance.EndText(this);
         }
+    }
+
+    public class ScrollPanel : UIPanel {
+        private const float SCROLLBAR_WIDTH = 20f;
+        private const float ITEM_SPACING = UI.Constants.UI_PADDING;
+        private const float SCROLL_SPEED = 20f;
+
+        private FixedUIScrollbar scrollbar;
+        private List<UIElement> items;
+        private List<float> item_tops;
+
+        RasterizerState _rasterizerState = new RasterizerState() { ScissorTestEnable = true };
+
+        public ScrollPanel(float width, float height, UserInterface ui, bool transparent = true) {
+            SetPadding(0f);
+            Width.Set(width, 0f);
+            Height.Set(height, 0f);
+
+            if (transparent) {
+                BackgroundColor = Color.Transparent;
+                BorderColor = Color.Transparent;
+            }
+
+            scrollbar = new FixedUIScrollbar(ui);
+            scrollbar.Height.Set(height - (UI.Constants.UI_PADDING * 3f), 0f);
+            scrollbar.Top.Set(UI.Constants.UI_PADDING, 0f);
+            scrollbar.Width.Set(SCROLLBAR_WIDTH, 0f);
+            scrollbar.Left.Set(width - SCROLLBAR_WIDTH - UI.Constants.UI_PADDING, 0f);
+            Append(scrollbar);
+
+            item_tops = new List<float>();
+            items = new List<UIElement>();
+        }
+
+        public void SetItems(List<UIElement> items) {
+            this.items = items;
+            RecalcItems();
+        }
+
+        private void RecalcItems() {
+            RemoveAllChildren();
+            Append(scrollbar);
+            if (items.Count > 0) {
+                item_tops.Clear();
+                float top = ITEM_SPACING;
+                foreach (UIElement item in items) {
+                    item.Top.Set(top, 0f);
+                    item.Left.Set(UI.Constants.UI_PADDING, 0f);
+                    item_tops.Add(top);
+                    Append(item);
+                    top += item.Height.Pixels + ITEM_SPACING;
+                }
+                if (top < Height.Pixels) {
+                    top = Height.Pixels;
+                }
+                scrollbar.SetView(Height.Pixels, top);
+                scrollbar.ViewPosition = 0f;
+            }
+        }
+
+        public override void Draw(SpriteBatch spriteBatch) {
+            //draw panel in the back
+            DrawSelf(spriteBatch);
+            
+            //stop normal draw
+            spriteBatch.End();
+
+            //start clipping draw
+            spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, null, null, _rasterizerState);
+            Rectangle prior_rect = spriteBatch.GraphicsDevice.ScissorRectangle;
+            spriteBatch.GraphicsDevice.ScissorRectangle = GetClippingRectangle(spriteBatch);
+
+            //draw each item in position (clips if outside panel)
+            for (int i = 0; i < items.Count; i++) {
+                items[i].Top.Set(item_tops[i] - scrollbar.GetValue(), 0f);
+                items[i].Draw(spriteBatch);
+            }
+
+            //put settings back as they were
+            spriteBatch.GraphicsDevice.ScissorRectangle = prior_rect;
+
+            //stop clipping draw
+            spriteBatch.End();
+
+            //start normal draw again
+            spriteBatch.Begin();
+
+            //draw scrollbar over everything
+            scrollbar.Draw(spriteBatch);
+        }
+
+        public override void ScrollWheel(UIScrollWheelEvent evt) {
+            base.ScrollWheel(evt);
+            if (evt.ScrollWheelValue > 0) {
+                scrollbar.ViewPosition -= SCROLL_SPEED;
+            }
+            else {
+                scrollbar.ViewPosition += SCROLL_SPEED;
+            }
+        }
+    }
+
+    public class PassiveIcon : UIElement {
+        private const float ICON_SIZE = 22;
+        private const float TEXT_SCALE = 0.7f;
+        private const float TEXT_WIDTH = 150f;
+        private readonly Color COLOUR_TRANSPARENT = new Color(128, 128, 128, 120);
+        private readonly Color COLOUR_SOLID = new Color(255, 255, 255, 255);
+
+        private UITransparantImage icon;
+        private HelpTextPanel text;
+        private Systems.Passive passive;
+
+        public PassiveIcon(Systems.Passive passive) {
+            this.passive = passive;
+
+            SetPadding(0f);
+
+            Texture2D texture = passive.Texture;
+            Color colour;
+            if (passive.Unlocked) {
+                icon = new UITransparantImage(texture, COLOUR_SOLID);
+                colour = Color.White;
+            }
+            else {
+                icon = new UITransparantImage(texture, COLOUR_TRANSPARENT);
+                colour = Color.Gray;
+            }
+            icon.ImageScale = ICON_SIZE / texture.Width;
+            icon.Width.Set(ICON_SIZE, 0f);
+            icon.Height.Set(ICON_SIZE, 0f);
+            icon.Left.Set(0f, 0f);
+            icon.Top.Set(0f, 0f);
+            Append(icon);
+
+            text = new HelpTextPanel(passive.Specific_Name, TEXT_SCALE, false, null, null, true, true);
+            text.SetTextColour(colour);
+            text.Height.Set(icon.Height.Pixels, 0f);
+            text.Left.Set(icon.Width.Pixels + UI.Constants.UI_PADDING, 0f);
+            text.Top.Set(UI.Constants.UI_PADDING, 0f);
+            text.Recalculate();
+            Append(text);
+
+            Width.Set(text.Left.Pixels + text.Width.Pixels + UI.Constants.UI_PADDING, 0f);
+            Height.Set(icon.Height.Pixels , 0f);
+        }
+
+        public override void MouseOver(UIMouseEvent evt) {
+            base.MouseOver(evt);
+            UIInfo.Instance.ShowPassive(this, passive);
+        }
+
+        public override void MouseOut(UIMouseEvent evt) {
+            base.MouseOut(evt);
+            UIInfo.Instance.EndText(this);
+        }
+
     }
 }
