@@ -958,9 +958,10 @@ namespace ExperienceAndClasses.Systems {
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Templates ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         public abstract class ChannelManaCostSync : Status {
-            protected ushort mana_cost_per_timed_effect = 5;
+            private ushort mana_cost_per_timed_effect;
+            private bool apply_mana_cost_reduction;
 
-            public ChannelManaCostSync(IDs id, Systems.Ability.IDs ability_id) : base(id) {
+            public ChannelManaCostSync(IDs id, Systems.Ability.IDs ability_id, ushort mana_cost_per_timed_effect = 5, float second_per_timed = 0.1f, bool apply_mana_cost_reduction = true) : base(id) {
                 Specific_Syncs = true;
                 specific_target_can_be_npc = false;
                 Specific_Duration_Type = DURATION_TYPES.TOGGLE;
@@ -968,9 +969,18 @@ namespace ExperienceAndClasses.Systems {
                 Specific_Effect_Type = EFFECT_TYPES.CONSTANT_AND_TIMED;
                 Specific_UI_Type = UI_TYPES.ONE;
                 Specific_Target_Channelling = true;
-                specific_timed_effect_sec = 0.1f;
                 specific_owner_player_required_ability = ability_id;
                 specific_remove_if_key_not_pressed = Systems.Ability.LOOKUP[(ushort)specific_owner_player_required_ability].hotkey;
+
+                this.mana_cost_per_timed_effect = mana_cost_per_timed_effect;
+                specific_timed_effect_sec = second_per_timed;
+                this.apply_mana_cost_reduction = apply_mana_cost_reduction;
+            }
+
+            protected override void OnStart() {
+                if (apply_mana_cost_reduction) {
+                    specific_timed_effect_sec /= Target.MPlayer.player.manaCost;
+                }
             }
 
             protected override void EffectTimed() {
