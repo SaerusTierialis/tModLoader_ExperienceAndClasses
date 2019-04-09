@@ -26,7 +26,7 @@ namespace ExperienceAndClasses.UI {
         private const float TEXT_SCALE_BODY_STATUS = 1f;
 
         private const float WIDTH_CLASS = 400f;
-        private const float WIDTH_ATTRIBUTE = 350f;
+        private const float WIDTH_ATTRIBUTE = 450f;
         private const float WIDTH_HELP = 300f;
         private const float WIDTH_STATUS = 300f;
         private const float WIDTH_UNLOCK = 300f;
