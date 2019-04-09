@@ -14,6 +14,8 @@ namespace ExperienceAndClasses.Systems {
         /// inlcudes NUMBER_OF_IDs and NONE
         /// </summary>
         public enum IDs : ushort {
+            LevelUp,
+
             Warrior_Block,
             Warrior_BlockPerfect,
 
@@ -731,16 +733,23 @@ namespace ExperienceAndClasses.Systems {
             }
 
             //do effect
-            if ((Specific_Effect_Type == EFFECT_TYPES.CONSTANT) || (Specific_Effect_Type == EFFECT_TYPES.CONSTANT_AND_TIMED)) {
+            if (Specific_Duration_Type == DURATION_TYPES.INSTANT) {
+                //do any effects for instant duration
                 EffectConstant();
+                EffectTimed();
             }
-            if ((Specific_Effect_Type == EFFECT_TYPES.TIMED) || (Specific_Effect_Type == EFFECT_TYPES.CONSTANT_AND_TIMED)) {
-                if (ExperienceAndClasses.Now.CompareTo(Times_Next_Timed_Effect[ID]) >= 0) {
-                    //call effect
-                    EffectTimed();
+            else {
+                if ((Specific_Effect_Type == EFFECT_TYPES.CONSTANT) || (Specific_Effect_Type == EFFECT_TYPES.CONSTANT_AND_TIMED)) {
+                    EffectConstant();
+                }
+                if ((Specific_Effect_Type == EFFECT_TYPES.TIMED) || (Specific_Effect_Type == EFFECT_TYPES.CONSTANT_AND_TIMED)) {
+                    if (ExperienceAndClasses.Now.CompareTo(Times_Next_Timed_Effect[ID]) >= 0) {
+                        //call effect
+                        EffectTimed();
 
-                    //calculate next time of effect
-                    Times_Next_Timed_Effect[ID] = Times_Next_Timed_Effect[ID].AddSeconds(specific_timed_effect_sec);
+                        //calculate next time of effect
+                        Times_Next_Timed_Effect[ID] = Times_Next_Timed_Effect[ID].AddSeconds(specific_timed_effect_sec);
+                    }
                 }
             }
         }
@@ -1030,6 +1039,43 @@ namespace ExperienceAndClasses.Systems {
             }
         }
 
+        public abstract class InstantSync : Status {
+            public InstantSync(IDs id) : base(id) {
+                Specific_Syncs = true;
+                Specific_Duration_Type = DURATION_TYPES.INSTANT;
+            }
+        }
+
+        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Generic ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+        public class LevelUp : InstantSync {
+            public LevelUp() : base(IDs.LevelUp) {
+                Specific_Name = "Level Up!";
+            }
+
+            protected override void OnStart() {
+                int life = Target.MPlayer.player.statLifeMax2 - Target.MPlayer.player.statLife;
+                int mana = Target.MPlayer.player.statManaMax2 - Target.MPlayer.player.statMana;
+
+                if (life > 0)
+                    Target.MPlayer.player.HealEffect(life, false);
+                if (mana > 0)
+                    Target.MPlayer.player.ManaEffect(mana);
+
+                Target.MPlayer.player.statLife = Target.MPlayer.player.statLifeMax2;
+                Target.MPlayer.player.statMana = Target.MPlayer.player.statManaMax2;
+
+                for (byte i = 0; i < 20; i++) {
+                    Dust.NewDustDirect(Target.Position, 1, 1, DustID.Fireworks, Main.rand.NextFloat(-5f, +5f), Main.rand.NextFloat(-1f, -10f));
+                    Dust.NewDustDirect(Target.Position, 1, 1, DustID.Confetti, Main.rand.NextFloat(-5f, +5f), Main.rand.NextFloat(-1f, -10f));
+                }
+            }
+
+            public static void CreateNew(Utilities.Containers.Thing owner) {
+                Add(IDs.LevelUp, owner, owner);
+            }
+        }
+
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Warrior ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         public class Warrior_Block : ChannelManaCostSync {
@@ -1038,7 +1084,6 @@ namespace ExperienceAndClasses.Systems {
                 Specific_Description = "Defense increased while channelling";
                 //specific_texture_path = "ExperienceAndClasses/Textures/Status/Block";
 
-                //add any sync data types that will be used (for syncing)
                 Specific_Autosync_Data_Types.Add(AUTOSYNC_DATA_TYPES.MAGNITUDE1);
             }
 
@@ -1046,7 +1091,6 @@ namespace ExperienceAndClasses.Systems {
                 Target.MPlayer.player.statDefense += (int)Magitude1;
             }
 
-            //must inlcude a static add method with target/owner and any extra info
             public static void CreateNew(Utilities.Containers.Thing owner, float defense_bonus) {
                 Add(IDs.Warrior_Block, owner, owner, new Dictionary<AUTOSYNC_DATA_TYPES, float> {
                     { AUTOSYNC_DATA_TYPES.MAGNITUDE1, defense_bonus }
@@ -1062,7 +1106,6 @@ namespace ExperienceAndClasses.Systems {
                 specific_remove_on_owner_immobilized = true;
                 specific_remove_on_owner_silenced = true;
 
-                //add any sync data types that will be used (for syncing)
                 Specific_Autosync_Data_Types.Add(AUTOSYNC_DATA_TYPES.MAGNITUDE1);
             }
 
@@ -1070,7 +1113,7 @@ namespace ExperienceAndClasses.Systems {
                 Target.MPlayer.player.statDefense += (int)Magitude1;
             }
 
-            //must inlcude a static add method with target/owner and any extra info
+
             public static void CreateNew(Utilities.Containers.Thing owner, float defense_bonus) {
                 Add(IDs.Warrior_BlockPerfect, owner, owner, new Dictionary<AUTOSYNC_DATA_TYPES, float> {
                     { AUTOSYNC_DATA_TYPES.MAGNITUDE1, defense_bonus }

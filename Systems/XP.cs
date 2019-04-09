@@ -136,7 +136,10 @@ namespace ExperienceAndClasses.Systems {
                         return;
                     }
 
-                    LocalCheckDoLevelup();
+                    if (LocalCheckDoLevelup()) {
+                        //levelup!
+                        Systems.Status.LevelUp.CreateNew(ExperienceAndClasses.LOCAL_MPLAYER.thing);
+                    }
                 }
                 else {
                     ExperienceAndClasses.LOCAL_MPLAYER.extra_xp = Math.Max(ExperienceAndClasses.LOCAL_MPLAYER.extra_xp, ExperienceAndClasses.LOCAL_MPLAYER.extra_xp + xp); //prevent overflow
@@ -164,7 +167,7 @@ namespace ExperienceAndClasses.Systems {
             /// <summary>
             /// Look for any levelup, update as needed
             /// </summary>
-            private static void LocalCheckDoLevelup() {
+            private static bool LocalCheckDoLevelup() {
                 //store prior levels to detect level-up
                 byte effective_primary = ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary_Level_Effective;
                 byte effective_secondary = ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary_Level_Effective;
@@ -179,10 +182,12 @@ namespace ExperienceAndClasses.Systems {
                 //update class info if needed
                 if ((effective_primary != ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary_Level_Effective) || (effective_secondary != ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary_Level_Effective)) {
                     MPlayer.LocalUpdateAll();
+                    return true;
                 }
                 else {
                     //otherwise just update xp bars
                     UI.UIHUD.Instance.Update();
+                    return false;
                 }
             }
 
