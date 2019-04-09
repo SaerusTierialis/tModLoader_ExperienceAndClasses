@@ -27,7 +27,7 @@ namespace ExperienceAndClasses.Systems {
             BloodKnight,
             Berserker,
             Guardian,
-            Engineer,
+            Tinkerer,
             Sniper,
             Elementalist,
             Sage,
@@ -662,8 +662,8 @@ namespace ExperienceAndClasses.Systems {
         }
 
         public class Engineer : Tier3 {
-            public Engineer() : base(IDs.Engineer, PowerScaling.IDs.ProjectileMinion, IDs.Ranger) {
-                Name = "Engineer";
+            public Engineer() : base(IDs.Tinkerer, PowerScaling.IDs.ProjectileMinion, IDs.Ranger) {
+                Name = "Tinkerer";
                 Description = "TODO_desc";
                 Class_Locations[3, 1] = ID_num;
                 Attribute_Growth[(byte)Attribute.IDs.Power] = 3;
