@@ -226,7 +226,7 @@ namespace ExperienceAndClasses.UI {
             panel.Append(panel_help);
 
             //help title
-            panel_help.SetTitle("Info", FONT_SCALE_TITLE, true, "TODO_help_text", "Info");
+            panel_help.SetTitle("Help", FONT_SCALE_TITLE, true, "TODO_help_text", "Info");
 
             //done adding to main panel
             state.Append(panel);
