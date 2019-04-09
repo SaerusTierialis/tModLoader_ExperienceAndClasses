@@ -71,15 +71,16 @@ namespace ExperienceAndClasses.UI {
     public class HelpTextPanel : UIPanel {
         private UIText text;
         private string help_text_title, help_text;
-        private bool center_text;
+        private bool center_text, center_vertical;
         private float text_scale;
         private Vector2 text_measure;
 
-        public HelpTextPanel(string title, float text_scale, bool center_text=true, string help_text=null, string help_text_title=null) {
+        public HelpTextPanel(string title, float text_scale, bool center_text=true, string help_text=null, string help_text_title=null, bool center_vertical = true, bool hide_panel = false) {
             SetPadding(0f);
             this.help_text_title = help_text_title;
             this.help_text = help_text;
             this.center_text = center_text;
+            this.center_vertical = center_vertical;
             this.text_scale = text_scale;
 
             text = new UIText(title, text_scale);
@@ -88,6 +89,11 @@ namespace ExperienceAndClasses.UI {
             text_measure = Main.fontMouseText.MeasureString(text.Text);
 
             Height.Set((text_measure.Y * text_scale / 2f) + (Constants.UI_PADDING * 2) + 2f, 0f);
+
+            if (hide_panel) {
+                BackgroundColor = Color.Transparent;
+                BorderColor = Color.Transparent;
+            }
         }
 
         public void SetText(string new_text) {
@@ -101,6 +107,9 @@ namespace ExperienceAndClasses.UI {
             if (center_text) {
                 text.Top.Set((Height.Pixels - (text_measure.Y * text_scale / 2f)) / 2f , 0f);
                 text.Left.Set((Width.Pixels - (text_measure.X * text_scale)) / 2f, 0f);
+            }
+            else if (center_vertical) {
+                text.Top.Set((Height.Pixels - (text_measure.Y * text_scale / 2f)) / 2f, 0f);
             }
         }
 
@@ -1007,6 +1016,65 @@ namespace ExperienceAndClasses.UI {
             if (visible) {
                 base.Draw(spriteBatch);
             }
+        }
+    }
+
+    public class AbilityIcon : UIElement {
+        private readonly Color COLOUR_TRANSPARENT = new Color(128, 128, 128, 120);
+        private readonly Color COLOUR_SOLID = new Color(255, 255, 255, 255);
+
+        private UITransparantImage icon;
+        private Systems.Ability ability;
+        public bool active;
+
+        public AbilityIcon() {
+            SetPadding(0f);
+            active = false;
+
+            Width.Set(UIMain.SIZE_ABILITY_ICON, 0f);
+            Height.Set(UIMain.SIZE_ABILITY_ICON, 0f);
+
+            icon = new UITransparantImage(Utilities.Textures.TEXTURE_BLANK, COLOUR_TRANSPARENT);
+            Append(icon);
+        }
+
+        public void Update() {
+            if (active && (ability != null)) {
+                icon.SetImage(ability.Texture);
+                if (!ability.Unlocked) {
+                    icon.color = COLOUR_SOLID;
+                }
+                else {
+                    icon.color = COLOUR_TRANSPARENT;
+                }
+            }
+            else {
+                icon.SetImage(Utilities.Textures.TEXTURE_BLANK);
+                icon.color = COLOUR_TRANSPARENT;
+            }
+        }
+
+        public void SetAbility(Systems.Ability ability) {
+            this.ability = ability;
+            if (ability == null) {
+                active = false;
+            }
+            else {
+                active = true;
+            }
+            Update();
+        }
+
+        public override void MouseOver(UIMouseEvent evt) {
+            base.MouseOver(evt);
+            if (active) {
+                UIInfo.Instance.ShowAbility(this, ability);
+            }
+        }
+
+        public override void MouseOut(UIMouseEvent evt) {
+            base.MouseOut(evt);
+            UIInfo.Instance.EndText(this);
         }
     }
 }

@@ -31,6 +31,7 @@ namespace ExperienceAndClasses.UI {
         private const float WIDTH_STATUS = 300f;
         private const float WIDTH_UNLOCK = 300f;
         private const float WIDTH_RESET = 400f;
+        private const float WIDTH_ABILITY = 400f;
 
         private const float BUTTON_SEPARATION = 100f;
 
@@ -347,6 +348,10 @@ namespace ExperienceAndClasses.UI {
             unlock_mode = INPUT_MODE.RESET_ATTRIBUTES;
 
             ShowText(source, "Attribute Reset", str, WIDTH_RESET, null, 0, ModLoader.GetTexture(Systems.Attribute.RESET_COST_ITEM.Texture), true);
+        }
+
+        public void ShowAbility(UIElement source, Systems.Ability ability) {
+            ShowText(source, ability.Specific_Name, ability.Tooltip, WIDTH_ABILITY);
         }
 
     }
