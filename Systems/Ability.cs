@@ -458,8 +458,9 @@ namespace ExperienceAndClasses.Systems {
                     if (!target_position_line_of_sight) {
                         //can't see target, need to move closer
                         Vector2 position_reference = position_target;
-                        for (float percent_dist=0.9f; percent_dist >= 0; percent_dist -= 0.1f) {
-                            position_target = Vector2.Lerp(position_player, position_reference, percent_dist);
+                        float distance_reference = Vector2.Distance(position_player, position_reference);
+                        for (float distance = distance_reference; distance >= 0; distance -= 50f) {
+                            position_target = Vector2.Lerp(position_player, position_reference, distance / distance_reference);
                             position_target_distance = Vector2.Distance(position_player, position_target) - 1f;
                             target_position_line_of_sight = Collision.CanHit(position_player, 0, 0, position_target, 0, 0);
                             if (target_position_line_of_sight) {
