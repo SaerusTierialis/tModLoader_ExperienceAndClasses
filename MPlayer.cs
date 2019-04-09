@@ -955,19 +955,22 @@ namespace ExperienceAndClasses {
             //class unlocked
             List<bool> class_unlock_loaded = Utilities.Commons.TryGet<List<bool>>(tag, "eac_class_unlock", new List<bool>());
             for (byte i = 0; i < class_unlock_loaded.Count; i++) {
-                Class_Unlocked[i] = class_unlock_loaded[i];
+                if (i < Class_Unlocked.Length)
+                    Class_Unlocked[i] = class_unlock_loaded[i];
             }
 
             //class level
             List<byte> class_level_loaded = Utilities.Commons.TryGet<List<byte>>(tag, "eac_class_level", new List<byte>());
             for (byte i = 0; i < class_level_loaded.Count; i++) {
-                Class_Levels[i] = class_level_loaded[i];
+                if (i < Class_Levels.Length)
+                    Class_Levels[i] = class_level_loaded[i];
             }
 
             //class xp
             List<uint> class_xp_loaded = Utilities.Commons.TryGet<List<uint>>(tag, "eac_class_xp", new List<uint>());
             for (byte i = 0; i < class_xp_loaded.Count; i++) {
-                Class_XP[i] = class_xp_loaded[i];
+                if (i < Class_XP.Length)
+                    Class_XP[i] = class_xp_loaded[i];
             }
 
             //fix any potential issues...
