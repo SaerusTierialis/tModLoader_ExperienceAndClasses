@@ -297,7 +297,7 @@ namespace ExperienceAndClasses.Systems {
         /// <summary>
         /// remove if owner is local player and they are not pressing this key | default is null
         /// </summary>
-        protected ModHotKey specific_remove_if_key_not_pressed = null;
+        protected List<ModHotKey> specific_remove_if_key_not_pressed = null;
 
         /// <summary>
         /// has a visual drawn behind target (uses DrawEffectBack) | default is false
@@ -605,8 +605,18 @@ namespace ExperienceAndClasses.Systems {
                 }
 
                 //key press
-                if (specific_remove_if_key_not_pressed != null && !specific_remove_if_key_not_pressed.Current) {
-                    return CHECK_REMOVE.REMOVE_KEY_NOT_PRESSED;
+                if (specific_remove_if_key_not_pressed != null) {
+                    bool any_pressed = false;
+                    foreach (ModHotKey key in specific_remove_if_key_not_pressed) {
+                        if (key.Current) {
+                            any_pressed = true;
+                            break;
+                        }
+                    }
+
+                    if (!any_pressed) {
+                        return CHECK_REMOVE.REMOVE_KEY_NOT_PRESSED;
+                    }
                 }
             }
 
@@ -979,7 +989,7 @@ namespace ExperienceAndClasses.Systems {
                 Specific_UI_Type = UI_TYPES.ONE;
                 Specific_Target_Channelling = true;
                 specific_owner_player_required_ability = ability_id;
-                specific_remove_if_key_not_pressed = Systems.Ability.LOOKUP[(ushort)specific_owner_player_required_ability].hotkey;
+                specific_remove_if_key_not_pressed = Systems.Ability.LOOKUP[(ushort)specific_owner_player_required_ability].hotkeys;
 
                 this.mana_cost_per_timed_effect = mana_cost_per_timed_effect;
                 specific_timed_effect_sec = second_per_timed;

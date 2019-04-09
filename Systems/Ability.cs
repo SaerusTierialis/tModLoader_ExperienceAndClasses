@@ -209,10 +209,9 @@ namespace ExperienceAndClasses.Systems {
 
         private DateTime Time_Cooldown_End = DateTime.MinValue;
 
-        public ModHotKey hotkey = null;
-        public bool hotkey_alternate = false;
-        public bool hotkey_primary = true;
-        public int hotkey_index = 0;
+        public List<ModHotKey> hotkeys { get; private set; } = new List<ModHotKey>();
+        private string hotkey = "";
+        private bool hotkey_not_set = false;
 
         public bool Unlocked { get; private set; } = false;
 
@@ -242,6 +241,22 @@ namespace ExperienceAndClasses.Systems {
             ID_num = (ushort)id;
         }
 
+        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Public Static Methods ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+        public static void ClearHotkeyData() {
+            foreach (Ability ability in LOOKUP) {
+                ability.hotkeys.Clear();
+                ability.hotkey = "";
+                ability.hotkey_not_set = false;
+            }
+        }
+
+        public static void UpdateTooltips() {
+            foreach (Ability ability in LOOKUP) {
+                ability.UpdateTooltip();
+            }
+        }
+
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Public Instance Methods ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         /// <summary>
@@ -254,6 +269,43 @@ namespace ExperienceAndClasses.Systems {
             else {
                 Texture = Utilities.Textures.TEXTURE_ABILITY_DEFAULT;
             }
+        }
+
+        public void AddHotkeyData(bool primary, bool alternate, int index) {
+            if (hotkey.Length > 0) {
+                hotkey += " , ";
+            }
+
+            hotkey += "[";
+
+            if (alternate) {
+                if (ExperienceAndClasses.HOTKEY_ALTERNATE_EFFECT.GetAssignedKeys().Count > 0) {
+                    hotkey += ExperienceAndClasses.HOTKEY_ALTERNATE_EFFECT.GetAssignedKeys()[0] + " + ";
+                }
+                else {
+                    hotkey_not_set = true;
+                    hotkey += "Alternate + ";
+                }
+            }
+
+            ModHotKey key;
+            if (primary) {
+                key = ExperienceAndClasses.HOTKEY_ABILITY_PRIMARY[index];
+            }
+            else {
+                key = ExperienceAndClasses.HOTKEY_ABILITY_SECONDARY[index];
+            }
+            hotkeys.Add(key);
+
+            if (key.GetAssignedKeys().Count > 0) {
+                hotkey += key.GetAssignedKeys()[0];
+            }
+            else {
+                hotkey_not_set = true;
+                hotkey += "Primary" + index;
+            }
+
+            hotkey += "]";
         }
 
         public void Activate() {
@@ -323,40 +375,17 @@ namespace ExperienceAndClasses.Systems {
             }
         }
 
-        public void UpdateTooltip() {
+        private void UpdateTooltip() {
             Tooltip = "Required Class: " + Systems.Class.LOOKUP[(byte)Specific_Required_Class_ID].Name + "\n" +
                         "Required Level: " + Specific_Required_Class_Level + "\n\n";
 
             Tooltip += specific_description + "\n";
 
-            string key_combo = "";
-            bool keys_not_set = false;
-            if (hotkey_alternate) {
-                if (ExperienceAndClasses.HOTKEY_ALTERNATE_EFFECT.GetAssignedKeys().Count > 0) {
-                    key_combo = ExperienceAndClasses.HOTKEY_ALTERNATE_EFFECT.GetAssignedKeys()[0];
-                }
-                else {
-                    keys_not_set = true;
-                    key_combo = "Alternate";
-                }
-                key_combo += " + ";
+            Tooltip += "\nHotkey: " + hotkey;
+            if (hotkey_not_set) {
+                Tooltip += " (key not set)";
             }
-            if (hotkey.GetAssignedKeys().Count > 0) {
-                key_combo += hotkey.GetAssignedKeys()[0];
-            }
-            else {
-                keys_not_set = true;
-                if (hotkey_primary) {
-                    key_combo += "Primary" + hotkey_index;
-                }
-                else {
-                    key_combo += "Secondary" + hotkey_index;
-                }
-            }
-            if (keys_not_set) {
-                key_combo += " (key not set)";
-            }
-            Tooltip += "\nHotkey: " + key_combo + "\n";
+            Tooltip += "\n";
 
             if (specific_show_level_in_tooltip) {
                 Tooltip += "Ability Level: " + level + "\n";

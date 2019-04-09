@@ -441,11 +441,17 @@ namespace ExperienceAndClasses {
                 }
             }
 
+            //clear ability hotkey data
+            Systems.Ability.ClearHotkeyData();
+
             //populate abilities (and updates unlocked + updates passives + set hotkey)
             local.Abilities_Primary = local.Class_Primary.GetAbilities(true, false);
             local.Abilities_Primary_Alt = local.Class_Primary.GetAbilities(true, true);
             local.Abilities_Secondary = local.Class_Secondary.GetAbilities(false, false);
             local.Abilities_Secondary_Alt = local.Class_Secondary.GetAbilities(false, true);
+
+            //update ability tooltips
+            Systems.Ability.UpdateTooltips();
 
             //update UI
             UI.UIMain.Instance.UpdateClassInfo();

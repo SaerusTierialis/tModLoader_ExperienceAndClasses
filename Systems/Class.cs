@@ -432,16 +432,7 @@ namespace ExperienceAndClasses.Systems {
                     abilities[i] = Systems.Ability.LOOKUP[(ushort)id];
                     abilities[i].UpdatePassives();
                     abilities[i].UpdateUnlock();
-                    if (primary) {
-                        abilities[i].hotkey = ExperienceAndClasses.HOTKEY_ABILITY_PRIMARY[i];
-                    }
-                    else {
-                        abilities[i].hotkey = ExperienceAndClasses.HOTKEY_ABILITY_SECONDARY[i];
-                    }
-                    abilities[i].hotkey_primary = primary;
-                    abilities[i].hotkey_alternate = alternate;
-                    abilities[i].hotkey_index = i;
-                    abilities[i].UpdateTooltip();
+                    abilities[i].AddHotkeyData(primary, alternate, i);
                 }
             }
             return abilities;
