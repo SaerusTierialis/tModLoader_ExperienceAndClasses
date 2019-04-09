@@ -49,6 +49,11 @@ namespace ExperienceAndClasses.UI {
                 panel.visible = false;
             }
             else {
+                //TODO - call at fixed intervals instead of constantly (don't need to set cooldown visuals that often)
+                //TODO - remove rearrange checks (will be in UpdateClassInfo)
+                //TODO - add updating of resource
+                //TODO - add update of cooldown
+
                 panel.visible = true;
 
                 bool needs_rearrangement = false;
@@ -92,6 +97,35 @@ namespace ExperienceAndClasses.UI {
                     panel.Height.Set(y, 0f);
                 }
             }
+        }
+
+        public void UpdateClassInfo() {
+            //xp bars
+
+            //TODO
+
+            //resource bars
+
+            //TODO
+
+            //cooldown icons
+
+            //TODO
+
+            /*
+            
+            //create Abilities_Summary_For_UIHUD
+            local.Abilities_Summary_For_UIHUD = new List<Systems.Ability>();
+            for (int i=0; i<ExperienceAndClasses.NUMBER_ABILITY_SLOTS_PER_CLASS; i++) {
+                foreach (Systems.Ability ability in new Systems.Ability[] {local.Abilities_Primary[i], local.Abilities_Primary_Alt[i], local.Abilities_Secondary[i], local.Abilities_Secondary_Alt[i] }) {
+                    if (ability != null && ability.Unlocked && !local.Abilities_Summary_For_UIHUD.Contains(ability)) {
+                        local.Abilities_Summary_For_UIHUD.Add(ability);
+                    }
+                }
+            }
+
+            */
+
         }
     }
 }

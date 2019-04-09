@@ -97,7 +97,6 @@ namespace ExperienceAndClasses {
         private Systems.Ability[] Abilities_Primary_Alt;
         private Systems.Ability[] Abilities_Secondary;
         private Systems.Ability[] Abilities_Secondary_Alt;
-        public List<Systems.Ability> Abilities_Summary { get; private set; }
 
         public Dictionary<Systems.Resource.IDs, Systems.Resource> Resources { get; private set; }
 
@@ -234,7 +233,6 @@ namespace ExperienceAndClasses {
             Abilities_Primary_Alt = new Systems.Ability[ExperienceAndClasses.NUMBER_ABILITY_SLOTS_PER_CLASS];
             Abilities_Secondary = new Systems.Ability[ExperienceAndClasses.NUMBER_ABILITY_SLOTS_PER_CLASS];
             Abilities_Secondary_Alt = new Systems.Ability[ExperienceAndClasses.NUMBER_ABILITY_SLOTS_PER_CLASS];
-            Abilities_Summary = new List<Systems.Ability>();
             channelling = false;
         }
 
@@ -448,16 +446,6 @@ namespace ExperienceAndClasses {
             local.Abilities_Primary_Alt = local.Class_Primary.GetAbilities(true, true);
             local.Abilities_Secondary = local.Class_Secondary.GetAbilities(false, false);
             local.Abilities_Secondary_Alt = local.Class_Secondary.GetAbilities(false, true);
-
-            //create summary list of abilities (includes locked)
-            local.Abilities_Summary = new List<Systems.Ability>();
-            for (int i=0; i<ExperienceAndClasses.NUMBER_ABILITY_SLOTS_PER_CLASS; i++) {
-                foreach (Systems.Ability ability in new Systems.Ability[] {local.Abilities_Primary[i], local.Abilities_Primary_Alt[i], local.Abilities_Secondary[i], local.Abilities_Secondary_Alt[i] }) {
-                    if (ability != null) {
-                        local.Abilities_Summary.Add(ability);
-                    }
-                }
-            }
 
             //update UI
             UI.UIMain.Instance.UpdateClassInfo();
