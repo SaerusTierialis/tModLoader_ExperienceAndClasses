@@ -662,7 +662,7 @@ namespace ExperienceAndClasses.Systems {
         }
 
         public class Engineer : Tier3 {
-            public Engineer() : base(IDs.Engineer, PowerScaling.IDs.Projectile, IDs.Ranger) {
+            public Engineer() : base(IDs.Engineer, PowerScaling.IDs.ProjectileMinion, IDs.Ranger) {
                 Name = "Engineer";
                 Description = "TODO_desc";
                 Class_Locations[3, 1] = ID_num;

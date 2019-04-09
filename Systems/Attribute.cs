@@ -360,6 +360,7 @@ namespace ExperienceAndClasses.Systems {
             CloseRangeMelee,
             CloseRangeAll,
             Projectile,
+            ProjectileMinion,
             AllCore,
             Holy_AllCore,
             MinionOnly,
@@ -589,6 +590,18 @@ namespace ExperienceAndClasses.Systems {
                 Magic = SCALE_PRIMARY;
                 Throwing = SCALE_PRIMARY;
                 Melee_Projectile = SCALE_PRIMARY;
+            }
+        }
+
+        public class ProjectileMinion : PowerScaling {
+            public ProjectileMinion() : base(IDs.ProjectileMinion) {
+                Primary_Types = "Ranged, Magic, Throwing, Projectile Melee";
+                Ranged = SCALE_PRIMARY;
+                Magic = SCALE_PRIMARY;
+                Throwing = SCALE_PRIMARY;
+                Melee_Projectile = SCALE_PRIMARY;
+                Secondary_Types = "Minion";
+                Minion = SCALE_SECONDARY;
             }
         }
 
