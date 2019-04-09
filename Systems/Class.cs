@@ -19,7 +19,7 @@ namespace ExperienceAndClasses.Systems {
             Novice,
             Warrior,
             Ranger,
-            Mage,
+            Traveler,
             Rogue,
             Summoner,
             Cleric,
@@ -28,14 +28,13 @@ namespace ExperienceAndClasses.Systems {
             Berserker,
             Guardian,
             Tinkerer,
-            Sniper,
-            Elementalist,
-            Sage,
-            Assassin,
+            Artillery,
             Chrono,
-            Ninja,
-            Hivemind,
+            Controller,
+            Shadow,
+            Assassin,
             SoulBinder,
+            Placeholder,
             Saint,
             HybridPrime,
             Explorer,
@@ -563,13 +562,15 @@ namespace ExperienceAndClasses.Systems {
             }
         }
 
-        public class Mage : Tier2 {
-            public Mage() : base(IDs.Mage, PowerScaling.IDs.AllCore) {
-                Name = "Mage";
+        public class Traveler : Tier2 {
+            public Traveler() : base(IDs.Traveler, PowerScaling.IDs.AllCore) {
+                Name = "Traveler";
                 Description = "TODO_desc";
                 Class_Locations[1, 2] = ID_num;
-                Attribute_Growth[(byte)Attribute.IDs.Power] = 3;
-                Attribute_Growth[(byte)Attribute.IDs.Mind] = 3;
+                Attribute_Growth[(byte)Attribute.IDs.Dexterity] = 2;
+                Attribute_Growth[(byte)Attribute.IDs.Vitality] = 2;
+                Attribute_Growth[(byte)Attribute.IDs.Mind] = 2;
+                Attribute_Growth[(byte)Attribute.IDs.Agility] = 2;
             }
         }
 
@@ -651,9 +652,9 @@ namespace ExperienceAndClasses.Systems {
             }
         }
 
-        public class Sniper : Tier3 {
-            public Sniper() : base(IDs.Sniper, PowerScaling.IDs.Projectile, IDs.Ranger) {
-                Name = "Sniper";
+        public class Artillery : Tier3 {
+            public Artillery() : base(IDs.Artillery, PowerScaling.IDs.Projectile, IDs.Ranger) {
+                Name = "Artillery";
                 Description = "TODO_desc";
                 Class_Locations[2, 1] = ID_num;
                 Attribute_Growth[(byte)Attribute.IDs.Power] = 4;
@@ -661,8 +662,8 @@ namespace ExperienceAndClasses.Systems {
             }
         }
 
-        public class Engineer : Tier3 {
-            public Engineer() : base(IDs.Tinkerer, PowerScaling.IDs.ProjectileMinion, IDs.Ranger) {
+        public class Tinkerer : Tier3 {
+            public Tinkerer() : base(IDs.Tinkerer, PowerScaling.IDs.ProjectileMinion, IDs.Ranger) {
                 Name = "Tinkerer";
                 Description = "TODO_desc";
                 Class_Locations[3, 1] = ID_num;
@@ -673,24 +674,26 @@ namespace ExperienceAndClasses.Systems {
             }
         }
 
-        public class Elementalist : Tier3 {
-            public Elementalist() : base(IDs.Elementalist, PowerScaling.IDs.AllCore, IDs.Mage) {
-                Name = "Elementalist";
+        public class Controller : Tier3 {
+            public Controller() : base(IDs.Controller, PowerScaling.IDs.AllCore, IDs.Traveler) {
+                Name = "Controller";
                 Description = "TODO_desc";
                 Class_Locations[2, 2] = ID_num;
-                Attribute_Growth[(byte)Attribute.IDs.Power] = 5;
-                Attribute_Growth[(byte)Attribute.IDs.Mind] = 3;
+                Attribute_Growth[(byte)Attribute.IDs.Dexterity] = 3;
+                Attribute_Growth[(byte)Attribute.IDs.Vitality] = 2;
+                Attribute_Growth[(byte)Attribute.IDs.Mind] = 2;
+                Attribute_Growth[(byte)Attribute.IDs.Agility] = 3;
             }
         }
 
-        public class Sage : Tier3 {
-            public Sage() : base(IDs.Sage, PowerScaling.IDs.AllCore, IDs.Mage) {
-                Name = "Sage";
+        public class Shadow : Tier3 {
+            public Shadow() : base(IDs.Shadow, PowerScaling.IDs.AllCore, IDs.Traveler) {
+                Name = "Shadow";
                 Description = "TODO_desc";
-                Class_Locations[3, 2] = ID_num;
+                Class_Locations[3, 3] = ID_num;
                 Attribute_Growth[(byte)Attribute.IDs.Power] = 3;
-                Attribute_Growth[(byte)Attribute.IDs.Vitality] = 2;
-                Attribute_Growth[(byte)Attribute.IDs.Mind] = 4;
+                Attribute_Growth[(byte)Attribute.IDs.Dexterity] = 2;
+                Attribute_Growth[(byte)Attribute.IDs.Agility] = 4;
             }
         }
 
@@ -709,21 +712,10 @@ namespace ExperienceAndClasses.Systems {
             public Chrono() : base(IDs.Chrono, PowerScaling.IDs.Projectile, IDs.Ranger) {
                 Name = "Chrono";
                 Description = "TODO_desc";
-                Class_Locations[3, 3] = ID_num;
+                Class_Locations[4, 1] = ID_num;
                 Attribute_Growth[(byte)Attribute.IDs.Power] = 2;
                 Attribute_Growth[(byte)Attribute.IDs.Spirit] = 2;
                 Attribute_Growth[(byte)Attribute.IDs.Dexterity] = 5;
-            }
-        }
-
-        public class Ninja : Tier3 {
-            public Ninja() : base(IDs.Ninja, PowerScaling.IDs.AllCore, IDs.Rogue) {
-                Name = "Ninja";
-                Description = "TODO_desc";
-                Class_Locations[4, 3] = ID_num;
-                Attribute_Growth[(byte)Attribute.IDs.Power] = 3;
-                Attribute_Growth[(byte)Attribute.IDs.Spirit] = 3;
-                Attribute_Growth[(byte)Attribute.IDs.Agility] = 3;
             }
         }
 
@@ -738,13 +730,12 @@ namespace ExperienceAndClasses.Systems {
             }
         }
 
-        public class Hivemind : Tier3 {
-            public Hivemind() : base(IDs.Hivemind, PowerScaling.IDs.MinionOnly, IDs.Summoner) {
-                Name = "Hivemind";
+        public class Placeholder : Tier3 {
+            public Placeholder() : base(IDs.Placeholder, PowerScaling.IDs.MinionOnly, IDs.Summoner) {
+                Name = "Placeholder";
                 Description = "TODO_desc";
                 Class_Locations[3, 4] = ID_num;
-                Attribute_Growth[(byte)Attribute.IDs.Power] = 3;
-                Attribute_Growth[(byte)Attribute.IDs.Mind] = 2;
+                Attribute_Growth[(byte)Attribute.IDs.Power] = 4;
                 Attribute_Growth[(byte)Attribute.IDs.Spirit] = 4;
             }
         }
