@@ -19,8 +19,7 @@ namespace ExperienceAndClasses.UI {
         private const float HEIGHT = 200f; //default, actual height is dynamic
 
         private const float MAX_WIDTH_PER_ITEM_ROW = WIDTH - (Constants.UI_PADDING * 2);
-        private const float SPACING_ABILITY_ICON = 2f;
-        private const float SPACING_RESOURCE = 2f;
+        private const float SPACING = 2f;
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Variables ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         public DragableUIPanel panel { get; private set; }
@@ -45,18 +44,20 @@ namespace ExperienceAndClasses.UI {
             panel.Append(xp_bars[0]);
 
             xp_bars[1] = new XPBar(MAX_WIDTH_PER_ITEM_ROW);
-            xp_bars[1].Top.Set(xp_bars[0].Top.Pixels + xp_bars[0].Height.Pixels + Constants.UI_PADDING, 0f);
+            xp_bars[1].Top.Set(xp_bars[0].Top.Pixels + xp_bars[0].Height.Pixels + SPACING, 0f);
             xp_bars[1].Left.Set(Constants.UI_PADDING, 0f);
             panel.Append(xp_bars[1]);
 
             //resource panel and bars
             resource_bars = new List<ResourceBar>();
-            panel_resource = new DragableUIPanel(panel.Width.Pixels, 0f, panel.BackgroundColor, this, false, false, false);
+            panel_resource = new DragableUIPanel(panel.Width.Pixels, 0f, Color.Transparent, this, false, false, false);
+            panel_resource.BorderColor = Color.Transparent;
             panel.Append(panel_resource);
 
             //cooldown icons
             ability_icons = new AbilityIconCooldown[ExperienceAndClasses.NUMBER_ABILITY_SLOTS_PER_CLASS * 4];
-            panel_cooldown = new DragableUIPanel(panel.Width.Pixels, 0f, panel.BackgroundColor, this, false, false, false);
+            panel_cooldown = new DragableUIPanel(panel.Width.Pixels, 0f, Color.Transparent, this, false, false, false);
+            panel_cooldown.BorderColor = Color.Transparent;
             panel.Append(panel_cooldown);
             float left = Constants.UI_PADDING;
             float left_max = panel_cooldown.Width.Pixels - Constants.UI_PADDING - AbilityIconCooldown.SIZE;
@@ -66,10 +67,10 @@ namespace ExperienceAndClasses.UI {
                 ability_icons[i].Left.Set(left, 0f);
                 ability_icons[i].Top.Set(top, 0f);
                 panel_cooldown.Append(ability_icons[i]);
-                left += AbilityIconCooldown.SIZE + SPACING_RESOURCE;
+                left += AbilityIconCooldown.SIZE + SPACING;
                 if (left > left_max) {
                     left = Constants.UI_PADDING;
-                    top += AbilityIconCooldown.SIZE + SPACING_RESOURCE;
+                    top += AbilityIconCooldown.SIZE + SPACING;
                 }
             }
 
@@ -102,68 +103,68 @@ namespace ExperienceAndClasses.UI {
             else {
                 panel.visible = true;
 
+                float final_height;
+
                 //xp bars
                 xp_bars[0].SetClass(local.Class_Primary);
                 if (local.Class_Secondary.Tier > 0) {
                     xp_bars[1].SetClass(local.Class_Secondary);
                     xp_bars[1].visible = true;
-                    panel.Height.Set(xp_bars[1].Top.Pixels + xp_bars[1].Height.Pixels + Constants.UI_PADDING, 0f);
+                    final_height = xp_bars[1].Top.Pixels + xp_bars[1].Height.Pixels;
                 }
                 else {
                     xp_bars[1].visible = false;
-                    panel.Height.Set(xp_bars[0].Top.Pixels + xp_bars[0].Height.Pixels + Constants.UI_PADDING, 0f);
+                    final_height = xp_bars[0].Top.Pixels + xp_bars[0].Height.Pixels;
                 }
 
                 //resource
-                panel_resource.Top.Set(panel.Height.Pixels, 0f);
                 panel_resource.RemoveAllChildren();
                 if (local.Resources.Count == 0) {
                     panel_resource.visible = false;
-                    panel_resource.Height.Set(0f, 0f);
                 }
                 else {
                     panel_resource.visible = true;
-                    float top = Constants.UI_PADDING;
                     ResourceBar rb;
                     foreach (Systems.Resource resource in local.Resources.Values) {
                         rb = new ResourceBar(resource, MAX_WIDTH_PER_ITEM_ROW);
                         rb.Left.Set(Constants.UI_PADDING, 0f);
-                        rb.Top.Set(top, 0f);
+                        rb.Top.Set(final_height += SPACING, 0f);
                         panel_resource.Append(rb);
-                        top += ResourceBar.HEIGHT + SPACING_RESOURCE;
-                    }
-                    panel_resource.Height.Set(top, 0f);
-                }
-            }
-
-            //create Abilities_Summary_For_UIHUD
-            List<Systems.Ability> abilities = new List<Systems.Ability>();
-            for (int i = 0; i < ExperienceAndClasses.NUMBER_ABILITY_SLOTS_PER_CLASS; i++) {
-                foreach (Systems.Ability ability in new Systems.Ability[] { local.Abilities_Primary[i], local.Abilities_Primary_Alt[i], local.Abilities_Secondary[i], local.Abilities_Secondary_Alt[i] }) {
-                    if (ability != null && ability.Unlocked && !abilities.Contains(ability)) {
-                        abilities.Add(ability);
+                        final_height += ResourceBar.HEIGHT;
                     }
                 }
-            }
 
-            //cooldown
-            if (abilities.Count == 0) {
-                panel_cooldown.visible = false;
-            }
-            else {
-                panel_cooldown.visible = true;
-                panel_cooldown.Top.Set(panel_resource.Top.Pixels + panel_resource.Height.Pixels, 0f);
-                byte counter = 0;
-                foreach (Systems.Ability ability in abilities) {
-                    ability_icons[counter++].SetAbility(ability);
+                //create Abilities_Summary_For_UIHUD
+                List<Systems.Ability> abilities = new List<Systems.Ability>();
+                for (int i = 0; i < ExperienceAndClasses.NUMBER_ABILITY_SLOTS_PER_CLASS; i++) {
+                    foreach (Systems.Ability ability in new Systems.Ability[] { local.Abilities_Primary[i], local.Abilities_Primary_Alt[i], local.Abilities_Secondary[i], local.Abilities_Secondary_Alt[i] }) {
+                        if (ability != null && ability.Unlocked && !abilities.Contains(ability)) {
+                            abilities.Add(ability);
+                        }
+                    }
                 }
-                panel_cooldown.Height.Set(ability_icons[counter - 1].Top.Pixels + ability_icons[counter - 1].Height.Pixels + Constants.UI_PADDING, 0f);
-                while (counter < ability_icons.Length) {
-                    ability_icons[counter].active = false;
-                }
-            }
 
-            Update();
+                //cooldown
+                if (abilities.Count == 0) {
+                    panel_cooldown.visible = false;
+                }
+                else {
+                    panel_cooldown.visible = true;
+                    panel_cooldown.Top.Set(final_height, 0f);
+                    byte counter = 0;
+                    foreach (Systems.Ability ability in abilities) {
+                        ability_icons[counter++].SetAbility(ability);
+                    }
+                    final_height += ability_icons[counter - 1].Top.Pixels + AbilityIconCooldown.SIZE + Constants.UI_PADDING;
+                    while (counter < ability_icons.Length) {
+                        ability_icons[counter++].active = false;
+                    }
+                }
+
+                panel.Height.Set(final_height + Constants.UI_PADDING, 0f);
+
+                Update();
+            }
         }
  
     }

@@ -1251,7 +1251,7 @@ namespace ExperienceAndClasses.UI {
 
     public class AbilityIconCooldown : UIElement {
         public const float SIZE = 24f;
-        public readonly float ICON_SCALE = Utilities.Textures.TEXTURE_ABILITY_DEFAULT.Width / SIZE;
+        public readonly float ICON_SCALE = SIZE / Utilities.Textures.TEXTURE_ABILITY_DEFAULT.Width;
         private readonly Color COLOUR_TRANSPARENT = new Color(128, 128, 128, 120);
         private readonly Color COLOUR_SOLID = new Color(255, 255, 255, 255);
 
@@ -1291,12 +1291,14 @@ namespace ExperienceAndClasses.UI {
 
     public class ResourceBar : UIElement {
         public const float HEIGHT = 24f;
+        public readonly float ICON_SCALE = HEIGHT / Utilities.Textures.TEXTURE_RESOURCE_DEFAULT.Width;
         private Systems.Resource resource;
         private UIImage icon;
 
         public ResourceBar(Systems.Resource resource, float width) {
             this.resource = resource;
             icon = new UIImage(resource.Texture);
+            icon.ImageScale = ICON_SCALE;
             Append(icon);
         }
 
