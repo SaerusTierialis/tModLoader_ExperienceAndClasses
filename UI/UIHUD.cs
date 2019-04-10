@@ -18,7 +18,9 @@ namespace ExperienceAndClasses.UI {
         private const float WIDTH = 200f;
         private const float HEIGHT = 200f; //default, actual height is dynamic
 
-        private const float ITEM_WIDTH = WIDTH - (Constants.UI_PADDING * 2);
+        private const float MAX_WIDTH_PER_ITEM_ROW = WIDTH - (Constants.UI_PADDING * 2);
+        private const float SPACING_ABILITY_ICON = 2f;
+        private const float SPACING_RESOURCE = 2f;
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Variables ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         public DragableUIPanel panel { get; private set; }
@@ -37,12 +39,12 @@ namespace ExperienceAndClasses.UI {
             //xp bars
             xp_bars = new XPBar[2];
 
-            xp_bars[0] = new XPBar(ITEM_WIDTH);
+            xp_bars[0] = new XPBar(MAX_WIDTH_PER_ITEM_ROW);
             xp_bars[0].Top.Set(Constants.UI_PADDING, 0f);
             xp_bars[0].Left.Set(Constants.UI_PADDING, 0f);
             panel.Append(xp_bars[0]);
 
-            xp_bars[1] = new XPBar(ITEM_WIDTH);
+            xp_bars[1] = new XPBar(MAX_WIDTH_PER_ITEM_ROW);
             xp_bars[1].Top.Set(xp_bars[0].Top.Pixels + xp_bars[0].Height.Pixels + Constants.UI_PADDING, 0f);
             xp_bars[1].Left.Set(Constants.UI_PADDING, 0f);
             panel.Append(xp_bars[1]);
@@ -56,7 +58,20 @@ namespace ExperienceAndClasses.UI {
             ability_icons = new AbilityIconCooldown[ExperienceAndClasses.NUMBER_ABILITY_SLOTS_PER_CLASS * 4];
             panel_cooldown = new DragableUIPanel(panel.Width.Pixels, 0f, panel.BackgroundColor, this, false, false, false);
             panel.Append(panel_cooldown);
-            //TODO add in multiple rows
+            float left = Constants.UI_PADDING;
+            float left_max = panel_cooldown.Width.Pixels - Constants.UI_PADDING - AbilityIconCooldown.SIZE;
+            float top = Constants.UI_PADDING;
+            for (byte i=0; i<ability_icons.Length; i++) {
+                ability_icons[i] = new AbilityIconCooldown();
+                ability_icons[i].Left.Set(left, 0f);
+                ability_icons[i].Top.Set(top, 0f);
+                panel_cooldown.Append(ability_icons[i]);
+                left += AbilityIconCooldown.SIZE + SPACING_RESOURCE;
+                if (left > left_max) {
+                    left = Constants.UI_PADDING;
+                    top += AbilityIconCooldown.SIZE + SPACING_RESOURCE;
+                }
+            }
 
             state.Append(panel);
             panel.SetPosition(ExperienceAndClasses.LOCAL_MPLAYER.loaded_ui_hud.LEFT, ExperienceAndClasses.LOCAL_MPLAYER.loaded_ui_hud.TOP, true);
@@ -111,11 +126,11 @@ namespace ExperienceAndClasses.UI {
                     float top = Constants.UI_PADDING;
                     ResourceBar rb;
                     foreach (Systems.Resource resource in local.Resources.Values) {
-                        rb = new ResourceBar(resource, ITEM_WIDTH);
+                        rb = new ResourceBar(resource, MAX_WIDTH_PER_ITEM_ROW);
                         rb.Left.Set(Constants.UI_PADDING, 0f);
                         rb.Top.Set(top, 0f);
                         panel_resource.Append(rb);
-                        top += ResourceBar.HEIGHT + Constants.UI_PADDING;
+                        top += ResourceBar.HEIGHT + SPACING_RESOURCE;
                     }
                     panel_resource.Height.Set(top, 0f);
                 }
@@ -142,7 +157,7 @@ namespace ExperienceAndClasses.UI {
                 foreach (Systems.Ability ability in abilities) {
                     ability_icons[counter++].SetAbility(ability);
                 }
-                //TODO get height for panel
+                panel_cooldown.Height.Set(ability_icons[counter - 1].Top.Pixels + ability_icons[counter - 1].Height.Pixels + Constants.UI_PADDING, 0f);
                 while (counter < ability_icons.Length) {
                     ability_icons[counter].active = false;
                 }
