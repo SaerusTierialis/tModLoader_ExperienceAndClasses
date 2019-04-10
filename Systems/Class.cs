@@ -95,7 +95,7 @@ namespace ExperienceAndClasses.Systems {
             }
             else {
                 //no texture loaded, set blank
-                Texture = Utilities.Textures.TEXTURE_BLANK;
+                Texture = Utilities.Textures.TEXTURE_CLASS_DEFAULT;
             }
         }
 

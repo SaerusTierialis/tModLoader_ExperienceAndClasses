@@ -24,6 +24,7 @@ namespace ExperienceAndClasses.Utilities {
         public static float TEXTURE_LOCK_WIDTH { get; private set; }
         public static float TEXTURE_LOCK_HEIGHT { get; private set; }
 
+        public static Texture2D TEXTURE_CLASS_DEFAULT { get; private set; }
         public static Texture2D TEXTURE_STATUS_DEFAULT { get; private set; }
         public static Texture2D TEXTURE_ABILITY_DEFAULT { get; private set; }
         public static Texture2D TEXTURE_PASSIVE_DEFAULT { get; private set; }
@@ -50,6 +51,7 @@ namespace ExperienceAndClasses.Utilities {
             TEXTURE_LOCK_WIDTH = TEXTURE_LOCK_BROWN.Width;
             TEXTURE_LOCK_HEIGHT = TEXTURE_LOCK_BROWN.Height;
 
+            TEXTURE_CLASS_DEFAULT = ModLoader.GetTexture("ExperienceAndClasses/Textures/Class/Default");
             TEXTURE_STATUS_DEFAULT = ModLoader.GetTexture("ExperienceAndClasses/Textures/Status/Default");
             TEXTURE_ABILITY_DEFAULT = ModLoader.GetTexture("ExperienceAndClasses/Textures/Ability/Default");
             TEXTURE_PASSIVE_DEFAULT = ModLoader.GetTexture("ExperienceAndClasses/Textures/Passive/Default");
@@ -69,6 +71,10 @@ namespace ExperienceAndClasses.Utilities {
 
             foreach (Systems.Passive p in Systems.Passive.LOOKUP) {
                 p.LoadTexture();
+            }
+
+            foreach (Systems.Resource r in Systems.Resource.LOOKUP) {
+                r.LoadTexture();
             }
 
         }

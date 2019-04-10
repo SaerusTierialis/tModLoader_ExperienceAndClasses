@@ -54,11 +54,11 @@ namespace ExperienceAndClasses.Systems {
         }
 
         public void LoadTexture() {
-            if (specific_texture_path == null) {
+            if (specific_texture_path != null) {
                 Texture = ModLoader.GetTexture(specific_texture_path);
             }
             else {
-                Texture = Utilities.Textures.TEXTURE_PASSIVE_DEFAULT;
+                Texture = Utilities.Textures.TEXTURE_RESOURCE_DEFAULT;
             }
         }
 

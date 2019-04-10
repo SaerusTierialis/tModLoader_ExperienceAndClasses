@@ -301,26 +301,25 @@ namespace ExperienceAndClasses.UI {
         private UIImage icon;
         private ProgressBar bar;
         private UIText text;
+        private float left;
 
-        public bool Visible { get; private set; }
+        public bool visible;
         public Systems.Class Class_Tracked { get; private set; }
 
-        public XPBar(float width, Systems.Class c) {
-            Class_Tracked = c;
-
-            Visible = true;
+        public XPBar(float width) {
+            visible = false;
             
             SetPadding(0f);
 
-            icon = new UIImage(Class_Tracked.Texture);
+            icon = new UIImage(Utilities.Textures.TEXTURE_CLASS_DEFAULT);
             icon.ImageScale = ICON_SCALE;
-            icon.Top.Set(-(Class_Tracked.Texture.Height * (1f - ICON_SCALE) / 2f), 0f);
-            icon.Left.Set(-(Class_Tracked.Texture.Width * (1f - ICON_SCALE) / 2f), 0f);
-            icon.Width.Set(Class_Tracked.Texture.Width * ICON_SCALE, 0f);
-            icon.Height.Set(Class_Tracked.Texture.Height * ICON_SCALE, 0f);
+            icon.Top.Set(-(Utilities.Textures.TEXTURE_CLASS_DEFAULT.Height * (1f - ICON_SCALE) / 2f), 0f);
+            icon.Left.Set(-(Utilities.Textures.TEXTURE_CLASS_DEFAULT.Width * (1f - ICON_SCALE) / 2f), 0f);
+            icon.Width.Set(Utilities.Textures.TEXTURE_CLASS_DEFAULT.Width * ICON_SCALE, 0f);
+            icon.Height.Set(Utilities.Textures.TEXTURE_CLASS_DEFAULT.Height * ICON_SCALE, 0f);
             Append(icon);
 
-            float left = icon.Width.Pixels + Constants.UI_PADDING;
+            left = icon.Width.Pixels + Constants.UI_PADDING;
             bar = new ProgressBar(width - left, BAR_HEIGHT, Constants.COLOUR_XP_DIM);
             bar.Left.Set(left, 0f);
             bar.Top.Set((icon.Height.Pixels - bar.Height.Pixels) / 2f, 0f);
@@ -334,56 +333,62 @@ namespace ExperienceAndClasses.UI {
             Height.Set(Math.Max(icon.Height.Pixels, bar.Height.Pixels), 0f);
         }
 
+        public void SetWidth (float width) {
+            Width.Set(width, 0f);
+            bar.Width.Set(width - left, 0f);
+        }
+
         public void SetClass(Systems.Class class_new) {
             Class_Tracked = class_new;
             icon.SetImage(Class_Tracked.Texture);
 
-            Visible = (Class_Tracked.Tier >= 1);
+            visible = (Class_Tracked.Tier >= 1);
 
             Update();
         }
 
         public void Update() {
-            uint xp = ExperienceAndClasses.LOCAL_MPLAYER.Class_XP[Class_Tracked.ID_num];
-            uint xp_needed = Systems.XP.Requirements.GetXPReq(Class_Tracked, ExperienceAndClasses.LOCAL_MPLAYER.Class_Levels[Class_Tracked.ID_num]);
+            if (visible) {
+                uint xp = ExperienceAndClasses.LOCAL_MPLAYER.Class_XP[Class_Tracked.ID_num];
+                uint xp_needed = Systems.XP.Requirements.GetXPReq(Class_Tracked, ExperienceAndClasses.LOCAL_MPLAYER.Class_Levels[Class_Tracked.ID_num]);
 
-            float percent;
-            bool maxed;
-            if (xp_needed <= 0) {
-                percent = 1f;
-                maxed = true;
-            }
-            else {
-                percent = (float)xp / xp_needed;
-                maxed = false;
-            }
+                float percent;
+                bool maxed;
+                if (xp_needed <= 0) {
+                    percent = 1f;
+                    maxed = true;
+                }
+                else {
+                    percent = (float)xp / xp_needed;
+                    maxed = false;
+                }
 
-            //progress bar
-            bar.SetProgress(percent);
+                //progress bar
+                bar.SetProgress(percent);
 
-            //text
-            string str;
-            float string_width;
-            if (maxed) {
-                str = "MAX";
-                string_width = Main.fontMouseText.MeasureString(str).X * TEXT_SCALE;
-            }
-            else {
-                str = xp + " / " + xp_needed;
-                string_width = Main.fontMouseText.MeasureString(xp_needed + " / " + xp_needed).X * TEXT_SCALE;
-
-                if (string_width > bar.Width.Pixels) {
-                    str = (Math.Round(percent * 10000f) / 100) + "%";
+                //text
+                string str;
+                float string_width;
+                if (maxed) {
+                    str = "MAX";
                     string_width = Main.fontMouseText.MeasureString(str).X * TEXT_SCALE;
                 }
-            }
-            text.SetText(str);
-            text.Left.Set(bar.Left.Pixels + ((bar.Width.Pixels - string_width) / 2), 0f);
+                else {
+                    str = xp + " / " + xp_needed;
+                    string_width = Main.fontMouseText.MeasureString(xp_needed + " / " + xp_needed).X * TEXT_SCALE;
 
+                    if (string_width > bar.Width.Pixels) {
+                        str = (Math.Round(percent * 10000f) / 100) + "%";
+                        string_width = Main.fontMouseText.MeasureString(str).X * TEXT_SCALE;
+                    }
+                }
+                text.SetText(str);
+                text.Left.Set(bar.Left.Pixels + ((bar.Width.Pixels - string_width) / 2), 0f);
+            }
         }
 
         public override void Draw(SpriteBatch spriteBatch) {
-            if (Visible)
+            if (visible)
                 base.Draw(spriteBatch);
             else
                 return;
@@ -1242,5 +1247,61 @@ namespace ExperienceAndClasses.UI {
             UIInfo.Instance.EndText(this);
         }
 
+    }
+
+    public class AbilityIconCooldown : UIElement {
+        public const float SIZE = 24f;
+        public readonly float ICON_SCALE = Utilities.Textures.TEXTURE_ABILITY_DEFAULT.Width / SIZE;
+        private readonly Color COLOUR_TRANSPARENT = new Color(128, 128, 128, 120);
+        private readonly Color COLOUR_SOLID = new Color(255, 255, 255, 255);
+
+        private Systems.Ability ability;
+        private float cooldown_percent;
+        public bool active = false;
+        private UITransparantImage icon;
+
+
+        public AbilityIconCooldown() {
+            Width.Set(SIZE, 0f);
+            Height.Set(SIZE, 0f);
+
+            icon = new UITransparantImage(Utilities.Textures.TEXTURE_ABILITY_DEFAULT, COLOUR_SOLID);
+            icon.ImageScale = ICON_SCALE;
+            Append(icon);
+        }
+
+        public void Update() {
+            if (active) {
+                //TODO
+            }
+        }
+
+        public void SetAbility(Systems.Ability ability) {
+            this.ability = ability;
+            active = true;
+            icon.SetImage(ability.Texture);
+            Update();
+        }
+
+        public override void Draw(SpriteBatch spriteBatch) {
+            if (active)
+                base.Draw(spriteBatch);
+        }
+    }
+
+    public class ResourceBar : UIElement {
+        public const float HEIGHT = 24f;
+        private Systems.Resource resource;
+        private UIImage icon;
+
+        public ResourceBar(Systems.Resource resource, float width) {
+            this.resource = resource;
+            icon = new UIImage(resource.Texture);
+            Append(icon);
+        }
+
+        public void Update() {
+            //TODO
+        }
     }
 }

@@ -455,7 +455,7 @@ namespace ExperienceAndClasses {
 
             //update UI
             UI.UIMain.Instance.UpdateClassInfo();
-            UI.UIHUD.Instance.Update();
+            UI.UIHUD.Instance.UpdateClassInfo();
         }
 
         public static void LocalCalculateEffectiveLevels() {

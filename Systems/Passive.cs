@@ -21,8 +21,7 @@ namespace ExperienceAndClasses.Systems {
             RESOURCE_UNLOCK,
             RESOURCE_UPGRADE,
             ABILITY_UPGRADE,
-            BONUS,
-            OTHER,
+            MISC,
         }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Auto-Populated Lookup ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
@@ -168,7 +167,28 @@ namespace ExperienceAndClasses.Systems {
         }
 
         public void UpdateTooltip() {
-            //todo Tooltip
+            Tooltip = "Required Class: " + Systems.Class.LOOKUP[(byte)Specific_Required_Class_ID].Name + "\n" +
+                        "Required Level: " + Specific_Required_Class_Level + "\n\n";
+
+            Tooltip += "Type: ";
+            switch (Specific_Type) {
+                case (PASSIVE_TYPE.RESOURCE_UNLOCK):
+                    Tooltip += "Resource Unlock - " + Systems.Resource.LOOKUP[(byte)specific_resource].Specific_Name;
+                    break;
+                case (PASSIVE_TYPE.RESOURCE_UPGRADE):
+                    Tooltip += "Resource Upgrade - " + Systems.Resource.LOOKUP[(byte)specific_resource].Specific_Name;
+                    break;
+                case (PASSIVE_TYPE.ABILITY_UPGRADE):
+                    Tooltip += "Resource Upgrade - " + Systems.Ability.LOOKUP[(ushort)specific_ability].Specific_Name;
+                    break;
+                case (PASSIVE_TYPE.MISC):
+                    Tooltip += "Miscellaneous";
+                    break;
+                default:
+                    break;
+            }
+
+            Tooltip += "\n\n" + specific_description;
         }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Private Methods ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
@@ -218,7 +238,7 @@ namespace ExperienceAndClasses.Systems {
 
         public class Bonus : Passive {
             public Bonus(IDs id) : base(id) {
-                Specific_Type = PASSIVE_TYPE.BONUS;
+                Specific_Type = PASSIVE_TYPE.MISC;
             }
         }
 
@@ -250,7 +270,7 @@ namespace ExperienceAndClasses.Systems {
             public BloodKnight_Resoruce_Bloodforce() : base(IDs.BloodKnight_Resoruce_Bloodforce, Systems.Resource.IDs.Bloodforce) {
                 specific_description = "TODO";
                 Specific_Required_Class_ID = Systems.Class.IDs.BloodKnight;
-                Specific_Required_Class_Level = 100;
+                Specific_Required_Class_Level = 1;
             }
         }
 
