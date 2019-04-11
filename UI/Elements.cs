@@ -1255,11 +1255,13 @@ namespace ExperienceAndClasses.UI {
         private readonly Color COLOUR_TRANSPARENT = new Color(128, 128, 128, 120);
         private readonly Color COLOUR_SOLID = new Color(255, 255, 255, 255);
 
+        RasterizerState _rasterizerState = new RasterizerState() { ScissorTestEnable = true };
+
         private Systems.Ability ability;
         private float cooldown_percent;
         public bool active = false;
         private UITransparantImage icon;
-
+        private UIImage icon_cover;
 
         public AbilityIconCooldown() {
             Width.Set(SIZE, 0f);
@@ -1268,6 +1270,10 @@ namespace ExperienceAndClasses.UI {
             icon = new UITransparantImage(Utilities.Textures.TEXTURE_ABILITY_DEFAULT, COLOUR_SOLID);
             icon.ImageScale = ICON_SCALE;
             Append(icon);
+
+            icon_cover = new UIImage(Utilities.Textures.TEXTURE_ABILITY_COOLDOWN_COVER);
+            icon_cover.ImageScale = ICON_SCALE;
+            Append(icon_cover);
         }
 
         /// <summary>
@@ -1276,24 +1282,58 @@ namespace ExperienceAndClasses.UI {
         /// <returns></returns>
         public bool Update() {
             bool on_cooldown = false;
-
             if (active) {
-                //TODO
+                cooldown_percent = ability.CooldownPercent();
+                icon_cover.Top.Set((1f - cooldown_percent) * SIZE, 0f);
+                if (cooldown_percent > 0f) {
+                    icon.color = COLOUR_TRANSPARENT;
+                    on_cooldown = true;
+                }
+                else {
+                    icon.color = COLOUR_SOLID;
+                }
             }
-
             return on_cooldown;
         }
 
         public void SetAbility(Systems.Ability ability) {
             this.ability = ability;
             active = true;
+            cooldown_percent = -1;
             icon.SetImage(ability.Texture);
             Update();
         }
 
         public override void Draw(SpriteBatch spriteBatch) {
-            if (active)
-                base.Draw(spriteBatch);
+            if (active) {
+                //draw icon
+                icon.Draw(spriteBatch);
+
+                if (cooldown_percent > 0f) {
+                    //stop normal draw
+                    spriteBatch.End();
+
+                    //start clipping draw
+                    spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, null, null, _rasterizerState);
+                    Rectangle prior_rect = spriteBatch.GraphicsDevice.ScissorRectangle;
+                    Rectangle rect = icon.GetClippingRectangle(spriteBatch);
+                    rect.Height = (int)SIZE + 2;
+                    rect.Width = (int)SIZE + 2;
+                    spriteBatch.GraphicsDevice.ScissorRectangle = rect;
+
+                    //draw cover
+                    icon_cover.Draw(spriteBatch);
+
+                    //put settings back as they were
+                    spriteBatch.GraphicsDevice.ScissorRectangle = prior_rect;
+
+                    //stop clipping draw
+                    spriteBatch.End();
+
+                    //start normal draw again
+                    spriteBatch.Begin();
+                }
+            }
         }
     }
 

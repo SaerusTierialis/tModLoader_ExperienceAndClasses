@@ -27,6 +27,7 @@ namespace ExperienceAndClasses.Utilities {
         public static Texture2D TEXTURE_CLASS_DEFAULT { get; private set; }
         public static Texture2D TEXTURE_STATUS_DEFAULT { get; private set; }
         public static Texture2D TEXTURE_ABILITY_DEFAULT { get; private set; }
+        public static Texture2D TEXTURE_ABILITY_COOLDOWN_COVER { get; private set; }
         public static Texture2D TEXTURE_PASSIVE_DEFAULT { get; private set; }
         public static Texture2D TEXTURE_RESOURCE_DEFAULT { get; private set; }
 
@@ -54,6 +55,7 @@ namespace ExperienceAndClasses.Utilities {
             TEXTURE_CLASS_DEFAULT = ModLoader.GetTexture("ExperienceAndClasses/Textures/Class/Default");
             TEXTURE_STATUS_DEFAULT = ModLoader.GetTexture("ExperienceAndClasses/Textures/Status/Default");
             TEXTURE_ABILITY_DEFAULT = ModLoader.GetTexture("ExperienceAndClasses/Textures/Ability/Default");
+            TEXTURE_ABILITY_COOLDOWN_COVER = ModLoader.GetTexture("ExperienceAndClasses/Textures/Ability/Cooldown");
             TEXTURE_PASSIVE_DEFAULT = ModLoader.GetTexture("ExperienceAndClasses/Textures/Passive/Default");
             TEXTURE_RESOURCE_DEFAULT = ModLoader.GetTexture("ExperienceAndClasses/Textures/Resource/Default");
 

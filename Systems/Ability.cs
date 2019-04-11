@@ -335,6 +335,7 @@ namespace ExperienceAndClasses.Systems {
             //set cooldown
             if (cooldown_seconds > 0) {
                 Time_Cooldown_End = ExperienceAndClasses.Now.AddSeconds(cooldown_seconds);
+                UI.UIHUD.Instance.UpdateCooldown();
             }
 
             //take mana (even if reduced to free, do this to stop regen)
@@ -346,6 +347,7 @@ namespace ExperienceAndClasses.Systems {
             //take resource
             if (cost_resource > 0) {
                 Systems.Resource.LOOKUP[(byte)specific_resource].Amount = (ushort)Math.Max(0, Systems.Resource.LOOKUP[(byte)specific_resource].Amount - cost_resource);
+                UI.UIHUD.Instance.UpdateResource();
             }
 
             //do main effect
@@ -406,6 +408,11 @@ namespace ExperienceAndClasses.Systems {
             if (specific_show_channelling_in_tooltip) {
                 Tooltip += "\nChannelling abilities require that you hold down the key for a duration. Many of these abilities have a mana or resource cost while channelling. Death, damage, immobilization, and silence all interrupt channeling.";
             }
+        }
+
+        public float CooldownPercent() {
+            float seconds_remaining = (float)Math.Max(0f, Time_Cooldown_End.Subtract(ExperienceAndClasses.Now).TotalSeconds);
+            return seconds_remaining / cooldown_seconds;
         }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Generic Calculations ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
