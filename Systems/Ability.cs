@@ -364,10 +364,6 @@ namespace ExperienceAndClasses.Systems {
             }
         }
 
-        public string GetUIText() {
-            return "TODO";
-        }
-
         public void UpdateUnlock() {
             if(CalculateLevel() > 0) {
                 Unlocked = true;
@@ -413,6 +409,12 @@ namespace ExperienceAndClasses.Systems {
         public float CooldownPercent() {
             float seconds_remaining = (float)Math.Max(0f, Time_Cooldown_End.Subtract(ExperienceAndClasses.Now).TotalSeconds);
             return seconds_remaining / cooldown_seconds;
+        }
+
+        public Color Colour {
+            get {
+                return Systems.Class.LOOKUP[(byte)Specific_Required_Class_ID].Colour;
+            }
         }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Generic Calculations ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/

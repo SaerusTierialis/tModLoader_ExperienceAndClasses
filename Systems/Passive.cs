@@ -70,6 +70,7 @@ namespace ExperienceAndClasses.Systems {
         public IDs ID { get; private set; } = IDs.NONE;
         public ushort ID_num { get; private set; } = (ushort)IDs.NONE;
         public Texture2D Texture { get; private set; } = null;
+        public Texture2D Texture_Background { get; private set; } = null;
         public bool Unlocked { get; private set; } = false;
         protected string ability_name = "";
         public string Tooltip { get; private set; } = "";
@@ -87,6 +88,7 @@ namespace ExperienceAndClasses.Systems {
         /// Run once during init
         /// </summary>
         public void LoadTexture() {
+            Texture_Background = Utilities.Textures.TEXTURE_PASSIVE_BACKGROUND;
             if (Specific_Type == PASSIVE_TYPE.ABILITY_UPGRADE) {
                 if (specific_ability != Systems.Ability.IDs.NONE) {
                     Texture = Systems.Ability.LOOKUP[(ushort)specific_ability].Texture;
@@ -96,6 +98,8 @@ namespace ExperienceAndClasses.Systems {
                 }
             }
             else if ((Specific_Type == PASSIVE_TYPE.RESOURCE_UNLOCK) || (Specific_Type == PASSIVE_TYPE.RESOURCE_UPGRADE)) {
+                Texture_Background = Utilities.Textures.TEXTURE_RESOURCE_BACKGROUND;
+                Systems.Resource.LOOKUP[(byte)specific_resource].colour = Colour;
                 if (specific_resource == Systems.Resource.IDs.NONE) {
                     Texture = Systems.Resource.LOOKUP[(byte)specific_resource].Texture;
                 }
@@ -191,6 +195,12 @@ namespace ExperienceAndClasses.Systems {
             Tooltip += "\n\n" + specific_description;
         }
 
+        public Microsoft.Xna.Framework.Color Colour {
+            get {
+                return Systems.Class.LOOKUP[(byte)Specific_Required_Class_ID].Colour;
+            }
+        }
+
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Private Methods ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         private void EnableResource() {
@@ -219,7 +229,7 @@ namespace ExperienceAndClasses.Systems {
         }
 
         /// <summary>
-        /// defaults the name to resource's name
+        /// defaults the name to resource's name, sets the resource colour
         /// </summary>
         public class ResourceUnlock : Passive {
             public ResourceUnlock(IDs id, Systems.Resource.IDs resource_id) : base(id) {

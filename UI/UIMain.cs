@@ -47,7 +47,6 @@ namespace ExperienceAndClasses.UI {
         private const float FONT_SCALE_ATTRIBUTE = 1f;
         private const float FONT_SCALE_ABILITY = 0.9f;
 
-        public const float SIZE_ABILITY_ICON = 30f;
         public const float SPACING_ABILITY_ICON = 2f;
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Variables ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
@@ -181,11 +180,11 @@ namespace ExperienceAndClasses.UI {
             top = level_primary.Top.Pixels + level_primary.Height.Pixels;
             float left = Constants.UI_PADDING;
             for (byte i=0; i<ability_primary.Length; i++) {
-                ability_primary[i] = new AbilityIcon();
+                ability_primary[i] = new AbilityIcon(1);
                 ability_primary[i].Top.Set(top, 0f);
                 ability_primary[i].Left.Set(left, 0f);
-                ability_primary[i].Width.Set(SIZE_ABILITY_ICON, 0f);
-                ability_primary[i].Height.Set(SIZE_ABILITY_ICON, 0f);
+                ability_primary[i].Width.Set(AbilityIcon.SIZE, 0f);
+                ability_primary[i].Height.Set(AbilityIcon.SIZE, 0f);
                 panel_ability.Append(ability_primary[i]);
                 left += ability_primary[i].Width.Pixels + SPACING_ABILITY_ICON;
             }
@@ -205,8 +204,8 @@ namespace ExperienceAndClasses.UI {
                 ability_secondary[i] = new AbilityIcon();
                 ability_secondary[i].Top.Set(top, 0f);
                 ability_secondary[i].Left.Set(left, 0f);
-                ability_secondary[i].Width.Set(SIZE_ABILITY_ICON, 0f);
-                ability_secondary[i].Height.Set(SIZE_ABILITY_ICON, 0f);
+                ability_secondary[i].Width.Set(AbilityIcon.SIZE, 0f);
+                ability_secondary[i].Height.Set(AbilityIcon.SIZE, 0f);
                 panel_ability.Append(ability_secondary[i]);
                 left += ability_secondary[i].Width.Pixels + SPACING_ABILITY_ICON;
             }

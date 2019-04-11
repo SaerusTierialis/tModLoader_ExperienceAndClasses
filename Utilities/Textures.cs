@@ -26,11 +26,18 @@ namespace ExperienceAndClasses.Utilities {
 
         public static Texture2D TEXTURE_CLASS_DEFAULT { get; private set; }
         public static Texture2D TEXTURE_CLASS_BACKGROUND { get; private set; }
+
         public static Texture2D TEXTURE_STATUS_DEFAULT { get; private set; }
+
         public static Texture2D TEXTURE_ABILITY_DEFAULT { get; private set; }
+        public static Texture2D TEXTURE_ABILITY_BACKGROUND { get; private set; }
         public static Texture2D TEXTURE_ABILITY_COOLDOWN_COVER { get; private set; }
+
         public static Texture2D TEXTURE_PASSIVE_DEFAULT { get; private set; }
+        public static Texture2D TEXTURE_PASSIVE_BACKGROUND { get; private set; }
+
         public static Texture2D TEXTURE_RESOURCE_DEFAULT { get; private set; }
+        public static Texture2D TEXTURE_RESOURCE_BACKGROUND { get; private set; }
 
         /// <summary>
         /// (Re)Load all textures
@@ -55,11 +62,18 @@ namespace ExperienceAndClasses.Utilities {
 
             TEXTURE_CLASS_DEFAULT = ModLoader.GetTexture("ExperienceAndClasses/Textures/Class/Default");
             TEXTURE_CLASS_BACKGROUND = ModLoader.GetTexture("ExperienceAndClasses/Textures/Class/Background");
+
             TEXTURE_STATUS_DEFAULT = ModLoader.GetTexture("ExperienceAndClasses/Textures/Status/Default");
+
             TEXTURE_ABILITY_DEFAULT = ModLoader.GetTexture("ExperienceAndClasses/Textures/Ability/Default");
             TEXTURE_ABILITY_COOLDOWN_COVER = ModLoader.GetTexture("ExperienceAndClasses/Textures/Ability/Cooldown");
+            TEXTURE_ABILITY_BACKGROUND = ModLoader.GetTexture("ExperienceAndClasses/Textures/Ability/Background");
+
             TEXTURE_PASSIVE_DEFAULT = ModLoader.GetTexture("ExperienceAndClasses/Textures/Passive/Default");
+            TEXTURE_PASSIVE_BACKGROUND = ModLoader.GetTexture("ExperienceAndClasses/Textures/Passive/Background");
+
             TEXTURE_RESOURCE_DEFAULT = ModLoader.GetTexture("ExperienceAndClasses/Textures/Resource/Default");
+            TEXTURE_RESOURCE_BACKGROUND = ModLoader.GetTexture("ExperienceAndClasses/Textures/Resource/Background");
 
             foreach (Systems.Class c in Systems.Class.LOOKUP) {
                 c.LoadTexture();
@@ -73,12 +87,12 @@ namespace ExperienceAndClasses.Utilities {
                 a.LoadTexture();
             }
 
-            foreach (Systems.Passive p in Systems.Passive.LOOKUP) {
-                p.LoadTexture();
-            }
-
             foreach (Systems.Resource r in Systems.Resource.LOOKUP) {
                 r.LoadTexture();
+            }
+
+            foreach (Systems.Passive p in Systems.Passive.LOOKUP) {
+                p.LoadTexture();
             }
 
         }

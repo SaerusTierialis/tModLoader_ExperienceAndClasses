@@ -297,13 +297,13 @@ namespace ExperienceAndClasses.UI {
         private const float TEXT_SCALE = 1f;
         private const float ICON_SCALE = 0.8f;
         private const float BAR_HEIGHT = 24f;
-        private readonly int ICON_SIZE = (int)Math.Ceiling(Utilities.Textures.TEXTURE_CLASS_DEFAULT.Width * ICON_SCALE);
+        private static readonly int ICON_SIZE = (int)Math.Ceiling(Utilities.Textures.TEXTURE_CLASS_DEFAULT.Width * ICON_SCALE);
+        private static readonly int background_shift = (int)Math.Ceiling(Utilities.Textures.TEXTURE_CLASS_DEFAULT.Height * (1f - ICON_SCALE) / 2f);
 
         private UIImage icon;
         private ProgressBar bar;
         private UIText text;
         private float left;
-        private int shift;
 
         public bool visible;
         public Systems.Class Class_Tracked { get; private set; }
@@ -312,12 +312,11 @@ namespace ExperienceAndClasses.UI {
             visible = false;
             
             SetPadding(0f);
-            shift = (int)Math.Ceiling(-(Utilities.Textures.TEXTURE_CLASS_DEFAULT.Height * (1f - ICON_SCALE) / 2f));
 
             icon = new UIImage(Utilities.Textures.TEXTURE_CLASS_DEFAULT);
             icon.ImageScale = ICON_SCALE;
-            icon.Top.Set(shift, 0f);
-            icon.Left.Set(shift, 0f);
+            icon.Top.Set(-background_shift, 0f);
+            icon.Left.Set(-background_shift, 0f);
             Append(icon);
 
             left = ICON_SIZE + Constants.UI_PADDING;
@@ -392,8 +391,8 @@ namespace ExperienceAndClasses.UI {
             if (visible) {
                 //draw background
                 Rectangle rect = icon.GetClippingRectangle(spriteBatch);
-                rect.X -= shift;
-                rect.Y -= shift;
+                rect.X += background_shift - 1;
+                rect.Y += background_shift - 1;
                 rect.Width = ICON_SIZE + 1;
                 rect.Height = ICON_SIZE + 1;
                 spriteBatch.Draw(Utilities.Textures.TEXTURE_CLASS_BACKGROUND, rect, Class_Tracked.Colour);
@@ -1053,22 +1052,26 @@ namespace ExperienceAndClasses.UI {
     }
 
     public class AbilityIcon : UIElement {
+        public static readonly float SIZE = Utilities.Textures.TEXTURE_ABILITY_DEFAULT.Width;
         private readonly Color COLOUR_TRANSPARENT = new Color(128, 128, 128, 120);
         private readonly Color COLOUR_SOLID = new Color(255, 255, 255, 255);
 
         private UITransparantImage icon;
         private Systems.Ability ability;
         public bool active;
+        private int add_y;
 
-        public AbilityIcon() {
+        public AbilityIcon(int add_y = 0) {
             SetPadding(0f);
             active = false;
 
-            Width.Set(UIMain.SIZE_ABILITY_ICON, 0f);
-            Height.Set(UIMain.SIZE_ABILITY_ICON, 0f);
+            Width.Set(SIZE, 0f);
+            Height.Set(SIZE, 0f);
 
             icon = new UITransparantImage(Utilities.Textures.TEXTURE_BLANK, COLOUR_TRANSPARENT);
             Append(icon);
+
+            this.add_y = add_y;
         }
 
         public void Update() {
@@ -1108,6 +1111,20 @@ namespace ExperienceAndClasses.UI {
         public override void MouseOut(UIMouseEvent evt) {
             base.MouseOut(evt);
             UIInfo.Instance.EndText(this);
+        }
+
+        public override void Draw(SpriteBatch spriteBatch) {
+            if (active) {
+                //draw background
+                Rectangle rect = GetClippingRectangle(spriteBatch);
+                rect.Y += add_y;
+                rect.Width = (int)SIZE;
+                rect.Height = (int)SIZE;
+                spriteBatch.Draw(Utilities.Textures.TEXTURE_ABILITY_BACKGROUND, rect, ability.Colour);
+
+                //draw normally
+                base.Draw(spriteBatch);
+            }
         }
     }
 
@@ -1213,6 +1230,8 @@ namespace ExperienceAndClasses.UI {
 
     public class PassiveIcon : UIElement {
         private const float ICON_SIZE = 22;
+        private static readonly float ICON_SCALE = ICON_SIZE / Utilities.Textures.TEXTURE_PASSIVE_DEFAULT.Width;
+        private static readonly int background_shift = (int)Math.Ceiling(Utilities.Textures.TEXTURE_RESOURCE_DEFAULT.Height * (1f - ICON_SCALE) / 2f);
         private const float TEXT_SCALE = 0.7f;
         private const float TEXT_WIDTH = 150f;
         private readonly Color COLOUR_TRANSPARENT = new Color(128, 128, 128, 120);
@@ -1237,7 +1256,7 @@ namespace ExperienceAndClasses.UI {
                 icon = new UITransparantImage(texture, COLOUR_TRANSPARENT);
                 colour = Color.Gray;
             }
-            icon.ImageScale = ICON_SIZE / texture.Width;
+            icon.ImageScale = ICON_SCALE;
             icon.Width.Set(ICON_SIZE, 0f);
             icon.Height.Set(ICON_SIZE, 0f);
             icon.Left.Set(0f, 0f);
@@ -1266,13 +1285,27 @@ namespace ExperienceAndClasses.UI {
             UIInfo.Instance.EndText(this);
         }
 
+        public override void Draw(SpriteBatch spriteBatch) {
+            //draw background
+            Rectangle rect = icon.GetClippingRectangle(spriteBatch);
+            rect.X += background_shift;
+            rect.Y += background_shift;
+            rect.Width = (int)ICON_SIZE;
+            rect.Height = (int)ICON_SIZE;
+            spriteBatch.Draw(passive.Texture_Background, rect, passive.Colour);
+
+            //draw normally
+            base.Draw(spriteBatch);
+        }
+
     }
 
     public class AbilityIconCooldown : UIElement {
         public const float SIZE = 24f;
-        public readonly float ICON_SCALE = SIZE / Utilities.Textures.TEXTURE_ABILITY_DEFAULT.Width;
-        private readonly Color COLOUR_TRANSPARENT = new Color(128, 128, 128, 120);
-        private readonly Color COLOUR_SOLID = new Color(255, 255, 255, 255);
+        public static readonly float ICON_SCALE = SIZE / Utilities.Textures.TEXTURE_ABILITY_DEFAULT.Width;
+        private static readonly int background_shift = (int)Math.Ceiling(Utilities.Textures.TEXTURE_RESOURCE_DEFAULT.Height * (1f - ICON_SCALE) / 2f);
+        private static readonly Color COLOUR_TRANSPARENT = new Color(128, 128, 128, 120);
+        private static readonly Color COLOUR_SOLID = new Color(255, 255, 255, 255);
 
         RasterizerState _rasterizerState = new RasterizerState() { ScissorTestEnable = true };
 
@@ -1325,6 +1358,14 @@ namespace ExperienceAndClasses.UI {
 
         public override void Draw(SpriteBatch spriteBatch) {
             if (active) {
+                //draw background
+                Rectangle rect = icon.GetClippingRectangle(spriteBatch);
+                rect.X += background_shift;
+                rect.Y += background_shift;
+                rect.Width = (int)SIZE;
+                rect.Height = (int)SIZE;
+                spriteBatch.Draw(Utilities.Textures.TEXTURE_ABILITY_BACKGROUND, rect, ability.Colour);
+
                 //draw icon
                 icon.Draw(spriteBatch);
 
@@ -1335,7 +1376,7 @@ namespace ExperienceAndClasses.UI {
                     //start clipping draw
                     spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, null, null, _rasterizerState);
                     Rectangle prior_rect = spriteBatch.GraphicsDevice.ScissorRectangle;
-                    Rectangle rect = icon.GetClippingRectangle(spriteBatch);
+                    rect = icon.GetClippingRectangle(spriteBatch);
                     rect.Height = (int)SIZE + 2;
                     rect.Width = (int)SIZE + 2;
                     spriteBatch.GraphicsDevice.ScissorRectangle = rect;
@@ -1359,14 +1400,15 @@ namespace ExperienceAndClasses.UI {
     public class ResourceBar : UIElement {
         public const float HEIGHT = 24f;
         private const float HEIGHT_BAR = 20f;
-        public readonly float ICON_SCALE = HEIGHT / Utilities.Textures.TEXTURE_RESOURCE_DEFAULT.Height;
+        public static readonly float ICON_SCALE = HEIGHT / Utilities.Textures.TEXTURE_RESOURCE_DEFAULT.Height;
+        private static readonly int background_shift = (int)Math.Ceiling(Utilities.Textures.TEXTURE_RESOURCE_DEFAULT.Height * (1f - ICON_SCALE) / 2f);
         private Systems.Resource resource;
         private UIImage icon;
 
         public ResourceBar(Systems.Resource resource, float width) {
             Width.Set(width, 0f);
             Height.Set(HEIGHT, 0f);
-            
+
             this.resource = resource;
             icon = new UIImage(resource.Texture);
             icon.ImageScale = ICON_SCALE;
@@ -1381,6 +1423,19 @@ namespace ExperienceAndClasses.UI {
 
         public void Update() {
             //TODO
+        }
+
+        public override void Draw(SpriteBatch spriteBatch) {
+            //draw background
+            Rectangle rect = icon.GetClippingRectangle(spriteBatch);
+            rect.X += background_shift;
+            rect.Y += background_shift;
+            rect.Width = (int)HEIGHT;
+            rect.Height = (int)HEIGHT;
+            spriteBatch.Draw(Utilities.Textures.TEXTURE_RESOURCE_BACKGROUND, rect, resource.colour);
+
+            //draw normally
+            base.Draw(spriteBatch);
         }
     }
 }

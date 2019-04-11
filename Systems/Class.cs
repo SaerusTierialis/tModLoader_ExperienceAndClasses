@@ -47,7 +47,7 @@ namespace ExperienceAndClasses.Systems {
         public const byte MAX_TIER = 3;
         public static readonly byte[] TIER_MAX_LEVELS = new byte[] {0, 10, 50, 100};
 
-        private static readonly Color COLOUR_DEFAULT = new Color(255, 255, 255);
+        public static readonly Color COLOUR_DEFAULT = new Color(255, 255, 255);
         private static readonly Color COLOUR_NOVICE = new Color(168, 185, 127);
         private static readonly Color COLOUR_NONCOMBAT = new Color(165, 98, 77);
         private static readonly Color COLOUR_CLOSE_RANGE_2 = new Color(204, 89, 89);
