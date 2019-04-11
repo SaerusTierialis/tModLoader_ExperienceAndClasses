@@ -21,6 +21,8 @@ namespace ExperienceAndClasses.UI {
         private const float MAX_WIDTH_PER_ITEM_ROW = WIDTH - (Constants.UI_PADDING * 2);
         private const float SPACING = 2f;
 
+        private const float UPDATE_COOLDOWN_SECONDS = 0.25f;
+
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Variables ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         public DragableUIPanel panel { get; private set; }
         private XPBar[] xp_bars;
@@ -28,10 +30,14 @@ namespace ExperienceAndClasses.UI {
         private AbilityIconCooldown[] ability_icons;
         private List<ResourceBar> resource_bars;
         private bool any_classes;
+        private bool any_cooldowns;
+        private DateTime time_next_cooldown_update;
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Initialize ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         protected override void InitializeState() {
             any_classes = false;
+            any_cooldowns = false;
+            time_next_cooldown_update = ExperienceAndClasses.Now;
             panel = new DragableUIPanel(WIDTH, HEIGHT, Constants.COLOUR_BAR_UI, this, false, ExperienceAndClasses.LOCAL_MPLAYER.loaded_ui_hud.AUTO);
             panel.Width.Set(WIDTH, 0f);
 
@@ -79,17 +85,41 @@ namespace ExperienceAndClasses.UI {
         }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Methods ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-        public void Update() {
-            Main.NewText("HERE");
+        public void TimedUpdateCooldown() {
+            if (any_cooldowns) {
+                if (ExperienceAndClasses.Now.CompareTo(time_next_cooldown_update) > 0) {
+                    UpdateCooldown();
+                    time_next_cooldown_update = ExperienceAndClasses.Now.AddSeconds(UPDATE_COOLDOWN_SECONDS);
+                }
+            }
+        }
+
+        public void UpdateAll() {
+            UpdateXP();
+            UpdateXP();
+            UpdateCooldown();
+        }
+
+        public void UpdateXP() {
             foreach (XPBar xp_bar in xp_bars) {
                 xp_bar.Update();
             }
-            foreach(ResourceBar rb in resource_bars) {
+        }
+
+        public void UpdateResource() {
+            foreach (ResourceBar rb in resource_bars) {
                 rb.Update();
             }
-            foreach(AbilityIconCooldown icon in ability_icons) {
-                if (icon != null)
-                    icon.Update();
+        }
+
+        public void UpdateCooldown() {
+            any_cooldowns = false;
+            foreach (AbilityIconCooldown icon in ability_icons) {
+                if (icon != null) {
+                    if (icon.Update()) {
+                        any_cooldowns = true;
+                    }
+                }
             }
         }
 
@@ -163,7 +193,7 @@ namespace ExperienceAndClasses.UI {
 
                 panel.Height.Set(final_height + Constants.UI_PADDING, 0f);
 
-                Update();
+                UpdateAll();
             }
         }
  

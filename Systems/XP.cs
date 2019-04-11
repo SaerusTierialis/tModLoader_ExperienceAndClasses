@@ -186,7 +186,7 @@ namespace ExperienceAndClasses.Systems {
                 }
                 else {
                     //otherwise just update xp bars
-                    UI.UIHUD.Instance.Update();
+                    UI.UIHUD.Instance.UpdateAll();
                     return false;
                 }
             }

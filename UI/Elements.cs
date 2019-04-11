@@ -1270,10 +1270,18 @@ namespace ExperienceAndClasses.UI {
             Append(icon);
         }
 
-        public void Update() {
+        /// <summary>
+        /// return true if on cooldown
+        /// </summary>
+        /// <returns></returns>
+        public bool Update() {
+            bool on_cooldown = false;
+
             if (active) {
                 //TODO
             }
+
+            return on_cooldown;
         }
 
         public void SetAbility(Systems.Ability ability) {

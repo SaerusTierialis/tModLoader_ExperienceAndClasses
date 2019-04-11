@@ -320,8 +320,9 @@ namespace ExperienceAndClasses {
 
             //local events
             if (Is_Local_Player) {
-                //ui //TODO only update if something changed
+                //ui (these only update if needed or time due)
                 UI.UIStatus.Instance.Update();
+                UI.UIHUD.Instance.TimedUpdateCooldown();
             }
         }
 
