@@ -297,11 +297,13 @@ namespace ExperienceAndClasses.UI {
         private const float TEXT_SCALE = 1f;
         private const float ICON_SCALE = 0.8f;
         private const float BAR_HEIGHT = 24f;
+        private readonly int ICON_SIZE = (int)Math.Ceiling(Utilities.Textures.TEXTURE_CLASS_DEFAULT.Width * ICON_SCALE);
 
         private UIImage icon;
         private ProgressBar bar;
         private UIText text;
         private float left;
+        private int shift;
 
         public bool visible;
         public Systems.Class Class_Tracked { get; private set; }
@@ -310,19 +312,18 @@ namespace ExperienceAndClasses.UI {
             visible = false;
             
             SetPadding(0f);
+            shift = (int)Math.Ceiling(-(Utilities.Textures.TEXTURE_CLASS_DEFAULT.Height * (1f - ICON_SCALE) / 2f));
 
             icon = new UIImage(Utilities.Textures.TEXTURE_CLASS_DEFAULT);
             icon.ImageScale = ICON_SCALE;
-            icon.Top.Set(-(Utilities.Textures.TEXTURE_CLASS_DEFAULT.Height * (1f - ICON_SCALE) / 2f), 0f);
-            icon.Left.Set(-(Utilities.Textures.TEXTURE_CLASS_DEFAULT.Width * (1f - ICON_SCALE) / 2f), 0f);
-            icon.Width.Set(Utilities.Textures.TEXTURE_CLASS_DEFAULT.Width * ICON_SCALE, 0f);
-            icon.Height.Set(Utilities.Textures.TEXTURE_CLASS_DEFAULT.Height * ICON_SCALE, 0f);
+            icon.Top.Set(shift, 0f);
+            icon.Left.Set(shift, 0f);
             Append(icon);
 
-            left = icon.Width.Pixels + Constants.UI_PADDING;
+            left = ICON_SIZE + Constants.UI_PADDING;
             bar = new ProgressBar(width - left, BAR_HEIGHT, Constants.COLOUR_XP_DIM);
             bar.Left.Set(left, 0f);
-            bar.Top.Set((icon.Height.Pixels - bar.Height.Pixels) / 2f, 0f);
+            bar.Top.Set((ICON_SIZE - bar.Height.Pixels) / 2f, 0f);
             Append(bar);
 
             text = new UIText("0123 / 45679", TEXT_SCALE);
@@ -330,7 +331,7 @@ namespace ExperienceAndClasses.UI {
             Append(text);
 
             Width.Set(width, 0f);
-            Height.Set(Math.Max(icon.Height.Pixels, bar.Height.Pixels), 0f);
+            Height.Set(Math.Max(ICON_SIZE, bar.Height.Pixels), 0f);
         }
 
         public void SetWidth (float width) {
@@ -388,8 +389,18 @@ namespace ExperienceAndClasses.UI {
         }
 
         public override void Draw(SpriteBatch spriteBatch) {
-            if (visible)
+            if (visible) {
+                //draw background
+                Rectangle rect = icon.GetClippingRectangle(spriteBatch);
+                rect.X -= shift;
+                rect.Y -= shift;
+                rect.Width = ICON_SIZE + 1;
+                rect.Height = ICON_SIZE + 1;
+                spriteBatch.Draw(Utilities.Textures.TEXTURE_CLASS_BACKGROUND, rect, Class_Tracked.Colour);
+
+                //draw normally
                 base.Draw(spriteBatch);
+            }
             else
                 return;
         }
@@ -516,7 +527,7 @@ namespace ExperienceAndClasses.UI {
     class ClassButton : UIImageButton {
         private const float TEXT_SCALE = 0.7f;
         private const float TEXT_OFFSET = 5f;
-        private const float LOW_VISIBILITY = 0.4f;
+        private const float LOW_VISIBILITY = 0.7f;
         private float button_size = 0f;
 
         public Systems.Class Class { get; private set; }
@@ -525,7 +536,7 @@ namespace ExperienceAndClasses.UI {
 
         public ClassButton(Systems.Class Class) : base(Class.Texture) {
             this.Class = Class;
-
+            
             Width.Set(Class.Texture.Width, 0f);
             Height.Set(Class.Texture.Height, 0f);
             
@@ -625,12 +636,20 @@ namespace ExperienceAndClasses.UI {
                 else {
                     image_lock.SetImage(Utilities.Textures.TEXTURE_LOCK_RED);
                 }
-                SetVisibility(1f, LOW_VISIBILITY);
 
                 //no text
                 text.SetText("");
             }
             this.MouseOut(null);
+        }
+
+        public override void Draw(SpriteBatch spriteBatch) {
+            //draw background
+            Rectangle rect = GetClippingRectangle(spriteBatch);
+            spriteBatch.Draw(Utilities.Textures.TEXTURE_CLASS_BACKGROUND, new Vector2(rect.X, rect.Y), Class.Colour);
+
+            //draw normally
+            base.Draw(spriteBatch);
         }
     }
 
@@ -1339,15 +1358,25 @@ namespace ExperienceAndClasses.UI {
 
     public class ResourceBar : UIElement {
         public const float HEIGHT = 24f;
-        public readonly float ICON_SCALE = HEIGHT / Utilities.Textures.TEXTURE_RESOURCE_DEFAULT.Width;
+        private const float HEIGHT_BAR = 20f;
+        public readonly float ICON_SCALE = HEIGHT / Utilities.Textures.TEXTURE_RESOURCE_DEFAULT.Height;
         private Systems.Resource resource;
         private UIImage icon;
 
         public ResourceBar(Systems.Resource resource, float width) {
+            Width.Set(width, 0f);
+            Height.Set(HEIGHT, 0f);
+            
             this.resource = resource;
             icon = new UIImage(resource.Texture);
             icon.ImageScale = ICON_SCALE;
             Append(icon);
+
+            float left = HEIGHT + Constants.UI_PADDING;
+            ProgressBar bar = new ProgressBar(width - left, HEIGHT_BAR, Color.Red);
+            bar.Left.Set(left, 0f);
+            bar.Top.Set(UIHUD.SPACING + (HEIGHT - HEIGHT_BAR)/2f, 0f);
+            Append(bar);
         }
 
         public void Update() {

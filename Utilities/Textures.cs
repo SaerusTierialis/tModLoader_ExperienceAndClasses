@@ -25,6 +25,7 @@ namespace ExperienceAndClasses.Utilities {
         public static float TEXTURE_LOCK_HEIGHT { get; private set; }
 
         public static Texture2D TEXTURE_CLASS_DEFAULT { get; private set; }
+        public static Texture2D TEXTURE_CLASS_BACKGROUND { get; private set; }
         public static Texture2D TEXTURE_STATUS_DEFAULT { get; private set; }
         public static Texture2D TEXTURE_ABILITY_DEFAULT { get; private set; }
         public static Texture2D TEXTURE_ABILITY_COOLDOWN_COVER { get; private set; }
@@ -53,6 +54,7 @@ namespace ExperienceAndClasses.Utilities {
             TEXTURE_LOCK_HEIGHT = TEXTURE_LOCK_BROWN.Height;
 
             TEXTURE_CLASS_DEFAULT = ModLoader.GetTexture("ExperienceAndClasses/Textures/Class/Default");
+            TEXTURE_CLASS_BACKGROUND = ModLoader.GetTexture("ExperienceAndClasses/Textures/Class/Background");
             TEXTURE_STATUS_DEFAULT = ModLoader.GetTexture("ExperienceAndClasses/Textures/Status/Default");
             TEXTURE_ABILITY_DEFAULT = ModLoader.GetTexture("ExperienceAndClasses/Textures/Ability/Default");
             TEXTURE_ABILITY_COOLDOWN_COVER = ModLoader.GetTexture("ExperienceAndClasses/Textures/Ability/Cooldown");

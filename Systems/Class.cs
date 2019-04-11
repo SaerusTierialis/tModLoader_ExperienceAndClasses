@@ -47,6 +47,24 @@ namespace ExperienceAndClasses.Systems {
         public const byte MAX_TIER = 3;
         public static readonly byte[] TIER_MAX_LEVELS = new byte[] {0, 10, 50, 100};
 
+        private static readonly Color COLOUR_DEFAULT = new Color(255, 255, 255);
+        private static readonly Color COLOUR_NOVICE = new Color(168, 185, 127);
+        private static readonly Color COLOUR_NONCOMBAT = new Color(165, 98, 77);
+        private static readonly Color COLOUR_CLOSE_RANGE_2 = new Color(204, 89, 89);
+        private static readonly Color COLOUR_CLOSE_RANGE_3 = new Color(198, 43, 43);
+        private static readonly Color COLOUR_PROJECTILE_2 = new Color(127, 146, 255);
+        private static readonly Color COLOUR_PROJECTILE_3 = new Color(81, 107, 255);
+        private static readonly Color COLOUR_UTILITY_2 = new Color(158, 255, 255);
+        private static readonly Color COLOUR_UTILITY_3 = new Color(49, 160, 160);
+        private static readonly Color COLOUR_MINION_2 = new Color(142, 79, 142);
+        private static readonly Color COLOUR_MINION_3 = new Color(145, 37, 145);
+        private static readonly Color COLOUR_SUPPORT_2 = new Color(255, 204, 153);
+        private static readonly Color COLOUR_SUPPORT_3 = new Color(255, 174, 94);
+        private static readonly Color COLOUR_TRICKERY_2 = new Color(158, 158, 158);
+        private static readonly Color COLOUR_TRICKERY_3 = new Color(107, 107, 107);
+        private static readonly Color COLOUR_HYBRID_2 = new Color(204, 87, 138);
+        private static readonly Color COLOUR_HYBRID_3 = new Color(193, 36, 104);
+
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Treated like readonly ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         public static Class[] LOOKUP { get; private set; }
@@ -82,6 +100,7 @@ namespace ExperienceAndClasses.Systems {
         public bool Enabled { get; protected set; } = false;
         public Systems.Ability.IDs[] AbilitiesID { get; protected set; } = Enumerable.Repeat(Systems.Ability.IDs.NONE, ExperienceAndClasses.NUMBER_ABILITY_SLOTS_PER_CLASS).ToArray();
         public Systems.Ability.IDs[] AbilitiesID_Alt { get; protected set; } = Enumerable.Repeat(Systems.Ability.IDs.NONE, ExperienceAndClasses.NUMBER_ABILITY_SLOTS_PER_CLASS).ToArray();
+        public Color Colour { get; protected set; } = COLOUR_DEFAULT;
 
         public Class(IDs id) {
             //defaults
@@ -515,6 +534,7 @@ namespace ExperienceAndClasses.Systems {
                 Attribute_Growth[(byte)Attribute.IDs.Spirit] = 2f;
                 Attribute_Growth[(byte)Attribute.IDs.Agility] = 2f;
                 Attribute_Growth[(byte)Attribute.IDs.Dexterity] = 2f;
+                Colour = COLOUR_NONCOMBAT;
             }
         }
 
@@ -524,6 +544,7 @@ namespace ExperienceAndClasses.Systems {
                 Name = "Novice";
                 Description = "TODO_desc";
                 Class_Locations[0, 3] = ID_num;
+                Colour = COLOUR_NOVICE;
             }
         }
 
@@ -537,7 +558,7 @@ namespace ExperienceAndClasses.Systems {
                 Attribute_Growth[(byte)Attribute.IDs.Power] = 2;
                 Attribute_Growth[(byte)Attribute.IDs.Vitality] = 3;
                 Attribute_Growth[(byte)Attribute.IDs.Dexterity] = 2;
-
+                Colour = COLOUR_CLOSE_RANGE_2;
                 AbilitiesID[0] = Systems.Ability.IDs.Warrior_Block;
             }
         }
@@ -550,6 +571,7 @@ namespace ExperienceAndClasses.Systems {
                 Attribute_Growth[(byte)Attribute.IDs.Power] = 3;
                 Attribute_Growth[(byte)Attribute.IDs.Spirit] = 2;
                 Attribute_Growth[(byte)Attribute.IDs.Dexterity] = 2;
+                Colour = COLOUR_PROJECTILE_2;
             }
         }
 
@@ -562,6 +584,7 @@ namespace ExperienceAndClasses.Systems {
                 Attribute_Growth[(byte)Attribute.IDs.Vitality] = 2;
                 Attribute_Growth[(byte)Attribute.IDs.Mind] = 2;
                 Attribute_Growth[(byte)Attribute.IDs.Agility] = 2;
+                Colour = COLOUR_UTILITY_2;
             }
         }
 
@@ -572,6 +595,7 @@ namespace ExperienceAndClasses.Systems {
                 Class_Locations[1, 3] = ID_num;
                 Attribute_Growth[(byte)Attribute.IDs.Spirit] = 3;
                 Attribute_Growth[(byte)Attribute.IDs.Agility] = 3;
+                Colour = COLOUR_TRICKERY_2;
             }
         }
 
@@ -582,6 +606,7 @@ namespace ExperienceAndClasses.Systems {
                 Class_Locations[1, 4] = ID_num;
                 Attribute_Growth[(byte)Attribute.IDs.Power] = 3;
                 Attribute_Growth[(byte)Attribute.IDs.Spirit] = 3;
+                Colour = COLOUR_MINION_2;
             }
         }
 
@@ -592,6 +617,7 @@ namespace ExperienceAndClasses.Systems {
                 Class_Locations[1, 5] = ID_num;
                 Attribute_Growth[(byte)Attribute.IDs.Mind] = 3;
                 Attribute_Growth[(byte)Attribute.IDs.Spirit] = 3;
+                Colour = COLOUR_SUPPORT_2;
             }
         }
 
@@ -606,6 +632,7 @@ namespace ExperienceAndClasses.Systems {
                 Attribute_Growth[(byte)Attribute.IDs.Spirit] = 2;
                 Attribute_Growth[(byte)Attribute.IDs.Agility] = 2;
                 Attribute_Growth[(byte)Attribute.IDs.Dexterity] = 2;
+                Colour = COLOUR_HYBRID_2;
             }
         }
 
@@ -618,6 +645,7 @@ namespace ExperienceAndClasses.Systems {
                 Class_Locations[2, 0] = ID_num;
                 Attribute_Growth[(byte)Attribute.IDs.Power] = 5;
                 Attribute_Growth[(byte)Attribute.IDs.Vitality] = 3;
+                Colour = COLOUR_CLOSE_RANGE_3;
             }
         }
 
@@ -630,6 +658,7 @@ namespace ExperienceAndClasses.Systems {
                 Attribute_Growth[(byte)Attribute.IDs.Vitality] = 2;
                 Attribute_Growth[(byte)Attribute.IDs.Agility] = 2;
                 Attribute_Growth[(byte)Attribute.IDs.Dexterity] = 4;
+                Colour = COLOUR_CLOSE_RANGE_3;
             }
         }
 
@@ -640,6 +669,7 @@ namespace ExperienceAndClasses.Systems {
                 Class_Locations[4, 0] = ID_num;
                 Attribute_Growth[(byte)Attribute.IDs.Power] = 3;
                 Attribute_Growth[(byte)Attribute.IDs.Vitality] = 5;
+                Colour = COLOUR_CLOSE_RANGE_3;
             }
         }
 
@@ -650,6 +680,7 @@ namespace ExperienceAndClasses.Systems {
                 Class_Locations[2, 1] = ID_num;
                 Attribute_Growth[(byte)Attribute.IDs.Power] = 4;
                 Attribute_Growth[(byte)Attribute.IDs.Spirit] = 4;
+                Colour = COLOUR_PROJECTILE_3;
             }
         }
 
@@ -662,6 +693,7 @@ namespace ExperienceAndClasses.Systems {
                 Attribute_Growth[(byte)Attribute.IDs.Vitality] = 3;
                 Attribute_Growth[(byte)Attribute.IDs.Spirit] = 2;
                 Attribute_Growth[(byte)Attribute.IDs.Dexterity] = 2;
+                Colour = COLOUR_PROJECTILE_3;
             }
         }
 
@@ -674,6 +706,7 @@ namespace ExperienceAndClasses.Systems {
                 Attribute_Growth[(byte)Attribute.IDs.Vitality] = 2;
                 Attribute_Growth[(byte)Attribute.IDs.Mind] = 2;
                 Attribute_Growth[(byte)Attribute.IDs.Agility] = 3;
+                Colour = COLOUR_UTILITY_3;
             }
         }
 
@@ -685,6 +718,7 @@ namespace ExperienceAndClasses.Systems {
                 Attribute_Growth[(byte)Attribute.IDs.Power] = 3;
                 Attribute_Growth[(byte)Attribute.IDs.Dexterity] = 2;
                 Attribute_Growth[(byte)Attribute.IDs.Agility] = 4;
+                Colour = COLOUR_TRICKERY_3;
             }
         }
 
@@ -696,6 +730,7 @@ namespace ExperienceAndClasses.Systems {
                 Attribute_Growth[(byte)Attribute.IDs.Power] = 2;
                 Attribute_Growth[(byte)Attribute.IDs.Spirit] = 4;
                 Attribute_Growth[(byte)Attribute.IDs.Agility] = 3;
+                Colour = COLOUR_TRICKERY_3;
             }
         }
 
@@ -707,6 +742,7 @@ namespace ExperienceAndClasses.Systems {
                 Attribute_Growth[(byte)Attribute.IDs.Power] = 2;
                 Attribute_Growth[(byte)Attribute.IDs.Spirit] = 2;
                 Attribute_Growth[(byte)Attribute.IDs.Dexterity] = 5;
+                Colour = COLOUR_PROJECTILE_3;
             }
         }
 
@@ -718,6 +754,7 @@ namespace ExperienceAndClasses.Systems {
                 Attribute_Growth[(byte)Attribute.IDs.Power] = 5;
                 Attribute_Growth[(byte)Attribute.IDs.Mind] = 2;
                 Attribute_Growth[(byte)Attribute.IDs.Spirit] = 2;
+                Colour = COLOUR_MINION_3;
             }
         }
 
@@ -728,6 +765,7 @@ namespace ExperienceAndClasses.Systems {
                 Class_Locations[3, 4] = ID_num;
                 Attribute_Growth[(byte)Attribute.IDs.Power] = 4;
                 Attribute_Growth[(byte)Attribute.IDs.Spirit] = 4;
+                Colour = COLOUR_MINION_3;
             }
         }
 
@@ -738,6 +776,7 @@ namespace ExperienceAndClasses.Systems {
                 Class_Locations[2, 5] = ID_num;
                 Attribute_Growth[(byte)Attribute.IDs.Mind] = 3;
                 Attribute_Growth[(byte)Attribute.IDs.Spirit] = 5;
+                Colour = COLOUR_SUPPORT_3;
             }
         }
 
@@ -752,6 +791,7 @@ namespace ExperienceAndClasses.Systems {
                 Attribute_Growth[(byte)Attribute.IDs.Spirit] = 2.5f;
                 Attribute_Growth[(byte)Attribute.IDs.Agility] = 2.5f;
                 Attribute_Growth[(byte)Attribute.IDs.Dexterity] = 2.5f;
+                Colour = COLOUR_HYBRID_3;
             }
         }
 

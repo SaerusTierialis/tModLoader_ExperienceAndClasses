@@ -19,7 +19,7 @@ namespace ExperienceAndClasses.UI {
         private const float HEIGHT = 200f; //default, actual height is dynamic
 
         private const float MAX_WIDTH_PER_ITEM_ROW = WIDTH - (Constants.UI_PADDING * 2);
-        private const float SPACING = 2f;
+        public const float SPACING = 2f;
 
         private const float UPDATE_COOLDOWN_SECONDS = 0.25f;
 
@@ -154,11 +154,13 @@ namespace ExperienceAndClasses.UI {
                 }
                 else {
                     panel_resource.visible = true;
+                    resource_bars.Clear();
                     ResourceBar rb;
                     foreach (Systems.Resource resource in local.Resources.Values) {
                         rb = new ResourceBar(resource, MAX_WIDTH_PER_ITEM_ROW);
                         rb.Left.Set(Constants.UI_PADDING, 0f);
                         rb.Top.Set(final_height += SPACING, 0f);
+                        resource_bars.Add(rb);
                         panel_resource.Append(rb);
                         final_height += ResourceBar.HEIGHT;
                     }
@@ -192,6 +194,7 @@ namespace ExperienceAndClasses.UI {
                 }
 
                 panel.Height.Set(final_height + Constants.UI_PADDING, 0f);
+                panel_resource.Height.Set(panel.Height.Pixels, 0f);
 
                 UpdateAll();
             }
