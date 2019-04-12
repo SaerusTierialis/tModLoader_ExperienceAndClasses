@@ -380,7 +380,7 @@ namespace ExperienceAndClasses.Systems {
 
             Tooltip += "\nHotkey: " + hotkey;
             if (hotkey_not_set) {
-                Tooltip += " (key not set)";
+                Tooltip += " (might not be set)";
             }
             Tooltip += "\n";
 
