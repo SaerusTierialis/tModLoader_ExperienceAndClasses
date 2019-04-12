@@ -52,7 +52,7 @@ namespace ExperienceAndClasses.Systems {
 
         public IDs ID { get; private set; } = IDs.NONE;
         public byte ID_num { get; private set; } = (byte)IDs.NONE;
-        public ushort Value = 0;
+        public ushort Value { get; private set; } = 0;
         public Texture2D Texture { get; private set; }
         public Color colour = Systems.Class.COLOUR_DEFAULT;
         protected DateTime time_next_update;
@@ -74,7 +74,7 @@ namespace ExperienceAndClasses.Systems {
         }
 
         /// <summary>
-        /// Called when a resource is added by a passive and was not already in use
+        /// Call when a resource is added by a passive and was not already in use
         /// </summary>
         public void Initialize() {
             Value = specific_default_value;
@@ -82,6 +82,9 @@ namespace ExperienceAndClasses.Systems {
             OnInitialize();
         }
 
+        /// <summary>
+        /// Call on each cycle
+        /// </summary>
         public void TimedUpdate() {
             if (passive_value_change) {
                 if (ExperienceAndClasses.Now.CompareTo(time_next_update) > 0) {
@@ -99,22 +102,46 @@ namespace ExperienceAndClasses.Systems {
                     }
                     change = ModifyPassiveValueChange(change);
 
-                    ushort new_value = (ushort)(Value + change);
-                    if (new_value > Specific_Capacity) {
-                        new_value = Specific_Capacity;
-                    }
-
-                    if (Value != new_value) {
-                        Value = new_value;
-                        UI.UIHUD.Instance.UpdateResource();
-                    }
+                    AdjustValue((int)change);
                 }
+            }
+
+            OnUpdate();
+        }
+
+        /// <summary>
+        /// Limits to 0-to-Capacity and updates UI if value changed
+        /// </summary>
+        /// <param name="change"></param>
+        public void AdjustValue(int change) {
+            ushort new_value = (ushort)(Value + change);
+            if (new_value > Specific_Capacity) {
+                new_value = Specific_Capacity;
+            }
+
+            if (Value != new_value) {
+                Value = new_value;
+                UI.UIHUD.Instance.UpdateResource();
             }
         }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Overrides ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
+        /// <summary>
+        /// Called when a resource is added by a passive and was not already in use - called after defaulting Value and time_next_update
+        /// </summary>
         public virtual void OnInitialize() { }
+
+        /// <summary>
+        /// Called on each cycle after passive value changes
+        /// </summary>
+        public virtual void OnUpdate() { }
+
+        /// <summary>
+        /// Modify the amount of passive value change
+        /// </summary>
+        /// <param name="change"></param>
+        /// <returns></returns>
         public virtual float ModifyPassiveValueChange(float change) { return change; }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Resources ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/

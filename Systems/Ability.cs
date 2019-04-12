@@ -346,8 +346,7 @@ namespace ExperienceAndClasses.Systems {
 
             //take resource
             if (cost_resource > 0) {
-                Systems.Resource.LOOKUP[(byte)specific_resource].Value = (ushort)Math.Max(0, Systems.Resource.LOOKUP[(byte)specific_resource].Value - cost_resource);
-                UI.UIHUD.Instance.UpdateResource();
+                Systems.Resource.LOOKUP[(byte)specific_resource].AdjustValue(-cost_resource);
             }
 
             //do main effect
