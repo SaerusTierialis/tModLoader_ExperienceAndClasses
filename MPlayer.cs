@@ -569,11 +569,9 @@ namespace ExperienceAndClasses {
         public override void Hurt(bool pvp, bool quiet, double damage, int hitDirection, bool crit) {
             base.Hurt(pvp, quiet, damage, hitDirection, crit);
             if (channelling) {
-                if (!Utilities.Netmode.IS_SERVER) {
+                if (thing.Statuses.RemoveChannellingHurt() && !Utilities.Netmode.IS_SERVER) {
                     Main.PlaySound(SoundID.Shatter);
                 }
-                thing.Statuses.RemoveChannellingHurt();
-                channelling = false;
             }
         }
 
