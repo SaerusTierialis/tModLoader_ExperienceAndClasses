@@ -205,7 +205,11 @@ namespace ExperienceAndClasses.Systems {
 
         private void EnableResource() {
             if (specific_resource != Systems.Resource.IDs.NONE) {
-                ExperienceAndClasses.LOCAL_MPLAYER.Resources.Add(specific_resource, Systems.Resource.LOOKUP[(byte)specific_resource]);
+                MPlayer.Resources.Add(specific_resource, Systems.Resource.LOOKUP[(byte)specific_resource]);
+                if (!MPlayer.Resources_Prior.ContainsKey(specific_resource)) {
+                    //(re)init resource if it wasn't in use
+                    Systems.Resource.LOOKUP[(byte)specific_resource].Initialize();
+                }
             }
         }
 

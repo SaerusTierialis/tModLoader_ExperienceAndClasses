@@ -149,14 +149,14 @@ namespace ExperienceAndClasses.UI {
 
                 //resource
                 panel_resource.RemoveAllChildren();
-                if (local.Resources.Count == 0) {
+                if (MPlayer.Resources.Count == 0) {
                     panel_resource.visible = false;
                 }
                 else {
                     panel_resource.visible = true;
                     resource_bars.Clear();
                     ResourceBar rb;
-                    foreach (Systems.Resource resource in local.Resources.Values) {
+                    foreach (Systems.Resource resource in MPlayer.Resources.Values) {
                         rb = new ResourceBar(resource, MAX_WIDTH_PER_ITEM_ROW);
                         rb.Left.Set(Constants.UI_PADDING, 0f);
                         rb.Top.Set(final_height += SPACING, 0f);

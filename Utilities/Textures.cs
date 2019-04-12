@@ -41,6 +41,7 @@ namespace ExperienceAndClasses.Utilities {
 
         public static Texture2D TEXTURE_RESOURCE_DEFAULT { get; private set; }
         public static Texture2D TEXTURE_RESOURCE_BACKGROUND { get; private set; }
+        public static Texture2D TEXTURE_RESOURCE_DOT { get; private set; }
 
         /// <summary>
         /// (Re)Load all textures
@@ -80,6 +81,7 @@ namespace ExperienceAndClasses.Utilities {
 
             TEXTURE_RESOURCE_DEFAULT = ModLoader.GetTexture("ExperienceAndClasses/Textures/Resource/Default");
             TEXTURE_RESOURCE_BACKGROUND = ModLoader.GetTexture("ExperienceAndClasses/Textures/Resource/Background");
+            TEXTURE_RESOURCE_DOT = ModLoader.GetTexture("ExperienceAndClasses/Textures/Resource/Dot");
 
             foreach (Systems.Class c in Systems.Class.LOOKUP) {
                 c.LoadTexture();

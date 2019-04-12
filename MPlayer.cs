@@ -18,6 +18,8 @@ namespace ExperienceAndClasses {
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Static Vars ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         private static DateTime time_next_full_sync;
+        public static Dictionary<Systems.Resource.IDs, Systems.Resource> Resources_Prior { get; private set; }
+        public static Dictionary<Systems.Resource.IDs, Systems.Resource> Resources { get; private set; }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Instance Vars (non-syncing, non-save/load) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -99,8 +101,6 @@ namespace ExperienceAndClasses {
         public Systems.Ability[] Abilities_Secondary { get; private set; }
         public Systems.Ability[] Abilities_Secondary_Alt { get; private set; }
 
-        public Dictionary<Systems.Resource.IDs, Systems.Resource> Resources { get; private set; }
-
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Instance Vars (saved/loaded) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         //Class_Primary and Class_Secondary also save/load (specifically the .ID)
@@ -165,6 +165,11 @@ namespace ExperienceAndClasses {
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Initialize ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         
+        static MPlayer() {
+            Resources_Prior = new Dictionary<Systems.Resource.IDs, Systems.Resource>();
+            Resources = new Dictionary<Systems.Resource.IDs, Systems.Resource>();
+        }
+
         /// <summary>
         /// instanced arrays must be initialized here (also called during cloning, etc)
         /// </summary>
@@ -321,6 +326,11 @@ namespace ExperienceAndClasses {
 
             //local events
             if (Is_Local_Player) {
+                //resource updates
+                foreach (Systems.Resource r in Resources.Values) {
+                    r.TimedUpdate();
+                }
+
                 //ui (these only update if needed or time due)
                 UI.UIStatus.Instance.Update();
                 UI.UIHUD.Instance.TimedUpdateCooldown();
@@ -428,7 +438,8 @@ namespace ExperienceAndClasses {
             LocalProgressionUpdate();
 
             //clear resources
-            local.Resources.Clear();
+            Resources_Prior = Resources;
+            Resources = new Dictionary<Systems.Resource.IDs, Systems.Resource>();
 
             //populate passives (also adds AutoPassive statuses AND resources AND sets passive.Unlocked)
             local.Passives.Clear();

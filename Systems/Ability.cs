@@ -346,7 +346,7 @@ namespace ExperienceAndClasses.Systems {
 
             //take resource
             if (cost_resource > 0) {
-                Systems.Resource.LOOKUP[(byte)specific_resource].Amount = (ushort)Math.Max(0, Systems.Resource.LOOKUP[(byte)specific_resource].Amount - cost_resource);
+                Systems.Resource.LOOKUP[(byte)specific_resource].Value = (ushort)Math.Max(0, Systems.Resource.LOOKUP[(byte)specific_resource].Value - cost_resource);
                 UI.UIHUD.Instance.UpdateResource();
             }
 
@@ -814,12 +814,12 @@ namespace ExperienceAndClasses.Systems {
 
             if (CalculateResourceCost() > 0) {
                 //doesn't have the resource
-                if (!ExperienceAndClasses.LOCAL_MPLAYER.Resources.ContainsKey(specific_resource)) {
+                if (!MPlayer.Resources.ContainsKey(specific_resource)) {
                     return USE_RESULT.FAIL_MISSING_RESOURCE;
                 }
 
                 //cost resource (calculates for use later in activation)
-                if (Systems.Resource.LOOKUP[(byte)specific_resource].Amount < cost_resource) {
+                if (Systems.Resource.LOOKUP[(byte)specific_resource].Value < cost_resource) {
                     return USE_RESULT.FAIL_NOT_ENOUGH_RESOURCE;
                 }
             }

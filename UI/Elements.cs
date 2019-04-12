@@ -140,8 +140,11 @@ namespace ExperienceAndClasses.UI {
         private UIPanel bar_background, bar_progress;
 
         private Color colour_border, colour_background; 
+        private bool show_min_for_low;
 
-        public ProgressBar(float width, float height, Color colour) {
+        public ProgressBar(float width, float height, Color colour, bool show_min_width_for_low=false) {
+            this.show_min_for_low = show_min_width_for_low;
+
             SetPadding(0f);
             Width.Set(width, 0f);
             Height.Set(height, 0f);
@@ -169,8 +172,15 @@ namespace ExperienceAndClasses.UI {
 
             float width = bar_background.Width.Pixels * percent;
             if (width < MIN_WIDTH) {
-                bar_progress.BackgroundColor = Color.Transparent;
-                bar_progress.BorderColor = Color.Transparent;
+                if (show_min_for_low && percent > 0f) {
+                    bar_progress.BorderColor = colour_border;
+                    bar_progress.BackgroundColor = colour_background;
+                    bar_progress.Width.Set(MIN_WIDTH, 0f);
+                }
+                else {
+                    bar_progress.BackgroundColor = Color.Transparent;
+                    bar_progress.BorderColor = Color.Transparent;
+                }
             }
             else {
                 bar_progress.BorderColor = colour_border;
@@ -1418,29 +1428,64 @@ namespace ExperienceAndClasses.UI {
     public class ResourceBar : UIElement {
         public const float HEIGHT = 24f;
         private const float HEIGHT_BAR = 20f;
+        private static readonly float DOT_HEIGHT = Utilities.Textures.TEXTURE_RESOURCE_DOT.Height;
+        private static readonly float DOT_WIDTH = Utilities.Textures.TEXTURE_RESOURCE_DOT.Width;
         public static readonly float ICON_SCALE = HEIGHT / Utilities.Textures.TEXTURE_RESOURCE_DEFAULT.Height;
         private static readonly int background_shift = (int)Math.Ceiling(Utilities.Textures.TEXTURE_RESOURCE_DEFAULT.Height * (1f - ICON_SCALE) / 2f);
         private Systems.Resource resource;
         private UIImage icon;
+        private bool bar_mode;
+        private ProgressBar bar;
+        private byte max_dots;
+        private float dot_top;
+        private byte dot_value, dot_capacity;
+        private float left;
+        private Color colour;
 
         public ResourceBar(Systems.Resource resource, float width) {
             Width.Set(width, 0f);
             Height.Set(HEIGHT, 0f);
+
+            colour = resource.colour;
 
             this.resource = resource;
             icon = new UIImage(resource.Texture);
             icon.ImageScale = ICON_SCALE;
             Append(icon);
 
-            float left = HEIGHT + Constants.UI_PADDING;
-            ProgressBar bar = new ProgressBar(width - left, HEIGHT_BAR, Color.Red);
+            left = HEIGHT + Constants.UI_PADDING;
+            float width_tracker = width - left;
+
+            //bar
+            bar = new ProgressBar(width_tracker, HEIGHT_BAR, colour, true);
             bar.Left.Set(left, 0f);
             bar.Top.Set(UIHUD.SPACING + (HEIGHT - HEIGHT_BAR)/2f, 0f);
             Append(bar);
+
+            //dots
+            max_dots = (byte)(width_tracker / DOT_WIDTH);
+            dot_top = UIHUD.SPACING + ((HEIGHT - DOT_HEIGHT) / 2f) + 1f;
+
+            Update();
         }
 
         public void Update() {
-            //TODO
+            //set bar/dot mode
+            if (bar_mode && (resource.Specific_Capacity <= max_dots)) {
+                bar_mode = false;
+            }
+            else if (!bar_mode && (resource.Specific_Capacity > max_dots)) {
+                bar_mode = true;
+            }
+
+            //set value
+            if (bar_mode) {
+                bar.SetProgress(resource.Value / (float)resource.Specific_Capacity);
+            }
+            else {
+                dot_value = (byte)resource.Value;
+                dot_capacity = (byte)resource.Specific_Capacity;
+            }
         }
 
         public override void Draw(SpriteBatch spriteBatch) {
@@ -1453,7 +1498,25 @@ namespace ExperienceAndClasses.UI {
             spriteBatch.Draw(Utilities.Textures.TEXTURE_RESOURCE_BACKGROUND, rect, resource.colour);
 
             //draw normally
-            base.Draw(spriteBatch);
+            icon.Draw(spriteBatch);
+            if (bar_mode) {
+                bar.Draw(spriteBatch);
+            }
+            else {
+                rect = icon.GetClippingRectangle(spriteBatch);
+                rect.Y += (int)dot_top;
+                rect.X += (int)left;
+                rect.Width = (int)DOT_WIDTH;
+                rect.Height = (int)DOT_HEIGHT;
+                for (byte i = 0; i < dot_value; i++) {
+                    spriteBatch.Draw(Utilities.Textures.TEXTURE_RESOURCE_DOT, rect, colour);
+                    rect.X += (int)DOT_WIDTH;
+                }
+                for (byte i = dot_value; i < dot_capacity; i++) {
+                    spriteBatch.Draw(Utilities.Textures.TEXTURE_RESOURCE_DOT, rect, Color.Gray);
+                    rect.X += (int)DOT_WIDTH;
+                }
+            }
         }
     }
 }
