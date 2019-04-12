@@ -1088,6 +1088,8 @@ namespace ExperienceAndClasses.Systems {
                     Dust.NewDustDirect(Target.Position, 1, 1, DustID.Fireworks, Main.rand.NextFloat(-5f, +5f), Main.rand.NextFloat(-1f, -10f));
                     Dust.NewDustDirect(Target.Position, 1, 1, DustID.Confetti, Main.rand.NextFloat(-5f, +5f), Main.rand.NextFloat(-1f, -10f));
                 }
+
+                //TODO add sound
             }
 
             public static void CreateNew(Utilities.Containers.Thing owner) {
