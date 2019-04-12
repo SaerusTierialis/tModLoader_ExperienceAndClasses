@@ -169,7 +169,7 @@ namespace ExperienceAndClasses.UI {
             panel_ability.SetTitle("Abilities", FONT_SCALE_TITLE, true, "TODO_help_text", "Class Abilities");
 
             //ability panel primary info
-            level_primary = new HelpTextPanel("DEFAULT", FONT_SCALE_ABILITY, false, "TODO", "TODO", true, true);
+            level_primary = new HelpTextPanel("DEFAULT", FONT_SCALE_ABILITY, false, "The level shown here is your effective level. The level of the secondary class is capped at half the level of the primary. If the secondary class is a higher tier, then it is capped at Lv1.", "Effective Level", true, true);
             level_primary.Left.Set(Constants.UI_PADDING, 0f);
             level_primary.Top.Set(panel_ability.top_space + Constants.UI_PADDING, 0f);
             level_primary.Width.Set(panel_ability.Width.Pixels - (Constants.UI_PADDING * 2f), 0f);
@@ -190,7 +190,7 @@ namespace ExperienceAndClasses.UI {
             }
 
             //ability panel secondary info
-            level_secondary = new HelpTextPanel("DEFAULT", FONT_SCALE_ABILITY, false, "TODO", "TODO", true, true);
+            level_secondary = new HelpTextPanel("DEFAULT", FONT_SCALE_ABILITY, false, "The level shown here is your effective level. The level of the secondary class is capped at half the level of the primary. If the secondary class is a higher tier, then it is capped at Lv1.", "Effective Level", true, true);
             level_secondary.Left.Set(Constants.UI_PADDING, 0f);
             level_secondary.Top.Set(ability_primary[0].Top.Pixels + ability_primary[0].Height.Pixels + (Constants.UI_PADDING * 2f), 0f);
             level_secondary.Width.Set(panel_ability.Width.Pixels - (Constants.UI_PADDING * 2f), 0f);
@@ -270,7 +270,7 @@ namespace ExperienceAndClasses.UI {
             //primary effective level
             Systems.Class c = ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary;
             if (c != null && c.Tier > 0) {
-                level_primary.SetText(c.Name + " Lv." + ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary_Level_Effective);
+                level_primary.SetText(c.Name + " Lv" + ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary_Level_Effective);
             }
             else {
                 level_primary.SetText("No Primary Class");
@@ -296,7 +296,7 @@ namespace ExperienceAndClasses.UI {
             //secondary effective level
             c = ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary;
             if (c != null && c.Tier > 0) {
-                level_secondary.SetText(c.Name + " Lv." + ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary_Level_Effective);
+                level_secondary.SetText(c.Name + " Lv" + ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary_Level_Effective);
             }
             else {
                 level_secondary.SetText("No Secondary Class");
