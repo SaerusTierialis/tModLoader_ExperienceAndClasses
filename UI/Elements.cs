@@ -207,6 +207,7 @@ namespace ExperienceAndClasses.UI {
     }
 
     class StatusIcon : UIElement {
+        public static readonly float SIZE = Utilities.Textures.TEXTURE_STATUS_DEFAULT.Width;
         private const float TEXT_SCALE = 0.75f;
         private const float TEXT_VERTICAL_SPACE = 2f;
 
@@ -214,7 +215,7 @@ namespace ExperienceAndClasses.UI {
         private readonly Color COLOUR_SOLID = new Color(255, 255, 255, 255);
         private readonly Color COLOUR_TEXT = new Color(128, 128, 128, 128);
 
-        private UITransparantImage icon;
+        private UITransparantImage icon, icon_background;
         private UIText text;
         private Systems.Status status;
 
@@ -227,15 +228,18 @@ namespace ExperienceAndClasses.UI {
             active = false;
             prior_text = "";
 
-            Width.Set(UIStatus.BUFF_SIZE, 0f);
-            Height.Set(UIStatus.BUFF_SIZE, 0f);
+            Width.Set(SIZE, 0f);
+            Height.Set(SIZE, 0f);
+
+            icon_background = new UITransparantImage(Utilities.Textures.TEXTURE_STATUS_BACKGROUND_DEFAULT, COLOUR_TRANSPARENT);
+            Append(icon_background);
 
             icon = new UITransparantImage(Utilities.Textures.TEXTURE_BLANK, COLOUR_TRANSPARENT);
             Append(icon);
 
             text = new UIText("", TEXT_SCALE);
             text.Left.Set(0f, 0f);
-            text.Top.Set(UIStatus.BUFF_SIZE + TEXT_VERTICAL_SPACE, 0f);
+            text.Top.Set(SIZE + TEXT_VERTICAL_SPACE, 0f);
             text.TextColor = COLOUR_TEXT;
             Append(text);
         }
@@ -254,6 +258,17 @@ namespace ExperienceAndClasses.UI {
         public void SetStatus(Systems.Status status) {
             this.status = status;
             icon.SetImage(status.Texture);
+            switch (status.Specific_Background) {
+                case (Systems.Status.BACKGROUND.BUFF):
+                    icon_background.SetImage(Utilities.Textures.TEXTURE_STATUS_BACKGROUND_BUFF);
+                    break;
+                case (Systems.Status.BACKGROUND.DEBUFF):
+                    icon_background.SetImage(Utilities.Textures.TEXTURE_STATUS_BACKGROUND_DEBUFF);
+                    break;
+                default:
+                    icon_background.SetImage(Utilities.Textures.TEXTURE_STATUS_BACKGROUND_DEFAULT);
+                    break;
+            }
         }
 
         public void Update() {
@@ -261,6 +276,7 @@ namespace ExperienceAndClasses.UI {
             if (!str.Equals(prior_text)) {
                 text.SetText(str);
                 text.Recalculate();
+                prior_text = str;
             }
         }
 
@@ -275,6 +291,7 @@ namespace ExperienceAndClasses.UI {
             base.MouseOver(evt);
             if (active) {
                 icon.color = COLOUR_SOLID;
+                icon_background.color = COLOUR_SOLID;
                 UIInfo.Instance.ShowStatus(this, status);
             }
         }
@@ -282,6 +299,7 @@ namespace ExperienceAndClasses.UI {
             base.MouseOut(evt);
             if (active) {
                 icon.color = COLOUR_TRANSPARENT;
+                icon_background.color = COLOUR_TRANSPARENT;
                 UIInfo.Instance.EndText(this);
             }
         }

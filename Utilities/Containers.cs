@@ -598,6 +598,21 @@ namespace ExperienceAndClasses.Utilities.Containers {
             return any_removed;
         }
 
+        private static Systems.Status.IDs[] status_channel_not_remove_on_hurt = new Systems.Status.IDs[] { Systems.Status.IDs.Warrior_Block };
+        /// <summary>
+        /// Remove all chanelling statuses except those allowed to continue through taking damage
+        /// </summary>
+        public bool RemoveChannellingHurt() {
+            bool any_removed = false;
+            foreach (Systems.Status.IDs id in statuses.Keys) {
+                if (Systems.Status.LOOKUP[(ushort)id].Specific_Target_Channelling && !status_channel_not_remove_on_hurt.Contains(id)) {
+                    RemoveAll(id);
+                    any_removed = true;
+                }
+            }
+            return any_removed;
+        }
+
         /// <summary>
         /// Returns list of instances for each active status (empty if no statuses)
         /// </summary>

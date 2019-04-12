@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.GameInput;
+using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
 
@@ -524,6 +525,12 @@ namespace ExperienceAndClasses {
             }
 
             if (ExperienceAndClasses.HOTKEY_UI.JustPressed) {
+                if (UI.UIMain.Instance.Visibility) {
+                    Main.PlaySound(SoundID.MenuClose);
+                }
+                else {
+                    Main.PlaySound(SoundID.MenuOpen);
+                }
                 UI.UIMain.Instance.Visibility = !UI.UIMain.Instance.Visibility;
             }
 
@@ -562,7 +569,10 @@ namespace ExperienceAndClasses {
         public override void Hurt(bool pvp, bool quiet, double damage, int hitDirection, bool crit) {
             base.Hurt(pvp, quiet, damage, hitDirection, crit);
             if (channelling) {
-                thing.Statuses.RemoveChannelling();
+                if (!Utilities.Netmode.IS_SERVER) {
+                    Main.PlaySound(SoundID.Shatter);
+                }
+                thing.Statuses.RemoveChannellingHurt();
                 channelling = false;
             }
         }

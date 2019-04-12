@@ -28,6 +28,9 @@ namespace ExperienceAndClasses.Utilities {
         public static Texture2D TEXTURE_CLASS_BACKGROUND { get; private set; }
 
         public static Texture2D TEXTURE_STATUS_DEFAULT { get; private set; }
+        public static Texture2D TEXTURE_STATUS_BACKGROUND_BUFF { get; private set; }
+        public static Texture2D TEXTURE_STATUS_BACKGROUND_DEBUFF { get; private set; }
+        public static Texture2D TEXTURE_STATUS_BACKGROUND_DEFAULT { get; private set; }
 
         public static Texture2D TEXTURE_ABILITY_DEFAULT { get; private set; }
         public static Texture2D TEXTURE_ABILITY_BACKGROUND { get; private set; }
@@ -64,6 +67,9 @@ namespace ExperienceAndClasses.Utilities {
             TEXTURE_CLASS_BACKGROUND = ModLoader.GetTexture("ExperienceAndClasses/Textures/Class/Background");
 
             TEXTURE_STATUS_DEFAULT = ModLoader.GetTexture("ExperienceAndClasses/Textures/Status/Default");
+            TEXTURE_STATUS_BACKGROUND_BUFF = ModLoader.GetTexture("ExperienceAndClasses/Textures/Status/Background_Buff");
+            TEXTURE_STATUS_BACKGROUND_DEBUFF = ModLoader.GetTexture("ExperienceAndClasses/Textures/Status/Background_Debuff");
+            TEXTURE_STATUS_BACKGROUND_DEFAULT = ModLoader.GetTexture("ExperienceAndClasses/Textures/Status/Background_Default");
 
             TEXTURE_ABILITY_DEFAULT = ModLoader.GetTexture("ExperienceAndClasses/Textures/Ability/Default");
             TEXTURE_ABILITY_COOLDOWN_COVER = ModLoader.GetTexture("ExperienceAndClasses/Textures/Ability/Cooldown");

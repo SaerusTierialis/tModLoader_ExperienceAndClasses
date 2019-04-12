@@ -402,7 +402,7 @@ namespace ExperienceAndClasses.Systems {
             }
 
             if (specific_show_channelling_in_tooltip) {
-                Tooltip += "\nChannelling abilities require that you hold down the key for a duration. Many of these abilities have a mana or resource cost while channelling. Death, damage, immobilization, and silence all interrupt channeling.";
+                Tooltip += "\nChannelling abilities require that you hold down the key for a duration. Many of these abilities have a mana or resource cost while channelling. Death, immobilization, and silence all interrupt channelling. Taking damage also interrupts most channelling.";
             }
         }
 

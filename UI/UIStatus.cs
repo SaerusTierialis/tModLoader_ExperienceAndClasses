@@ -15,7 +15,6 @@ namespace ExperienceAndClasses.UI {
         //Terraria buff positions
         private const float LEFT = 32; //don't change this
         private const float TOP = 76; //don't change this
-        public const float BUFF_SIZE = 32f; //don't change this
         public const float BUFF_HORIZONTAL_SPACING = 6f; //don't change this
         public const float BUFF_VERTICAL_SPACING = 20f; //don't change this
         private const byte COLUMNS = 11; //don't change this
@@ -49,7 +48,7 @@ namespace ExperienceAndClasses.UI {
 
             byte row = 0, col = 0;
             foreach(StatusIcon icon in icons) {
-                icon.SetPosition(LEFT + (col * (BUFF_SIZE + BUFF_HORIZONTAL_SPACING)), TOP + (row * (BUFF_SIZE + BUFF_VERTICAL_SPACING)));
+                icon.SetPosition(LEFT + (col * (StatusIcon.SIZE + BUFF_HORIZONTAL_SPACING)), TOP + (row * (StatusIcon.SIZE + BUFF_VERTICAL_SPACING)));
                 state.Append(icon);
 
                 col++;

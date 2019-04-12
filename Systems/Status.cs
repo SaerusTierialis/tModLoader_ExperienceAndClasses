@@ -101,6 +101,12 @@ namespace ExperienceAndClasses.Systems {
             REMOVE_KEY_NOT_PRESSED,
         }
 
+        public enum BACKGROUND : byte {
+            BUFF,
+            DEBUFF,
+            DEFAULT,
+        }
+
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Constants ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         /// <summary>
@@ -323,6 +329,8 @@ namespace ExperienceAndClasses.Systems {
         /// Allows target to end status with right click if status is in UI | default is false
         /// </summary>
         public bool Specific_Right_Click_End { get; protected set; } = false;
+
+        public BACKGROUND Specific_Background { get; protected set; } = BACKGROUND.DEFAULT;
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Instance Vars Generic ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -990,6 +998,7 @@ namespace ExperienceAndClasses.Systems {
                 Specific_Target_Channelling = true;
                 specific_owner_player_required_ability = ability_id;
                 specific_remove_if_key_not_pressed = Systems.Ability.LOOKUP[(ushort)specific_owner_player_required_ability].hotkeys;
+                Specific_Background = BACKGROUND.BUFF;
 
                 this.mana_cost_per_timed_effect = mana_cost_per_timed_effect;
                 specific_timed_effect_sec = second_per_timed;
@@ -1115,6 +1124,7 @@ namespace ExperienceAndClasses.Systems {
                 specific_remove_on_owner_death = true;
                 specific_remove_on_owner_immobilized = true;
                 specific_remove_on_owner_silenced = true;
+                Specific_Background = BACKGROUND.BUFF;
 
                 Specific_Autosync_Data_Types.Add(AUTOSYNC_DATA_TYPES.MAGNITUDE1);
             }
