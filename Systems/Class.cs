@@ -551,7 +551,7 @@ namespace ExperienceAndClasses.Systems {
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Tier 2 Classes ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         public class Warrior : Tier2 {
-            public Warrior() : base(IDs.Warrior, PowerScaling.IDs.CloseRangeMelee) {
+            public Warrior() : base(IDs.Warrior, PowerScaling.IDs.CloseRange) {
                 Name = "Warrior";
                 Description = "TODO_desc";
                 Class_Locations[1, 0] = ID_num;
@@ -589,7 +589,7 @@ namespace ExperienceAndClasses.Systems {
         }
 
         public class Rogue : Tier2 {
-            public Rogue() : base(IDs.Rogue, PowerScaling.IDs.CloseRangeAll) {
+            public Rogue() : base(IDs.Rogue, PowerScaling.IDs.CloseRange) {
                 Name = "Rogue";
                 Description = "TODO_desc";
                 Class_Locations[1, 3] = ID_num;
@@ -639,7 +639,7 @@ namespace ExperienceAndClasses.Systems {
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Tier 3 Classes ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         public class BloodKnight : Tier3 {
-            public BloodKnight() : base(IDs.BloodKnight, PowerScaling.IDs.CloseRangeMelee, IDs.Warrior) {
+            public BloodKnight() : base(IDs.BloodKnight, PowerScaling.IDs.CloseRange, IDs.Warrior) {
                 Name = "Blood Knight";
                 Description = "TODO_desc";
                 Class_Locations[2, 0] = ID_num;
@@ -650,7 +650,7 @@ namespace ExperienceAndClasses.Systems {
         }
 
         public class Berserker : Tier3 {
-            public Berserker() : base(IDs.Berserker, PowerScaling.IDs.CloseRangeMelee, IDs.Warrior) {
+            public Berserker() : base(IDs.Berserker, PowerScaling.IDs.CloseRange, IDs.Warrior) {
                 Name = "Berserker";
                 Description = "TODO_desc";
                 Class_Locations[3, 0] = ID_num;
@@ -663,7 +663,7 @@ namespace ExperienceAndClasses.Systems {
         }
 
         public class Guardian : Tier3 {
-            public Guardian() : base(IDs.Guardian, PowerScaling.IDs.CloseRangeMelee, IDs.Warrior) {
+            public Guardian() : base(IDs.Guardian, PowerScaling.IDs.CloseRange, IDs.Warrior) {
                 Name = "Guardian";
                 Description = "TODO_desc";
                 Class_Locations[4, 0] = ID_num;
@@ -685,7 +685,7 @@ namespace ExperienceAndClasses.Systems {
         }
 
         public class Tinkerer : Tier3 {
-            public Tinkerer() : base(IDs.Tinkerer, PowerScaling.IDs.ProjectileMinion, IDs.Ranger) {
+            public Tinkerer() : base(IDs.Tinkerer, PowerScaling.IDs.ProjectileAndMinion, IDs.Ranger) {
                 Name = "Tinkerer";
                 Description = "TODO_desc";
                 Class_Locations[3, 1] = ID_num;
@@ -723,7 +723,7 @@ namespace ExperienceAndClasses.Systems {
         }
 
         public class Assassin : Tier3 {
-            public Assassin() : base(IDs.Assassin, PowerScaling.IDs.CloseRangeAll, IDs.Rogue) {
+            public Assassin() : base(IDs.Assassin, PowerScaling.IDs.CloseRange, IDs.Rogue) {
                 Name = "Assassin";
                 Description = "TODO_desc";
                 Class_Locations[2, 3] = ID_num;

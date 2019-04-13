@@ -606,7 +606,7 @@ namespace ExperienceAndClasses.Systems {
                 }
 
                 if (specific_type_holy) {
-                    value = ExperienceAndClasses.LOCAL_MPLAYER.holy_damage - 1f;
+                    value = ExperienceAndClasses.LOCAL_MPLAYER.damage_holy - 1f;
                     if (value > highest) {
                         highest = value;
                     }
@@ -637,7 +637,7 @@ namespace ExperienceAndClasses.Systems {
                     multiplier += (Main.LocalPlayer.magicDamage - 1f);
                 }
                 if (specific_type_holy) {
-                    multiplier += (ExperienceAndClasses.LOCAL_MPLAYER.holy_damage - 1f);
+                    multiplier += (ExperienceAndClasses.LOCAL_MPLAYER.damage_holy - 1f);
                 }
             }
 

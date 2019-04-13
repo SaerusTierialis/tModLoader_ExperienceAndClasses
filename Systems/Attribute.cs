@@ -164,7 +164,7 @@ namespace ExperienceAndClasses.Systems {
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Attributes ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         public class Power : Attribute {
-            public const float PER_POINT_DAMAGE = 0.005f;
+            public const float PER_POINT_DAMAGE = 0.0025f;
             public const float PER_POINT_FISH = 0.1f;
 
             public Power() : base(IDs.Power) {
@@ -208,7 +208,7 @@ namespace ExperienceAndClasses.Systems {
         }
 
         public class Mind : Attribute {
-            private const float PER_POINT_MANA = 1f;
+            private const float PER_POINT_MANA = 0.5f;
             private const float PER_POINT_MANA_REGEN = 0.5f;
             private const float PER_POINT_MANA_DELAY = 0.5f;
 
@@ -270,12 +270,12 @@ namespace ExperienceAndClasses.Systems {
                 if (mplayer.Is_Local_Player) Bonus += "\n+" + bonus + " maximum minions (" + PER_POINT_MINION_CAP + " per point)";
 
                 //healing (use holy damage scaling)
-                float holy_damage_per = Math.Max(mplayer.Class_Primary.Power_Scaling.Holy_Damage, mplayer.Class_Secondary.Power_Scaling.Holy_Damage / 2);
+                float holy_damage_per = Math.Max(mplayer.Class_Primary.Power_Scaling.Damage_Holy, mplayer.Class_Secondary.Power_Scaling.Damage_Holy / 2);
                 if (holy_damage_per > 0f) {
                     float bonus_per_point = holy_damage_per * PER_POINT_HOLY_HEAL;
                     float bonus_float = bonus_per_point * points;
-                    mplayer.holy_healing += bonus_float;
-                    if (mplayer.Is_Local_Player) Bonus += "\n+" + Math.Round(bonus_float * 100, 3) + "% holy healing (" + Math.Round(bonus_per_point * 100, 3) + " per point)";
+                    mplayer.healing += bonus_float;
+                    if (mplayer.Is_Local_Player) Bonus += "\n+" + Math.Round(bonus_float * 100, 3) + "% healing (" + Math.Round(bonus_per_point * 100, 3) + " per point)";
                 }
             }
         }
@@ -357,10 +357,9 @@ namespace ExperienceAndClasses.Systems {
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Constants (and readonly) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         public enum IDs : byte {
             None,
-            CloseRangeMelee,
-            CloseRangeAll,
+            CloseRange,
             Projectile,
-            ProjectileMinion,
+            ProjectileAndMinion,
             AllCore,
             Holy_AllCore,
             MinionOnly,
@@ -390,21 +389,18 @@ namespace ExperienceAndClasses.Systems {
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Instance Vars (specific) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
+        //labels
         public string Primary_Types { get; private set; } = "";
         public string Secondary_Types { get; private set; } = "";
 
         //core types
-        protected float Melee { get; private set; } = 0f;
-        protected float Ranged { get; private set; } = 0f;
-        protected float Magic { get; private set; } = 0f;
-        protected float Throwing { get; private set; } = 0f;
         protected float Minion { get; private set; } = 0f;
 
         //custom types
-        protected float Melee_Close_Range { get; private set; } = 0f;
-        protected float NonMelee_Close_Range { get; private set; } = 0f;
-        protected float Melee_Projectile { get; private set; } = 0f;
-        public float Holy_Damage { get; private set; } = 0f;
+        protected float Damage_All_Non_Minion { get; private set; } = 0f;
+        protected float Damage_Close_Range { get; private set; } = 0f;
+        protected float Damage_Non_Minion_Projectile { get; private set; } = 0f;
+        public float Damage_Holy { get; private set; } = 0f;
 
         //non-combat
         public float Fish_Power { get; private set; } = 0f;
@@ -425,96 +421,59 @@ namespace ExperienceAndClasses.Systems {
 
         public static string ApplyPower(MPlayer mplayer, int points) {
             string bonus = "";
+            bool tooltip_close_range = false;
+            bool tooltip_projectile = false;
 
             //calculate scaling values to use...
 
             //core
-            float melee_per = Math.Max(mplayer.Class_Primary.Power_Scaling.Melee, mplayer.Class_Secondary.Power_Scaling.Melee / 2);
-            float ranged_per = Math.Max(mplayer.Class_Primary.Power_Scaling.Ranged, mplayer.Class_Secondary.Power_Scaling.Ranged / 2);
-            float magic_per = Math.Max(mplayer.Class_Primary.Power_Scaling.Magic, mplayer.Class_Secondary.Power_Scaling.Magic / 2);
-            float throwing_per = Math.Max(mplayer.Class_Primary.Power_Scaling.Throwing, mplayer.Class_Secondary.Power_Scaling.Throwing / 2);
+            float non_minion_per = Math.Max(mplayer.Class_Primary.Power_Scaling.Damage_All_Non_Minion, mplayer.Class_Secondary.Power_Scaling.Damage_All_Non_Minion / 2);
             float minion_per = Math.Max(mplayer.Class_Primary.Power_Scaling.Minion, mplayer.Class_Secondary.Power_Scaling.Minion / 2);
 
             //custom types
-            float melee_close_range_per = Math.Max(mplayer.Class_Primary.Power_Scaling.Melee_Close_Range, mplayer.Class_Secondary.Power_Scaling.Melee_Close_Range / 2);
-            float nonmelee_close_range_per = Math.Max(mplayer.Class_Primary.Power_Scaling.NonMelee_Close_Range, mplayer.Class_Secondary.Power_Scaling.NonMelee_Close_Range / 2);
-            float melee_projectile_per = Math.Max(mplayer.Class_Primary.Power_Scaling.Melee_Projectile, mplayer.Class_Secondary.Power_Scaling.Melee_Projectile / 2);
-            float holy_damage_per = Math.Max(mplayer.Class_Primary.Power_Scaling.Holy_Damage, mplayer.Class_Secondary.Power_Scaling.Holy_Damage / 2);
+            float close_range_damage_per = Math.Max(mplayer.Class_Primary.Power_Scaling.Damage_Close_Range, mplayer.Class_Secondary.Power_Scaling.Damage_Close_Range / 2);
+            float non_minion_projectile_damage_per = Math.Max(mplayer.Class_Primary.Power_Scaling.Damage_Non_Minion_Projectile, mplayer.Class_Secondary.Power_Scaling.Damage_Non_Minion_Projectile / 2);
+            float holy_damage_per = Math.Max(mplayer.Class_Primary.Power_Scaling.Damage_Holy, mplayer.Class_Secondary.Power_Scaling.Damage_Holy / 2);
 
             //non-combat
             float fish_per = Math.Max(mplayer.Class_Primary.Power_Scaling.Fish_Power, mplayer.Class_Secondary.Power_Scaling.Fish_Power / 2);
+
+            //non_minion_per does not stack with projectile_damage_per and close_range_damage_per
+            if ((non_minion_per > 0f) && (non_minion_projectile_damage_per > 0)) {
+                if (non_minion_per > non_minion_projectile_damage_per) {
+                    non_minion_projectile_damage_per = 0f;
+                }
+                else {
+                    non_minion_projectile_damage_per -= non_minion_per;
+                }
+            }
+            if ((non_minion_per > 0f) && (close_range_damage_per > 0)) {
+                if (non_minion_per > close_range_damage_per) {
+                    close_range_damage_per = 0f;
+                }
+                else {
+                    close_range_damage_per -= non_minion_per;
+                }
+            }
+            if ((close_range_damage_per > 0f) && (non_minion_projectile_damage_per > 0f)) {
+                float global = Math.Min(close_range_damage_per, non_minion_projectile_damage_per);
+                close_range_damage_per -= global;
+                non_minion_projectile_damage_per -= global;
+                non_minion_per += global;
+                minion_per += global;
+            }
 
             //apply bonuses...
             float bonus_per_point;
             float bonus_total;
 
-            //all melee
-            if (melee_per > 0f) {
-                bonus_per_point = melee_per * Attribute.Power.PER_POINT_DAMAGE;
+            //all non-minion
+            if (non_minion_per > 0f) {
+                bonus_per_point = non_minion_per * Attribute.Power.PER_POINT_DAMAGE;
                 bonus_total = bonus_per_point * points;
-                mplayer.player.meleeDamage += bonus_total;
+                mplayer.damage_non_minion += bonus_total;
                 if (mplayer.Is_Local_Player) {
-                    bonus += "\n+" + Math.Round(bonus_total * 100, 3) + "% all melee damage (" + Math.Round(bonus_per_point * 100, 3) + " per point)";
-                }
-            }
-
-            //projectile melee
-            if (melee_projectile_per > 0f) {
-                bonus_per_point = melee_projectile_per * Attribute.Power.PER_POINT_DAMAGE;
-                bonus_total = bonus_per_point * points;
-                mplayer.melee_projectile_damage += bonus_total;
-                if (mplayer.Is_Local_Player) {
-                    bonus += "\n+" + Math.Round(bonus_total * 100, 3) + "% melee projectile damage (" + Math.Round(bonus_per_point * 100, 3) + " per point)";
-                }
-            }
-
-            //close-range melee
-            if (melee_close_range_per > 0f) {
-                bonus_per_point = melee_close_range_per * Attribute.Power.PER_POINT_DAMAGE;
-                bonus_total = bonus_per_point * points;
-                mplayer.close_range_melee_damage += bonus_total;
-                if (mplayer.Is_Local_Player) {
-                    bonus += "\n+" + Math.Round(bonus_total * 100, 3) + "% close-range melee damage (" + Math.Round(bonus_per_point * 100, 3) + " per point)";
-                }
-            }
-
-            //close_range non-melee
-            if (nonmelee_close_range_per > 0f) {
-                bonus_per_point = nonmelee_close_range_per * Attribute.Power.PER_POINT_DAMAGE;
-                bonus_total = bonus_per_point * points;
-                mplayer.close_range_nonmelee_damage += bonus_total;
-                if (mplayer.Is_Local_Player) {
-                    bonus += "\n+" + Math.Round(bonus_total * 100, 3) + "% close-range non-melee damage (" + Math.Round(bonus_per_point * 100, 3) + " per point)";
-                }
-            }
-
-            //all ranged
-            if (ranged_per > 0f) {
-                bonus_per_point = ranged_per * Attribute.Power.PER_POINT_DAMAGE;
-                bonus_total = bonus_per_point * points;
-                mplayer.player.rangedDamage += bonus_total;
-                if (mplayer.Is_Local_Player) {
-                    bonus += "\n+" + Math.Round(bonus_total * 100, 3) + "% all ranged damage (" + Math.Round(bonus_per_point * 100, 3) + " per point)";
-                }
-            }
-
-            //all magic
-            if (magic_per > 0f) {
-                bonus_per_point = magic_per * Attribute.Power.PER_POINT_DAMAGE;
-                bonus_total = bonus_per_point * points;
-                mplayer.player.magicDamage += bonus_total;
-                if (mplayer.Is_Local_Player) {
-                    bonus += "\n+" + Math.Round(bonus_total * 100, 3) + "% all magic damage (" + Math.Round(bonus_per_point * 100, 3) + " per point)";
-                }
-            }
-
-            //all throwing
-            if (throwing_per > 0f) {
-                bonus_per_point = throwing_per * Attribute.Power.PER_POINT_DAMAGE;
-                bonus_total = bonus_per_point * points;
-                mplayer.player.thrownDamage += bonus_total;
-                if (mplayer.Is_Local_Player) {
-                    bonus += "\n+" + Math.Round(bonus_total * 100, 3) + "% all throwing damage (" + Math.Round(bonus_per_point * 100, 3) + " per point)";
+                    bonus += "\n+" + Math.Round(bonus_total * 100, 3) + "% all non-minion damage (" + Math.Round(bonus_per_point * 100, 3) + " per point)";
                 }
             }
 
@@ -528,13 +487,35 @@ namespace ExperienceAndClasses.Systems {
                 }
             }
 
+            //close range
+            if (close_range_damage_per > 0f) {
+                bonus_per_point = close_range_damage_per * Attribute.Power.PER_POINT_DAMAGE;
+                bonus_total = bonus_per_point * points;
+                mplayer.damage_close_range += bonus_total;
+                if (mplayer.Is_Local_Player) {
+                    bonus += "\n+" + Math.Round(bonus_total * 100, 3) + "% all close-range hit damage* (" + Math.Round(bonus_per_point * 100, 3) + " per point)";
+                    tooltip_close_range = true;
+                }
+            }
+
+            //non-minon projectile
+            if (non_minion_projectile_damage_per > 0f) {
+                bonus_per_point = non_minion_projectile_damage_per * Attribute.Power.PER_POINT_DAMAGE;
+                bonus_total = bonus_per_point * points;
+                mplayer.damage_non_minion_projectile += bonus_total;
+                if (mplayer.Is_Local_Player) {
+                    bonus += "\n+" + Math.Round(bonus_total * 100, 3) + "% all non-minion projectile damage** (" + Math.Round(bonus_per_point * 100, 3) + " per point)";
+                    tooltip_projectile = true;
+                }
+            }
+
             //holy
             if (holy_damage_per > 0f) {
                 bonus_per_point = holy_damage_per * Attribute.Power.PER_POINT_DAMAGE;
                 bonus_total = bonus_per_point * points;
-                mplayer.holy_damage += bonus_total;
+                mplayer.damage_holy += bonus_total;
                 if (mplayer.Is_Local_Player) {
-                    bonus += "\n+" + Math.Round(bonus_total * 100, 3) + "% all holy damage (" + Math.Round(bonus_per_point * 100, 3) + " per point)";
+                    bonus += "\n+" + Math.Round(bonus_total * 100, 3) + "% holy damage (" + Math.Round(bonus_per_point * 100, 3) + " per point)";
                 }
             }
 
@@ -545,6 +526,16 @@ namespace ExperienceAndClasses.Systems {
                 mplayer.player.fishingSkill += bonus_total_int;
                 if (mplayer.Is_Local_Player) {
                     bonus += "\n+" + bonus_total_int + " fishing power (" + Math.Round(bonus_per_point, 3) + " per point)";
+                }
+            }
+
+            if (tooltip_close_range || tooltip_projectile) {
+                bonus += "\n";
+                if (tooltip_close_range) {
+                    bonus += "\n* not shown in item's tooltip damage (because bonus is contingent on distance to target at time of hit)";
+                }
+                if (tooltip_projectile) {
+                    bonus += "\n** not shown in item's tooltip damage for weapons with both a melee hit and a melee projectile, but does affect the projectile";
                 }
             }
 
@@ -559,47 +550,24 @@ namespace ExperienceAndClasses.Systems {
             }
         }
 
-        public class CloseRangeMelee : PowerScaling {
-            public CloseRangeMelee() : base(IDs.CloseRangeMelee) {
-                Primary_Types = "Melee (bonus for close-range)";
-                Melee = SCALE_PRIMARY;
-                Melee_Close_Range = 0.2f;
-                Secondary_Types = "Close-Range Non-Melee";
-                NonMelee_Close_Range = SCALE_SECONDARY;
-            }
-        }
-
-        public class CloseRangeAll : PowerScaling {
-            public CloseRangeAll() : base(IDs.CloseRangeAll) {
-                Primary_Types = "All Close-Range";
-                Melee_Close_Range = 0.5f;
-                NonMelee_Close_Range = 0.5f;
-                Secondary_Types = "Melee, Ranged, Magic, Throwing, Minion";
-                Melee = SCALE_SECONDARY;
-                Ranged = SCALE_SECONDARY;
-                Magic = SCALE_SECONDARY;
-                Throwing = SCALE_SECONDARY;
-                Minion = SCALE_SECONDARY;
+        public class CloseRange : PowerScaling {
+            public CloseRange() : base(IDs.CloseRange) {
+                Primary_Types = "Any Close Range Hit";
+                Damage_Close_Range = SCALE_PRIMARY + 0.2f;
             }
         }
 
         public class Projectile : PowerScaling {
             public Projectile() : base(IDs.Projectile) {
-                Primary_Types = "Ranged, Magic, Throwing, Projectile Melee";
-                Ranged = SCALE_PRIMARY;
-                Magic = SCALE_PRIMARY;
-                Throwing = SCALE_PRIMARY;
-                Melee_Projectile = SCALE_PRIMARY;
+                Primary_Types = "Any Projectile";
+                Damage_Non_Minion_Projectile = SCALE_PRIMARY;
             }
         }
 
-        public class ProjectileMinion : PowerScaling {
-            public ProjectileMinion() : base(IDs.ProjectileMinion) {
-                Primary_Types = "Ranged, Magic, Throwing, Projectile Melee";
-                Ranged = SCALE_PRIMARY;
-                Magic = SCALE_PRIMARY;
-                Throwing = SCALE_PRIMARY;
-                Melee_Projectile = SCALE_PRIMARY;
+        public class ProjectileAndMinion : PowerScaling {
+            public ProjectileAndMinion() : base(IDs.ProjectileAndMinion) {
+                Primary_Types = "Any Projectile";
+                Damage_Non_Minion_Projectile = SCALE_PRIMARY;
                 Secondary_Types = "Minion";
                 Minion = SCALE_SECONDARY;
             }
@@ -607,11 +575,8 @@ namespace ExperienceAndClasses.Systems {
 
         public class AllCore : PowerScaling {
             public AllCore() : base(IDs.AllCore) {
-                Primary_Types = "Melee, Ranged, Magic, Throwing, Minion";
-                Melee = SCALE_PRIMARY;
-                Ranged = SCALE_PRIMARY;
-                Magic = SCALE_PRIMARY;
-                Throwing = SCALE_PRIMARY;
+                Primary_Types = "All Damage";
+                Damage_All_Non_Minion = SCALE_PRIMARY;
                 Minion = SCALE_PRIMARY;
             }
         }
@@ -619,13 +584,10 @@ namespace ExperienceAndClasses.Systems {
         public class Holy_AllCore : PowerScaling {
             public Holy_AllCore() : base(IDs.Holy_AllCore) {
                 Primary_Types = "Holy";
-                Holy_Damage = SCALE_PRIMARY;
+                Damage_Holy = SCALE_PRIMARY;
 
-                Secondary_Types = "Melee, Ranged, Magic, Throwing, Minion";
-                Melee = SCALE_SECONDARY;
-                Ranged = SCALE_SECONDARY;
-                Magic = SCALE_SECONDARY;
-                Throwing = SCALE_SECONDARY;
+                Secondary_Types = "All Damage";
+                Damage_All_Non_Minion = SCALE_SECONDARY;
                 Minion = SCALE_SECONDARY;
             }
         }

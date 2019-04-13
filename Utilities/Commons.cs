@@ -201,8 +201,36 @@ namespace ExperienceAndClasses.Utilities {
             return false;
         }
 
-        public static T CreateObjectFromName<T>(string name) {
-            return (T)(Assembly.GetExecutingAssembly().CreateInstance(typeof(T).FullName + "+" + name));
+        public static T CreateObjectFromName<T>(string name, Type partent_type = null) {
+            if (partent_type == null)
+                return (T)(Assembly.GetExecutingAssembly().CreateInstance(typeof(T).FullName + "+" + name));
+            else {
+                return (T)(Assembly.GetExecutingAssembly().CreateInstance(partent_type.FullName + "+" + name));
+            }
+        }
+
+        public static bool IsNonMinionProjectileWeapon_ExceptMeleeWithHitANDProj(Item item) {
+            if ((item.shoot > 0) && (item.damage > 0) && !IsMinionItem(item) && !(item.melee && !item.noMelee)) {
+                //shoots some kind of projectile, does damage, isn't a minion item, and it IS NOT a melee weapon that deals melee hits
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+
+        public static bool IsNonMinionProjectileWeapon_OnlyMeleeWithHitANDProj(Item item) {
+            if ((item.shoot > 0) && (item.damage > 0) && !IsMinionItem(item) && (item.melee && !item.noMelee)) {
+                //shoots some kind of projectile, does damage, isn't a minion item, and it IS a melee weapon that deals melee hits but also has a proj
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+
+        public static bool IsMinionItem(Item item) {
+            return (item.sentry || item.summon || item.DD2Summon);
         }
     }
 }
