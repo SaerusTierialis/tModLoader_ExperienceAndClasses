@@ -46,39 +46,27 @@ namespace ExperienceAndClasses.Utilities {
         //populate lookup for automated receiving of packets (possible because receiving is standardized)
         public static Handler[] LOOKUP { get; private set; }
         static PacketHandler() {
+            string str;
             LOOKUP = new Handler[(byte)PACKET_TYPE.NUMBER_OF_TYPES];
-
-            string[] packet_names = Enum.GetNames(typeof(PACKET_TYPE));
-
             for (byte i = 0; i < LOOKUP.Length; i++) {
-                LOOKUP[i] = (Handler)Assembly.GetExecutingAssembly().CreateInstance(typeof(PacketHandler).FullName + "+" + packet_names[i]);
-
-                //set instance vars for inherited methods
-                LOOKUP[i].SetFields(i, packet_names[i]);
+                str = Enum.GetName(typeof(PACKET_TYPE), i);
+                LOOKUP[i] = Utilities.Commons.CreateObjectFromName<Handler>(str, typeof(PacketHandler));
             }
         }
 
         //base type
         public abstract class Handler {
-            public byte packet_byte { get; private set; }
-            public string packet_string { get; private set; }
-            private bool fields_set = false;
+            public PACKET_TYPE ID { get; private set; }
+            public byte ID_Num { get; private set; }
 
-            public bool SetFields(byte packet_byte, string packet_string) {
-                if (!fields_set) {
-                    this.packet_byte = packet_byte;
-                    this.packet_string = packet_string;
-                    fields_set = true;
-                    return true;
-                }
-                else {
-                    return false;
-                }
+            public Handler(PACKET_TYPE id) {
+                ID = id;
+                ID_Num = (byte)ID;
             }
 
             public ModPacket GetPacket(int origin) {
                 ModPacket packet = ExperienceAndClasses.MOD.GetPacket();
-                packet.Write(packet_byte);
+                packet.Write(ID_Num);
                 packet.Write(origin);
                 return packet;
             }
@@ -87,7 +75,7 @@ namespace ExperienceAndClasses.Utilities {
                 //do not read anything from reader here (called multiple times when processing full sync packet)
 
                 if (ExperienceAndClasses.trace) {
-                    Commons.Trace("Handling " + packet_string + " originating from " + origin);
+                    Commons.Trace("Handling " + ID + " originating from " + origin);
                 }
 
                 MPlayer origin_mplayer = null;
@@ -96,6 +84,10 @@ namespace ExperienceAndClasses.Utilities {
                 }
 
                 RecieveBody(reader, origin, origin_mplayer);
+
+                if (ExperienceAndClasses.trace) {
+                    Commons.Trace("Done handling " + ID + " originating from " + origin);
+                }
             }
 
             protected abstract void RecieveBody(BinaryReader reader, int origin, MPlayer origin_mplayer);
@@ -105,11 +97,11 @@ namespace ExperienceAndClasses.Utilities {
         /// Client request broadcast from server
         /// </summary>
         public sealed class Broadcast : Handler {
-            private static readonly Handler Instance = LOOKUP[(byte)Enum.Parse(typeof(PACKET_TYPE), MethodBase.GetCurrentMethod().DeclaringType.Name)];
+            public Broadcast() : base(PACKET_TYPE.Broadcast) { }
 
             public static void Send(int target, int origin, string message) {
                 //get packet containing header
-                ModPacket packet = Instance.GetPacket(origin);
+                ModPacket packet = LOOKUP[(byte)PACKET_TYPE.Broadcast].GetPacket(origin);
                 
                 //specific content
                 packet.Write(message);
@@ -131,12 +123,12 @@ namespace ExperienceAndClasses.Utilities {
         }
 
         public sealed class ForceFull : Handler {
-            private static readonly Handler Instance = LOOKUP[(byte)Enum.Parse(typeof(PACKET_TYPE), MethodBase.GetCurrentMethod().DeclaringType.Name)];
+            public ForceFull() : base(PACKET_TYPE.ForceFull) { }
 
             public static void Send(MPlayer mplayer) {
                 //get packet containing header
                 int origin = mplayer.player.whoAmI;
-                ModPacket packet = Instance.GetPacket(origin);
+                ModPacket packet = LOOKUP[(byte)PACKET_TYPE.ForceFull].GetPacket(origin);
 
                 //specific content
                 ForceClass.WritePacketBody(packet, mplayer.Class_Primary.ID_num, mplayer.Class_Primary_Level_Effective, mplayer.Class_Secondary.ID_num, mplayer.Class_Secondary_Level_Effective);
@@ -167,11 +159,11 @@ namespace ExperienceAndClasses.Utilities {
         }
 
         public sealed class ForceClass : Handler {
-            private static readonly Handler Instance = LOOKUP[(byte)Enum.Parse(typeof(PACKET_TYPE), MethodBase.GetCurrentMethod().DeclaringType.Name)];
+            public ForceClass() : base(PACKET_TYPE.ForceClass) { }
 
             public static void Send(int target, int origin, byte primary_id, byte primary_level, byte secondary_id, byte secondary_level) {
                 //get packet containing header
-                ModPacket packet = Instance.GetPacket(origin);
+                ModPacket packet = LOOKUP[(byte)PACKET_TYPE.ForceClass].GetPacket(origin);
 
                 //specific content
                 WritePacketBody(packet, primary_id, primary_level, secondary_id, secondary_level);
@@ -202,11 +194,11 @@ namespace ExperienceAndClasses.Utilities {
         }
 
         public sealed class SyncAttribute : Handler {
-            private static readonly Handler Instance = LOOKUP[(byte)Enum.Parse(typeof(PACKET_TYPE), MethodBase.GetCurrentMethod().DeclaringType.Name)];
+            public SyncAttribute() : base(PACKET_TYPE.SyncAttribute) { }
 
             public static void Send(int target, int origin, int[] attributes) {
                 //get packet containing header
-                ModPacket packet = Instance.GetPacket(origin);
+                ModPacket packet = LOOKUP[(byte)PACKET_TYPE.SyncAttribute].GetPacket(origin);
 
                 //specific content
                 WritePacketBody(packet, attributes);
@@ -239,11 +231,11 @@ namespace ExperienceAndClasses.Utilities {
         }
 
         public sealed class AFK : Handler {
-            private static readonly Handler Instance = LOOKUP[(byte)Enum.Parse(typeof(PACKET_TYPE), MethodBase.GetCurrentMethod().DeclaringType.Name)];
+            public AFK() : base(PACKET_TYPE.AFK) { }
 
             public static void Send(int target, int origin, bool afk_status) {
                 //get packet containing header
-                ModPacket packet = Instance.GetPacket(origin);
+                ModPacket packet = LOOKUP[(byte)PACKET_TYPE.AFK].GetPacket(origin);
 
                 //specific content
                 WritePacketBody(packet, afk_status);
@@ -271,11 +263,11 @@ namespace ExperienceAndClasses.Utilities {
         }
 
         public sealed class InCombat : Handler {
-            private static readonly Handler Instance = LOOKUP[(byte)Enum.Parse(typeof(PACKET_TYPE), MethodBase.GetCurrentMethod().DeclaringType.Name)];
+            public InCombat() : base(PACKET_TYPE.InCombat) { }
 
             public static void Send(int target, int origin, bool combat_status) {
                 //get packet containing header
-                ModPacket packet = Instance.GetPacket(origin);
+                ModPacket packet = LOOKUP[(byte)PACKET_TYPE.InCombat].GetPacket(origin);
 
                 //specific content
                 WritePacketBody(packet, combat_status);
@@ -303,11 +295,11 @@ namespace ExperienceAndClasses.Utilities {
         }
 
         public sealed class Progression : Handler {
-            private static readonly Handler Instance = LOOKUP[(byte)Enum.Parse(typeof(PACKET_TYPE), MethodBase.GetCurrentMethod().DeclaringType.Name)];
+            public Progression() : base(PACKET_TYPE.Progression) { }
 
             public static void Send(int target, int origin, int player_progression) {
                 //get packet containing header
-                ModPacket packet = Instance.GetPacket(origin);
+                ModPacket packet = LOOKUP[(byte)PACKET_TYPE.Progression].GetPacket(origin);
 
                 //specific content
                 WritePacketBody(packet, player_progression);
@@ -335,11 +327,11 @@ namespace ExperienceAndClasses.Utilities {
         }
 
         public sealed class XP : Handler {
-            private static readonly Handler Instance = LOOKUP[(byte)Enum.Parse(typeof(PACKET_TYPE), MethodBase.GetCurrentMethod().DeclaringType.Name)];
+            public XP() : base(PACKET_TYPE.XP) { }
 
             public static void Send(int target, int origin, uint xp) {
                 //get packet containing header
-                ModPacket packet = Instance.GetPacket(origin);
+                ModPacket packet = LOOKUP[(byte)PACKET_TYPE.XP].GetPacket(origin);
 
                 //specific content
                 packet.Write(xp);
@@ -358,11 +350,11 @@ namespace ExperienceAndClasses.Utilities {
         }
 
         public sealed class AddStatus : Handler {
-            public static readonly Handler Instance = LOOKUP[(byte)Enum.Parse(typeof(PACKET_TYPE), MethodBase.GetCurrentMethod().DeclaringType.Name)];
+            public AddStatus() : base(PACKET_TYPE.AddStatus) { }
 
             public static void Send(Systems.Status status, int origin) {
                 //get packet containing header
-                ModPacket packet = Instance.GetPacket(origin);
+                ModPacket packet = LOOKUP[(byte)PACKET_TYPE.AddStatus].GetPacket(origin);
 
                 //write status
                 StatusWrite(packet, status);
@@ -466,11 +458,11 @@ namespace ExperienceAndClasses.Utilities {
         }
 
         public sealed class RemoveStatus : Handler {
-            public static readonly Handler Instance = LOOKUP[(byte)Enum.Parse(typeof(PACKET_TYPE), MethodBase.GetCurrentMethod().DeclaringType.Name)];
+            public RemoveStatus() : base(PACKET_TYPE.RemoveStatus) { }
 
             public static void Send(Systems.Status status, int origin) {
                 //get packet containing header
-                ModPacket packet = Instance.GetPacket(origin);
+                ModPacket packet = LOOKUP[(byte)PACKET_TYPE.RemoveStatus].GetPacket(origin);
 
                 //1:  ID (ushort = uint16)
                 packet.Write(status.ID_num);
@@ -513,7 +505,7 @@ namespace ExperienceAndClasses.Utilities {
         }
 
         public sealed class SetStatuses : Handler {
-            public static readonly Handler Instance = LOOKUP[(byte)Enum.Parse(typeof(PACKET_TYPE), MethodBase.GetCurrentMethod().DeclaringType.Name)];
+            public SetStatuses() : base(PACKET_TYPE.SetStatuses) { }
 
             public static void Send(Utilities.Containers.Thing target) {
                 //origin
@@ -526,7 +518,7 @@ namespace ExperienceAndClasses.Utilities {
                 }
 
                 //get packet containing header
-                ModPacket packet = Instance.GetPacket(origin);
+                ModPacket packet = LOOKUP[(byte)PACKET_TYPE.SetStatuses].GetPacket(origin);
 
                 //1: write target (ushort)
                 packet.Write(target.Index);
@@ -573,11 +565,11 @@ namespace ExperienceAndClasses.Utilities {
         /// When a client recieves this packet, WOF is marked as defeated
         /// </summary>
         public sealed class WOF : Handler {
-            private static readonly Handler Instance = LOOKUP[(byte)Enum.Parse(typeof(PACKET_TYPE), MethodBase.GetCurrentMethod().DeclaringType.Name)];
+            public WOF() : base(PACKET_TYPE.WOF) { }
 
             public static void Send(int target, int origin) {
                 //get packet containing header
-                ModPacket packet = Instance.GetPacket(origin);
+                ModPacket packet = LOOKUP[(byte)PACKET_TYPE.WOF].GetPacket(origin);
 
                 //no contents
 
