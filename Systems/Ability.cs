@@ -14,7 +14,7 @@ namespace ExperienceAndClasses.Systems {
 
         public enum IDs : ushort {
             Warrior_Block,
-
+            Test,
 
             NUMBER_OF_IDs, //leave this second to last
             NONE, //leave this last
@@ -118,22 +118,6 @@ namespace ExperienceAndClasses.Systems {
         protected float specific_radius_level_multiplier = 0;
 
         protected float specific_power_base = 0f;
-        /// <summary>
-        /// if weapon matches type, add its per-hit damage to base power | default is false
-        /// </summary>
-        protected bool specific_power_base_add_weapon_damage_if_type = false;
-        /// <summary>
-        /// if weapon matches type, add its damage-per-use-time to base power | default is false
-        /// </summary>
-        protected bool specific_power_base_add_weapon_dpt_if_type = false;
-        /// <summary>
-        /// apply highest of type bonuses | default is false
-        /// </summary>
-        protected bool specific_power_apply_bonus_highest = false;
-        /// <summary>
-        /// apply all type bonuses | default is false
-        /// </summary>
-        protected bool specific_power_apply_bonus_all = false;
         /// <summary>
         /// 0 is no bonus, 0.01 is a 1%/point bonus, etc. | default is 0s
         /// </summary>
@@ -526,33 +510,6 @@ namespace ExperienceAndClasses.Systems {
             //base: initial
             power = specific_power_base;
 
-            //base: add weapon damae?
-            if (specific_power_base_add_weapon_damage_if_type) {
-                Item item = Main.LocalPlayer.HeldItem;
-                if ((specific_type_melee && item.melee) ||
-                    (specific_type_ranged && item.ranged) ||
-                    (specific_type_throwing && item.thrown) ||
-                    (specific_type_minion && (item.summon || item.sentry)) ||
-                    (specific_type_magic && item.magic)) {
-                    
-                    power += item.damage;
-                }
-            }
-
-            //base: add weapon dpt?
-            if (specific_power_base_add_weapon_dpt_if_type) {
-                Item item = Main.LocalPlayer.HeldItem;
-                if ((specific_type_melee && item.melee) ||
-                    (specific_type_ranged && item.ranged) ||
-                    (specific_type_throwing && item.thrown) ||
-                    (specific_type_minion && (item.summon || item.sentry)) ||
-                    (specific_type_magic && item.magic)) {
-
-                    power += (float)item.damage / item.useTime;
-
-                }
-            }
-
             //base: modifications
             power = ModifyPowerBase(power);
 
@@ -563,81 +520,6 @@ namespace ExperienceAndClasses.Systems {
             for (byte i = 0; i<(byte)Systems.Attribute.IDs.NUMBER_OF_IDs; i++) {
                 if (Systems.Attribute.LOOKUP[i].Active) { //must be an active attribute
                     multiplier += specific_power_attribute_multipliers[i] * ExperienceAndClasses.LOCAL_MPLAYER.Attributes_Final[i];
-                }
-            }
-
-            //multiplier: highest of type?
-            if (specific_power_apply_bonus_highest) {
-                float value, highest = 0f;
-
-                if (specific_type_melee) {
-                    value = Main.LocalPlayer.meleeDamage - 1f;
-                    if (value > highest) {
-                        highest = value;
-                    }
-                }
-
-                if (specific_type_ranged) {
-                    value = Main.LocalPlayer.rangedDamage - 1f;
-                    if (value > highest) {
-                        highest = value;
-                    }
-                }
-
-                if (specific_type_throwing) {
-                    value = Main.LocalPlayer.thrownDamage - 1f;
-                    if (value > highest) {
-                        highest = value;
-                    }
-                }
-
-                if (specific_type_minion) {
-                    value = Main.LocalPlayer.minionDamage - 1f;
-                    if (value > highest) {
-                        highest = value;
-                    }
-                }
-
-                if (specific_type_magic) {
-                    value = Main.LocalPlayer.magicDamage - 1f;
-                    if (value > highest) {
-                        highest = value;
-                    }
-                }
-
-                if (specific_type_holy) {
-                    value = ExperienceAndClasses.LOCAL_MPLAYER.damage_holy - 1f;
-                    if (value > highest) {
-                        highest = value;
-                    }
-                }
-
-                //add highest to multiplier
-                if (highest != 1f) {
-                    //subtract out the base 100%
-                    multiplier += highest;
-                }
-            }
-
-            //mutilplier: all bonuses
-            if (specific_power_apply_bonus_all) {
-                if (specific_type_melee) {
-                    multiplier += (Main.LocalPlayer.meleeDamage - 1f);
-                }
-                if (specific_type_ranged) {
-                    multiplier += (Main.LocalPlayer.rangedDamage - 1f);
-                }
-                if (specific_type_throwing) {
-                    multiplier += (Main.LocalPlayer.thrownDamage - 1f);
-                }
-                if (specific_type_minion) {
-                    multiplier += (Main.LocalPlayer.minionDamage - 1f);
-                }
-                if (specific_type_magic) {
-                    multiplier += (Main.LocalPlayer.magicDamage - 1f);
-                }
-                if (specific_type_holy) {
-                    multiplier += (ExperienceAndClasses.LOCAL_MPLAYER.damage_holy - 1f);
                 }
             }
 
@@ -1034,6 +916,17 @@ namespace ExperienceAndClasses.Systems {
                 if (apply_perfect_block) {
                     Systems.Status.Warrior_BlockPerfect.CreateNew(target, defense_bonus);
                 }
+            }
+        }
+
+        public class Test : Ability {
+            public Test() : base(IDs.Test) {
+                Specific_Name = "Test";
+                Specific_Required_Class_ID = Systems.Class.IDs.Warrior;
+                Specific_Required_Class_Level = 1;
+                specific_cooldown_seconds = 0.5f;
+                specific_target_position_type = TARGET_POSITION_TYPE.CURSOR;
+                specific_range_base = 1000f;
             }
         }
 
