@@ -124,18 +124,18 @@ namespace ExperienceAndClasses.Utilities {
         public static void Error(string message) {
             message = message + " (please report)";
             if (Utilities.Netmode.IS_SERVER) {
-                message = "ERROR from Server: " + message;
+                message = "ExperienceAndClasses-ERROR from Server: " + message;
                 Console.WriteLine(message);
                 NetMessage.BroadcastChatMessage(NetworkText.FromLiteral(message), UI.Constants.COLOUR_MESSAGE_ERROR);
             }
             else {
                 if (Utilities.Netmode.IS_CLIENT) {
-                    message = "ERROR from Player" + Main.LocalPlayer.whoAmI + ": " + message;
+                    message = "ExperienceAndClasses-ERROR from Player" + Main.LocalPlayer.whoAmI + ": " + message;
                     Main.NewText("Sending " + message, UI.Constants.COLOUR_MESSAGE_ERROR);
                     PacketHandler.Broadcast.Send(-1, (byte)Main.LocalPlayer.whoAmI, message);
                 }
                 else {
-                    Main.NewText("ERROR: " + message, UI.Constants.COLOUR_MESSAGE_TRACE);
+                    Main.NewText("ExperienceAndClasses-ERROR: " + message, UI.Constants.COLOUR_MESSAGE_TRACE);
                 }
             }
             ErrorLogger.Log(message);
