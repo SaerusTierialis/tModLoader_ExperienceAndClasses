@@ -66,6 +66,8 @@ namespace ExperienceAndClasses.UI {
 
         private ScrollPanel passives;
 
+        private TextButton old_xp_button;
+
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Initialize ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         protected override void InitializeState() {
             //main panel
@@ -119,6 +121,16 @@ namespace ExperienceAndClasses.UI {
                     }
                 }
             }
+
+            //old xp button
+            old_xp_button = new TextButton("Apply Pre-Revamp XP", FONT_SCALE_ATTRIBUTE, FONT_SCALE_ATTRIBUTE + 0.1f);
+            old_xp_button.OnClick += new UIElement.MouseEvent(ClickPreRevampXP);
+            old_xp_button.HAlign = 1f;
+            old_xp_button.VAlign = 1f;
+            old_xp_button.Left.Set(old_xp_button.Left.Pixels - (Constants.UI_PADDING * 2f), 0f);
+            old_xp_button.Top.Set(old_xp_button.Top.Pixels - (Constants.UI_PADDING * 2f), 0f);
+            old_xp_button.visible = false;
+            panel_class.Append(old_xp_button);
 
             //attribute panel
             DragableUIPanel panel_attribute = new DragableUIPanel(WIDTH_ATTRIBUTES, HEIGHT_ATTRIBUTES, Constants.COLOUR_SUBPANEL, this, false, false, false);
@@ -380,17 +392,20 @@ namespace ExperienceAndClasses.UI {
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Events ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-        public void ClickReset(UIMouseEvent evt, UIElement listeningElement) {
+        private void ClickReset(UIMouseEvent evt, UIElement listeningElement) {
             UIInfo.Instance.ShowResetAttributes(listeningElement);
         }
 
-        public void ClickHelp(UIMouseEvent evt, UIElement listeningElement) {
+        private void ClickHelp(UIMouseEvent evt, UIElement listeningElement) {
             Main.NewText("TODO"); //TODO
         }
 
-        public void ClickSettings(UIMouseEvent evt, UIElement listeningElement) {
+        private void ClickSettings(UIMouseEvent evt, UIElement listeningElement) {
             Main.NewText("TODO"); //TODO
         }
 
+        private void ClickPreRevampXP(UIMouseEvent evt, UIElement listeningElement) {
+            Main.NewText("TODO"); //TODO
+        }
     }
 }
