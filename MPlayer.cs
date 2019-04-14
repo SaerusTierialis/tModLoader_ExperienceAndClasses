@@ -340,9 +340,6 @@ namespace ExperienceAndClasses {
                 //ui (these only update if needed or time due)
                 UI.UIStatus.Instance.Update();
                 UI.UIHUD.Instance.TimedUpdateCooldown();
-
-                //update non-vanilla damage type multi
-                UpdateNonVanillaDamagetypeMultiplier();
             }
         }
 
@@ -823,12 +820,12 @@ namespace ExperienceAndClasses {
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Custom Damage Bonuses ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         public override void ModifyHitNPC(Item item, NPC target, ref int damage, ref float knockback, ref bool crit) {
-            ModifyDamage(EstimateDamageMulti(item), ref damage);
+            ModifyDamage(GetDamageType(item), ref damage);
             base.ModifyHitNPC(item, target, ref damage, ref knockback, ref crit);
         }
 
         public override void ModifyHitPvp(Item item, Player target, ref int damage, ref bool crit) {
-            ModifyDamage(EstimateDamageMulti(item), ref damage);
+            ModifyDamage(GetDamageType(item), ref damage);
             base.ModifyHitPvp(item, target, ref damage, ref crit);
         }
 
@@ -903,14 +900,14 @@ namespace ExperienceAndClasses {
                 return CORE_DAMAGE_TYPE.NON_VANILLA;
         }
 
-        private CORE_DAMAGE_TYPE EstimateDamageMulti(Item item) {
+        private CORE_DAMAGE_TYPE GetDamageType(Item item) {
             if (item.melee)
                 return CORE_DAMAGE_TYPE.MELEE;
             else if (item.ranged)
                 return CORE_DAMAGE_TYPE.RANGED;
             else if (item.magic)
                 return CORE_DAMAGE_TYPE.MAGIC;
-            else if (item.sentry || item.DD2Summon || item.summon)
+            else if (item.sentry || item.summon || item.DD2Summon)
                 return CORE_DAMAGE_TYPE.MINION;
             else if (item.thrown)
                 return CORE_DAMAGE_TYPE.THROWING;
@@ -918,17 +915,15 @@ namespace ExperienceAndClasses {
                 return CORE_DAMAGE_TYPE.NON_VANILLA;
         }
 
-        /// <summary>
-        /// If held item is of a non-vanilla damage type, update the non-vanilla damage type multiplier
-        /// </summary>
-        private void UpdateNonVanillaDamagetypeMultiplier() {
-            Item item = player.HeldItem;
-            if ((item.damage > 0) && (EstimateDamageMulti(item) == CORE_DAMAGE_TYPE.NON_VANILLA)) {
-                //has damage and isn't a vanilla type
-                int dmg = 10000;
-                GetWeaponDamage(item, ref dmg);
-                damage_multi_non_vanilla_type = (float)dmg / 10000;
+        public override void GetWeaponDamage(Item item, ref int damage) {
+            base.GetWeaponDamage(item, ref damage);
+
+            //update damage multiplier for non-vanilla (unknown) type
+            //damage_multi_non_vanilla_type is auto-synced when value changes locally
+            if (Is_Local_Player && (item.damage > 0) && (item == player.HeldItem) && (GetDamageType(item) == CORE_DAMAGE_TYPE.NON_VANILLA)) {
+                damage_multi_non_vanilla_type = (float)damage / item.damage;
             }
+
         }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Drawing ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
