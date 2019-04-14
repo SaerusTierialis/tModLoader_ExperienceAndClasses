@@ -30,7 +30,6 @@ namespace ExperienceAndClasses.Utilities {
             ForceFull,
             ForceClass,
             SyncAttribute,
-            //Heal,
             AFK, //TODO convert to status
             InCombat, //TODO convert to status
             Progression,
