@@ -421,8 +421,7 @@ namespace ExperienceAndClasses.Systems {
 
         public static string ApplyPower(MPlayer mplayer, int points) {
             string bonus = "";
-            bool tooltip_close_range = false;
-            bool tooltip_projectile = false;
+            bool tooltip_damage_not_shown = false;
 
             //calculate scaling values to use...
 
@@ -473,7 +472,8 @@ namespace ExperienceAndClasses.Systems {
                 bonus_total = bonus_per_point * points;
                 mplayer.damage_non_minion += bonus_total;
                 if (mplayer.Is_Local_Player) {
-                    bonus += "\n+" + Math.Round(bonus_total * 100, 3) + "% all non-minion damage (" + Math.Round(bonus_per_point * 100, 3) + " per point)";
+                    bonus += "\n+" + Math.Round(bonus_total * 100, 3) + "% all non-minion damage* (" + Math.Round(bonus_per_point * 100, 3) + " per point)";
+                    tooltip_damage_not_shown = true;
                 }
             }
 
@@ -493,8 +493,8 @@ namespace ExperienceAndClasses.Systems {
                 bonus_total = bonus_per_point * points;
                 mplayer.damage_close_range += bonus_total;
                 if (mplayer.Is_Local_Player) {
-                    bonus += "\n+" + Math.Round(bonus_total * 100, 3) + "% all close-range hit damage* (" + Math.Round(bonus_per_point * 100, 3) + " per point)";
-                    tooltip_close_range = true;
+                    bonus += "\n+" + Math.Round(bonus_total * 100, 3) + "% all damage on nearby targets* (" + Math.Round(bonus_per_point * 100, 3) + " per point)";
+                    tooltip_damage_not_shown = true;
                 }
             }
 
@@ -504,8 +504,8 @@ namespace ExperienceAndClasses.Systems {
                 bonus_total = bonus_per_point * points;
                 mplayer.damage_non_minion_projectile += bonus_total;
                 if (mplayer.Is_Local_Player) {
-                    bonus += "\n+" + Math.Round(bonus_total * 100, 3) + "% all non-minion projectile damage** (" + Math.Round(bonus_per_point * 100, 3) + " per point)";
-                    tooltip_projectile = true;
+                    bonus += "\n+" + Math.Round(bonus_total * 100, 3) + "% all non-minion projectile damage* (" + Math.Round(bonus_per_point * 100, 3) + " per point)";
+                    tooltip_damage_not_shown = true;
                 }
             }
 
@@ -529,14 +529,8 @@ namespace ExperienceAndClasses.Systems {
                 }
             }
 
-            if (tooltip_close_range || tooltip_projectile) {
-                bonus += "\n";
-                if (tooltip_close_range) {
-                    bonus += "\n* not shown in item's tooltip damage (because bonus is contingent on distance to target at time of hit)";
-                }
-                if (tooltip_projectile) {
-                    bonus += "\n** not shown in item's tooltip damage for weapons with both a melee hit and a melee projectile, but does affect the projectile";
-                }
+            if (tooltip_damage_not_shown) {
+                bonus += "\n\n* bonus is not reflected in item tooltip damage";
             }
 
             return bonus;

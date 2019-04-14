@@ -34,6 +34,7 @@ namespace ExperienceAndClasses.Utilities {
             AFK, //TODO convert to status
             InCombat, //TODO convert to status
             Progression,
+            NonVanillaTypeMultiplier,
             XP,
             AddStatus,
             RemoveStatus,
@@ -136,6 +137,7 @@ namespace ExperienceAndClasses.Utilities {
                 AFK.WritePacketBody(packet, mplayer.AFK);
                 InCombat.WritePacketBody(packet, mplayer.IN_COMBAT);
                 Progression.WritePacketBody(packet, mplayer.Progression);
+                NonVanillaTypeMultiplier.WritePacketBody(packet, mplayer.damage_multi_non_vanilla_type);
 
                 //send
                 packet.Send(-1, origin);
@@ -147,6 +149,7 @@ namespace ExperienceAndClasses.Utilities {
                 LOOKUP[(byte)PACKET_TYPE.AFK].Recieve(reader, origin);
                 LOOKUP[(byte)PACKET_TYPE.InCombat].Recieve(reader, origin);
                 LOOKUP[(byte)PACKET_TYPE.Progression].Recieve(reader, origin);
+                LOOKUP[(byte)PACKET_TYPE.NonVanillaTypeMultiplier].Recieve(reader, origin);
 
                 if (!origin_mplayer.initialized) {
                     origin_mplayer.initialized = true;
@@ -323,6 +326,38 @@ namespace ExperienceAndClasses.Utilities {
 
             public static void WritePacketBody(ModPacket packet, int player_progression) {
                 packet.Write(player_progression);
+            }
+        }
+
+        public sealed class NonVanillaTypeMultiplier : Handler {
+            public NonVanillaTypeMultiplier() : base(PACKET_TYPE.NonVanillaTypeMultiplier) { }
+
+            public static void Send(int target, int origin, float non_vanilla_damage_multi) {
+                //get packet containing header
+                ModPacket packet = LOOKUP[(byte)PACKET_TYPE.NonVanillaTypeMultiplier].GetPacket(origin);
+
+                //specific content
+                WritePacketBody(packet, non_vanilla_damage_multi);
+
+                //send
+                packet.Send(target, origin);
+            }
+
+            protected override void RecieveBody(BinaryReader reader, int origin, MPlayer origin_mplayer) {
+                //read
+                float non_vanilla_damage_multi = reader.ReadSingle();
+
+                //set
+                origin_mplayer.damage_multi_non_vanilla_type = non_vanilla_damage_multi;
+
+                //relay
+                if (Utilities.Netmode.IS_SERVER) {
+                    Send(-1, origin, non_vanilla_damage_multi);
+                }
+            }
+
+            public static void WritePacketBody(ModPacket packet, float non_vanilla_damage_multi) {
+                packet.Write(non_vanilla_damage_multi);
             }
         }
 

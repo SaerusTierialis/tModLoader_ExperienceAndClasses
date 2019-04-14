@@ -12,9 +12,18 @@ namespace ExperienceAndClasses {
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Constants ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-        public const float DISTANCE_CLOSE_RANGE = 500f;
+        public const float DISTANCE_CLOSE_RANGE = 250f;
         private const long TICKS_PER_FULL_SYNC = TimeSpan.TicksPerMinute * 2;
         private const float CHANNELLING_SPEED_MULTIPLIER = 0.99f;
+
+        private enum CORE_DAMAGE_TYPE : byte {
+            MELEE,
+            RANGED,
+            THROWING,
+            MAGIC,
+            MINION,
+            NON_VANILLA,
+        }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Static Vars ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -76,6 +85,7 @@ namespace ExperienceAndClasses {
         /// </summary>
         private int Allocation_Points_Total;
 
+        public float damage_multi_non_vanilla_type;
         public float damage_close_range, damage_non_minion_projectile, damage_non_minion; //default is 0
         public float damage_holy; //TODO
         public float healing; //TODO
@@ -221,6 +231,7 @@ namespace ExperienceAndClasses {
             Allocation_Points_Total = 0;
 
             //stats
+            damage_multi_non_vanilla_type = 1f;
             damage_close_range = damage_non_minion_projectile = damage_non_minion = 0f;
             damage_holy = 1f;
             healing = 1f;
@@ -329,6 +340,9 @@ namespace ExperienceAndClasses {
                 //ui (these only update if needed or time due)
                 UI.UIStatus.Instance.Update();
                 UI.UIHUD.Instance.TimedUpdateCooldown();
+
+                //update non-vanilla damage type multi
+                UpdateNonVanillaDamagetypeMultiplier();
             }
         }
 
@@ -594,6 +608,7 @@ namespace ExperienceAndClasses {
             Attributes_Sync.CopyTo(clone.Attributes_Sync, 0);
 
             clone.Progression = Progression;
+            clone.damage_multi_non_vanilla_type = damage_multi_non_vanilla_type;
 
             clone.AFK = AFK;
             clone.IN_COMBAT = IN_COMBAT;
@@ -641,6 +656,11 @@ namespace ExperienceAndClasses {
                 //combat
                 if (clone.IN_COMBAT != IN_COMBAT) {
                     Utilities.PacketHandler.InCombat.Send(-1, player.whoAmI, IN_COMBAT);
+                }
+
+                //non-vanilla damage multi
+                if (clone.damage_multi_non_vanilla_type != damage_multi_non_vanilla_type) {
+                    Utilities.PacketHandler.NonVanillaTypeMultiplier.Send(-1, player.whoAmI, damage_multi_non_vanilla_type);
                 }
 
             }
@@ -800,144 +820,117 @@ namespace ExperienceAndClasses {
             return base.UseTimeMultiplier(item) * multiplier;
         }
 
-        /// <summary>
-        /// apply global and projectile damage bonus
-        /// </summary>
-        /// <param name="item"></param>
-        /// <param name="damage"></param>
-        public override void GetWeaponDamage(Item item, ref int damage) {
-            base.GetWeaponDamage(item, ref damage);
-
-            //non-minion damage
-            if ((damage_non_minion != 0f) && !Utilities.Commons.IsMinionItem(item)) {
-                //calculate multiplier from other sources
-                float multi = (float)damage / item.damage;
-
-                //recalculate damage
-                damage = (int)(item.damage * (multi + damage_non_minion));
-            }
-
-            //projectile bonus (if melee weapon with melee hit and projectile, apply later)
-            if ((damage_non_minion_projectile != 0f) && Utilities.Commons.IsNonMinionProjectileWeapon_ExceptMeleeWithHitANDProj(item)) {
-                //calculate multiplier from other sources
-                float multi = (float)damage / item.damage;
-
-                //recalculate damage
-                damage = (int)(item.damage * (multi + damage_non_minion_projectile));
-            }
-        }
-
-        /// <summary>
-        /// summon weapons do NOT call this, only local player calls this
-        /// </summary>
-        /// <param name="item"></param>
-        /// <param name="position"></param>
-        /// <param name="speedX"></param>
-        /// <param name="speedY"></param>
-        /// <param name="type"></param>
-        /// <param name="damage"></param>
-        /// <param name="knockBack"></param>
-        /// <returns></returns>
-        public override bool Shoot(Item item, ref Vector2 position, ref float speedX, ref float speedY, ref int type, ref int damage, ref float knockBack) {
-            //projectile bonus if melee weapon with melee hit and projectile
-            if ((damage_non_minion_projectile != 0f) && Utilities.Commons.IsNonMinionProjectileWeapon_OnlyMeleeWithHitANDProj(item)) {
-                //calculate multiplier from other sources
-                float multi = (float)damage / item.damage;
-
-                //recalculate damage
-                damage = (int)(item.damage * (multi + damage_non_minion_projectile));
-            }
-
-            return base.Shoot(item, ref position, ref speedX, ref speedY, ref type, ref damage, ref knockBack);
-        }
+        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Custom Damage Bonuses ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         public override void ModifyHitNPC(Item item, NPC target, ref int damage, ref float knockback, ref bool crit) {
-            //close range bonus always applies to direct hits
-            if (damage_close_range != 0f) {
-                //calculate multiplier from other sources
-                float multi = (float)damage / item.damage;
-
-                //recalculate damage
-                damage = (int)(item.damage * (multi + damage_close_range));
-            }
-
+            ModifyDamage(EstimateDamageMulti(item), ref damage);
             base.ModifyHitNPC(item, target, ref damage, ref knockback, ref crit);
         }
 
         public override void ModifyHitPvp(Item item, Player target, ref int damage, ref bool crit) {
-            //close range bonus always applies to direct hits
-            if (damage_close_range != 0f) {
-                //calculate multiplier from other sources
-                float multi = (float)damage / item.damage;
-
-                //recalculate damage
-                damage = (int)(item.damage * (multi + damage_close_range));
-            }
-
+            ModifyDamage(EstimateDamageMulti(item), ref damage);
             base.ModifyHitPvp(item, target, ref damage, ref crit);
         }
 
         public override void ModifyHitNPCWithProj(Projectile proj, NPC target, ref int damage, ref float knockback, ref bool crit, ref int hitDirection) {
-            if ((damage_close_range != 0f) && (target.Distance(player.position) < DISTANCE_CLOSE_RANGE)) {
-                //estimate multiplier from other sources
-                float multi = EstimateDamageMulti(proj);
-
-                //recalculate damage
-                damage = (int)(damage * (multi + damage_close_range) / damage_close_range);
-            }
-
+            ModifyDamage(GetDamageType(proj), ref damage, true, player.Distance(target.position));
             base.ModifyHitNPCWithProj(proj, target, ref damage, ref knockback, ref crit, ref hitDirection);
         }
 
         public override void ModifyHitPvpWithProj(Projectile proj, Player target, ref int damage, ref bool crit) {
-            if ((damage_close_range != 0f) && (target.Distance(player.position) < DISTANCE_CLOSE_RANGE)) {
-                //estimate multiplier from other sources
-                float multi = EstimateDamageMulti(proj);
-
-                //recalculate damage
-                proj.damage = (int)(proj.damage * (multi + damage_close_range) / damage_close_range);
-            }
-
+            ModifyDamage(GetDamageType(proj), ref damage, true, player.Distance(target.position));
             base.ModifyHitPvpWithProj(proj, target, ref damage, ref crit);
         }
 
+        private void ModifyDamage(CORE_DAMAGE_TYPE type, ref int damage, bool is_projectile = false, float distance = 0f) {
+            //get base multiplier (already applied)
+            float multi_base;
+            switch (type) {
+                case CORE_DAMAGE_TYPE.MELEE:
+                    multi_base = player.meleeDamage;
+                    break;
+                case CORE_DAMAGE_TYPE.RANGED:
+                    multi_base = player.rangedDamage;
+                    break;
+                case CORE_DAMAGE_TYPE.MAGIC:
+                    multi_base = player.magicDamage;
+                    break;
+                case CORE_DAMAGE_TYPE.MINION:
+                    multi_base = player.minionDamage;
+                    break;
+                case CORE_DAMAGE_TYPE.THROWING:
+                    multi_base = player.thrownDamage;
+                    break;
+                case CORE_DAMAGE_TYPE.NON_VANILLA:
+                    multi_base = damage_multi_non_vanilla_type;
+                    break;
+                default:
+                    Utilities.Commons.Error("Unsupported CORE_DAMAGE_TYPE: " + type);
+                    return;
+            }
+
+            //calcualte final multiplier
+            float multi_new = multi_base;
+            if (type != CORE_DAMAGE_TYPE.MINION) {
+                //any non-minion
+                multi_new += damage_non_minion;
+                if (is_projectile) {
+                    //any non-minion projectile
+                    multi_new += damage_non_minion_projectile;
+                }
+            }
+            if (distance < DISTANCE_CLOSE_RANGE) {
+                //any close range (including minion)
+                multi_new += damage_close_range;
+            }
+
+            Main.NewText(type + " " + is_projectile + " " + distance + " " + multi_base + " " + multi_new);
+
+            //calculate new damage
+            damage = (int)Math.Round(damage * multi_new / multi_base);
+        }
+
+        private CORE_DAMAGE_TYPE GetDamageType(Projectile proj) {
+            if (proj.melee)
+                return CORE_DAMAGE_TYPE.MELEE;
+            else if (proj.ranged)
+                return CORE_DAMAGE_TYPE.RANGED;
+            else if (proj.magic)
+                return CORE_DAMAGE_TYPE.MAGIC;
+            else if (proj.minion || proj.sentry)
+                return CORE_DAMAGE_TYPE.MINION;
+            else if (proj.thrown)
+                return CORE_DAMAGE_TYPE.THROWING;
+            else
+                return CORE_DAMAGE_TYPE.NON_VANILLA;
+        }
+
+        private CORE_DAMAGE_TYPE EstimateDamageMulti(Item item) {
+            if (item.melee)
+                return CORE_DAMAGE_TYPE.MELEE;
+            else if (item.ranged)
+                return CORE_DAMAGE_TYPE.RANGED;
+            else if (item.magic)
+                return CORE_DAMAGE_TYPE.MAGIC;
+            else if (item.sentry || item.DD2Summon || item.summon)
+                return CORE_DAMAGE_TYPE.MINION;
+            else if (item.thrown)
+                return CORE_DAMAGE_TYPE.THROWING;
+            else
+                return CORE_DAMAGE_TYPE.NON_VANILLA;
+        }
+
         /// <summary>
-        /// does not include close-range bonus
-        /// underestimates for non-vanilla types
+        /// If held item is of a non-vanilla damage type, update the non-vanilla damage type multiplier
         /// </summary>
-        /// <param name="proj"></param>
-        /// <returns></returns>
-        private float EstimateDamageMulti(Projectile proj) {
-            //default is 100%
-            float multi = 1f;
-            
-            if (proj.minion) {
-                //minion
-                multi += (player.minionDamage - 1f);
+        private void UpdateNonVanillaDamagetypeMultiplier() {
+            Item item = player.HeldItem;
+            if ((item.damage > 0) && (EstimateDamageMulti(item) == CORE_DAMAGE_TYPE.NON_VANILLA)) {
+                //has damage and isn't a vanilla type
+                int dmg = 10000;
+                GetWeaponDamage(item, ref dmg);
+                damage_multi_non_vanilla_type = (float)dmg / 10000;
             }
-            else {
-                //non-minion custom
-                multi += damage_non_minion + damage_non_minion_projectile;
-
-                if (proj.melee) {
-                    //melee
-                    multi += (player.meleeDamage - 1f);
-                }
-                if (proj.ranged) {
-                    //ranged
-                    multi += (player.rangedDamage - 1f);
-                }
-                if (proj.thrown) {
-                    //throwing
-                    multi += (player.thrownDamage - 1f);
-                }
-                if (proj.magic) {
-                    //magic
-                    multi += (player.magicDamage - 1f);
-                }
-            }
-
-            return multi;
         }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Drawing ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
