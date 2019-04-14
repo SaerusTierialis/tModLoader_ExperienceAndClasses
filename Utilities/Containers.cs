@@ -144,6 +144,22 @@ namespace ExperienceAndClasses.Utilities.Containers {
         /// </summary>
         public bool needs_update_status_visuals_back = false;
 
+        public static Thing GetThingPlayer(int player_index) {
+            return Things[GetIndexPlayer(player_index)];
+        }
+
+        public static Thing GetThingNPC(int npc_index) {
+            return Things[GetIndexNPC(npc_index)];
+        }
+
+        private static ushort GetIndexPlayer(int player_index) {
+            return (ushort)player_index;
+        }
+
+        private static ushort GetIndexNPC(int npc_index) {
+            return (ushort)(Main.maxPlayers + npc_index);
+        }
+
         public Thing(MPlayer mplayer) {
             Is_Player = true;
             Is_Npc = false;
@@ -151,7 +167,7 @@ namespace ExperienceAndClasses.Utilities.Containers {
             this.mplayer = mplayer;
             mnpc = null;
 
-            Index = (ushort)whoAmI;
+            Index = GetIndexPlayer(mplayer.player.whoAmI);
 
             if ((Netmode.IS_SINGLEPLAYER) || (Netmode.IS_CLIENT && (whoAmI == Main.LocalPlayer.whoAmI))) {
                 //singleplayer OR this is the local player on a client
@@ -175,7 +191,7 @@ namespace ExperienceAndClasses.Utilities.Containers {
             mplayer = null;
             this.mnpc = mnpc;
 
-            Index = (ushort)(Main.maxPlayers + whoAmI);
+            Index = GetIndexNPC(mnpc.npc.whoAmI);
 
             if (!Netmode.IS_CLIENT) {
                 //singleplayer OR this is an npc on the server
