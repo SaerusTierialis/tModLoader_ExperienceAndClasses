@@ -27,13 +27,13 @@ namespace ExperienceAndClasses.UI {
         private const float WIDTH_ABILITY = WIDTH_ATTRIBUTES;
         private const float HEIGHT_ABILITY = (HEIGHT - HEIGHT_ATTRIBUTES) - (Constants.UI_PADDING * 2) + 1;
 
-        private const float WIDTH_UNLOCK = 180f;
+        private const float WIDTH_PASSIVES = 180f;
         private static readonly float HEIGHT_UNLOCK = HEIGHT - HEIGHT_HELP + 1 - (Constants.UI_PADDING * 2) + 1;
 
-        private const float WIDTH_HELP = WIDTH_UNLOCK;
-        private const float HEIGHT_HELP = 120f;
+        private const float WIDTH_HELP = WIDTH_PASSIVES;
+        private const float HEIGHT_HELP = 65f;
 
-        private static readonly float WIDTH = CLASS_WIDTH + WIDTH_ATTRIBUTES + WIDTH_UNLOCK + (Constants.UI_PADDING * 2) - 4;
+        private static readonly float WIDTH = CLASS_WIDTH + WIDTH_ATTRIBUTES + WIDTH_PASSIVES + (Constants.UI_PADDING * 2) - 4;
         private const float HEIGHT = 430f;
 
         private const float WIDTH_CONFIRM = 200f;
@@ -44,6 +44,7 @@ namespace ExperienceAndClasses.UI {
         private const byte INDICATOR_ALPHA = 50;
 
         private const float FONT_SCALE_TITLE = 1.5f;
+        private const float FONT_SCALE_HELP = 1.2f;
         private const float FONT_SCALE_ATTRIBUTE = 1f;
         private const float FONT_SCALE_ABILITY = 0.9f;
 
@@ -211,7 +212,7 @@ namespace ExperienceAndClasses.UI {
             }
 
             //unlock panel
-            DragableUIPanel panel_passive = new DragableUIPanel(WIDTH_UNLOCK, HEIGHT_UNLOCK, Constants.COLOUR_SUBPANEL, this, false, false, false);
+            DragableUIPanel panel_passive = new DragableUIPanel(WIDTH_PASSIVES, HEIGHT_UNLOCK, Constants.COLOUR_SUBPANEL, this, false, false, false);
             panel_passive.Left.Set(panel_ability.Left.Pixels + panel_ability.Width.Pixels - 2f, 0f);
             panel_passive.Top.Set(Constants.UI_PADDING, 0f);
             panel.Append(panel_passive);
@@ -228,10 +229,23 @@ namespace ExperienceAndClasses.UI {
             DragableUIPanel panel_help = new DragableUIPanel(WIDTH_HELP, HEIGHT_HELP, Constants.COLOUR_SUBPANEL, this, false, false, false);
             panel_help.Left.Set(panel_passive.Left.Pixels, 0f);
             panel_help.Top.Set(HEIGHT - Constants.UI_PADDING - HEIGHT_HELP, 0f);
+            panel_help.BackgroundColor = Color.Transparent;
+            panel_help.BorderColor = Color.Transparent;
             panel.Append(panel_help);
 
-            //help title
-            panel_help.SetTitle("Help", FONT_SCALE_TITLE, true, "TODO_help_text", "Info");
+            //help button
+            TextButton help = new TextButton("Help", FONT_SCALE_HELP, FONT_SCALE_HELP + 0.1f);
+            help.OnClick += new UIElement.MouseEvent(ClickHelp);
+            help.HAlign = 0.5f;
+            help.Top.Set(Constants.UI_PADDING * 2, 0f);
+            panel_help.Append(help);
+
+            //settings button
+            TextButton settings = new TextButton("Settings", FONT_SCALE_HELP, FONT_SCALE_HELP + 0.1f);
+            settings.OnClick += new UIElement.MouseEvent(ClickSettings);
+            settings.HAlign = 0.5f;
+            settings.Top.Set(help.Top.Pixels + help.Height.Pixels + (Constants.UI_PADDING * 2), 0f);
+            panel_help.Append(settings);
 
             //done adding to main panel
             state.Append(panel);
@@ -369,5 +383,14 @@ namespace ExperienceAndClasses.UI {
         public void ClickReset(UIMouseEvent evt, UIElement listeningElement) {
             UIInfo.Instance.ShowResetAttributes(listeningElement);
         }
+
+        public void ClickHelp(UIMouseEvent evt, UIElement listeningElement) {
+            Main.NewText("TODO"); //TODO
+        }
+
+        public void ClickSettings(UIMouseEvent evt, UIElement listeningElement) {
+            Main.NewText("TODO"); //TODO
+        }
+
     }
 }
