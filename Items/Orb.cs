@@ -40,7 +40,7 @@ namespace ExperienceAndClasses.Items {
             line.overrideColor = UI.Constants.COLOUR_XP_BRIGHT;
             tooltips.Add(line);
 
-            if (!Systems.XP.Adjusting.LocalCanGainXP()) {
+            if (!Systems.XP.Adjusting.LocalCanGainXP) {
                 line = new TooltipLine(mod, "desc2", "Use is currently prevented because you cannot gain XP!");
                 line.overrideColor = UI.Constants.COLOUR_MESSAGE_ERROR;
                 tooltips.Add(line);
@@ -48,11 +48,11 @@ namespace ExperienceAndClasses.Items {
         }
 
         public override bool CanUseItem(Player player) {
-            return Systems.XP.Adjusting.LocalCanGainXP();
+            return Systems.XP.Adjusting.LocalCanGainXP;
         }
 
         public override bool UseItem(Player player) {
-            if (Systems.XP.Adjusting.LocalCanGainXP()) {
+            if (Systems.XP.Adjusting.LocalCanGainXP) {
                 Systems.XP.Adjusting.LocalAddXP(GetXPValue(), false);
                 return true;
             }

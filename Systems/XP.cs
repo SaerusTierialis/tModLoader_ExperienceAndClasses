@@ -87,24 +87,30 @@ namespace ExperienceAndClasses.Systems {
             /// Can local player gain xp at all
             /// </summary>
             /// <returns></returns>
-            public static bool LocalCanGainXP() {
-                return (LocalCanGainXPPrimary() || LocalCanGainXPSecondary());
+            public static bool LocalCanGainXP {
+                get {
+                    return (LocalCanGainXPPrimary || LocalCanGainXPSecondary);
+                }
             }
 
             /// <summary>
             /// Can local player's primary class gain xp
             /// </summary>
             /// <returns></returns>
-            public static bool LocalCanGainXPPrimary() {
-                return (ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary.Tier > 0) && (ExperienceAndClasses.LOCAL_MPLAYER.Class_Levels[ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary.ID_num] < ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary.Max_Level);
+            public static bool LocalCanGainXPPrimary {
+                get {
+                    return (ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary.Tier > 0) && (ExperienceAndClasses.LOCAL_MPLAYER.Class_Levels[ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary.ID_num] < ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary.Max_Level);
+                }
             }
 
             /// <summary>
             /// Can local player's secondary class gain xp
             /// </summary>
             /// <returns></returns>
-            public static bool LocalCanGainXPSecondary() {
-                return ExperienceAndClasses.LOCAL_MPLAYER.Allow_Secondary && (ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary.Tier > 0) && (ExperienceAndClasses.LOCAL_MPLAYER.Class_Levels[ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary.ID_num] < ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary.Max_Level);
+            public static bool LocalCanGainXPSecondary {
+                get {
+                    return ExperienceAndClasses.LOCAL_MPLAYER.Allow_Secondary && (ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary.Tier > 0) && (ExperienceAndClasses.LOCAL_MPLAYER.Class_Levels[ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary.ID_num] < ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary.Max_Level);
+                }
             }
 
             /// <summary>
@@ -116,9 +122,9 @@ namespace ExperienceAndClasses.Systems {
                     CombatText.NewText(Main.LocalPlayer.getRect(), UI.Constants.COLOUR_XP_BRIGHT, "+" + xp + " XP");
                 }
 
-                if (LocalCanGainXP()) {
-                    bool add_primary = LocalCanGainXPPrimary();
-                    bool add_secondary = LocalCanGainXPSecondary();
+                if (LocalCanGainXP) {
+                    bool add_primary = LocalCanGainXPPrimary;
+                    bool add_secondary = LocalCanGainXPSecondary;
 
                     if (add_primary && add_secondary) {
                         LocalAddXPToClass(ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary.ID_num, (uint)Math.Ceiling(xp * Systems.XP.SUBCLASS_PENALTY_XP_MULTIPLIER_PRIMARY));

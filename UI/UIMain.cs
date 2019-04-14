@@ -268,16 +268,18 @@ namespace ExperienceAndClasses.UI {
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Methods ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         public void UpdateClassInfo() {
+            MPlayer local_player = ExperienceAndClasses.LOCAL_MPLAYER;
+
             //class buttons
             indicate_primary.visible = false;
             indicate_secondary.visible = false;
             foreach (ClassButton button in class_buttons) {
-                if (button.Class.ID_num == ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary.ID_num) {
+                if (button.Class.ID_num == local_player.Class_Primary.ID_num) {
                     indicate_primary.SetPosition(button.Left.Pixels + INDICATOR_OFFSETS, button.Top.Pixels + INDICATOR_OFFSETS);
                     button_primary = button;
                     indicate_primary.visible = true;
                 }
-                else if (button.Class.ID_num == ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary.ID_num) {
+                else if (button.Class.ID_num == local_player.Class_Secondary.ID_num) {
                     indicate_secondary.SetPosition(button.Left.Pixels + INDICATOR_OFFSETS, button.Top.Pixels + INDICATOR_OFFSETS);
                     button_secondary = button;
                     indicate_secondary.visible = true;
@@ -294,9 +296,9 @@ namespace ExperienceAndClasses.UI {
             UpdateAttributePoints();
 
             //primary effective level
-            Systems.Class c = ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary;
+            Systems.Class c = local_player.Class_Primary;
             if (c != null && c.Tier > 0) {
-                level_primary.SetText(c.Name + " Lv" + ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary_Level_Effective);
+                level_primary.SetText(c.Name + " Lv" + local_player.Class_Primary_Level_Effective);
             }
             else {
                 level_primary.SetText("No Primary Class");
@@ -309,20 +311,20 @@ namespace ExperienceAndClasses.UI {
             byte counter = 0;
             Systems.Ability ability;
             for (byte i = 0; i < ExperienceAndClasses.NUMBER_ABILITY_SLOTS_PER_CLASS; i++) {
-                ability = ExperienceAndClasses.LOCAL_MPLAYER.Abilities_Primary[i];
+                ability = local_player.Abilities_Primary[i];
                 if (ability != null) {
                     ability_primary[counter++].SetAbility(ability);
                 }
-                ability = ExperienceAndClasses.LOCAL_MPLAYER.Abilities_Primary_Alt[i];
+                ability = local_player.Abilities_Primary_Alt[i];
                 if (ability != null) {
                     ability_primary[counter++].SetAbility(ability);
                 }
             }
 
             //secondary effective level
-            c = ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary;
+            c = local_player.Class_Secondary;
             if (c != null && c.Tier > 0) {
-                level_secondary.SetText(c.Name + " Lv" + ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary_Level_Effective);
+                level_secondary.SetText(c.Name + " Lv" + local_player.Class_Secondary_Level_Effective);
             }
             else {
                 level_secondary.SetText("No Secondary Class");
@@ -334,11 +336,11 @@ namespace ExperienceAndClasses.UI {
             }
             counter = 0;
             for (byte i = 0; i < ExperienceAndClasses.NUMBER_ABILITY_SLOTS_PER_CLASS; i++) {
-                ability = ExperienceAndClasses.LOCAL_MPLAYER.Abilities_Secondary[i];
+                ability = local_player.Abilities_Secondary[i];
                 if (ability != null) {
                     ability_secondary[counter++].SetAbility(ability);
                 }
-                ability = ExperienceAndClasses.LOCAL_MPLAYER.Abilities_Secondary_Alt[i];
+                ability = local_player.Abilities_Secondary_Alt[i];
                 if (ability != null) {
                     ability_secondary[counter++].SetAbility(ability);
                 }
@@ -346,10 +348,22 @@ namespace ExperienceAndClasses.UI {
 
             //passives
             List<UIElement> passive_icons = new List<UIElement>();
-            foreach (Systems.Passive passive in ExperienceAndClasses.LOCAL_MPLAYER.Passives) {
+            foreach (Systems.Passive passive in local_player.Passives) {
                 passive_icons.Add(new PassiveIcon(passive));
             }
             passives.SetItems(passive_icons);
+
+            //apply prerevamp xp
+            UpdatePreRevampXPButtonVisible();
+        }
+
+        public void UpdatePreRevampXPButtonVisible() {
+            if (Main.LocalPlayer.GetModPlayer<Systems.Legacy.MyPlayer>().GetXPAvailable() > 0) {
+                old_xp_button.visible = true;
+            }
+            else {
+                old_xp_button.visible = false;
+            }
         }
 
         private void UpdateAttributePoints() {
@@ -405,7 +419,36 @@ namespace ExperienceAndClasses.UI {
         }
 
         private void ClickPreRevampXP(UIMouseEvent evt, UIElement listeningElement) {
-            Main.NewText("TODO"); //TODO
+            if (old_xp_button.visible) {
+                if (Systems.XP.Adjusting.LocalCanGainXP) {
+                    Systems.Legacy.MyPlayer old_modplayer = Main.LocalPlayer.GetModPlayer<Systems.Legacy.MyPlayer>();
+
+                    uint current_class_xp, xp_needed_total, xp_needed_remaining;
+                    if (Systems.XP.Adjusting.LocalCanGainXPPrimary) {
+                        current_class_xp = ExperienceAndClasses.LOCAL_MPLAYER.Class_XP[ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary.ID_num];
+                        xp_needed_total = Systems.XP.Requirements.GetXPReq(ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary, ExperienceAndClasses.LOCAL_MPLAYER.Class_Levels[ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary.ID_num]);
+                        xp_needed_remaining = xp_needed_total - current_class_xp;
+                        if (Systems.XP.Adjusting.LocalCanGainXPSecondary) {
+                            xp_needed_remaining = (uint)Math.Ceiling(xp_needed_remaining / Systems.XP.SUBCLASS_PENALTY_XP_MULTIPLIER_PRIMARY);
+                        }
+                    }
+                    else {
+                        current_class_xp = ExperienceAndClasses.LOCAL_MPLAYER.Class_XP[ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary.ID_num];
+                        xp_needed_total = Systems.XP.Requirements.GetXPReq(ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary, ExperienceAndClasses.LOCAL_MPLAYER.Class_Levels[ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary.ID_num]);
+                        xp_needed_remaining = xp_needed_total - current_class_xp;
+                    }
+
+                    uint xp_to_apply = (uint)Math.Ceiling(Math.Min(xp_needed_remaining, old_modplayer.GetXPAvailable()));
+                    old_modplayer.SpendXP(xp_to_apply);
+                    Systems.XP.Adjusting.LocalAddXP(xp_to_apply, false);
+
+                    Main.NewText(xp_to_apply + " XP has been applied! " + old_modplayer.GetXPAvailable() + " Pre-Revamp XP remains.");
+
+                }
+                else {
+                    Main.NewText("Cannot currently gain XP!");
+                }
+            }
         }
     }
 }

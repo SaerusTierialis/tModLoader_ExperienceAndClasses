@@ -11,8 +11,8 @@ using Terraria.ModLoader.IO;
 /// <summary>
 /// Handles conversion from legacy versions (pre 2.0). Also maintains amount of legacy xp available.
 /// </summary>
-namespace ExperienceAndClasses.Utilities {
-    static class Legacy {
+namespace ExperienceAndClasses.Systems {
+    public static class Legacy {
         /// <summary>
         /// Must use the ModPlayer name "MyPlayer"
         /// </summary>
@@ -40,6 +40,9 @@ namespace ExperienceAndClasses.Utilities {
 
                 //update amount of legacy_xp that is available to revamp
                 UpdateXPAvailable();
+
+                //update initial state of UIMain button
+                UI.UIMain.Instance.UpdatePreRevampXPButtonVisible();
             }
 
             private void UpdateXPAvailable() {
