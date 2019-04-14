@@ -884,8 +884,6 @@ namespace ExperienceAndClasses {
                 multi_new += damage_close_range;
             }
 
-            Main.NewText(type + " " + is_projectile + " " + distance + " " + multi_base + " " + multi_new);
-
             //calculate new damage
             damage = (int)Math.Round(damage * multi_new / multi_base);
         }
