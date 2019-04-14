@@ -127,13 +127,6 @@ namespace ExperienceAndClasses.Systems {
         /// </summary>
         protected float specific_power_level_multiplier = 0;
 
-        protected bool specific_type_melee = false;
-        protected bool specific_type_ranged = false;
-        protected bool specific_type_throwing = false;
-        protected bool specific_type_minion = false;
-        protected bool specific_type_magic = false;
-        protected bool specific_type_holy = false;  //note: there are no holy weapons, but MPlayer has a holy_power stat
-
         /// <summary>
         /// Max number of targets (not including self if specific_targets_self_always).
         /// This max is SEPARATE for friendly and hostile target.
