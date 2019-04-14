@@ -157,7 +157,7 @@ namespace ExperienceAndClasses.Systems {
         /// Set 0 if self is the only target to save time.
         /// | default is 0
         /// </summary>
-        protected ushort specific_targets_max = 0;
+        protected ushort specific_number_targets_base = 0;
         /// <summary>
         /// self can be included as a friednly target but it is not guarenteed and does count towards max | default is true
         /// </summary>
@@ -711,7 +711,9 @@ namespace ExperienceAndClasses.Systems {
 
             Utilities.Containers.Thing self = ExperienceAndClasses.LOCAL_MPLAYER.thing;
 
-            if (specific_targets_max > 0) {
+            ushort number_targets = ModifyNumberTargets(specific_number_targets_base);
+
+            if (number_targets > 0) {
                 //create list of all valid friendly and hostile targets
                 bool can_be_targeted, is_friendly;
                 float distance;
@@ -761,14 +763,14 @@ namespace ExperienceAndClasses.Systems {
                     }
                 }
 
-                //copy to lists and reduce to closest targets (specific_targets_max)
+                //copy to lists and reduce to closest targets (number_targets)
                 targets_friendly = friendly.Values.ToList();
-                if (targets_friendly.Count > specific_targets_max) {
-                    targets_friendly.RemoveRange(specific_targets_max, targets_friendly.Count - specific_targets_max + 1);
+                if (targets_friendly.Count > number_targets) {
+                    targets_friendly.RemoveRange(number_targets, targets_friendly.Count - number_targets + 1);
                 }
                 targets_hostile = hostile.Values.ToList();
-                if (targets_hostile.Count > specific_targets_max) {
-                    targets_hostile.RemoveRange(specific_targets_max, targets_hostile.Count - specific_targets_max + 1);
+                if (targets_hostile.Count > number_targets) {
+                    targets_hostile.RemoveRange(number_targets, targets_hostile.Count - number_targets + 1);
                 }
             }
 
@@ -995,6 +997,7 @@ namespace ExperienceAndClasses.Systems {
         protected virtual float ModifyPowerFinal(float power) { return power; }
         protected virtual float ModifyCooldown(float cooldown_seconds) { return cooldown_seconds; }
         protected virtual bool ModifyCanBeTarget(Utilities.Containers.Thing target, bool can_be_targeted) { return can_be_targeted; }
+        protected virtual ushort ModifyNumberTargets(ushort number_targets) { return number_targets; }
 
         protected virtual void DoEffectMain() {}
         protected virtual void DoEffectTargetFriendly(Utilities.Containers.Thing target) { }
