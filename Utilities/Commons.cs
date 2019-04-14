@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Xna.Framework;
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 using Terraria;
@@ -231,6 +232,11 @@ namespace ExperienceAndClasses.Utilities {
 
         public static bool IsMinionItem(Item item) {
             return (item.sentry || item.summon || item.DD2Summon);
+        }
+
+        public static bool PositionNonSolidTile(Vector2 position) {
+            Point point = position.ToTileCoordinates();
+            return (Main.tile[point.X, point.Y].collisionType != 1);
         }
     }
 }

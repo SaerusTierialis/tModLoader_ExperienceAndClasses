@@ -560,7 +560,6 @@ namespace ExperienceAndClasses.Systems {
                 Attribute_Growth[(byte)Attribute.IDs.Dexterity] = 2;
                 Colour = COLOUR_CLOSE_RANGE_2;
                 AbilitiesID[0] = Systems.Ability.IDs.Warrior_Block;
-                AbilitiesID[1] = Systems.Ability.IDs.Test;
             }
         }
 

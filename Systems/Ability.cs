@@ -14,7 +14,6 @@ namespace ExperienceAndClasses.Systems {
 
         public enum IDs : ushort {
             Warrior_Block,
-            Test,
 
             NUMBER_OF_IDs, //leave this second to last
             NONE, //leave this last
@@ -29,6 +28,7 @@ namespace ExperienceAndClasses.Systems {
             FAIL_ON_COOLDOWN,
             FAIL_RANGE,
             FAIL_LINE_OF_SIGHT,
+            FAIL_SOLID_TILE,
             FAIL_NO_TARGET,
             FAIL_SILENCED,
             FAIL_IMMOBILIZED,
@@ -76,6 +76,8 @@ namespace ExperienceAndClasses.Systems {
         /// default is TARGET_POSITION_TYPE.NONE
         /// </summary>
         protected TARGET_POSITION_TYPE specific_target_position_type = TARGET_POSITION_TYPE.NONE;
+        protected bool specific_target_position_require_line_of_sight = true;
+        protected bool specific_target_position_require_nonsolid_tile = true;
 
         protected float specific_mana_cost_flat = 0;
         protected float specific_mana_cost_percent = 0f;
@@ -205,7 +207,7 @@ namespace ExperienceAndClasses.Systems {
         private float cooldown_seconds;
         private Vector2 position_player, position_cursor, position_target;
         private float position_target_distance;
-        private bool target_position_line_of_sight;
+        private bool target_position_line_of_sight, target_position_nonsolid_tile;
         protected string custom_use_fail_message;
         protected List<Utilities.Containers.Thing> targets_friendly;
         protected List<Utilities.Containers.Thing> targets_hostile;
@@ -442,16 +444,19 @@ namespace ExperienceAndClasses.Systems {
                 case TARGET_POSITION_TYPE.NONE:
                     position_target_distance = 0;
                     target_position_line_of_sight = true;
+                    target_position_nonsolid_tile = true;
                     break;
                 case TARGET_POSITION_TYPE.SELF:
                     position_target = position_player;
                     position_target_distance = 0;
                     target_position_line_of_sight = true;
+                    target_position_nonsolid_tile = true;
                     break;
                 case TARGET_POSITION_TYPE.CURSOR:
                     position_target = position_cursor;
                     position_target_distance = Vector2.Distance(position_player, position_target);
                     target_position_line_of_sight = Collision.CanHit(position_player, 0, 0, position_target, 0, 0);
+                    target_position_nonsolid_tile = Utilities.Commons.PositionNonSolidTile(position_target);
                     break;
                 case TARGET_POSITION_TYPE.BETWEEN_SELF_AND_CURSOR:
                     //first check if cursor is within range
@@ -461,23 +466,26 @@ namespace ExperienceAndClasses.Systems {
                         position_target = Vector2.Lerp(position_player, position_cursor, range / distance_cursor);
                         position_target_distance = Vector2.Distance(position_player, position_target) - 1f;
                         target_position_line_of_sight = Collision.CanHit(position_player, 0, 0, position_target, 0, 0);
+                        target_position_nonsolid_tile = Utilities.Commons.PositionNonSolidTile(position_target);
                     }
                     else {
                         //cursor was within range so just check sight
                         position_target = position_cursor;
                         position_target_distance = distance_cursor;
                         target_position_line_of_sight = Collision.CanHit(position_player, 0, 0, position_target, 0, 0);
+                        target_position_nonsolid_tile = Utilities.Commons.PositionNonSolidTile(position_target);
                     }
 
-                    if (!target_position_line_of_sight) {
-                        //can't see target, need to move closer
+                    if ((specific_target_position_require_line_of_sight && !target_position_line_of_sight) || (specific_target_position_require_nonsolid_tile && !target_position_nonsolid_tile)) {
+                        //invalid target, need to move closer
                         Vector2 position_reference = position_target;
                         float distance_reference = Vector2.Distance(position_player, position_reference);
                         for (float distance = distance_reference; distance >= 0; distance -= 50f) {
                             position_target = Vector2.Lerp(position_player, position_reference, distance / distance_reference);
                             position_target_distance = Vector2.Distance(position_player, position_target) - 1f;
                             target_position_line_of_sight = Collision.CanHit(position_player, 0, 0, position_target, 0, 0);
-                            if (target_position_line_of_sight) {
+                            target_position_nonsolid_tile = Utilities.Commons.PositionNonSolidTile(position_target);
+                            if ((!specific_target_position_require_line_of_sight || target_position_line_of_sight) && (!specific_target_position_require_nonsolid_tile || target_position_nonsolid_tile)) {
                                 break;
                             }
                         }
@@ -718,8 +726,11 @@ namespace ExperienceAndClasses.Systems {
             if (position_target_distance > range) {
                 return USE_RESULT.FAIL_RANGE;
             }
-            else if (!target_position_line_of_sight) {
+            else if (specific_target_position_require_line_of_sight && !target_position_line_of_sight) {
                 return USE_RESULT.FAIL_LINE_OF_SIGHT;
+            }
+            else if (specific_target_position_require_nonsolid_tile && !target_position_nonsolid_tile) {
+                return USE_RESULT.FAIL_SOLID_TILE;
             }
 
             //targets (calculates for use later in activation)
@@ -772,6 +783,10 @@ namespace ExperienceAndClasses.Systems {
 
                         case USE_RESULT.FAIL_LINE_OF_SIGHT:
                             message = "Line of Sight";
+                            break;
+
+                        case USE_RESULT.FAIL_SOLID_TILE:
+                            message = "Invalid Tile";
                             break;
 
                         case USE_RESULT.FAIL_NO_TARGET:
@@ -909,17 +924,6 @@ namespace ExperienceAndClasses.Systems {
                 if (apply_perfect_block) {
                     Systems.Status.Warrior_BlockPerfect.CreateNew(target, defense_bonus);
                 }
-            }
-        }
-
-        public class Test : Ability {
-            public Test() : base(IDs.Test) {
-                Specific_Name = "Test";
-                Specific_Required_Class_ID = Systems.Class.IDs.Warrior;
-                Specific_Required_Class_Level = 1;
-                specific_cooldown_seconds = 0.5f;
-                specific_target_position_type = TARGET_POSITION_TYPE.CURSOR;
-                specific_range_base = 1000f;
             }
         }
 
