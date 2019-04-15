@@ -16,7 +16,8 @@ namespace ExperienceAndClasses {
         public const float DISTANCE_CLOSE_RANGE = 250f;
         private const long TICKS_PER_FULL_SYNC = TimeSpan.TicksPerMinute * 2;
         private const float CHANNELLING_SPEED_MULTIPLIER = 0.99f;
-        private const float AFK_SECONDS = 3f;
+        private const float AFK_SECONDS = 60f;
+        private const float IN_COMBAT_SECONDS = 2f;
 
         private enum CORE_DAMAGE_TYPE : byte {
             MELEE,
@@ -112,7 +113,7 @@ namespace ExperienceAndClasses {
         public Systems.Ability[] Abilities_Secondary { get; private set; }
         public Systems.Ability[] Abilities_Secondary_Alt { get; private set; }
 
-        private DateTime AFK_TIME;
+        private DateTime AFK_TIME, IN_COMBAT_TIME;
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Instance Vars (saved/loaded) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -173,8 +174,8 @@ namespace ExperienceAndClasses {
         /// </summary>
         public int[] Attributes_Sync { get; private set; }
 
-        public bool AFK { get; private set; } //TODO local set
-        public bool IN_COMBAT { get; private set; } //TODO local set
+        public bool AFK { get; private set; }
+        public bool IN_COMBAT { get; private set; }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Initialize ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         
@@ -197,6 +198,7 @@ namespace ExperienceAndClasses {
             Load_Version = new int[3];
             AFK = false;
             AFK_TIME = DateTime.MaxValue;
+            IN_COMBAT_TIME = DateTime.MinValue;
             IN_COMBAT = false;
             Defeated_WOF = false;
             show_xp = true;
@@ -264,6 +266,7 @@ namespace ExperienceAndClasses {
             if (!Utilities.Netmode.IS_SERVER) {
                 //time to become afk
                 AFK_TIME = DateTime.Now.AddSeconds(AFK_SECONDS);
+                IN_COMBAT_TIME = DateTime.MinValue;
 
                 //this is the current local player
                 Is_Local_Player = true;
@@ -343,6 +346,11 @@ namespace ExperienceAndClasses {
                 //afk
                 if (!AFK && (ExperienceAndClasses.Now.CompareTo(AFK_TIME) > 0)) {
                     SetAFK(true);
+                }
+
+                //in combat
+                if (IN_COMBAT && (ExperienceAndClasses.Now.CompareTo(IN_COMBAT_TIME) > 0)) {
+                    SetInCombat(false);
                 }
 
                 //resource updates
@@ -601,14 +609,24 @@ namespace ExperienceAndClasses {
 
         }
 
-        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Combat ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Damage Taken ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         public override void Hurt(bool pvp, bool quiet, double damage, int hitDirection, bool crit) {
             base.Hurt(pvp, quiet, damage, hitDirection, crit);
+
+            //stop channelling
             if (channelling) {
                 if (thing.Statuses.RemoveChannellingHurt() && !Utilities.Netmode.IS_SERVER) {
                     Main.PlaySound(SoundID.Shatter);
                 }
+            }
+
+            //trigger in combat
+            if (Is_Local_Player) {
+                if (!IN_COMBAT) {
+                    SetInCombat(true);
+                }
+                IN_COMBAT_TIME = ExperienceAndClasses.Now.AddSeconds(IN_COMBAT_SECONDS);
             }
         }
 
@@ -840,26 +858,34 @@ namespace ExperienceAndClasses {
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Custom Damage Bonuses ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         public override void ModifyHitNPC(Item item, NPC target, ref int damage, ref float knockback, ref bool crit) {
-            ModifyDamage(GetDamageType(item), ref damage);
+            ModifyDamageDealt(GetDamageType(item), ref damage);
             base.ModifyHitNPC(item, target, ref damage, ref knockback, ref crit);
         }
 
         public override void ModifyHitPvp(Item item, Player target, ref int damage, ref bool crit) {
-            ModifyDamage(GetDamageType(item), ref damage);
+            ModifyDamageDealt(GetDamageType(item), ref damage);
             base.ModifyHitPvp(item, target, ref damage, ref crit);
         }
 
         public override void ModifyHitNPCWithProj(Projectile proj, NPC target, ref int damage, ref float knockback, ref bool crit, ref int hitDirection) {
-            ModifyDamage(GetDamageType(proj), ref damage, true, player.Distance(target.position));
+            ModifyDamageDealt(GetDamageType(proj), ref damage, true, player.Distance(target.position));
             base.ModifyHitNPCWithProj(proj, target, ref damage, ref knockback, ref crit, ref hitDirection);
         }
 
         public override void ModifyHitPvpWithProj(Projectile proj, Player target, ref int damage, ref bool crit) {
-            ModifyDamage(GetDamageType(proj), ref damage, true, player.Distance(target.position));
+            ModifyDamageDealt(GetDamageType(proj), ref damage, true, player.Distance(target.position));
             base.ModifyHitPvpWithProj(proj, target, ref damage, ref crit);
         }
 
-        private void ModifyDamage(CORE_DAMAGE_TYPE type, ref int damage, bool is_projectile = false, float distance = 0f) {
+        private void ModifyDamageDealt(CORE_DAMAGE_TYPE type, ref int damage, bool is_projectile = false, float distance = 0f) {
+            //trigger in combat
+            if (Is_Local_Player) {
+                if (!IN_COMBAT) {
+                    SetInCombat(true);
+                }
+                IN_COMBAT_TIME = ExperienceAndClasses.Now.AddSeconds(IN_COMBAT_SECONDS);
+            }
+
             //get base multiplier (already applied)
             float multi_base;
             switch (type) {
