@@ -555,7 +555,7 @@ namespace ExperienceAndClasses.Systems {
         public class Rogue : PowerScaling {
             public Rogue() : base(IDs.Rogue) {
                 Primary_Types = "Hits Against Nearby Targets";
-                Damage_Close_Range = (SCALE_PRIMARY + 0.2f) / 2f;
+                Damage_Close_Range = SCALE_PRIMARY + 0.1f;
                 Secondary_Types = "All Damage";
                 Damage_All_Non_Minion = SCALE_PRIMARY / 2f;
                 Minion = SCALE_PRIMARY / 2f;
