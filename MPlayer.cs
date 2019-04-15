@@ -15,6 +15,7 @@ namespace ExperienceAndClasses {
         public const float DISTANCE_CLOSE_RANGE = 250f;
         private const long TICKS_PER_FULL_SYNC = TimeSpan.TicksPerMinute * 2;
         private const float CHANNELLING_SPEED_MULTIPLIER = 0.99f;
+        private const float AFK_SECONDS = 3f;
 
         private enum CORE_DAMAGE_TYPE : byte {
             MELEE,
@@ -110,6 +111,8 @@ namespace ExperienceAndClasses {
         public Systems.Ability[] Abilities_Secondary { get; private set; }
         public Systems.Ability[] Abilities_Secondary_Alt { get; private set; }
 
+        private DateTime AFK_TIME;
+
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Instance Vars (saved/loaded) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         //Class_Primary and Class_Secondary also save/load (specifically the .ID)
@@ -192,6 +195,7 @@ namespace ExperienceAndClasses {
             initialized = false;
             Load_Version = new int[3];
             AFK = false;
+            AFK_TIME = DateTime.MaxValue;
             IN_COMBAT = false;
             Defeated_WOF = false;
             show_xp = true;
@@ -257,6 +261,9 @@ namespace ExperienceAndClasses {
         public override void OnEnterWorld(Player player) {
             base.OnEnterWorld(player);
             if (!Utilities.Netmode.IS_SERVER) {
+                //time to become afk
+                AFK_TIME = DateTime.Now.AddSeconds(AFK_SECONDS);
+
                 //this is the current local player
                 Is_Local_Player = true;
                 ExperienceAndClasses.LOCAL_MPLAYER = this;
@@ -332,6 +339,11 @@ namespace ExperienceAndClasses {
 
             //local events
             if (Is_Local_Player) {
+                //afk
+                if (!AFK && (ExperienceAndClasses.Now.CompareTo(AFK_TIME) > 0)) {
+                    SetAFK(true);
+                }
+
                 //resource updates
                 foreach (Systems.Resource r in Resources.Values) {
                     r.TimedUpdate();
@@ -537,6 +549,13 @@ namespace ExperienceAndClasses {
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Keys ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         public override void ProcessTriggers(TriggersSet triggersSet) {
+            if (triggersSet.KeyStatus.ContainsValue(true)) {
+                if (AFK) {
+                    SetAFK(false);
+                }
+                AFK_TIME = ExperienceAndClasses.Now.AddSeconds(AFK_SECONDS);
+            }
+
             if (channelling) {
                 player.controlUseItem = false;
             }

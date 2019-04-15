@@ -30,8 +30,8 @@ namespace ExperienceAndClasses.Utilities {
             ForceFull,
             ForceClass,
             SyncAttribute,
-            AFK, //TODO convert to status
-            InCombat, //TODO convert to status
+            AFK,
+            InCombat,
             Progression,
             NonVanillaTypeMultiplier,
             XP,
@@ -251,7 +251,7 @@ namespace ExperienceAndClasses.Utilities {
                 bool afk_status = reader.ReadBoolean();
 
                 //set
-                origin_mplayer.SetInCombat(afk_status);
+                origin_mplayer.SetAFK(afk_status);
 
                 //relay
                 if (Utilities.Netmode.IS_SERVER) {
