@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Terraria;
+using Terraria.DataStructures;
 using Terraria.GameInput;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -1230,6 +1231,13 @@ namespace ExperienceAndClasses {
                 }
             }
             return false;
+        }
+
+        public override void Kill(double damage, int hitDirection, bool pvp, PlayerDeathReason damageSource) {
+            base.Kill(damage, hitDirection, pvp, damageSource);
+            if (Is_Local_Player) {
+                Systems.XP.Adjusting.LocalDeathXP();
+            }
         }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Status ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/

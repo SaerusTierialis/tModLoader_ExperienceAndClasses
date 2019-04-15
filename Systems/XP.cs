@@ -15,6 +15,8 @@ namespace ExperienceAndClasses.Systems {
 
         public const double EXTRA_XP_POOL_MULTIPLIER = 0.5;
 
+        public const double DEATH_PENALTY_PERCENT = 0.05;
+
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ XP Requirements ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         public static class Requirements {
@@ -149,6 +151,36 @@ namespace ExperienceAndClasses.Systems {
                 }
                 else {
                     ExperienceAndClasses.LOCAL_MPLAYER.extra_xp = Math.Max(ExperienceAndClasses.LOCAL_MPLAYER.extra_xp, ExperienceAndClasses.LOCAL_MPLAYER.extra_xp + xp); //prevent overflow
+                }
+            }
+
+            public static void LocalDeathXP() {
+                MPlayer local_player = ExperienceAndClasses.LOCAL_MPLAYER;
+
+                if (!local_player.AFK && LocalCanGainXP) {
+                    uint xp_loss;
+
+                    //primary
+                    Systems.Class c = local_player.Class_Primary;
+                    if (LocalCanGainXPPrimary && c.Tier > 0) {
+                        xp_loss = (uint)Math.Floor(Math.Min(local_player.Class_XP[c.ID_num], Requirements.GetXPReq(c, local_player.Class_Levels[c.ID_num]) * DEATH_PENALTY_PERCENT));
+                        if (xp_loss > 0) {
+                            LocalSubtractXPFromClass(c.ID_num, xp_loss);
+                            Main.NewText(c.Name + " has lost " + xp_loss + " XP!");
+                        }
+                    }
+
+                    //secondary
+                    c = local_player.Class_Secondary;
+                    if (LocalCanGainXPSecondary && c.Tier > 0) {
+                        xp_loss = (uint)Math.Floor(Math.Min(local_player.Class_XP[c.ID_num], Requirements.GetXPReq(c, local_player.Class_Levels[c.ID_num]) * DEATH_PENALTY_PERCENT));
+                        if (xp_loss > 0) {
+                            LocalSubtractXPFromClass(c.ID_num, xp_loss);
+                            Main.NewText(c.Name + " has lost " + xp_loss + " XP!");
+                        }
+                    }
+
+                    UI.UIHUD.Instance.UpdateXP();
                 }
             }
 
