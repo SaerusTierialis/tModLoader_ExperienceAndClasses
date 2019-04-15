@@ -589,7 +589,7 @@ namespace ExperienceAndClasses.Systems {
         }
 
         public class Rogue : Tier2 {
-            public Rogue() : base(IDs.Rogue, PowerScaling.IDs.CloseRange) {
+            public Rogue() : base(IDs.Rogue, PowerScaling.IDs.Rogue) {
                 Name = "Rogue";
                 Description = "TODO_desc";
                 Class_Locations[1, 3] = ID_num;
@@ -711,7 +711,7 @@ namespace ExperienceAndClasses.Systems {
         }
 
         public class Shadow : Tier3 {
-            public Shadow() : base(IDs.Shadow, PowerScaling.IDs.AllCore, IDs.Traveler) {
+            public Shadow() : base(IDs.Shadow, PowerScaling.IDs.Rogue, IDs.Traveler) {
                 Name = "Shadow";
                 Description = "TODO_desc";
                 Class_Locations[3, 3] = ID_num;
@@ -723,7 +723,7 @@ namespace ExperienceAndClasses.Systems {
         }
 
         public class Assassin : Tier3 {
-            public Assassin() : base(IDs.Assassin, PowerScaling.IDs.CloseRange, IDs.Rogue) {
+            public Assassin() : base(IDs.Assassin, PowerScaling.IDs.Rogue, IDs.Rogue) {
                 Name = "Assassin";
                 Description = "TODO_desc";
                 Class_Locations[2, 3] = ID_num;

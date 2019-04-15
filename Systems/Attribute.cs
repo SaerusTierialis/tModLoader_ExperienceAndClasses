@@ -364,6 +364,7 @@ namespace ExperienceAndClasses.Systems {
             Holy_AllCore,
             MinionOnly,
             NonCombat,
+            Rogue,
 
             //insert here
 
@@ -546,21 +547,31 @@ namespace ExperienceAndClasses.Systems {
 
         public class CloseRange : PowerScaling {
             public CloseRange() : base(IDs.CloseRange) {
-                Primary_Types = "Any Close Range Hit";
+                Primary_Types = "Hits Against Nearby Targets";
                 Damage_Close_Range = SCALE_PRIMARY + 0.2f;
+            }
+        }
+
+        public class Rogue : PowerScaling {
+            public Rogue() : base(IDs.Rogue) {
+                Primary_Types = "Hits Against Nearby Targets";
+                Damage_Close_Range = (SCALE_PRIMARY + 0.2f) / 2f;
+                Secondary_Types = "All Damage";
+                Damage_All_Non_Minion = SCALE_PRIMARY / 2f;
+                Minion = SCALE_PRIMARY / 2f;
             }
         }
 
         public class Projectile : PowerScaling {
             public Projectile() : base(IDs.Projectile) {
-                Primary_Types = "Any Projectile";
+                Primary_Types = "Any Non-Minion Projectiles";
                 Damage_Non_Minion_Projectile = SCALE_PRIMARY;
             }
         }
 
         public class ProjectileAndMinion : PowerScaling {
             public ProjectileAndMinion() : base(IDs.ProjectileAndMinion) {
-                Primary_Types = "Any Projectile";
+                Primary_Types = "Any Non-Minion Projectiles";
                 Damage_Non_Minion_Projectile = SCALE_PRIMARY;
                 Secondary_Types = "Minion";
                 Minion = SCALE_SECONDARY;
