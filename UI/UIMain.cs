@@ -80,7 +80,7 @@ namespace ExperienceAndClasses.UI {
             panel.Append(panel_class);
 
             //class title
-            panel_class.SetTitle("Classes", FONT_SCALE_TITLE, true, "TODO_help_text", "Classes");
+            panel_class.SetTitle("Classes", FONT_SCALE_TITLE, true, "Left click to select primary class\nRight click to select secondary class", "Classes");
 
             //indicator for primary class
             Color color = Constants.COLOUR_CLASS_PRIMARY;
@@ -139,7 +139,7 @@ namespace ExperienceAndClasses.UI {
             panel.Append(panel_attribute);
 
             //attribute title
-            panel_attribute.SetTitle("Attributes", FONT_SCALE_TITLE, true, "TODO_help_text", "Attribute Points");
+            panel_attribute.SetTitle("Attributes", FONT_SCALE_TITLE, true, "Allocated + Class + Bonus = Final\nCost to increase is displayed on the right", "Attribute Points");
 
             //attributes
             float top = panel_attribute.top_space + Constants.UI_PADDING;
@@ -164,7 +164,7 @@ namespace ExperienceAndClasses.UI {
             panel_attribute.Append(attribute_point_reset);
 
             //attribute points
-            attribute_point_text = new HelpTextPanel("Points: 0", FONT_SCALE_ATTRIBUTE, false, "TODO_help_text", "Attribute Allocation");
+            attribute_point_text = new HelpTextPanel("Points: 0", FONT_SCALE_ATTRIBUTE, false, "Allocation points are earned with every level and higher tier classes award more points. These are character-wide rather than tied to a specific class.", "Attribute Allocation");
             attribute_point_text.Left.Set(WIDTH_ATTRIBUTES_RESET + (Constants.UI_PADDING * 2f), 0f);
             attribute_point_text.Top.Set(top, 0f);
             attribute_point_text.Width.Set(panel_attribute.Width.Pixels - WIDTH_ATTRIBUTES_RESET - (Constants.UI_PADDING * 3f), 0f);
@@ -179,10 +179,10 @@ namespace ExperienceAndClasses.UI {
             panel.Append(panel_ability);
 
             //ability title
-            panel_ability.SetTitle("Abilities", FONT_SCALE_TITLE, true, "TODO_help_text", "Class Abilities");
+            panel_ability.SetTitle("Abilities", FONT_SCALE_TITLE, true, "To use the class abilities, you must first set the mod hotkeys in settings.", "Class Abilities");
 
             //ability panel primary info
-            level_primary = new HelpTextPanel("DEFAULT", FONT_SCALE_ABILITY, false, "The level shown here is your effective level. The level of the secondary class is capped at half the level of the primary. If the secondary class is a higher tier, then it is capped at Lv1.", "Effective Level", true, true);
+            level_primary = new HelpTextPanel("DEFAULT", FONT_SCALE_ABILITY, false, "The level shown here is your effective level. The level of the secondary class is capped at half the level of the primary. If the secondary class is a higher tier, then it is capped at level 1.", "Effective Level", true, true);
             level_primary.Left.Set(Constants.UI_PADDING, 0f);
             level_primary.Top.Set(panel_ability.top_space + Constants.UI_PADDING, 0f);
             level_primary.Width.Set(panel_ability.Width.Pixels - (Constants.UI_PADDING * 2f), 0f);
@@ -203,7 +203,7 @@ namespace ExperienceAndClasses.UI {
             }
 
             //ability panel secondary info
-            level_secondary = new HelpTextPanel("DEFAULT", FONT_SCALE_ABILITY, false, "The level shown here is your effective level. The level of the secondary class is capped at half the level of the primary. If the secondary class is a higher tier, then it is capped at Lv1.", "Effective Level", true, true);
+            level_secondary = new HelpTextPanel("DEFAULT", FONT_SCALE_ABILITY, false, "The level shown here is your effective level. The level of the secondary class is capped at half the level of the primary. If the secondary class is a higher tier, then it is capped at level 1.", "Effective Level", true, true);
             level_secondary.Left.Set(Constants.UI_PADDING, 0f);
             level_secondary.Top.Set(ability_primary[0].Top.Pixels + ability_primary[0].Height.Pixels + (Constants.UI_PADDING * 2f), 0f);
             level_secondary.Width.Set(panel_ability.Width.Pixels - (Constants.UI_PADDING * 2f), 0f);
@@ -230,7 +230,7 @@ namespace ExperienceAndClasses.UI {
             panel.Append(panel_passive);
 
             //passives title
-            panel_passive.SetTitle("Passives", FONT_SCALE_TITLE, true, "TODO_help_text", "Passive Abilities");
+            panel_passive.SetTitle("Passives", FONT_SCALE_TITLE, true, "These include ability upgrades, special resources, and more!", "Passive Abilities");
 
             //passives
             passives = new ScrollPanel(panel_passive.Width.Pixels, panel_passive.Height.Pixels - panel_passive.top_space, this.UI, true);
