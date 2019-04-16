@@ -308,41 +308,13 @@ namespace ExperienceAndClasses {
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Update ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-        /// <summary>
-        /// this is after buff updates
-        /// </summary>
-        public override void PostUpdateEquips() {
-            base.PostUpdateEquips();
-            if (initialized) {
-                //reset
-                damage_close_range = damage_non_minion_projectile = damage_non_minion = 0f;
-                damage_holy = 1f;
-                healing = 1f;
-                dodge_chance = 0f;
-                use_speed_melee = use_speed_ranged = use_speed_magic = use_speed_throwing = use_speed_minion = use_speed_weapon = use_speed_tool = 0f;
-                ability_delay_reduction = 1f;
-                channelling = false;
-
-                ApplyStatuses();
-                ApplyAttributes();
-
-                //channelling slow
-                if (channelling) {
-                    player.velocity *= CHANNELLING_SPEED_MULTIPLIER;
-                }
-            }
-        }
-
-        public override void PostUpdate() {
-            base.PostUpdate();
-
-            //timed events...
-            DateTime now = DateTime.Now;
+        public override void PreUpdate() {
+            base.PreUpdate();
 
             //server/singleplayer
             if (!Utilities.Netmode.IS_CLIENT) {
 
-                
+
 
             }
 
@@ -366,6 +338,31 @@ namespace ExperienceAndClasses {
                 //ui (these only update if needed or time due)
                 UI.UIStatus.Instance.Update();
                 UI.UIHUD.Instance.TimedUpdateCooldown();
+            }
+        }
+
+        /// <summary>
+        /// this is after buff updates
+        /// </summary>
+        public override void PostUpdateEquips() {
+            base.PostUpdateEquips();
+            if (initialized) {
+                //reset
+                damage_close_range = damage_non_minion_projectile = damage_non_minion = 0f;
+                damage_holy = 1f;
+                healing = 1f;
+                dodge_chance = 0f;
+                use_speed_melee = use_speed_ranged = use_speed_magic = use_speed_throwing = use_speed_minion = use_speed_weapon = use_speed_tool = 0f;
+                ability_delay_reduction = 1f;
+                channelling = false;
+
+                ApplyStatuses();
+                ApplyAttributes();
+
+                //channelling slow
+                if (channelling) {
+                    player.velocity *= CHANNELLING_SPEED_MULTIPLIER;
+                }
             }
         }
 
