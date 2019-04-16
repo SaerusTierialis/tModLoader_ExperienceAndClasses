@@ -61,6 +61,8 @@
     <Compile Include="Systems\Passive.cs" />
     <Compile Include="Systems\Resource.cs" />
     <Compile Include="Systems\Status.cs" />
+    <Compile Include="UI\UIHelpSettings.cs" />
+    <Compile Include="UI\UIOverlay.cs" />
     <Compile Include="Utilities\Commons.cs" />
     <Compile Include="Items\MItem.cs" />
     <Compile Include="Items\Orb.cs" />

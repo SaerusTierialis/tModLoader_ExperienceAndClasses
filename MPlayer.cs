@@ -157,6 +157,8 @@ namespace ExperienceAndClasses {
 
         public bool show_ability_fail_messages;
 
+        public bool show_classes_button;
+
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Instance Vars (syncing) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         public Systems.Class Class_Primary { get; private set; }
@@ -201,7 +203,6 @@ namespace ExperienceAndClasses {
             IN_COMBAT_TIME = DateTime.MinValue;
             IN_COMBAT = false;
             Defeated_WOF = false;
-            show_xp = true;
             minions = new List<Projectile>();
             slot_minions = new List<Projectile>();
             Progression = 0;
@@ -247,7 +248,6 @@ namespace ExperienceAndClasses {
             ability_delay_reduction = 1f;
 
             //ability
-            show_ability_fail_messages = true;
             Passives = new Utilities.Containers.LevelSortedPassives();
             Resources = new Dictionary<Systems.Resource.IDs, Systems.Resource>();
             Abilities_Primary = new Systems.Ability[ExperienceAndClasses.NUMBER_ABILITY_SLOTS_PER_CLASS];
@@ -255,6 +255,11 @@ namespace ExperienceAndClasses {
             Abilities_Secondary = new Systems.Ability[ExperienceAndClasses.NUMBER_ABILITY_SLOTS_PER_CLASS];
             Abilities_Secondary_Alt = new Systems.Ability[ExperienceAndClasses.NUMBER_ABILITY_SLOTS_PER_CLASS];
             channelling = false;
+
+            //settings
+            show_ability_fail_messages = true;
+            show_classes_button = true;
+            show_xp = true;
         }
 
         /// <summary>
@@ -279,7 +284,7 @@ namespace ExperienceAndClasses {
                 time_next_full_sync = DateTime.Now.AddTicks(TICKS_PER_FULL_SYNC);
 
                 //grab UI-state combos to display
-                ExperienceAndClasses.UIs = new UI.UIStateCombo[] { UI.UIStatus.Instance, UI.UIHUD.Instance, UI.UIMain.Instance, UI.UIInfo.Instance };
+                ExperienceAndClasses.UIs = new UI.UIStateCombo[] { UI.UIStatus.Instance, UI.UIHUD.Instance, UI.UIMain.Instance, UI.UIHelpSettings.Instance, UI.UIOverlay.Instance,  UI.UIInfo.Instance };
 
                 //(re)initialize ui
                 foreach (UI.UIStateCombo ui in ExperienceAndClasses.UIs) {
@@ -1097,6 +1102,7 @@ namespace ExperienceAndClasses {
                 {"eac_settings_show_xp", show_xp},
                 {"eac_extra_xp", extra_xp},
                 {"eac_show_ability_fail_messages", show_ability_fail_messages},
+                {"eac_show_classes_button", show_classes_button },
             };
         }
 
@@ -1116,9 +1122,6 @@ namespace ExperienceAndClasses {
 
             //extra xp pool
             extra_xp = Utilities.Commons.TryGet<uint>(tag, "eac_extra_xp", extra_xp);
-
-            //settings
-            show_xp = Utilities.Commons.TryGet<bool>(tag, "eac_settings_show_xp", show_xp);
 
             //current classes
             Class_Primary = Systems.Class.LOOKUP[Utilities.Commons.TryGet<byte>(tag, "eac_class_current_primary", Class_Primary.ID_num)];
@@ -1200,8 +1203,10 @@ namespace ExperienceAndClasses {
                 Utilities.Commons.TryGet<float>(tag, "eac_ui_hud_top", UI.Constants.DEFAULT_UI_HUD_TOP),
                 Utilities.Commons.TryGet<bool>(tag, "eac_ui_hud_auto", UI.Constants.DEFAULT_UI_HUD_AUTO));
 
-            //ability
+            //settings
+            show_xp = Utilities.Commons.TryGet<bool>(tag, "eac_settings_show_xp", show_xp);
             show_ability_fail_messages = Utilities.Commons.TryGet<bool>(tag, "eac_show_ability_fail_messages", show_ability_fail_messages);
+            show_classes_button = Utilities.Commons.TryGet<bool>(tag, "eac_show_classes_button", show_classes_button);
 
             //if this is a client loading (or singleplayer), then this will become the local mplayer again when entering the world
             ExperienceAndClasses.LOCAL_MPLAYER = backup;

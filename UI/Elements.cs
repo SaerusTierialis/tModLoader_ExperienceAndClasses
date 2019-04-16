@@ -70,13 +70,14 @@ namespace ExperienceAndClasses.UI {
     }
 
     public class HelpTextPanel : UIPanel {
+        public string title { get; private set; }
         private UIText text;
         private string help_text_title, help_text;
         private bool center_text, center_vertical;
         private float text_scale;
         private Vector2 text_measure;
 
-        public HelpTextPanel(string title, float text_scale, bool center_text=true, string help_text=null, string help_text_title=null, bool center_vertical = true, bool hide_panel = false) {
+        public HelpTextPanel(string title, float text_scale, bool center_text=true, string help_text=null, string help_text_title=null, bool center_vertical = true, bool hide_panel = false, float override_width = -1f) {
             SetPadding(0f);
             this.help_text_title = help_text_title;
             this.help_text = help_text;
@@ -84,12 +85,17 @@ namespace ExperienceAndClasses.UI {
             this.center_vertical = center_vertical;
             this.text_scale = text_scale;
 
+            this.title = title;
             text = new UIText(title, text_scale);
             Append(text);
 
             text_measure = Main.fontMouseText.MeasureString(text.Text);
 
             Height.Set((text_measure.Y * text_scale / 2f) + (Constants.UI_PADDING * 2) + 2f, 0f);
+
+            if (override_width > 0f) {
+                Width.Set(override_width, 0f);
+            }
 
             float width = text_measure.X * text_scale;
             if (Width.Pixels < width)
@@ -1157,7 +1163,7 @@ namespace ExperienceAndClasses.UI {
     }
 
     public class ScrollPanel : UIPanel {
-        private const float SCROLLBAR_WIDTH = 20f;
+        public const float SCROLLBAR_WIDTH = 20f;
         private const float ITEM_SPACING = UI.Constants.UI_PADDING;
         private const float SCROLL_SPEED = 20f;
 

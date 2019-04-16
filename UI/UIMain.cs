@@ -411,7 +411,7 @@ namespace ExperienceAndClasses.UI {
         }
 
         private void ClickHelp(UIMouseEvent evt, UIElement listeningElement) {
-            Main.NewText("TODO"); //TODO
+            UIHelpSettings.Instance.OpenHelp();
         }
 
         private void ClickSettings(UIMouseEvent evt, UIElement listeningElement) {
