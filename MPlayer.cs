@@ -16,8 +16,8 @@ namespace ExperienceAndClasses {
         public const float DISTANCE_CLOSE_RANGE = 250f;
         private const long TICKS_PER_FULL_SYNC = TimeSpan.TicksPerMinute * 2;
         private const float CHANNELLING_SPEED_MULTIPLIER = 0.99f;
-        private const float AFK_SECONDS = 60f;
-        private const float IN_COMBAT_SECONDS = 10f;
+        public const float AFK_SECONDS = 60f;
+        public const float IN_COMBAT_SECONDS = 10f;
 
         private enum CORE_DAMAGE_TYPE : byte {
             MELEE,
@@ -458,7 +458,7 @@ namespace ExperienceAndClasses {
             //add allocation milestone
             int milestones;
             for (byte id = 0; id < (byte)Systems.Attribute.IDs.NUMBER_OF_IDs; id++) {
-                milestones = (int)Math.Floor(local.Attributes_Allocated[id] / 10.0);
+                milestones = (int)Math.Floor(local.Attributes_Allocated[id] / Systems.Attribute.ALLOCATION_POINTS_PER_MILESTONE);
                 local.Attributes_Allocated_Milestone[id] = (int)((milestones + 1.0) * milestones / 2.0);
             }
 

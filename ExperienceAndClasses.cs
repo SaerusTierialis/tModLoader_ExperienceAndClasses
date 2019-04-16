@@ -38,7 +38,6 @@ namespace ExperienceAndClasses {
         public static ModHotKey[] HOTKEY_ABILITY_PRIMARY = new ModHotKey[NUMBER_ABILITY_SLOTS_PER_CLASS];
         public static ModHotKey[] HOTKEY_ABILITY_SECONDARY = new ModHotKey[NUMBER_ABILITY_SLOTS_PER_CLASS];
         public static ModHotKey HOTKEY_ALTERNATE_EFFECT;
-        public static ModHotKey HOTKEY_ACTIVATE;
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Variables ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -60,7 +59,6 @@ namespace ExperienceAndClasses {
 
             //hotkeys
             HOTKEY_UI = RegisterHotKey("Show Class Interface", "P");
-            HOTKEY_ACTIVATE = RegisterHotKey("Activate Ability", "LeftCtrl");
             HOTKEY_ALTERNATE_EFFECT = RegisterHotKey("Ability Alternate Effect", "LeftShift");
             HOTKEY_ABILITY_PRIMARY[0] = RegisterHotKey("Primary Class Ability 1", "Q");
             HOTKEY_ABILITY_PRIMARY[1] = RegisterHotKey("Primary Class Ability 2", "E");
@@ -85,7 +83,6 @@ namespace ExperienceAndClasses {
 
             //hotkeys
             HOTKEY_UI = null;
-            HOTKEY_ACTIVATE = null;
             HOTKEY_ALTERNATE_EFFECT = null;
             HOTKEY_ABILITY_PRIMARY = new ModHotKey[NUMBER_ABILITY_SLOTS_PER_CLASS];
             HOTKEY_ABILITY_SECONDARY = new ModHotKey[NUMBER_ABILITY_SLOTS_PER_CLASS];

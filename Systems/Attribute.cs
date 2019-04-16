@@ -36,6 +36,8 @@ namespace ExperienceAndClasses.Systems {
         public const byte ATTRIBUTE_GROWTH_LEVELS = 10;
 
         //allocation points
+        public const double ALLOCATION_POINTS_PER_INCREASED_COST = 5d;
+        public const double ALLOCATION_POINTS_PER_MILESTONE = 10d;
         public static readonly int[] ALLOCATION_POINTS_PER_LEVEL_TIERS = new int[] { 0, 1, 2, 3 };
 
         //reset
@@ -103,7 +105,7 @@ namespace ExperienceAndClasses.Systems {
         /// <param name="new_value"></param>
         /// <returns></returns>
         public static int AllocationPointCost(int current_value) {
-            return (int)Math.Ceiling((current_value + 1) / 5d);
+            return (int)Math.Ceiling((current_value + 1) / ALLOCATION_POINTS_PER_INCREASED_COST);
         }
 
         /// <summary>
@@ -271,12 +273,10 @@ namespace ExperienceAndClasses.Systems {
 
                 //healing (use holy damage scaling)
                 float holy_damage_per = Math.Max(mplayer.Class_Primary.Power_Scaling.Damage_Holy, mplayer.Class_Secondary.Power_Scaling.Damage_Holy / 2);
-                if (holy_damage_per > 0f) {
-                    float bonus_per_point = holy_damage_per * PER_POINT_HOLY_HEAL;
-                    float bonus_float = bonus_per_point * points;
-                    mplayer.healing += bonus_float;
-                    if (mplayer.Is_Local_Player) Bonus += "\n+" + Math.Round(bonus_float * 100, 3) + "% healing (" + Math.Round(bonus_per_point * 100, 3) + " per point)";
-                }
+                float bonus_per_point = holy_damage_per * PER_POINT_HOLY_HEAL;
+                float bonus_float = bonus_per_point * points;
+                mplayer.healing += bonus_float;
+                if (mplayer.Is_Local_Player) Bonus += "\n+" + Math.Round(bonus_float * 100, 3) + "% healing (" + Math.Round(bonus_per_point * 100, 3) + " per point)";
             }
         }
 

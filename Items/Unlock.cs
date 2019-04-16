@@ -18,7 +18,7 @@ namespace ExperienceAndClasses.Items {
 
     public class Unlock_Tier2 : Unlock {
         private const string NAME = "Tier II Class Token";
-        private const string TOOLTIP = "TODO_tooltip";
+        private const string TOOLTIP = "A token that is used to unlock any standard Tier II class. Click on a class icon to open the unlock dialogue.";
         private const string TEXTURE = "ExperienceAndClasses/Textures/Item/Unlock_Tier2";
         private const int RARITY = 8;
 
@@ -31,7 +31,7 @@ namespace ExperienceAndClasses.Items {
 
     public class Unlock_Tier3 : Unlock {
         private const string NAME = "Tier III Class Token";
-        private const string TOOLTIP = "TODO_tooltip";
+        private const string TOOLTIP = "A token that is used to unlock any Tier III class. Click on a class icon to open the unlock dialogue.";
         private const string TEXTURE = "ExperienceAndClasses/Textures/Item/Unlock_Tier3";
         private const int RARITY = 10;
 
@@ -45,8 +45,8 @@ namespace ExperienceAndClasses.Items {
     }
 
     public class Unlock_Subclass : Unlock {
-        private const string NAME = "Multiclass Token";
-        private const string TOOLTIP = "TODO_tooltip";
+        private const string NAME = "Subclass Token";
+        private const string TOOLTIP = "A token that is used to unlock the Subclass system. Right click on any class icon to open the unlock diaglogue.";
         private const string TEXTURE = "ExperienceAndClasses/Textures/Item/Unlock_Subclass";
         private const int RARITY = -12;
 
@@ -61,7 +61,7 @@ namespace ExperienceAndClasses.Items {
 
     public class Unlock_Explorer : Unlock {
         private const string NAME = "Explorer Token";
-        private const string TOOLTIP = "TODO_tooltip";
+        private const string TOOLTIP = "A token that is used to unlock the non-combat class. Click on the class icon to open the unlock dialogue.";
         private const string TEXTURE = "ExperienceAndClasses/Textures/Item/Unlock_Explorer";
         private const int RARITY = -11;
 

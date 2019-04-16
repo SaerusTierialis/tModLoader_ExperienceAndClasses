@@ -36,28 +36,34 @@ namespace ExperienceAndClasses.UI {
             //create list of help
             SortedDictionary<string, UIElement> sorted_items = new SortedDictionary<string, UIElement>();
 
+            string power = Systems.Attribute.LOOKUP[(byte)Systems.Attribute.IDs.Power].Specifc_Name;
+
             AddHelpTextPanel("Nearby Targets", "Some classes gain a damage bonus again nearby targets. This refers to any hit that occurs within a distance of " + MPlayer.DISTANCE_CLOSE_RANGE + ". For reference, this distance is equal to the width of " + (MPlayer.DISTANCE_CLOSE_RANGE / Main.LocalPlayer.width) + " players." , ref sorted_items);
             AddHelpTextPanel("Orbs", "Orbs are rare drops that are used to unlock classes, unlock subclass, and reset attributes. They can also be consumed for XP that scales with your overall progression.\n\n" + 
                 Items.Orb_Monster.NAME + " drops from all monsters and " + Items.Orb_Boss.NAME + " drop from all bosses. The drop chance is based on the XP value of the monster relative to your overall progression. The more levels you have in any class, the harder monsters you must fight to have a decent drop chance. However, there is a minimum chance so all monsters have the potential to drop an orb." , ref sorted_items);
-            AddHelpTextPanel("Subclass", "The subclass system allows you to have a primary class and a secondary class active at the same time. Primary class is set by left-click and secondary class is set by right-click.\n\n" + 
+            AddHelpTextPanel("Subclass", "The subclass system allows you to have a primary class and a secondary class active at the same time. Primary class is set by left-click and secondary class is set by right-click. Right clicking a class when subclass is not unlocked will open the unlock dialogue which lists the requirements.\n\n" + 
                 "When gaining XP, the primary class recieves " + (Systems.XP.SUBCLASS_PENALTY_XP_MULTIPLIER_PRIMARY * 100f) + "% and the secondary class recieves " + (Systems.XP.SUBCLASS_PENALTY_XP_MULTIPLIER_SECONDARY * 100f) + "%.\n\n" + 
                 "The power scaling of the two classes is combined using the primary and half of the secondary. In some cases, the power scaling types combine to create a more flexible bonus.\n\n" + 
                 "The effective level of the secondary class is limited to half the level of the primary class. If the secondary class is a higher tier, then it is limited to level 1.", ref sorted_items);
-            AddHelpTextPanel("Hotkeys", "TODO", ref sorted_items);
-            AddHelpTextPanel("Abilities", "TODO", ref sorted_items);
-            AddHelpTextPanel("Passives", "TODO", ref sorted_items);
-            AddHelpTextPanel("Attributes", "TODO", ref sorted_items);
-            AddHelpTextPanel("Attribute Allocation", "TODO", ref sorted_items);
-            AddHelpTextPanel("Class Unlock", "TODO", ref sorted_items);
-            AddHelpTextPanel("Tokens", "TODO", ref sorted_items);
-            AddHelpTextPanel("Channelling", "TODO", ref sorted_items);
-            AddHelpTextPanel("AFK", "TODO", ref sorted_items);
-            AddHelpTextPanel("In Combat", "TODO", ref sorted_items);
+            AddHelpTextPanel("Hotkeys", "This mod makes use of several hotkeys that need to be set before they can be used. To set these: click Settings either in the main menu or in the inventory screen, select Controls, scroll down to the Mod Controls section, and set each key (or click default).\n\n" +
+                "There are " + ExperienceAndClasses.NUMBER_ABILITY_SLOTS_PER_CLASS + " ability keys for the primary and secondary class. Some classes have more than " + ExperienceAndClasses.NUMBER_ABILITY_SLOTS_PER_CLASS +
+                " abilities. The additional abilities are used by holding the Ability Alternate Effect key when pressing the main key. If you are unsure how to use an ability, mouse over it in the class UI to view its tooltip. The hotkeys in the tooltip update when you change class or levelup. You can toggle your class off/on to manually update.", ref sorted_items);
+            AddHelpTextPanel("Abilities", "Abilities are class-specific techniques with various effects that are activated with hotkeys. Most classes have at least 2 abiltiies and additionally retain the abilities of the prerequisite class. As such, Tier 3 classes have at least 4 abilities. Most abilities have a mana or resource cost as well as a cooldown.", ref sorted_items);
+            AddHelpTextPanel("Passives", "Passives are class-specific unlocks that modify abilities, unlock resources, add new mechanics, or otherwise provide a bonus.", ref sorted_items);
+            AddHelpTextPanel("Attributes", "Attributes is a system for providing related bonuses. You can gain attributes from your active class(es) based on their level and scaling pattern, from your allocation choices, and from various buffs. Mouse over each attribute in the interface to see what it does. Note that the effect of " + power + " is different for each class.\n\n" + 
+                "Attributes are displayed as A+C+B for A=Allocated, C=Class, and B=Bonus (e.g., from statuses)", ref sorted_items);
+            AddHelpTextPanel("Attribute Allocation", "Every level in a class earns attribute allocation points and higher tier classes earn more points. These points are used to increase your base attributes. The cost to increase an attribute increases every " + Systems.Attribute.ALLOCATION_POINTS_PER_INCREASED_COST + " points, but bonus points are added for every " + Systems.Attribute.ALLOCATION_POINTS_PER_MILESTONE + " points allocated. This bonuses increase with further investment and is displayed in the mouse-over tooltip.", ref sorted_items);
+            AddHelpTextPanel("Class Unlock", "To unlock a class, simply click on it in the interface. This will open the unlock dialogue, which lists the requirements including any crafting recipes.", ref sorted_items);
+            AddHelpTextPanel("Channelling", "Channelling abilities require that you hold down the key for a duration. Many of these abilities have a mana or resource cost while channelling. Death, immobilization, and silence all interrupt channelling. Taking damage also interrupts most channelling.", ref sorted_items);
+            AddHelpTextPanel("AFK", "Away From Keyboard (AFK) triggers if you do not use any controls for " + MPlayer.AFK_SECONDS + " seconds. When AFK, you cannot gain or lose XP.", ref sorted_items);
+            AddHelpTextPanel("In Combat", "In Combat triggers for " + MPlayer.IN_COMBAT_SECONDS + " seconds each time you take or deal damage.", ref sorted_items);
             AddHelpTextPanel("Class", "TODO", ref sorted_items);
-            AddHelpTextPanel("Death Penalty", "TODO", ref sorted_items);
-            AddHelpTextPanel("Power Scaling", "TODO", ref sorted_items);
-            AddHelpTextPanel("Experience (XP)", "TODO", ref sorted_items);
-            AddHelpTextPanel("Resources", "TODO", ref sorted_items);
+            AddHelpTextPanel("Death Penalty", "When you die, any active class(es) lose up to " + (Systems.XP.DEATH_PENALTY_PERCENT * 100) + "% of the XP required for the next level. This does not occur if you were AFK.", ref sorted_items);
+            AddHelpTextPanel(power + " Scaling", power + " is the generic damage attribute, but its effects are different for each class. When using a subclass, the scaling is merged. This merging will not increase the scaling beyond what a single class could achieve, but does make the bonuses applied more flexible.", ref sorted_items);
+            AddHelpTextPanel("Experience (XP)", "XP is earned by defeating monsters and consuming orbs. Monster XP value is based on their life, defense, and damage.\n\n" +
+                "Earning XP while you are max level stores the XP for when you next unlock a class. When unlocking a class, the stored XP is transfered with a " + (Systems.XP.EXTRA_XP_POOL_MULTIPLIER * 100) + "% penalty.", ref sorted_items);
+            AddHelpTextPanel("Resources", "Some classes have an additional resource that is displayed in the HUD between the XP bars and ability cooldowns. Each of these is unique so you will have to read the passive to understand what it does.", ref sorted_items);
+            AddHelpTextPanel("Status", "This mod does not use the vanilla Buff system because there is a limit to the number of Buffs that can be on a target and it would be easy to reach that limit with this mod. Instead, this mod uses a custom status system. Some statuses are displayed with the Buffs in the top left corner, but these are not Buffs and do not count towards the Buff limit.", ref sorted_items);
 
             help = sorted_items.Values.ToList();
 

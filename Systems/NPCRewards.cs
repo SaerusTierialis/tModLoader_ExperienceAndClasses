@@ -229,7 +229,7 @@ namespace ExperienceAndClasses.Systems {
             //calculate
             double xp = 0;
             if (npc.defDefense >= 1000)
-                xp = (npc.lifeMax / 100d) * (1d + (npc.defDamage / 25d));
+                xp = (npc.lifeMax / 80d) * (1d + (npc.defDamage / 20d));
             else
                 xp = (npc.lifeMax / 100d) * (1d + (npc.defDefense / 10d)) * (1d + (npc.defDamage / 25d));
 
