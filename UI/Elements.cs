@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using Terraria;
 using Terraria.GameContent.UI.Elements;
+using Terraria.ID;
 using Terraria.UI;
 
 namespace ExperienceAndClasses.UI {
@@ -1523,6 +1524,55 @@ namespace ExperienceAndClasses.UI {
                     rect.X += (int)DOT_WIDTH;
                 }
             }
+        }
+    }
+
+    public class BetterTextButton : UIElement {
+        DragableUIPanel panel;
+        private UIText text_normal, text_select;
+
+        public BetterTextButton(string text, float scale_normal, float scale_select, UIStateCombo combo, UIElement.MouseEvent click, bool big_font = false) {
+
+            float scale_subtract = 0f;
+            if (big_font) {
+                scale_subtract = 1f;
+            }
+
+            text_normal = new UIText(text, scale_normal - scale_subtract, big_font);
+            text_select = new UIText(text, scale_select - scale_subtract, big_font);
+
+            Vector2 text_measure = Main.fontMouseText.MeasureString(text_normal.Text);
+            float width = text_measure.X * scale_normal;
+            float height = text_measure.Y / 2f * scale_normal;
+            Width.Set(width, 0f);
+            Height.Set(height, 0f);
+
+            text_measure = Main.fontMouseText.MeasureString(text_select.Text);
+            float width_select = text_measure.X * scale_select;
+            float height_select = text_measure.Y / 2f * scale_select;
+            text_select.Left.Set(-(width_select - width) / 2f, 0f);
+            text_select.Top.Set(-(height_select - height) / 2f, 0f);
+
+            panel = new DragableUIPanel(width, height, Color.Transparent, combo, false, false, false, true);
+            panel.OnClick += click;
+            panel.OnMouseOver += ClickSound;
+            panel.Append(text_normal);
+            panel.Append(text_select);
+            
+            Append(panel);
+        }
+
+        public override void Draw(SpriteBatch spriteBatch) {
+            if (IsMouseHovering) {
+                text_select.Draw(spriteBatch);
+            }
+            else {
+                text_normal.Draw(spriteBatch);
+            }
+        }
+
+        private void ClickSound(UIMouseEvent evt, UIElement listeningElement) {
+            Main.PlaySound(SoundID.MenuTick);
         }
     }
 }

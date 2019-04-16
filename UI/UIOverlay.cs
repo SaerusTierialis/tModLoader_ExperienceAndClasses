@@ -11,18 +11,17 @@ namespace ExperienceAndClasses.UI {
         public static readonly UIOverlay Instance = new UIOverlay();
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Constants ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-        private const float LEFT_FROM_MAX = 280f;
-        private const float TOP_FROM_MAX = 40f;
+        private const float LEFT_FROM_MAX = 270f;
+        private const float TOP_FROM_MAX = 37f;
         private const float TEXT_SCALE = 1.6f;
-        private const float TEXT_SCALE_HOVER = TEXT_SCALE + 0.2f;
+        private const float TEXT_SCALE_HOVER = TEXT_SCALE + 0.1f;
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Varibles ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-        private TextButton button;
+        private BetterTextButton button;
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Initialize ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         protected override void InitializeState() {
-            button = new TextButton("Classes", TEXT_SCALE, TEXT_SCALE_HOVER);
-            button.OnClick += new UIElement.MouseEvent(Click);
+            button = new BetterTextButton("Classes", TEXT_SCALE, TEXT_SCALE_HOVER, this, Click, true);
             state.Append(button);
         }
 
