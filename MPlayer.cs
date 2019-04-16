@@ -1263,6 +1263,7 @@ namespace ExperienceAndClasses {
             base.Kill(damage, hitDirection, pvp, damageSource);
             if (Is_Local_Player) {
                 Systems.XP.Adjusting.LocalDeathXP();
+                SetInCombat(false);
             }
         }
 
