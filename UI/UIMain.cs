@@ -415,7 +415,7 @@ namespace ExperienceAndClasses.UI {
         }
 
         private void ClickSettings(UIMouseEvent evt, UIElement listeningElement) {
-            Main.NewText("TODO"); //TODO
+            UIHelpSettings.Instance.OpenSettings();
         }
 
         private void ClickPreRevampXP(UIMouseEvent evt, UIElement listeningElement) {

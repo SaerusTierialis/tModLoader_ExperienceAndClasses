@@ -99,5 +99,21 @@ namespace ExperienceAndClasses.UI {
             //set visible
             Visibility = true;
         }
+
+        public void OpenSettings() {
+            //close main ui
+            UIMain.Instance.Visibility = false;
+
+            //set help
+            panel.SetTitle("Settings", TEXT_SCALE_TITLE);
+            scroll.SetItems(settings);
+
+            //center
+            panel.Left.Set((Main.screenWidth - panel.Width.Pixels) / 2f, 0f);
+            panel.Top.Set((Main.screenHeight - panel.Height.Pixels) / 2f, 0f);
+
+            //set visible
+            Visibility = true;
+        }
     }
 }
