@@ -179,7 +179,7 @@ namespace ExperienceAndClasses.UI {
             panel.Append(panel_ability);
 
             //ability title
-            panel_ability.SetTitle("Abilities", FONT_SCALE_TITLE, true, "To use the class abilities, you must first set the mod hotkeys in settings.", "Class Abilities");
+            panel_ability.SetTitle("Abilities", FONT_SCALE_TITLE, true, "To use the class abilities, you must first set the mod hotkeys in settings. After setting the hotkeys, the keys shown in the tooltips will not update until you next level up or toggle a class.", "Class Abilities");
 
             //ability panel primary info
             level_primary = new HelpTextPanel("DEFAULT", FONT_SCALE_ABILITY, false, "The level shown here is your effective level. The level of the secondary class is capped at half the level of the primary. If the secondary class is a higher tier, then it is capped at level 1.", "Effective Level", true, true);
