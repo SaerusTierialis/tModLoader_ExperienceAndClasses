@@ -120,7 +120,7 @@ namespace ExperienceAndClasses.Systems {
             /// </summary>
             /// <param name="xp"></param>
             public static void LocalAddXP(uint xp, bool can_show_xp_message = true) {
-                if (can_show_xp_message && ExperienceAndClasses.LOCAL_MPLAYER.show_xp) {
+                if (can_show_xp_message && ExperienceAndClasses.LOCAL_MPLAYER.show_xp.value) {
                     CombatText.NewText(Main.LocalPlayer.getRect(), UI.Constants.COLOUR_XP_BRIGHT, "+" + xp + " XP");
                 }
 

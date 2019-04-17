@@ -71,8 +71,9 @@ namespace ExperienceAndClasses.UI {
 
             //create list of settings
             sorted_items.Clear();
-
-            //TODO
+            AddSettingsToggle(ExperienceAndClasses.LOCAL_MPLAYER.show_xp, ref sorted_items);
+            AddSettingsToggle(ExperienceAndClasses.LOCAL_MPLAYER.show_ability_fail_messages, ref sorted_items);
+            AddSettingsToggle(ExperienceAndClasses.LOCAL_MPLAYER.show_classes_button, ref sorted_items);
 
             settings = sorted_items.Values.ToList();
 
@@ -81,6 +82,10 @@ namespace ExperienceAndClasses.UI {
 
         private void AddHelpTextPanel(string title, string text, ref SortedDictionary<string, UIElement> items) {
             items.Add(title, new HelpTextPanel(title, TEXT_SCALE_ITEMS, true, text, title, true, true, WIDTH_ITEM));
+        }
+
+        private void AddSettingsToggle(Utilities.Containers.Setting setting, ref SortedDictionary<string, UIElement> items) {
+            items.Add(setting.NAME, new SettingsToggle(setting, TEXT_SCALE_ITEMS, TEXT_SCALE_ITEMS + 0.1f, WIDTH_ITEM, this));
         }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Public ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/

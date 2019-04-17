@@ -7,6 +7,18 @@ using System.Threading.Tasks;
 using Terraria;
 
 namespace ExperienceAndClasses.Utilities.Containers {
+    public class Setting {
+        public bool value;
+        public readonly string NAME;
+        public readonly string DESCRIPTION;
+
+        public Setting(bool value, string name, string description = "TODO") {
+            this.value = value;
+            NAME = name;
+            DESCRIPTION = description;
+        }
+    }
+
     /// <summary>
     /// A container for loaded ui information
     /// </summary>

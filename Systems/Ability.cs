@@ -751,7 +751,7 @@ namespace ExperienceAndClasses.Systems {
         }
 
         private void FailMessage(USE_RESULT result) {
-            if (ExperienceAndClasses.LOCAL_MPLAYER.show_ability_fail_messages) {
+            if (ExperienceAndClasses.LOCAL_MPLAYER.show_ability_fail_messages.value) {
 
                 if ((result != type_last_Fail_message) || (ExperienceAndClasses.Now.CompareTo(time_allow_repeat_fail_message) > 0)) {
 

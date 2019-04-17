@@ -28,7 +28,7 @@ namespace ExperienceAndClasses.UI {
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Public ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         public void Update(bool inventory_state) {
-            if (ExperienceAndClasses.LOCAL_MPLAYER.show_classes_button) {
+            if (ExperienceAndClasses.LOCAL_MPLAYER.show_classes_button.value) {
                 Visibility = inventory_state;
                 if (Visibility) {
                     button.Left.Set(Main.screenWidth - LEFT_FROM_MAX, 0f);

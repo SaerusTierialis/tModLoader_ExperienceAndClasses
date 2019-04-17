@@ -1574,5 +1574,62 @@ namespace ExperienceAndClasses.UI {
         private void ClickSound(UIMouseEvent evt, UIElement listeningElement) {
             Main.PlaySound(SoundID.MenuTick);
         }
+
+        public void SetText(string text) {
+            text_normal.SetText(text);
+            text_select.SetText(text);
+        }
+
+        public void SetColour(Color colour_normal, Color colour_select) {
+            text_normal.TextColor = colour_normal;
+            text_select.TextColor = colour_select;
+        }
+    }
+
+    public class SettingsToggle : UIElement {
+        private BetterTextButton button;
+        private Utilities.Containers.Setting setting;
+
+        public SettingsToggle(Utilities.Containers.Setting setting, float text_scale, float text_scale_hover, float width, UIStateCombo combo) {
+            this.setting = setting;
+
+            HelpTextPanel label = new HelpTextPanel(setting.NAME + ": ", text_scale, false, setting.DESCRIPTION, setting.NAME, false, true);
+            label.OnClick += new UIElement.MouseEvent(Click);
+
+            Vector2 text_measure = Main.fontMouseText.MeasureString("False");
+            float width_value = text_measure.X * text_scale;
+
+            button = new BetterTextButton("False", text_scale, text_scale_hover, combo, Click);
+            button.Left.Set(width - width_value - Constants.UI_PADDING, 0f);
+
+            if (button.Left.Pixels < label.Width.Pixels) {
+                button.Left.Set(label.Width.Pixels, 0f);
+            }
+
+            label.Width.Set(width, 0f);
+
+            Width.Set(width, 0f);
+            Height.Set(label.Height.Pixels, 0f);
+
+            Append(button);
+            Append(label);
+
+            SetValue(setting.value);
+        }
+
+        private void SetValue(bool new_value) {
+            setting.value = new_value;
+            button.SetText("" + setting.value);
+            if (setting.value) {
+                button.SetColour(Color.Green, Color.Green);
+            }
+            else {
+                button.SetColour(Color.Red, Color.Red);
+            }
+        }
+
+        private void Click(UIMouseEvent evt, UIElement listeningElement) {
+            SetValue(!setting.value);
+        }
     }
 }

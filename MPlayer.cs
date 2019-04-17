@@ -141,11 +141,6 @@ namespace ExperienceAndClasses {
 
         public Utilities.Containers.LoadedUIData loaded_ui_main, loaded_ui_hud;
 
-        /// <summary>
-        /// Show xp gain overhead
-        /// </summary>
-        public bool show_xp;
-
         public byte[] Class_Levels { get; private set; }
         public uint[] Class_XP { get; private set; }
         public bool[] Class_Unlocked { get; private set; }
@@ -155,9 +150,20 @@ namespace ExperienceAndClasses {
         /// </summary>
         public uint extra_xp;
 
-        public bool show_ability_fail_messages;
+        /// <summary>
+        /// Show xp gain overhead
+        /// </summary>
+        public Utilities.Containers.Setting show_xp { get; private set; }
 
-        public bool show_classes_button;
+        /// <summary>
+        /// Show reason for ability fail overhead
+        /// </summary>
+        public Utilities.Containers.Setting show_ability_fail_messages { get; private set; }
+
+        /// <summary>
+        /// Show class button in bottom right beside settings
+        /// </summary>
+        public Utilities.Containers.Setting show_classes_button { get; private set; }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Instance Vars (syncing) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -257,9 +263,9 @@ namespace ExperienceAndClasses {
             channelling = false;
 
             //settings
-            show_ability_fail_messages = true;
-            show_classes_button = true;
-            show_xp = true;
+            show_ability_fail_messages = new Utilities.Containers.Setting(true, "Show Ability Fail", "When using an ability fails, the reason will be displayed overhead. The same message will not be shown again for a moment.");
+            show_classes_button = new Utilities.Containers.Setting(true, "Enable Classes Button", "Enable the Classes button in the bottom right next to the settings button in the inventory screen. If you turn off auto-toggle and hide this button, then the only way to access the interface will be through the hotkey.");
+            show_xp = new Utilities.Containers.Setting(true, "Show XP Gain", "Shows the amount of XP gained overhead after defeating a monster.");
         }
 
         /// <summary>
@@ -1096,10 +1102,10 @@ namespace ExperienceAndClasses {
                 {"eac_class_subclass_unlocked", Allow_Secondary },
                 {"eac_attribute_allocation", attributes_allocated },
                 {"eac_wof", Defeated_WOF },
-                {"eac_settings_show_xp", show_xp},
+                {"eac_settings_show_xp", show_xp.value},
                 {"eac_extra_xp", extra_xp},
-                {"eac_show_ability_fail_messages", show_ability_fail_messages},
-                {"eac_show_classes_button", show_classes_button },
+                {"eac_show_ability_fail_messages", show_ability_fail_messages.value},
+                {"eac_show_classes_button", show_classes_button.value },
             };
         }
 
@@ -1201,9 +1207,9 @@ namespace ExperienceAndClasses {
                 Utilities.Commons.TryGet<bool>(tag, "eac_ui_hud_auto", UI.Constants.DEFAULT_UI_HUD_AUTO));
 
             //settings
-            show_xp = Utilities.Commons.TryGet<bool>(tag, "eac_settings_show_xp", show_xp);
-            show_ability_fail_messages = Utilities.Commons.TryGet<bool>(tag, "eac_show_ability_fail_messages", show_ability_fail_messages);
-            show_classes_button = Utilities.Commons.TryGet<bool>(tag, "eac_show_classes_button", show_classes_button);
+            show_xp.value = Utilities.Commons.TryGet<bool>(tag, "eac_settings_show_xp", show_xp.value);
+            show_ability_fail_messages.value = Utilities.Commons.TryGet<bool>(tag, "eac_show_ability_fail_messages", show_ability_fail_messages.value);
+            show_classes_button.value = Utilities.Commons.TryGet<bool>(tag, "eac_show_classes_button", show_classes_button.value);
 
             //if this is a client loading (or singleplayer), then this will become the local mplayer again when entering the world
             ExperienceAndClasses.LOCAL_MPLAYER = backup;
