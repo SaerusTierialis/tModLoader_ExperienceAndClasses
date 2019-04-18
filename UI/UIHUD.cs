@@ -38,7 +38,7 @@ namespace ExperienceAndClasses.UI {
             any_classes = false;
             any_cooldowns = false;
             time_next_cooldown_update = ExperienceAndClasses.Now;
-            panel = new DragableUIPanel(WIDTH, HEIGHT, Constants.COLOUR_BAR_UI, this, false, ExperienceAndClasses.LOCAL_MPLAYER.loaded_ui_hud.AUTO);
+            panel = new DragableUIPanel(WIDTH, HEIGHT, Constants.COLOUR_BAR_UI, this, false, true);
             panel.Width.Set(WIDTH, 0f);
 
             //xp bars
@@ -81,6 +81,7 @@ namespace ExperienceAndClasses.UI {
             }
 
             state.Append(panel);
+            panel.Auto = ExperienceAndClasses.LOCAL_MPLAYER.loaded_ui_hud.AUTO;
             panel.SetPosition(ExperienceAndClasses.LOCAL_MPLAYER.loaded_ui_hud.LEFT, ExperienceAndClasses.LOCAL_MPLAYER.loaded_ui_hud.TOP, true);
         }
 

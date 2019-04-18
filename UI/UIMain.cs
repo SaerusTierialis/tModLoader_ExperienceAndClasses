@@ -71,7 +71,7 @@ namespace ExperienceAndClasses.UI {
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Initialize ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         protected override void InitializeState() {
             //main panel
-            panel = new DragableUIPanel(WIDTH, HEIGHT, Constants.COLOUR_UI_PANEL_BACKGROUND, this, true, ExperienceAndClasses.LOCAL_MPLAYER.loaded_ui_main.AUTO);
+            panel = new DragableUIPanel(WIDTH, HEIGHT, Constants.COLOUR_UI_PANEL_BACKGROUND, this, true, true);
 
             //class panel
             DragableUIPanel panel_class = new DragableUIPanel(CLASS_WIDTH, (HEIGHT - (Constants.UI_PADDING * 2)), Constants.COLOUR_SUBPANEL, this, false, false, false);
@@ -263,6 +263,7 @@ namespace ExperienceAndClasses.UI {
             state.Append(panel);
 
             //initial panel position
+            panel.Auto = ExperienceAndClasses.LOCAL_MPLAYER.loaded_ui_main.AUTO;
             panel.SetPosition(ExperienceAndClasses.LOCAL_MPLAYER.loaded_ui_main.LEFT, ExperienceAndClasses.LOCAL_MPLAYER.loaded_ui_main.TOP, true);
         }
 
