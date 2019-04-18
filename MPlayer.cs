@@ -316,34 +316,36 @@ namespace ExperienceAndClasses {
 
         public override void PreUpdate() {
             base.PreUpdate();
+            if (initialized) {
 
-            //server/singleplayer
-            if (!Utilities.Netmode.IS_CLIENT) {
+                //server/singleplayer
+                if (!Utilities.Netmode.IS_CLIENT) {
 
 
 
-            }
-
-            //local events
-            if (Is_Local_Player) {
-                //afk
-                if (!AFK && (ExperienceAndClasses.Now.CompareTo(AFK_TIME) > 0)) {
-                    SetAFK(true);
                 }
 
-                //in combat
-                if (IN_COMBAT && (ExperienceAndClasses.Now.CompareTo(IN_COMBAT_TIME) > 0)) {
-                    SetInCombat(false);
-                }
+                //local events
+                if (Is_Local_Player) {
+                    //afk
+                    if (!AFK && (ExperienceAndClasses.Now.CompareTo(AFK_TIME) > 0)) {
+                        SetAFK(true);
+                    }
 
-                //resource updates
-                foreach (Systems.Resource r in Resources.Values) {
-                    r.TimedUpdate();
-                }
+                    //in combat
+                    if (IN_COMBAT && (ExperienceAndClasses.Now.CompareTo(IN_COMBAT_TIME) > 0)) {
+                        SetInCombat(false);
+                    }
 
-                //ui (these only update if needed or time due)
-                UI.UIStatus.Instance.Update();
-                UI.UIHUD.Instance.TimedUpdateCooldown();
+                    //resource updates
+                    foreach (Systems.Resource r in Resources.Values) {
+                        r.TimedUpdate();
+                    }
+
+                    //ui (these only update if needed or time due)
+                    UI.UIStatus.Instance.Update();
+                    UI.UIHUD.Instance.TimedUpdateCooldown();
+                }
             }
         }
 
