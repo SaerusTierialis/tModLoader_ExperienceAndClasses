@@ -366,7 +366,7 @@ namespace ExperienceAndClasses {
                 use_speed_melee = use_speed_ranged = use_speed_magic = use_speed_throwing = use_speed_minion = use_speed_weapon = use_speed_tool = 0f;
                 ability_delay_reduction = 1f;
                 channelling = false;
-                can_use_abilities = true;
+                can_use_abilities = true; //if false, locks out even abilities that could be used while channelling
 
                 ApplyStatuses();
                 ApplyAttributes();
