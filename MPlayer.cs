@@ -115,6 +115,8 @@ namespace ExperienceAndClasses {
 
         private DateTime AFK_TIME, IN_COMBAT_TIME;
 
+        public bool can_use_abilities;
+
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Instance Vars (saved/loaded) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         //Class_Primary and Class_Secondary also save/load (specifically the .ID)
@@ -213,6 +215,7 @@ namespace ExperienceAndClasses {
             slot_minions = new List<Projectile>();
             Progression = 0;
             extra_xp = 0;
+            can_use_abilities = true;
 
             //ui
             loaded_ui_main = new Utilities.Containers.LoadedUIData();
@@ -363,6 +366,7 @@ namespace ExperienceAndClasses {
                 use_speed_melee = use_speed_ranged = use_speed_magic = use_speed_throwing = use_speed_minion = use_speed_weapon = use_speed_tool = 0f;
                 ability_delay_reduction = 1f;
                 channelling = false;
+                can_use_abilities = true;
 
                 ApplyStatuses();
                 ApplyAttributes();

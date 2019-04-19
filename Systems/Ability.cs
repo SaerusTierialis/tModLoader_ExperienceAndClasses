@@ -21,6 +21,7 @@ namespace ExperienceAndClasses.Systems {
 
         private enum USE_RESULT : byte {
             SUCCESS,
+            FAIL_ABILITIES_LOCKED,
             FAIL_CLASS_LEVEL,
             FAIL_NOT_ENOUGH_MANA,
             FAIL_NOT_ENOUGH_RESOURCE,
@@ -671,6 +672,11 @@ namespace ExperienceAndClasses.Systems {
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Private Instance Methods ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         private USE_RESULT PreActivate() {
+            //can use abilities at all right now?
+            if (!ExperienceAndClasses.LOCAL_MPLAYER.can_use_abilities) {
+                return USE_RESULT.FAIL_ABILITIES_LOCKED;
+            }
+
             //level (calculates for use later in activation)
             if (level < 1) {
                 return USE_RESULT.FAIL_CLASS_LEVEL;
@@ -766,6 +772,10 @@ namespace ExperienceAndClasses.Systems {
                     string message;
 
                     switch (result) {
+                        case USE_RESULT.FAIL_ABILITIES_LOCKED:
+                            message = "Cannot Use Abilities";
+                            break;
+
                         case USE_RESULT.FAIL_CLASS_LEVEL:
                             message = "Class Requirements Not Met";
                             break;
