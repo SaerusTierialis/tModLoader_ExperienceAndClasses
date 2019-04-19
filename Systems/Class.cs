@@ -34,7 +34,7 @@ namespace ExperienceAndClasses.Systems {
             Shadow,
             Assassin,
             SoulBinder,
-            Placeholder,
+            Tactician,
             Saint,
             HybridPrime,
             Explorer,
@@ -758,9 +758,9 @@ namespace ExperienceAndClasses.Systems {
             }
         }
 
-        public class Placeholder : Tier3 {
-            public Placeholder() : base(IDs.Placeholder, PowerScaling.IDs.MinionOnly, IDs.Summoner) {
-                Name = "Placeholder";
+        public class Tactician : Tier3 {
+            public Tactician() : base(IDs.Tactician, PowerScaling.IDs.MinionOnly, IDs.Summoner) {
+                Name = "Tactician";
                 Description = "TODO_desc";
                 Class_Locations[3, 4] = ID_num;
                 Attribute_Growth[(byte)Attribute.IDs.Power] = 4;
