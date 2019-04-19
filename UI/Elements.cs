@@ -286,6 +286,16 @@ namespace ExperienceAndClasses.UI {
                     icon_background.SetImage(Utilities.Textures.TEXTURE_STATUS_BACKGROUND_DEFAULT);
                     break;
             }
+            if (IsMouseHovering) {
+                icon.color = COLOUR_SOLID;
+                icon_background.color = COLOUR_SOLID;
+                UIInfo.Instance.ShowStatus(this, status);
+            }
+            else {
+                icon.color = COLOUR_TRANSPARENT;
+                icon_background.color = COLOUR_TRANSPARENT;
+                UIInfo.Instance.EndText(this);
+            }
         }
 
         public void Update() {
