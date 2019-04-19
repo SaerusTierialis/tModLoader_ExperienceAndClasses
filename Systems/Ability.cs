@@ -582,8 +582,10 @@ namespace ExperienceAndClasses.Systems {
             //use highest level (could still be 0 if not correct class)
             level = Math.Max(level_primary, level_secondary);
 
-            //subtract out levels required
-            level = (byte)(level - Specific_Required_Class_Level + 1);
+            if (level >= Specific_Required_Class_Level) {
+                //subtract out levels required
+                level = (byte)(level - Specific_Required_Class_Level + 1);
+            }
 
             return level;
         }
