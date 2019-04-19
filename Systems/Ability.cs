@@ -586,6 +586,9 @@ namespace ExperienceAndClasses.Systems {
                 //subtract out levels required
                 level = (byte)(level - Specific_Required_Class_Level + 1);
             }
+            else {
+                level = 0;
+            }
 
             return level;
         }
