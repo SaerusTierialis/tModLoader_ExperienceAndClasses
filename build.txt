@@ -1,5 +1,5 @@
 author = Saerus
-version = 1.99.3
+version = 1.99.4
 displayName = ExperienceAndClasses_Revamp_Beta
 buildIgnore = *.csproj, *.user, obj\*, bin\*, .vs\*, *.xlsx, *.m, *.pptx, *.docx, *.tmp, *.zip, *.psd, *.sln, *.gitattributes, *.gitignore, Properties\*, Service References\*
 homepage = https://saerustierialis.github.io/tModLoader_Homepage/
