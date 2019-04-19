@@ -343,8 +343,8 @@ namespace ExperienceAndClasses.UI {
         private const float ICON_SCALE = 0.8f;
         private const float BAR_HEIGHT = 24f;
         private static readonly int ICON_SIZE = (int)Math.Ceiling(Utilities.Textures.TEXTURE_CLASS_DEFAULT.Width * ICON_SCALE);
-        private static readonly int background_shift = (int)Math.Ceiling(Utilities.Textures.TEXTURE_CLASS_DEFAULT.Height * (1f - ICON_SCALE) / 2f);
 
+        private UITransparantImage icon_background;
         private UIImage icon;
         private ProgressBar bar;
         private UIText text;
@@ -358,10 +358,12 @@ namespace ExperienceAndClasses.UI {
             
             SetPadding(0f);
 
+            icon_background = new UITransparantImage(Utilities.Textures.TEXTURE_CLASS_BACKGROUND, Systems.Class.COLOUR_DEFAULT);
+            icon_background.ImageScale = ICON_SCALE;
+            Append(icon_background);
+
             icon = new UIImage(Utilities.Textures.TEXTURE_CLASS_DEFAULT);
             icon.ImageScale = ICON_SCALE;
-            icon.Top.Set(-background_shift, 0f);
-            icon.Left.Set(-background_shift, 0f);
             Append(icon);
 
             left = ICON_SIZE + Constants.UI_PADDING;
@@ -386,6 +388,7 @@ namespace ExperienceAndClasses.UI {
         public void SetClass(Systems.Class class_new) {
             Class_Tracked = class_new;
             icon.SetImage(Class_Tracked.Texture);
+            icon_background.color = class_new.Colour;
 
             visible = (Class_Tracked.Tier >= 1);
 
@@ -434,19 +437,8 @@ namespace ExperienceAndClasses.UI {
 
         public override void Draw(SpriteBatch spriteBatch) {
             if (visible) {
-                //draw background
-                Rectangle rect = icon.GetClippingRectangle(spriteBatch);
-                rect.X += background_shift - 1;
-                rect.Y += background_shift - 1;
-                rect.Width = ICON_SIZE + 1;
-                rect.Height = ICON_SIZE + 1;
-                spriteBatch.Draw(Utilities.Textures.TEXTURE_CLASS_BACKGROUND, rect, Class_Tracked.Colour);
-
-                //draw normally
                 base.Draw(spriteBatch);
             }
-            else
-                return;
         }
 
     }
@@ -572,11 +564,13 @@ namespace ExperienceAndClasses.UI {
         private const float TEXT_SCALE = 0.7f;
         private const float TEXT_OFFSET = 5f;
         private const float LOW_VISIBILITY = 0.7f;
-        private float button_size = 0f;
+        private static readonly Color COLOUR_GRAY_OUT = new Color(170, 170, 170, 255);
 
+        private float button_size = 0f;
         public Systems.Class Class { get; private set; }
         UIText text;
         UIImage image_lock;
+        UITransparantImage background;
 
         public ClassButton(Systems.Class Class) : base(Class.Texture) {
             this.Class = Class;
@@ -595,6 +589,9 @@ namespace ExperienceAndClasses.UI {
             image_lock.Left.Set(button_size / 2 - Utilities.Textures.TEXTURE_LOCK_WIDTH / 2, 0f);
             image_lock.Top.Set(button_size / 2 - Utilities.Textures.TEXTURE_LOCK_HEIGHT / 2, 0f);
             Append(image_lock);
+
+            background = new UITransparantImage(Utilities.Textures.TEXTURE_CLASS_BACKGROUND, Class.Colour);
+            Append(background);
 
             SetVisibility(1f, LOW_VISIBILITY);
         }
@@ -649,6 +646,9 @@ namespace ExperienceAndClasses.UI {
                 //not locked
                 image_lock.SetImage(Utilities.Textures.TEXTURE_BLANK);
 
+                //background
+                background.color = Class.Colour;
+
                 //text level
                 string str = "";
                 if (level >= Class.Max_Level) {
@@ -681,6 +681,9 @@ namespace ExperienceAndClasses.UI {
                     image_lock.SetImage(Utilities.Textures.TEXTURE_LOCK_RED);
                 }
 
+                //background
+                background.color = Class.Colour.MultiplyRGB(COLOUR_GRAY_OUT);
+
                 //no text
                 text.SetText("");
             }
@@ -688,12 +691,10 @@ namespace ExperienceAndClasses.UI {
         }
 
         public override void Draw(SpriteBatch spriteBatch) {
-            //draw background
-            Rectangle rect = GetClippingRectangle(spriteBatch);
-            spriteBatch.Draw(Utilities.Textures.TEXTURE_CLASS_BACKGROUND, new Vector2(rect.X, rect.Y), Class.Colour);
-
-            //draw normally
-            base.Draw(spriteBatch);
+            background.Draw(spriteBatch);
+            DrawSelf(spriteBatch);
+            text.Draw(spriteBatch);
+            image_lock.Draw(spriteBatch);
         }
     }
 
@@ -1098,10 +1099,11 @@ namespace ExperienceAndClasses.UI {
 
     public class AbilityIcon : UIElement {
         public static readonly float SIZE = Utilities.Textures.TEXTURE_ABILITY_DEFAULT.Width;
-        private readonly Color COLOUR_TRANSPARENT = new Color(128, 128, 128, 120);
-        private readonly Color COLOUR_SOLID = new Color(255, 255, 255, 255);
+        private static readonly Color COLOUR_TRANSPARENT = new Color(128, 128, 128, 120);
+        private static readonly Color COLOUR_SOLID = new Color(255, 255, 255, 255);
+        private static readonly Color COLOUR_GRAY_OUT = new Color(170, 170, 170, 255);
 
-        private UITransparantImage icon;
+        private UITransparantImage icon, icon_background;
         private Systems.Ability ability;
         public bool active;
         private int add_y;
@@ -1112,6 +1114,9 @@ namespace ExperienceAndClasses.UI {
 
             Width.Set(SIZE, 0f);
             Height.Set(SIZE, 0f);
+
+            icon_background = new UITransparantImage(Utilities.Textures.TEXTURE_ABILITY_BACKGROUND, Systems.Class.COLOUR_DEFAULT);
+            Append(icon_background);
 
             icon = new UITransparantImage(Utilities.Textures.TEXTURE_BLANK, COLOUR_TRANSPARENT);
             Append(icon);
@@ -1124,9 +1129,11 @@ namespace ExperienceAndClasses.UI {
                 icon.SetImage(ability.Texture);
                 if (ability.Unlocked) {
                     icon.color = COLOUR_SOLID;
+                    icon_background.color = ability.Colour;
                 }
                 else {
                     icon.color = COLOUR_TRANSPARENT;
+                    icon_background.color = ability.Colour.MultiplyRGB(COLOUR_GRAY_OUT);
                 }
             }
             else {
@@ -1160,14 +1167,6 @@ namespace ExperienceAndClasses.UI {
 
         public override void Draw(SpriteBatch spriteBatch) {
             if (active) {
-                //draw background
-                Rectangle rect = GetClippingRectangle(spriteBatch);
-                rect.Y += add_y;
-                rect.Width = (int)SIZE;
-                rect.Height = (int)SIZE;
-                spriteBatch.Draw(Utilities.Textures.TEXTURE_ABILITY_BACKGROUND, rect, ability.Colour);
-
-                //draw normally
                 base.Draw(spriteBatch);
             }
         }
@@ -1239,7 +1238,7 @@ namespace ExperienceAndClasses.UI {
             spriteBatch.End();
 
             //start clipping draw
-            spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, null, null, _rasterizerState);
+            spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, null, null, _rasterizerState, null, Main.UIScaleMatrix);
             Rectangle prior_rect = spriteBatch.GraphicsDevice.ScissorRectangle;
             spriteBatch.GraphicsDevice.ScissorRectangle = GetClippingRectangle(spriteBatch);
 
@@ -1248,7 +1247,7 @@ namespace ExperienceAndClasses.UI {
                 items[i].Top.Set(item_tops[i] - scrollbar.GetValue(), 0f);
                 items[i].Draw(spriteBatch);
             }
-
+            
             //put settings back as they were
             spriteBatch.GraphicsDevice.ScissorRectangle = prior_rect;
 
@@ -1256,7 +1255,7 @@ namespace ExperienceAndClasses.UI {
             spriteBatch.End();
 
             //start normal draw again
-            spriteBatch.Begin();
+            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, null, null, null, null, Main.UIScaleMatrix);
 
             //draw scrollbar over everything
             scrollbar.Draw(spriteBatch);
@@ -1279,10 +1278,11 @@ namespace ExperienceAndClasses.UI {
         private static readonly int background_shift = (int)Math.Ceiling(Utilities.Textures.TEXTURE_RESOURCE_DEFAULT.Height * (1f - ICON_SCALE) / 2f);
         private const float TEXT_SCALE = 0.7f;
         private const float TEXT_WIDTH = 150f;
-        private readonly Color COLOUR_TRANSPARENT = new Color(128, 128, 128, 120);
-        private readonly Color COLOUR_SOLID = new Color(255, 255, 255, 255);
+        private static readonly Color COLOUR_TRANSPARENT = new Color(128, 128, 128, 120);
+        private static readonly Color COLOUR_SOLID = new Color(255, 255, 255, 255);
+        private static readonly Color COLOUR_GRAY_OUT = new Color(170, 170, 170, 255);
 
-        private UITransparantImage icon;
+        private UITransparantImage icon, icon_background;
         private HelpTextPanel text;
         private Systems.Passive passive;
 
@@ -1291,15 +1291,20 @@ namespace ExperienceAndClasses.UI {
 
             SetPadding(0f);
 
+            icon_background = new UITransparantImage(passive.Texture_Background, passive.Colour);
+            icon_background.ImageScale = ICON_SCALE;
+            Append(icon_background);
+
             Texture2D texture = passive.Texture;
-            Color colour;
+            Color colour_text;
             if (passive.Unlocked) {
                 icon = new UITransparantImage(texture, COLOUR_SOLID);
-                colour = Color.White;
+                colour_text = Color.White;
             }
             else {
                 icon = new UITransparantImage(texture, COLOUR_TRANSPARENT);
-                colour = Color.Gray;
+                colour_text = Color.Gray;
+                icon_background.color = icon_background.color.MultiplyRGB(COLOUR_GRAY_OUT);
             }
             icon.ImageScale = ICON_SCALE;
             icon.Width.Set(ICON_SIZE, 0f);
@@ -1309,7 +1314,7 @@ namespace ExperienceAndClasses.UI {
             Append(icon);
 
             text = new HelpTextPanel(passive.Specific_Name, TEXT_SCALE, false, null, null, true, true);
-            text.SetTextColour(colour);
+            text.SetTextColour(colour_text);
             text.Height.Set(icon.Height.Pixels, 0f);
             text.Left.Set(icon.Width.Pixels + UI.Constants.UI_PADDING, 0f);
             text.Top.Set(UI.Constants.UI_PADDING, 0f);
@@ -1329,48 +1334,34 @@ namespace ExperienceAndClasses.UI {
             base.MouseOut(evt);
             UIInfo.Instance.EndText(this);
         }
-
-        public override void Draw(SpriteBatch spriteBatch) {
-            //draw background
-            Rectangle rect = icon.GetClippingRectangle(spriteBatch);
-            rect.X += background_shift;
-            rect.Y += background_shift;
-            rect.Width = (int)ICON_SIZE;
-            rect.Height = (int)ICON_SIZE;
-            spriteBatch.Draw(passive.Texture_Background, rect, passive.Colour);
-
-            //draw normally
-            base.Draw(spriteBatch);
-        }
-
     }
 
     public class AbilityIconCooldown : UIElement {
         public const float SIZE = 24f;
         public static readonly float ICON_SCALE = SIZE / Utilities.Textures.TEXTURE_ABILITY_DEFAULT.Width;
-        private static readonly int background_shift = (int)Math.Ceiling(Utilities.Textures.TEXTURE_RESOURCE_DEFAULT.Height * (1f - ICON_SCALE) / 2f);
-        private static readonly Color COLOUR_TRANSPARENT = new Color(128, 128, 128, 120);
+        private static readonly int background_shift = (int)Math.Ceiling(Utilities.Textures.TEXTURE_ABILITY_DEFAULT.Height * (1f - ICON_SCALE) / 2f);
+        private static readonly Color COLOUR_TRANSPARENT = new Color(0, 0, 0, 255);
         private static readonly Color COLOUR_SOLID = new Color(255, 255, 255, 255);
-
-        RasterizerState _rasterizerState = new RasterizerState() { ScissorTestEnable = true };
+        private static readonly Color COLOUR_COOLDOWN = new Color(128, 128, 128, 200);
+        private static readonly Color COLOUR_GRAY_OUT = new Color(170, 170, 170, 255);
 
         private Systems.Ability ability;
-        private float cooldown_percent;
         public bool active = false;
-        private UITransparantImage icon;
-        private UIImage icon_cover;
+        private UITransparantImage icon, icon_background;
+        private int cooldown_shift;
+        private bool on_cooldown;
 
         public AbilityIconCooldown() {
             Width.Set(SIZE, 0f);
             Height.Set(SIZE, 0f);
 
+            icon_background = new UITransparantImage(Utilities.Textures.TEXTURE_ABILITY_BACKGROUND, Systems.Class.COLOUR_DEFAULT);
+            icon_background.ImageScale = ICON_SCALE;
+            Append(icon_background);
+
             icon = new UITransparantImage(Utilities.Textures.TEXTURE_ABILITY_DEFAULT, COLOUR_SOLID);
             icon.ImageScale = ICON_SCALE;
             Append(icon);
-
-            icon_cover = new UIImage(Utilities.Textures.TEXTURE_ABILITY_COOLDOWN_COVER);
-            icon_cover.ImageScale = ICON_SCALE;
-            Append(icon_cover);
         }
 
         /// <summary>
@@ -1378,16 +1369,18 @@ namespace ExperienceAndClasses.UI {
         /// </summary>
         /// <returns></returns>
         public bool Update() {
-            bool on_cooldown = false;
+            on_cooldown = false;
             if (active) {
-                cooldown_percent = ability.CooldownPercent();
-                icon_cover.Top.Set((1f - cooldown_percent) * SIZE, 0f);
+                float cooldown_percent = ability.CooldownPercent();
                 if (cooldown_percent > 0f) {
                     icon.color = COLOUR_TRANSPARENT;
+                    icon_background.color = ability.Colour.MultiplyRGB(COLOUR_GRAY_OUT);
                     on_cooldown = true;
+                    cooldown_shift = (int)Math.Round((1f - cooldown_percent) * SIZE);
                 }
                 else {
                     icon.color = COLOUR_SOLID;
+                    icon_background.color = ability.Colour;
                 }
             }
             return on_cooldown;
@@ -1396,47 +1389,29 @@ namespace ExperienceAndClasses.UI {
         public void SetAbility(Systems.Ability ability) {
             this.ability = ability;
             active = true;
-            cooldown_percent = -1;
             icon.SetImage(ability.Texture);
             Update();
         }
 
         public override void Draw(SpriteBatch spriteBatch) {
             if (active) {
-                //draw background
-                Rectangle rect = icon.GetClippingRectangle(spriteBatch);
-                rect.X += background_shift;
-                rect.Y += background_shift;
-                rect.Width = (int)SIZE;
-                rect.Height = (int)SIZE;
-                spriteBatch.Draw(Utilities.Textures.TEXTURE_ABILITY_BACKGROUND, rect, ability.Colour);
-
                 //draw icon
+                icon_background.Draw(spriteBatch);
                 icon.Draw(spriteBatch);
 
-                if (cooldown_percent > 0f) {
-                    //stop normal draw
-                    spriteBatch.End();
-
+                if (on_cooldown) {
                     //start clipping draw
-                    spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, null, null, _rasterizerState);
-                    Rectangle prior_rect = spriteBatch.GraphicsDevice.ScissorRectangle;
-                    rect = icon.GetClippingRectangle(spriteBatch);
-                    rect.Height = (int)SIZE + 2;
-                    rect.Width = (int)SIZE + 2;
+                    Rectangle rect = icon.GetDimensions().ToRectangle(); // icon.GetClippingRectangle(spriteBatch);
+                    rect.X += background_shift;
+                    rect.Y += background_shift;
+                    rect.Width = (int)SIZE; 
+                    rect.Height = (int)SIZE;
                     spriteBatch.GraphicsDevice.ScissorRectangle = rect;
 
                     //draw cover
-                    icon_cover.Draw(spriteBatch);
-
-                    //put settings back as they were
-                    spriteBatch.GraphicsDevice.ScissorRectangle = prior_rect;
-
-                    //stop clipping draw
-                    spriteBatch.End();
-
-                    //start normal draw again
-                    spriteBatch.Begin();
+                    rect.Y += cooldown_shift;
+                    rect.Height -= cooldown_shift;
+                    spriteBatch.Draw(Utilities.Textures.TEXTURE_ABILITY_COOLDOWN_COVER, rect, COLOUR_COOLDOWN);
                 }
             }
         }
@@ -1451,6 +1426,7 @@ namespace ExperienceAndClasses.UI {
         private static readonly int background_shift = (int)Math.Ceiling(Utilities.Textures.TEXTURE_RESOURCE_DEFAULT.Height * (1f - ICON_SCALE) / 2f);
         private Systems.Resource resource;
         private UIImage icon;
+        private UITransparantImage icon_background;
         private bool bar_mode;
         private ProgressBar bar;
         private byte max_dots;
@@ -1464,6 +1440,10 @@ namespace ExperienceAndClasses.UI {
             Height.Set(HEIGHT, 0f);
 
             colour = resource.colour;
+
+            icon_background = new UITransparantImage(Utilities.Textures.TEXTURE_RESOURCE_BACKGROUND, resource.colour);
+            icon_background.ImageScale = ICON_SCALE;
+            Append(icon_background);
 
             this.resource = resource;
             icon = new UIImage(resource.Texture);
@@ -1506,21 +1486,13 @@ namespace ExperienceAndClasses.UI {
         }
 
         public override void Draw(SpriteBatch spriteBatch) {
-            //draw background
-            Rectangle rect = icon.GetClippingRectangle(spriteBatch);
-            rect.X += background_shift;
-            rect.Y += background_shift;
-            rect.Width = (int)HEIGHT;
-            rect.Height = (int)HEIGHT;
-            spriteBatch.Draw(Utilities.Textures.TEXTURE_RESOURCE_BACKGROUND, rect, resource.colour);
-
-            //draw normally
+            icon_background.Draw(spriteBatch);
             icon.Draw(spriteBatch);
             if (bar_mode) {
                 bar.Draw(spriteBatch);
             }
             else {
-                rect = icon.GetClippingRectangle(spriteBatch);
+                Rectangle rect = icon.GetClippingRectangle(spriteBatch);
                 rect.Y += (int)dot_top;
                 rect.X += (int)left;
                 rect.Width = (int)DOT_WIDTH;

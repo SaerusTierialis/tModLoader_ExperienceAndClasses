@@ -39,7 +39,6 @@ namespace ExperienceAndClasses.UI {
             any_cooldowns = false;
             time_next_cooldown_update = ExperienceAndClasses.Now;
             panel = new DragableUIPanel(WIDTH, HEIGHT, Constants.COLOUR_BAR_UI, this, false, true);
-            panel.Width.Set(WIDTH, 0f);
 
             //xp bars
             xp_bars = new XPBar[2];
