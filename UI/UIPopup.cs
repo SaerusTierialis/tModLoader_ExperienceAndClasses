@@ -14,9 +14,9 @@ namespace ExperienceAndClasses.UI {
 
     //UI for displaying info for mouse-hovered UI elements
 
-    public class UIInfo : UIStateCombo {
+    public class UIPopup : UIStateCombo {
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Singleton ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-        public static readonly UIInfo Instance = new UIInfo();
+        public static readonly UIPopup Instance = new UIPopup();
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Constants ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         private const float TEXT_SCALE_TITLE = 1.1f;

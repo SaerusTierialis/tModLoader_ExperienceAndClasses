@@ -115,7 +115,7 @@ namespace ExperienceAndClasses.UI {
             //update positions of icons (and text)
             if (needs_redraw_complete || number_buff_changed) {
                 //stop hover text if any
-                UIInfo.Instance.EndTextChildren(state);
+                UIPopup.Instance.EndTextChildren(state);
 
                 //clear all icons
                 foreach (StatusIcon i in icons) {

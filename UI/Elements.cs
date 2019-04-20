@@ -132,13 +132,13 @@ namespace ExperienceAndClasses.UI {
         public override void MouseOver(UIMouseEvent evt) {
             base.MouseOver(evt);
             if (help_text != null) {
-                UIInfo.Instance.ShowHelpText(this, help_text, help_text_title);
+                UIPopup.Instance.ShowHelpText(this, help_text, help_text_title);
             }
         }
 
         public override void MouseOut(UIMouseEvent evt) {
             base.MouseOut(evt);
-            UIInfo.Instance.EndText(this);
+            UIPopup.Instance.EndText(this);
         }
     }
 
@@ -289,12 +289,12 @@ namespace ExperienceAndClasses.UI {
             if (IsMouseHovering) {
                 icon.color = COLOUR_SOLID;
                 icon_background.color = COLOUR_SOLID;
-                UIInfo.Instance.ShowStatus(this, status);
+                UIPopup.Instance.ShowStatus(this, status);
             }
             else {
                 icon.color = COLOUR_TRANSPARENT;
                 icon_background.color = COLOUR_TRANSPARENT;
-                UIInfo.Instance.EndText(this);
+                UIPopup.Instance.EndText(this);
             }
         }
 
@@ -319,7 +319,7 @@ namespace ExperienceAndClasses.UI {
             if (active) {
                 icon.color = COLOUR_SOLID;
                 icon_background.color = COLOUR_SOLID;
-                UIInfo.Instance.ShowStatus(this, status);
+                UIPopup.Instance.ShowStatus(this, status);
             }
         }
         public override void MouseOut(UIMouseEvent evt) {
@@ -327,7 +327,7 @@ namespace ExperienceAndClasses.UI {
             if (active) {
                 icon.color = COLOUR_TRANSPARENT;
                 icon_background.color = COLOUR_TRANSPARENT;
-                UIInfo.Instance.EndText(this);
+                UIPopup.Instance.EndText(this);
             }
         }
         public override void RightClick(UIMouseEvent evt) {
@@ -508,23 +508,23 @@ namespace ExperienceAndClasses.UI {
         }
 
         public void ClickAdd(UIMouseEvent evt, UIElement listeningElement) {
-            if (!UIInfo.AllowClicks()) return;
+            if (!UIPopup.AllowClicks()) return;
 
             ExperienceAndClasses.LOCAL_MPLAYER.LocalAttributeAllocationAddPoint(attribute.ID_num);
         }
 
         public override void MouseUp(UIMouseEvent evt) {
-            UIInfo.Instance.ShowTextAttribute(this, attribute);
+            UIPopup.Instance.ShowTextAttribute(this, attribute);
             base.MouseUp(evt);
         }
 
         public override void MouseOver(UIMouseEvent evt) {
-            UIInfo.Instance.ShowTextAttribute(this, attribute);
+            UIPopup.Instance.ShowTextAttribute(this, attribute);
             base.MouseOver(evt);
         }
 
         public override void MouseOut(UIMouseEvent evt) {
-            UIInfo.Instance.EndText(this);
+            UIPopup.Instance.EndText(this);
             base.MouseOut(evt);
         }
 
@@ -597,12 +597,12 @@ namespace ExperienceAndClasses.UI {
         }
 
         public override void Click(UIMouseEvent evt) {
-            if (!UIInfo.AllowClicks()) return;
+            if (!UIPopup.AllowClicks()) return;
 
             base.Click(evt);
 
             if (!ExperienceAndClasses.LOCAL_MPLAYER.Class_Unlocked[Class.ID_num]) {
-                UIInfo.Instance.ShowUnlockClass(this, Class);
+                UIPopup.Instance.ShowUnlockClass(this, Class);
             }
             else {
                 if (ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary.ID_num == Class.ID_num) {
@@ -615,12 +615,12 @@ namespace ExperienceAndClasses.UI {
         }
 
         public override void RightClick(UIMouseEvent evt) {
-            if (!UIInfo.AllowClicks()) return;
+            if (!UIPopup.AllowClicks()) return;
 
             base.RightClick(evt);
 
             if(!ExperienceAndClasses.LOCAL_MPLAYER.Allow_Secondary) {
-                UIInfo.Instance.ShowUnlockSubclass(this);
+                UIPopup.Instance.ShowUnlockSubclass(this);
             }
             else if (ExperienceAndClasses.LOCAL_MPLAYER.Class_Secondary.ID_num == Class.ID_num) {
                 Systems.Class.LOOKUP[(byte)Systems.Class.IDs.None].LocalTrySetClass(false);
@@ -631,12 +631,12 @@ namespace ExperienceAndClasses.UI {
         }
 
         public override void MouseOver(UIMouseEvent evt) {
-            UIInfo.Instance.ShowTextClass(this, Class);
+            UIPopup.Instance.ShowTextClass(this, Class);
             base.MouseOver(evt);
         }
 
         public override void MouseOut(UIMouseEvent evt) {
-            UIInfo.Instance.EndText(this);
+            UIPopup.Instance.EndText(this);
             base.MouseOut(evt);
         }
 
@@ -715,7 +715,7 @@ namespace ExperienceAndClasses.UI {
                 if (UI != null) {
                     UI.IsVisible = value;
                     if (!UI.IsVisible) {
-                        UIInfo.Instance.EndTextChildren(state);
+                        UIPopup.Instance.EndTextChildren(state);
                     }
                 }
             }
@@ -900,7 +900,7 @@ namespace ExperienceAndClasses.UI {
 
         public override void RightMouseDown(UIMouseEvent evt) {
             base.RightMouseDown(evt);
-            if (can_drag && UIInfo.AllowClicks()) {
+            if (can_drag && UIPopup.AllowClicks()) {
                 DragStart(evt);
             }
         }
@@ -1086,7 +1086,7 @@ namespace ExperienceAndClasses.UI {
         }
 
         public override void Click(UIMouseEvent evt) {
-            if (!UIInfo.AllowClicks()) return;
+            if (!UIPopup.AllowClicks()) return;
             base.Click(evt);
         }
 
@@ -1156,13 +1156,13 @@ namespace ExperienceAndClasses.UI {
         public override void MouseOver(UIMouseEvent evt) {
             base.MouseOver(evt);
             if (active) {
-                UIInfo.Instance.ShowAbility(this, ability);
+                UIPopup.Instance.ShowAbility(this, ability);
             }
         }
 
         public override void MouseOut(UIMouseEvent evt) {
             base.MouseOut(evt);
-            UIInfo.Instance.EndText(this);
+            UIPopup.Instance.EndText(this);
         }
 
         public override void Draw(SpriteBatch spriteBatch) {
@@ -1327,12 +1327,12 @@ namespace ExperienceAndClasses.UI {
 
         public override void MouseOver(UIMouseEvent evt) {
             base.MouseOver(evt);
-            UIInfo.Instance.ShowPassive(this, passive);
+            UIPopup.Instance.ShowPassive(this, passive);
         }
 
         public override void MouseOut(UIMouseEvent evt) {
             base.MouseOut(evt);
-            UIInfo.Instance.EndText(this);
+            UIPopup.Instance.EndText(this);
         }
     }
 

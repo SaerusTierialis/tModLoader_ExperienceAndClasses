@@ -407,7 +407,7 @@ namespace ExperienceAndClasses.UI {
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Events ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         private void ClickReset(UIMouseEvent evt, UIElement listeningElement) {
-            UIInfo.Instance.ShowResetAttributes(listeningElement);
+            UIPopup.Instance.ShowResetAttributes(listeningElement);
         }
 
         private void ClickHelp(UIMouseEvent evt, UIElement listeningElement) {

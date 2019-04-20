@@ -293,7 +293,7 @@ namespace ExperienceAndClasses {
                 time_next_full_sync = DateTime.Now.AddTicks(TICKS_PER_FULL_SYNC);
 
                 //grab UI-state combos to display
-                ExperienceAndClasses.UIs = new UI.UIStateCombo[] { UI.UIStatus.Instance, UI.UIHUD.Instance, UI.UIMain.Instance, UI.UIHelpSettings.Instance, UI.UIOverlay.Instance,  UI.UIInfo.Instance };
+                ExperienceAndClasses.UIs = new UI.UIStateCombo[] { UI.UIStatus.Instance, UI.UIHUD.Instance, UI.UIMain.Instance, UI.UIHelpSettings.Instance, UI.UIOverlay.Instance,  UI.UIPopup.Instance };
 
                 //(re)initialize ui
                 foreach (UI.UIStateCombo ui in ExperienceAndClasses.UIs) {
