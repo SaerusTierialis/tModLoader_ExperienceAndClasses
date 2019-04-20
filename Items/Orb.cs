@@ -69,7 +69,7 @@ namespace ExperienceAndClasses.Items {
 
     public class Orb_Monster : Orb {
         public const string NAME = "Ascension Orb";
-        private const string TOOLTIP = "TODO_tooltip";
+        private const string TOOLTIP = "A crystalline sphere that glows with the promise of power.\n\nUsed to unlock classes, reset attributes, or consume for XP";
         private const string TEXTURE = "ExperienceAndClasses/Textures/Item/Orb_Monster";
         private const int RARITY = 9;
         private const short DUST = DustID.ApprenticeStorm;
@@ -88,7 +88,7 @@ namespace ExperienceAndClasses.Items {
 
     class Orb_Boss : Orb {
         public const string NAME = "Transcendence Orb";
-        private const string TOOLTIP = "TODO_tooltip";
+        private const string TOOLTIP = "A crystalline sphere that shines with the promise of power.\n\nUsed to unlock clases, unlock subclass, or consume for XP";
         private const string TEXTURE = "ExperienceAndClasses/Textures/Item/Orb_Boss";
         private const int RARITY = 11;
         private const short DUST = DustID.PurpleCrystalShard;
