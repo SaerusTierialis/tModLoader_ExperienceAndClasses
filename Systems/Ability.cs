@@ -288,7 +288,7 @@ namespace ExperienceAndClasses.Systems {
             hotkey += "]";
         }
 
-        public void Activate() {
+        public void Activate(bool show_message = true) {
             //if not unlocked, don't do anything
             if (!Unlocked) {
                 return;
@@ -302,7 +302,9 @@ namespace ExperienceAndClasses.Systems {
             //cooldown
             USE_RESULT result = PreActivate();
             if (result != USE_RESULT.SUCCESS) {
-                FailMessage(result);
+                if (show_message) {
+                    FailMessage(result);
+                }
                 return;
             }
 
