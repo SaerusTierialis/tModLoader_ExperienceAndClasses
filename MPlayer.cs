@@ -795,10 +795,10 @@ namespace ExperienceAndClasses {
             }
         }
 
-        public void LocalAttributeAllocationAddPoint(byte id) {
+        public bool LocalAttributeAllocationAddPoint(byte id) {
             if (!Is_Local_Player) {
                 Utilities.Commons.Error("Cannot set attribute allocation for non-local player");
-                return;
+                return false;
             }
             
             int adjustment = +1;
@@ -807,6 +807,10 @@ namespace ExperienceAndClasses {
                 (((adjustment < 0) || (Allocation_Points_Unallocated >= Systems.Attribute.AllocationPointCost(Attributes_Allocated[id]))) && ((Attributes_Allocated[id] + adjustment) >= 0))) {
                 Attributes_Allocated[id] += adjustment;
                 LocalUpdateAll();
+                return true;
+            }
+            else {
+                return false;
             }
         }
 

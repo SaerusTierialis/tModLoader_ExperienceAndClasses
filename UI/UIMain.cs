@@ -138,7 +138,7 @@ namespace ExperienceAndClasses.UI {
             panel.Append(panel_attribute);
 
             //attribute title
-            panel_attribute.SetTitle("Attributes", FONT_SCALE_TITLE, true, "Allocated + Class + Bonus = Final\nCost to increase is displayed on the right", "Attribute Points");
+            panel_attribute.SetTitle("Attributes", FONT_SCALE_TITLE, true, "Allocated + Class + Bonus = Final\n\nCost to increase is displayed on the right\n\nHold the Ability Alternate Effect key when clicking the add button to invest up to 10 points instead of 1", "Attribute Points");
 
             //attributes
             float top = panel_attribute.top_space + Constants.UI_PADDING;

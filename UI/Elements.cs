@@ -510,7 +510,19 @@ namespace ExperienceAndClasses.UI {
         public void ClickAdd(UIMouseEvent evt, UIElement listeningElement) {
             if (!UIPopup.AllowClicks()) return;
 
-            ExperienceAndClasses.LOCAL_MPLAYER.LocalAttributeAllocationAddPoint(attribute.ID_num);
+            int point_add;
+            if (ExperienceAndClasses.HOTKEY_ALTERNATE_EFFECT.Current) {
+                point_add = 10;
+            } 
+            else {
+                point_add = 1;
+            }
+
+            for (int i = 0; i < point_add; i++) {
+                if (!ExperienceAndClasses.LOCAL_MPLAYER.LocalAttributeAllocationAddPoint(attribute.ID_num)) {
+                    break;
+                }
+            }
         }
 
         public override void MouseUp(UIMouseEvent evt) {
