@@ -17,9 +17,9 @@ namespace ExperienceAndClasses.Systems {
         private const double PER_PLAYER_MODIFIER = 0.2;
 
         //orb drop values (min/max is before number-of-players modifier)
-        private const double DROP_CHANCE_ORB_MONSTER_MIN = 0.0001;
-        private const double DROP_CHANCE_ORB_MONSTER_MAX = 0.01;
-        private const double DROP_CHANCE_ORB_MONSTER_MODIFIER = 2;
+        private const double DROP_CHANCE_ORB_MONSTER_MIN = 0.0005;
+        private const double DROP_CHANCE_ORB_MONSTER_MAX = 0.05;
+        private const double DROP_CHANCE_ORB_MONSTER_MODIFIER = 1.8;
         private const double DROP_CHANCE_ORB_BOSS_MIN = 0.01;
         private const double DROP_CHANCE_ORB_BOSS_MAX = 0.5;
         private const double DROP_CHANCE_ORB_BOSS_MODIFIER = 1.5;
@@ -168,6 +168,7 @@ namespace ExperienceAndClasses.Systems {
             MPlayer mplayer;
             foreach (byte player_index in eligible_players) {
                 mplayer = Main.player[player_index].GetModPlayer<MPlayer>(ExperienceAndClasses.MOD);
+
                 if (Main.rand.NextDouble() <= CalculateOrbChanceMonster(base_xp, mplayer.Progression, reward_modifier)) {
                     orb_monster_interactions[player_index] = true;
                     any_orb_monster = true;
