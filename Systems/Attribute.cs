@@ -157,7 +157,7 @@ namespace ExperienceAndClasses.Systems {
         public static int LocalCalculateResetCost() {
             int points = ExperienceAndClasses.LOCAL_MPLAYER.Allocation_Points_Spent - RESET_POINTS_FREE;
             if (points > 0)
-                return (int)Math.Floor(Math.Pow(points, 0.35));
+                return (int)Math.Floor(Math.Pow(points, 0.5));
             else
                 return 0;
         }
