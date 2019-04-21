@@ -136,7 +136,7 @@ namespace ExperienceAndClasses.Utilities {
                 AFK.WritePacketBody(packet, mplayer.AFK);
                 InCombat.WritePacketBody(packet, mplayer.IN_COMBAT);
                 Progression.WritePacketBody(packet, mplayer.Progression);
-                NonVanillaTypeMultiplier.WritePacketBody(packet, mplayer.damage_multi_non_vanilla_type);
+                NonVanillaTypeMultiplier.WritePacketBody(packet, mplayer.damage_estimate_non_vanilla_type);
 
                 //send
                 packet.Send(-1, origin);
@@ -347,7 +347,7 @@ namespace ExperienceAndClasses.Utilities {
                 float non_vanilla_damage_multi = reader.ReadSingle();
 
                 //set
-                origin_mplayer.damage_multi_non_vanilla_type = non_vanilla_damage_multi;
+                origin_mplayer.damage_estimate_non_vanilla_type = non_vanilla_damage_multi;
 
                 //relay
                 if (Utilities.Netmode.IS_SERVER) {

@@ -88,9 +88,15 @@ namespace ExperienceAndClasses {
         /// </summary>
         private int Allocation_Points_Total;
 
-        public float damage_multi_non_vanilla_type;
-        public float damage_close_range, damage_non_minion_projectile, damage_non_minion; //default is 0
-        public float damage_holy; //TODO
+        //damage increase/decrease
+        public float damage_estimate_non_vanilla_type; //estimate of inc/dec to most recent non-vanilla damage type
+        public float damage_close_range, damage_non_minion_projectile, damage_non_minion; //default is 0 (unlike vanilla's 1f)
+        public float damage_holy; //TODO (not used)
+
+        //damage more/less (final multi)
+        public float damage_multi_close_range, damage_multi_non_minion_projectile, damage_multi_non_minion; //default is 0 (unlike vanilla's 1f)
+        public float damage_multi_holy; //TODO (not used)
+
         public float healing; //TODO
         public float dodge_chance; //TODO
         public float ability_delay_reduction; //TODO
@@ -248,8 +254,9 @@ namespace ExperienceAndClasses {
             Allocation_Points_Total = 0;
 
             //stats
-            damage_multi_non_vanilla_type = 1f;
+            damage_estimate_non_vanilla_type = 1f;
             damage_close_range = damage_non_minion_projectile = damage_non_minion = 0f;
+            damage_multi_close_range = damage_multi_non_minion_projectile = damage_multi_non_minion = 0f;
             damage_holy = 1f;
             healing = 1f;
             dodge_chance = 0f;
@@ -360,6 +367,7 @@ namespace ExperienceAndClasses {
             if (initialized) {
                 //reset
                 damage_close_range = damage_non_minion_projectile = damage_non_minion = 0f;
+                damage_multi_close_range = damage_multi_non_minion_projectile = damage_multi_non_minion = 0f;
                 damage_holy = 1f;
                 healing = 1f;
                 dodge_chance = 0f;
@@ -657,7 +665,7 @@ namespace ExperienceAndClasses {
             Attributes_Sync.CopyTo(clone.Attributes_Sync, 0);
 
             clone.Progression = Progression;
-            clone.damage_multi_non_vanilla_type = damage_multi_non_vanilla_type;
+            clone.damage_estimate_non_vanilla_type = damage_estimate_non_vanilla_type;
 
             clone.AFK = AFK;
             clone.IN_COMBAT = IN_COMBAT;
@@ -708,8 +716,8 @@ namespace ExperienceAndClasses {
                 }
 
                 //non-vanilla damage multi
-                if (clone.damage_multi_non_vanilla_type != damage_multi_non_vanilla_type) {
-                    Utilities.PacketHandler.NonVanillaTypeMultiplier.Send(-1, player.whoAmI, damage_multi_non_vanilla_type);
+                if (clone.damage_estimate_non_vanilla_type != damage_estimate_non_vanilla_type) {
+                    Utilities.PacketHandler.NonVanillaTypeMultiplier.Send(-1, player.whoAmI, damage_estimate_non_vanilla_type);
                 }
 
             }
@@ -904,7 +912,7 @@ namespace ExperienceAndClasses {
                 IN_COMBAT_TIME = ExperienceAndClasses.Now.AddSeconds(IN_COMBAT_SECONDS);
             }
 
-            //get base multiplier (already applied)
+            //get base multiplier (has already been applied at this point)
             float multi_base;
             switch (type) {
                 case CORE_DAMAGE_TYPE.MELEE:
@@ -923,30 +931,48 @@ namespace ExperienceAndClasses {
                     multi_base = player.thrownDamage;
                     break;
                 case CORE_DAMAGE_TYPE.NON_VANILLA:
-                    multi_base = damage_multi_non_vanilla_type;
+                    multi_base = damage_estimate_non_vanilla_type;
                     break;
                 default:
                     Utilities.Commons.Error("Unsupported CORE_DAMAGE_TYPE: " + type);
                     return;
             }
 
-            //calcualte final multiplier
-            float multi_new = multi_base;
+            //calcualte multiplier adjusted for custom inc/dec bonuses
+            float multi_after_inc_dec = multi_base;
             if (type != CORE_DAMAGE_TYPE.MINION) {
                 //any non-minion
-                multi_new += damage_non_minion;
+                multi_after_inc_dec += damage_non_minion;
                 if (is_projectile) {
                     //any non-minion projectile
-                    multi_new += damage_non_minion_projectile;
+                    multi_after_inc_dec += damage_non_minion_projectile;
                 }
             }
             if (distance < DISTANCE_CLOSE_RANGE) {
                 //any close range (including minion)
-                multi_new += damage_close_range;
+                multi_after_inc_dec += damage_close_range;
             }
 
+            //sum up more/less bonuses
+            float more_less = 1f;
+            if (type != CORE_DAMAGE_TYPE.MINION) {
+                //any non-minion
+                more_less += damage_multi_non_minion;
+                if (is_projectile) {
+                    //any non-minion projectile
+                    more_less += damage_multi_non_minion_projectile;
+                }
+            }
+            if (distance < DISTANCE_CLOSE_RANGE) {
+                //any close range (including minion)
+                more_less += damage_multi_close_range;
+            }
+
+            //calculate final multiplier
+            float multi_final = multi_after_inc_dec * more_less;
+
             //calculate new damage
-            damage = (int)Math.Round(damage * multi_new / multi_base);
+            damage = (int)Math.Round(damage * multi_final / multi_base);
         }
 
         private CORE_DAMAGE_TYPE GetDamageType(Projectile proj) {
@@ -985,7 +1011,7 @@ namespace ExperienceAndClasses {
             //update damage multiplier for non-vanilla (unknown) type
             //damage_multi_non_vanilla_type is auto-synced when value changes locally
             if (Is_Local_Player && (item.damage > 0) && (item == player.HeldItem) && (GetDamageType(item) == CORE_DAMAGE_TYPE.NON_VANILLA)) {
-                damage_multi_non_vanilla_type = (float)damage / item.damage;
+                damage_estimate_non_vanilla_type = (float)damage / item.damage;
             }
 
         }
