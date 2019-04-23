@@ -139,10 +139,29 @@ namespace ExperienceAndClasses.Systems {
                 Tooltip_Title += " [Tier " + new string('I', Tier) + "]";
             }
 
-            //set tooltip
-            Tooltip_Main += Description + "\n\n" + "POWER SCALING:\nPrimary:   " + Power_Scaling.Primary_Types + "\nSecondary: " + Power_Scaling.Secondary_Types + "\n\nATTRIBUTES:";
+            //implementation status
+            string implementation_status_text = "Implementation State: ";
+            switch (implementation_status) {
+                case IMPLEMENTATION_STATUS.ATTRIBUTE_ONLY:
+                    implementation_status_text += "attributes only";
+                    break;
 
-            //attributes
+                case IMPLEMENTATION_STATUS.ATTRIBUTE_PLUS_PARTIAL_ABILITY:
+                    implementation_status_text += "some abilities/passives";
+                    break;
+
+                case IMPLEMENTATION_STATUS.COMPLETE:
+                    implementation_status_text += "complete";
+                    break;
+
+                case IMPLEMENTATION_STATUS.UNKNOWN:
+                default:
+                    implementation_status_text += "unknown";
+                    break;
+            }
+
+            //set tooltip
+            Tooltip_Main = implementation_status_text + "\n\n" + Description + "\n\n" + "POWER SCALING:\nPrimary:   " + Power_Scaling.Primary_Types + "\nSecondary: " + Power_Scaling.Secondary_Types + "\n\nATTRIBUTES:";
             bool first = true;
             string attribute_names = "";
             Tooltip_Attribute_Growth = "";
@@ -615,7 +634,7 @@ namespace ExperienceAndClasses.Systems {
                 Attribute_Growth[(byte)Attribute.IDs.Dexterity] = 2;
                 Colour = COLOUR_CLOSE_RANGE_2;
                 AbilitiesID[0] = Systems.Ability.IDs.Warrior_Block;
-                implementation_status = IMPLEMENTATION_STATUS.ATTRIBUTE_ONLY;
+                implementation_status = IMPLEMENTATION_STATUS.ATTRIBUTE_PLUS_PARTIAL_ABILITY;
             }
         }
 
