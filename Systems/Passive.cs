@@ -283,8 +283,8 @@ namespace ExperienceAndClasses.Systems {
         public class BloodKnight_Resoruce_Bloodforce : ResourceUnlock {
             public BloodKnight_Resoruce_Bloodforce() : base(IDs.BloodKnight_Resoruce_Bloodforce, Systems.Resource.IDs.Bloodforce) {
                 specific_description = "TODO";
-                Specific_Required_Class_ID = Systems.Class.IDs.BloodKnight;
-                Specific_Required_Class_Level = 1;
+                //Specific_Required_Class_ID = Systems.Class.IDs.BloodKnight;
+                //Specific_Required_Class_Level = 1;
             }
         }
 
