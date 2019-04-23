@@ -84,7 +84,7 @@ namespace ExperienceAndClasses.Utilities {
             TEXTURE_RESOURCE_DOT = ModLoader.GetTexture("ExperienceAndClasses/Textures/Resource/Dot");
 
             foreach (Systems.Class c in Systems.Class.LOOKUP) {
-                c.LoadTexture();
+                c.LoadTextureAndSetTooltip();
             }
 
             foreach (Systems.Status s in Systems.Status.LOOKUP) {

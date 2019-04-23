@@ -232,13 +232,7 @@ namespace ExperienceAndClasses.UI {
         }
 
         public void ShowTextClass(UIElement source, Systems.Class c) {
-            string title = c.Name;
-            if (c.ID_num == (byte)Systems.Class.IDs.Explorer) {
-                title += " [Unique]";
-            }
-            else {
-                title += " [Tier " + new string('I', c.Tier) + "]";
-            }
+            string title = c.Tooltip_Title;
 
             string text = "";
             if (!ExperienceAndClasses.LOCAL_MPLAYER.Class_Unlocked[c.ID_num]) {
@@ -254,40 +248,9 @@ namespace ExperienceAndClasses.UI {
                 text += "\n";
             }
 
-            text += c.Description + "\n\n" + "POWER SCALING:\nPrimary:   " + c.Power_Scaling.Primary_Types + "\nSecondary: " + c.Power_Scaling.Secondary_Types + "\n\nATTRIBUTES:";
+            text += c.Tooltip_Main;
 
-            //attributes
-            bool first = true;
-            string attribute_names = "";
-            string attribute_growth = "";
-            foreach (byte id in Systems.Attribute.ATTRIBUTES_UI_ORDER) {
-                if (first) {
-                    first = false;
-                }
-                else {
-                    attribute_names += "\n";
-                    attribute_growth += "\n";
-                }
-                attribute_names += Systems.Attribute.LOOKUP[id].Specifc_Name + ":";
-
-                for (byte i = 0; i < 5; i++) {
-                    if (c.Attribute_Growth[id] >= (i + 1)) {
-                        attribute_growth += "★";
-                    }
-                    else if (c.Attribute_Growth[id] > i) {
-                        attribute_growth += "✯";
-                    }
-                    else {
-                        attribute_growth += "☆";
-                    }
-                }
-            }
-
-            float extra_left = (Main.fontMouseText.MeasureString(attribute_names).X * TEXT_SCALE_BODY) + 10f;
-
-            text += "\n" + attribute_names;
-
-            ShowText(source, title, text, WIDTH_CLASS, attribute_growth, extra_left);
+            ShowText(source, title, text, WIDTH_CLASS, c.Tooltip_Attribute_Growth, 100f);
         }
 
         public void ShowTextAttribute(UIElement source, Systems.Attribute attribute) {

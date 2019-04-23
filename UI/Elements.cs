@@ -446,7 +446,7 @@ namespace ExperienceAndClasses.UI {
     class AttributeText : UIPanel {
 
         private const float RIGHT_SIDE_PADDING = 5f;
-        private const float LEFT_SUM = 105f;
+        private const float LEFT_SUM = 85f;
         private const float SCALE_SUM = 0.8f;
         private const float SCALE_SUM_SMALL = 0.6f;
 
@@ -469,7 +469,7 @@ namespace ExperienceAndClasses.UI {
             BackgroundColor = UI.Constants.COLOUR_UI_PANEL_HIGHLIGHT;
 
             float top = ((height - (Main.fontMouseText.MeasureString("A").Y * scale)) / 2f) + UI.Constants.UI_PADDING;
-            title = new UIText(attribute.Specifc_Name.ToUpper(), scale);
+            title = new UIText(attribute.Specifc_Name, scale);
             title.Left.Set(UI.Constants.UI_PADDING, 0f);
             title.Top.Set(top, 0f);
             Append(title);

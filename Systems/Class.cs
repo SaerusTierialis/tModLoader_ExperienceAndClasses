@@ -44,6 +44,13 @@ namespace ExperienceAndClasses.Systems {
             NUMBER_OF_IDs, //leave this last
         }
 
+        public enum IMPLEMENTATION_STATUS : byte {
+            UNKNOWN,
+            ATTRIBUTE_ONLY,
+            ATTRIBUTE_PLUS_PARTIAL_ABILITY,
+            COMPLETE,
+        }
+
         public const byte MAX_TIER = 3;
         public static readonly byte[] TIER_MAX_LEVELS = new byte[] {0, 10, 50, 100};
 
@@ -101,6 +108,11 @@ namespace ExperienceAndClasses.Systems {
         public Systems.Ability.IDs[] AbilitiesID { get; protected set; } = Enumerable.Repeat(Systems.Ability.IDs.NONE, ExperienceAndClasses.NUMBER_ABILITY_SLOTS_PER_CLASS).ToArray();
         public Systems.Ability.IDs[] AbilitiesID_Alt { get; protected set; } = Enumerable.Repeat(Systems.Ability.IDs.NONE, ExperienceAndClasses.NUMBER_ABILITY_SLOTS_PER_CLASS).ToArray();
         public Color Colour { get; protected set; } = COLOUR_DEFAULT;
+        protected IMPLEMENTATION_STATUS implementation_status = IMPLEMENTATION_STATUS.UNKNOWN;
+        public string Tooltip_Main { get; private set; } = "Undefined_Tooltip";
+        public string Tooltip_Title { get; private set; } = "Undefined_Tooltip_Title";
+        public string Tooltip_Attribute_Growth { get; private set; } = "Undefined_Tooltip_Attribute_Growth";
+
 
         public Class(IDs id) {
             //defaults
@@ -108,7 +120,8 @@ namespace ExperienceAndClasses.Systems {
             ID_num = (byte)id;
         }
 
-        public void LoadTexture() {
+        public void LoadTextureAndSetTooltip() {
+            //load texture
             if (Has_Texture) {
                 Texture = ModLoader.GetTexture("ExperienceAndClasses/Textures/Class/" + Name);
             }
@@ -116,6 +129,46 @@ namespace ExperienceAndClasses.Systems {
                 //no texture loaded, set blank
                 Texture = Utilities.Textures.TEXTURE_CLASS_DEFAULT;
             }
+
+            //set tooltip title
+            Tooltip_Title = Name;
+            if (ID_num == (byte)Systems.Class.IDs.Explorer) {
+                Tooltip_Title += " [Unique]";
+            }
+            else {
+                Tooltip_Title += " [Tier " + new string('I', Tier) + "]";
+            }
+
+            //set tooltip
+            Tooltip_Main += Description + "\n\n" + "POWER SCALING:\nPrimary:   " + Power_Scaling.Primary_Types + "\nSecondary: " + Power_Scaling.Secondary_Types + "\n\nATTRIBUTES:";
+
+            //attributes
+            bool first = true;
+            string attribute_names = "";
+            Tooltip_Attribute_Growth = "";
+            foreach (byte id in Systems.Attribute.ATTRIBUTES_UI_ORDER) {
+                if (first) {
+                    first = false;
+                }
+                else {
+                    attribute_names += "\n";
+                    Tooltip_Attribute_Growth += "\n";
+                }
+                attribute_names += Systems.Attribute.LOOKUP[id].Specifc_Name + ":";
+
+                for (byte i = 0; i < 5; i++) {
+                    if (Attribute_Growth[id] >= (i + 1)) {
+                        Tooltip_Attribute_Growth += "★";
+                    }
+                    else if (Attribute_Growth[id] > i) {
+                        Tooltip_Attribute_Growth += "✯";
+                    }
+                    else {
+                        Tooltip_Attribute_Growth += "☆";
+                    }
+                }
+            }
+            Tooltip_Main += "\n" + attribute_names;
         }
 
         /// <summary>
@@ -535,6 +588,7 @@ namespace ExperienceAndClasses.Systems {
                 Attribute_Growth[(byte)Attribute.IDs.Agility] = 2f;
                 Attribute_Growth[(byte)Attribute.IDs.Dexterity] = 2f;
                 Colour = COLOUR_NONCOMBAT;
+                implementation_status = IMPLEMENTATION_STATUS.ATTRIBUTE_ONLY;
             }
         }
 
@@ -545,6 +599,7 @@ namespace ExperienceAndClasses.Systems {
                 Description = "TODO_desc";
                 Class_Locations[0, 3] = ID_num;
                 Colour = COLOUR_NOVICE;
+                implementation_status = IMPLEMENTATION_STATUS.COMPLETE;
             }
         }
 
@@ -560,6 +615,7 @@ namespace ExperienceAndClasses.Systems {
                 Attribute_Growth[(byte)Attribute.IDs.Dexterity] = 2;
                 Colour = COLOUR_CLOSE_RANGE_2;
                 AbilitiesID[0] = Systems.Ability.IDs.Warrior_Block;
+                implementation_status = IMPLEMENTATION_STATUS.ATTRIBUTE_ONLY;
             }
         }
 
@@ -572,6 +628,7 @@ namespace ExperienceAndClasses.Systems {
                 Attribute_Growth[(byte)Attribute.IDs.Spirit] = 2;
                 Attribute_Growth[(byte)Attribute.IDs.Dexterity] = 2;
                 Colour = COLOUR_PROJECTILE_2;
+                implementation_status = IMPLEMENTATION_STATUS.ATTRIBUTE_ONLY;
             }
         }
 
@@ -585,6 +642,7 @@ namespace ExperienceAndClasses.Systems {
                 Attribute_Growth[(byte)Attribute.IDs.Mind] = 2;
                 Attribute_Growth[(byte)Attribute.IDs.Agility] = 2;
                 Colour = COLOUR_UTILITY_2;
+                implementation_status = IMPLEMENTATION_STATUS.ATTRIBUTE_ONLY;
             }
         }
 
@@ -596,6 +654,7 @@ namespace ExperienceAndClasses.Systems {
                 Attribute_Growth[(byte)Attribute.IDs.Spirit] = 3;
                 Attribute_Growth[(byte)Attribute.IDs.Agility] = 3;
                 Colour = COLOUR_TRICKERY_2;
+                implementation_status = IMPLEMENTATION_STATUS.ATTRIBUTE_ONLY;
             }
         }
 
@@ -607,6 +666,7 @@ namespace ExperienceAndClasses.Systems {
                 Attribute_Growth[(byte)Attribute.IDs.Power] = 3;
                 Attribute_Growth[(byte)Attribute.IDs.Spirit] = 3;
                 Colour = COLOUR_MINION_2;
+                implementation_status = IMPLEMENTATION_STATUS.ATTRIBUTE_ONLY;
             }
         }
 
@@ -618,6 +678,7 @@ namespace ExperienceAndClasses.Systems {
                 Attribute_Growth[(byte)Attribute.IDs.Mind] = 3;
                 Attribute_Growth[(byte)Attribute.IDs.Spirit] = 3;
                 Colour = COLOUR_SUPPORT_2;
+                implementation_status = IMPLEMENTATION_STATUS.ATTRIBUTE_ONLY;
             }
         }
 
@@ -633,6 +694,7 @@ namespace ExperienceAndClasses.Systems {
                 Attribute_Growth[(byte)Attribute.IDs.Agility] = 2;
                 Attribute_Growth[(byte)Attribute.IDs.Dexterity] = 2;
                 Colour = COLOUR_HYBRID_2;
+                implementation_status = IMPLEMENTATION_STATUS.ATTRIBUTE_ONLY;
             }
         }
 
@@ -646,6 +708,7 @@ namespace ExperienceAndClasses.Systems {
                 Attribute_Growth[(byte)Attribute.IDs.Power] = 5;
                 Attribute_Growth[(byte)Attribute.IDs.Vitality] = 3;
                 Colour = COLOUR_CLOSE_RANGE_3;
+                implementation_status = IMPLEMENTATION_STATUS.ATTRIBUTE_ONLY;
             }
         }
 
@@ -659,6 +722,7 @@ namespace ExperienceAndClasses.Systems {
                 Attribute_Growth[(byte)Attribute.IDs.Agility] = 2;
                 Attribute_Growth[(byte)Attribute.IDs.Dexterity] = 4;
                 Colour = COLOUR_CLOSE_RANGE_3;
+                implementation_status = IMPLEMENTATION_STATUS.ATTRIBUTE_ONLY;
             }
         }
 
@@ -670,6 +734,7 @@ namespace ExperienceAndClasses.Systems {
                 Attribute_Growth[(byte)Attribute.IDs.Power] = 3;
                 Attribute_Growth[(byte)Attribute.IDs.Vitality] = 5;
                 Colour = COLOUR_CLOSE_RANGE_3;
+                implementation_status = IMPLEMENTATION_STATUS.ATTRIBUTE_ONLY;
             }
         }
 
@@ -681,6 +746,7 @@ namespace ExperienceAndClasses.Systems {
                 Attribute_Growth[(byte)Attribute.IDs.Power] = 4;
                 Attribute_Growth[(byte)Attribute.IDs.Spirit] = 4;
                 Colour = COLOUR_PROJECTILE_3;
+                implementation_status = IMPLEMENTATION_STATUS.ATTRIBUTE_ONLY;
             }
         }
 
@@ -694,6 +760,7 @@ namespace ExperienceAndClasses.Systems {
                 Attribute_Growth[(byte)Attribute.IDs.Spirit] = 2;
                 Attribute_Growth[(byte)Attribute.IDs.Dexterity] = 2;
                 Colour = COLOUR_PROJECTILE_3;
+                implementation_status = IMPLEMENTATION_STATUS.ATTRIBUTE_ONLY;
             }
         }
 
@@ -707,6 +774,7 @@ namespace ExperienceAndClasses.Systems {
                 Attribute_Growth[(byte)Attribute.IDs.Mind] = 2;
                 Attribute_Growth[(byte)Attribute.IDs.Agility] = 3;
                 Colour = COLOUR_UTILITY_3;
+                implementation_status = IMPLEMENTATION_STATUS.ATTRIBUTE_ONLY;
             }
         }
 
@@ -719,6 +787,7 @@ namespace ExperienceAndClasses.Systems {
                 Attribute_Growth[(byte)Attribute.IDs.Dexterity] = 2;
                 Attribute_Growth[(byte)Attribute.IDs.Agility] = 4;
                 Colour = COLOUR_TRICKERY_3;
+                implementation_status = IMPLEMENTATION_STATUS.ATTRIBUTE_ONLY;
             }
         }
 
@@ -731,6 +800,7 @@ namespace ExperienceAndClasses.Systems {
                 Attribute_Growth[(byte)Attribute.IDs.Spirit] = 4;
                 Attribute_Growth[(byte)Attribute.IDs.Agility] = 3;
                 Colour = COLOUR_TRICKERY_3;
+                implementation_status = IMPLEMENTATION_STATUS.ATTRIBUTE_ONLY;
             }
         }
 
@@ -743,6 +813,7 @@ namespace ExperienceAndClasses.Systems {
                 Attribute_Growth[(byte)Attribute.IDs.Spirit] = 2;
                 Attribute_Growth[(byte)Attribute.IDs.Dexterity] = 5;
                 Colour = COLOUR_PROJECTILE_3;
+                implementation_status = IMPLEMENTATION_STATUS.ATTRIBUTE_ONLY;
             }
         }
 
@@ -755,6 +826,7 @@ namespace ExperienceAndClasses.Systems {
                 Attribute_Growth[(byte)Attribute.IDs.Mind] = 2;
                 Attribute_Growth[(byte)Attribute.IDs.Spirit] = 2;
                 Colour = COLOUR_MINION_3;
+                implementation_status = IMPLEMENTATION_STATUS.ATTRIBUTE_ONLY;
             }
         }
 
@@ -766,6 +838,7 @@ namespace ExperienceAndClasses.Systems {
                 Attribute_Growth[(byte)Attribute.IDs.Power] = 4;
                 Attribute_Growth[(byte)Attribute.IDs.Spirit] = 4;
                 Colour = COLOUR_MINION_3;
+                implementation_status = IMPLEMENTATION_STATUS.ATTRIBUTE_ONLY;
             }
         }
 
@@ -777,6 +850,7 @@ namespace ExperienceAndClasses.Systems {
                 Attribute_Growth[(byte)Attribute.IDs.Mind] = 3;
                 Attribute_Growth[(byte)Attribute.IDs.Spirit] = 5;
                 Colour = COLOUR_SUPPORT_3;
+                implementation_status = IMPLEMENTATION_STATUS.ATTRIBUTE_ONLY;
             }
         }
 
@@ -792,6 +866,7 @@ namespace ExperienceAndClasses.Systems {
                 Attribute_Growth[(byte)Attribute.IDs.Agility] = 2.5f;
                 Attribute_Growth[(byte)Attribute.IDs.Dexterity] = 2.5f;
                 Colour = COLOUR_HYBRID_3;
+                implementation_status = IMPLEMENTATION_STATUS.ATTRIBUTE_ONLY;
             }
         }
 

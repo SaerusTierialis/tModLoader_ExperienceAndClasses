@@ -46,7 +46,7 @@ namespace ExperienceAndClasses.Items {
 
     public class Unlock_Subclass : Unlock {
         private const string NAME = "Subclass Token";
-        private const string TOOLTIP = "A token that is used to unlock the Subclass system. Right click on any class icon to open the unlock diaglogue.";
+        private const string TOOLTIP = "A token that is used to unlock the Subclass system. Right click on any class icon to open the unlock diaglogue. This unlock is performed just once rather than per class.";
         private const string TEXTURE = "ExperienceAndClasses/Textures/Item/Unlock_Subclass";
         private const int RARITY = -12;
 
