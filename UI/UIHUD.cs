@@ -166,10 +166,17 @@ namespace ExperienceAndClasses.UI {
                     }
                 }
 
-                //create Abilities_Summary_For_UIHUD
+                //create ability list
                 List<Systems.Ability> abilities = new List<Systems.Ability>();
                 for (int i = 0; i < ExperienceAndClasses.NUMBER_ABILITY_SLOTS_PER_CLASS; i++) {
-                    foreach (Systems.Ability ability in new Systems.Ability[] { local.Abilities_Primary[i], local.Abilities_Primary_Alt[i], local.Abilities_Secondary[i], local.Abilities_Secondary_Alt[i] }) {
+                    foreach (Systems.Ability ability in new Systems.Ability[] { local.Abilities_Primary[i], local.Abilities_Primary_Alt[i] }) {
+                        if (ability != null && ability.Unlocked && !abilities.Contains(ability)) {
+                            abilities.Add(ability);
+                        }
+                    }
+                }
+                for (int i = 0; i < ExperienceAndClasses.NUMBER_ABILITY_SLOTS_PER_CLASS; i++) {
+                    foreach (Systems.Ability ability in new Systems.Ability[] { local.Abilities_Secondary[i], local.Abilities_Secondary_Alt[i] }) {
                         if (ability != null && ability.Unlocked && !abilities.Contains(ability)) {
                             abilities.Add(ability);
                         }
