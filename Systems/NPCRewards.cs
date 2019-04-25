@@ -11,7 +11,7 @@ namespace ExperienceAndClasses.Systems {
         private const long TICKS_PER_XP_SEND = (long)(TimeSpan.TicksPerSecond * 0.5);
 
         //range for reward eligibility
-        private const float RANGE_ELIGIBLE = 2500f;
+        private const float RANGE_ELIGIBLE = 1000f;
 
         //rewards are increased prior to division based on the number of eligable players 
         private const double PER_PLAYER_MODIFIER = 0.2;
