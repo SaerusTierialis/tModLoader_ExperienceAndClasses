@@ -50,7 +50,7 @@ namespace ExperienceAndClasses.Systems {
         /// <summary>
         /// default is none
         /// </summary>
-        public Systems.Class.IDs Specific_Required_Class_ID { get; protected set; } = Systems.Class.IDs.None;
+        public Systems.Class.IDs Specific_Required_Class_ID { get; protected set; } = Systems.Class.IDs.New;
         public byte Specific_Required_Class_Level { get; protected set; } = 0;
 
         /// <summary>
