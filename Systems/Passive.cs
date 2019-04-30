@@ -122,6 +122,11 @@ namespace ExperienceAndClasses.Systems {
             bool correct_class = false;
             Unlocked = false;
 
+            //unobtainable
+            if (Specific_Required_Class_ID == Class.IDs.New) {
+                return false;
+            }
+
             //check primary
             Systems.Class c = ExperienceAndClasses.LOCAL_MPLAYER.Class_Primary;
             if (c.ID == Specific_Required_Class_ID) {
