@@ -878,7 +878,10 @@ namespace ExperienceAndClasses {
                 multiplier += use_speed_weapon;
             }
 
-            return base.UseTimeMultiplier(item) * multiplier;
+            //don't increase to the point that use time would be < 1
+            multiplier = Math.Min((base.UseTimeMultiplier(item) * multiplier), item.useTime);
+
+            return multiplier;
         }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Custom Damage Bonuses ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
