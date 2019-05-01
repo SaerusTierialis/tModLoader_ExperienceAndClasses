@@ -72,6 +72,8 @@ namespace ExperienceAndClasses.UI {
                 "More/Less are true multipliers. These multiply the final damage and therefore scale further with any increases/decreases. For example, if you have 50% increased damage and 30% more damage then you will deal 195% damage (150% * 1.3). Another example, if you have 30% more damage and 30% less damage then you will deal 100% damage.\n\n" + 
                 "When the type of bonus is unspecified, it is an increase/decrease. The More/Less type is uncommon.", ref sorted_items);
             AddHelpTextPanel("Custom Weapon Types", "Weapon types added by other mods ARE affected by this mod.", ref sorted_items);
+            AddHelpTextPanel("Legacy Conversion", "Items from versions prior to 2.0 are automatically converted to new items when entering a world. This applies only to items in the inventory and not to equipped items. The conversion may fail if the inventory is full in which case you would need to make some room and enter a world again.\n\n" +
+                "XP from versions prior to 2.0 is carried over and can be redistributed to any class with a button in the main interface. The button is removed when all XP has been distributed. If you switch back to a pre-2.0 version, your old XP will still be intact.", ref sorted_items);
 
             help = sorted_items.Values.ToList();
 
