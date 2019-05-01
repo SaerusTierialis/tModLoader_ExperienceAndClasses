@@ -1284,14 +1284,29 @@ namespace ExperienceAndClasses {
             Progression = player_progression;
         }
 
-        public bool UseMana(int cost) {
+        public bool UseMana(int cost, bool regen_delay = true) {
+            //mana flower: use potion if it makes the difference
+            if ((Main.LocalPlayer.statMana < cost) && Main.LocalPlayer.manaFlower) {
+                Item mana_item = Main.LocalPlayer.QuickMana_GetItemToUse();
+                if (mana_item != null) {
+                    if ((Main.LocalPlayer.statMana + mana_item.healMana) >= cost) {
+                        player.QuickMana();
+                    }
+                }
+            }
+
             if (player.statMana >= cost) {
+                //take mana (has enough)
                 player.statMana -= cost;
+                if (player.statMana < 0) player.statMana = 0;
                 player.netMana = true;
-                player.manaRegenDelay = Math.Min(200, player.manaRegenDelay + 50);
+                if (regen_delay) {
+                    player.manaRegenDelay = Math.Min(200, player.manaRegenDelay + 50);
+                }
                 return true;
             }
             else {
+                //not enough mana
                 return false;
             }
         }

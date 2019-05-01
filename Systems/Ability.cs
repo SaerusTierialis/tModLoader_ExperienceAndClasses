@@ -705,7 +705,14 @@ namespace ExperienceAndClasses.Systems {
             }
 
             //cost mana (calculates for use later in activation)
-            if (Main.LocalPlayer.statMana < CalculateManaCost()) {
+            int mana_available = Main.LocalPlayer.statMana;
+            if (Main.LocalPlayer.manaFlower && !Main.LocalPlayer.manaSick) {
+                Item mana_item = Main.LocalPlayer.QuickMana_GetItemToUse();
+                if (mana_item != null) {
+                    mana_available += mana_item.healMana;
+                }
+            }
+            if (mana_available < CalculateManaCost()) {
                 return USE_RESULT.FAIL_NOT_ENOUGH_MANA;
             }
 
