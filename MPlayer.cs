@@ -598,6 +598,7 @@ namespace ExperienceAndClasses {
                 else {
                     Main.PlaySound(SoundID.MenuOpen);
                 }
+                UI.UIHelpSettings.Instance.Visibility = false;
                 UI.UIMain.Instance.Visibility = !UI.UIMain.Instance.Visibility;
             }
 
