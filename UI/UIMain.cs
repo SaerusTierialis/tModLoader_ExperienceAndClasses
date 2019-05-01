@@ -124,6 +124,7 @@ namespace ExperienceAndClasses.UI {
             //old xp button
             old_xp_button = new TextButton("Apply Pre-Revamp XP", FONT_SCALE_ATTRIBUTE, FONT_SCALE_ATTRIBUTE + 0.1f);
             old_xp_button.OnClick += new UIElement.MouseEvent(ClickPreRevampXP);
+            old_xp_button.OnMouseOver += new UIElement.MouseEvent(MouseOverPreRevampXP);
             old_xp_button.HAlign = 1f;
             old_xp_button.VAlign = 1f;
             old_xp_button.Left.Set(old_xp_button.Left.Pixels - (Constants.UI_PADDING * 2f), 0f);
@@ -442,11 +443,21 @@ namespace ExperienceAndClasses.UI {
                     old_modplayer.SpendXP(xp_to_apply);
                     Systems.XP.Adjusting.LocalAddXP(xp_to_apply, false);
 
-                    Main.NewText(xp_to_apply + " XP has been applied! " + old_modplayer.GetXPAvailable() + " Pre-Revamp XP remains.");
+                    Main.NewText(xp_to_apply + " legacy experience has been redistribution! " + old_modplayer.GetXPAvailable() + " remains.");
 
                 }
                 else {
                     Main.NewText("Cannot currently gain XP!");
+                }
+            }
+        }
+
+        private void MouseOverPreRevampXP(UIMouseEvent evt, UIElement listeningElement) {
+            if (old_xp_button.visible) {
+                Systems.Legacy.MyPlayer old_modplayer = Main.LocalPlayer.GetModPlayer<Systems.Legacy.MyPlayer>();
+                double xp_available = old_modplayer.GetXPAvailable();
+                if (xp_available > 0) {
+                    Main.NewText(xp_available + " legacy experience is available for redistribution.");
                 }
             }
         }
