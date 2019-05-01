@@ -38,6 +38,7 @@ namespace ExperienceAndClasses.Systems {
             Saint,
             HybridPrime,
             Explorer,
+            Oracle,
 
             //insert here
 
@@ -866,6 +867,19 @@ namespace ExperienceAndClasses.Systems {
                 Name = "Saint";
                 Description = "TODO_desc";
                 Class_Locations[2, 5] = ID_num;
+                Attribute_Growth[(byte)Attribute.IDs.Power] = 2;
+                Attribute_Growth[(byte)Attribute.IDs.Mind] = 3;
+                Attribute_Growth[(byte)Attribute.IDs.Spirit] = 4;
+                Colour = COLOUR_SUPPORT_3;
+                implementation_status = IMPLEMENTATION_STATUS.ATTRIBUTE_ONLY;
+            }
+        }
+
+        public class Oracle : Tier3 {
+            public Oracle() : base(IDs.Oracle, PowerScaling.IDs.Holy_AllCore, IDs.Cleric) {
+                Name = "Oracle";
+                Description = "TODO_desc";
+                Class_Locations[3, 5] = ID_num;
                 Attribute_Growth[(byte)Attribute.IDs.Mind] = 3;
                 Attribute_Growth[(byte)Attribute.IDs.Spirit] = 5;
                 Colour = COLOUR_SUPPORT_3;
