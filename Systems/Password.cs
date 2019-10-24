@@ -27,7 +27,7 @@ namespace ExperienceAndClasses.Systems {
 
         public static void UpdateLocalPassword() {
             if (Shortcuts.IS_PLAYER) {
-                string password_new = GetInstance<ConfigClient>().Password;
+                string password_new = Shortcuts.GetConfigClient.Password;
 
                 if (Shortcuts.IS_SINGLEPLAYER) {
                     if (password_new != world_password) {
@@ -38,7 +38,7 @@ namespace ExperienceAndClasses.Systems {
                 else if (Shortcuts.IS_CLIENT && Shortcuts.LOCAL_PLAYER_VALID) {
                     if (password_new != Shortcuts.LOCAL_PLAYER.password) {
                         Shortcuts.LOCAL_PLAYER.password = password_new;
-                        Utilities.PacketHandler.ClientPassword.Send();
+                        Utilities.PacketHandler.ClientPassword.Send(-1, Shortcuts.WHO_AM_I, Shortcuts.LOCAL_PLAYER.password);
                     }
                 }
             }

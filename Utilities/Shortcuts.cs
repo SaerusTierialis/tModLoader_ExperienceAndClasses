@@ -2,6 +2,7 @@
 using Terraria.ID;
 using Terraria.Localization;
 using Terraria.ModLoader;
+using static Terraria.ModLoader.ModContent;
 
 namespace ExperienceAndClasses {
     class Shortcuts {
@@ -22,6 +23,12 @@ namespace ExperienceAndClasses {
         //ModPlayer
         public static EACPlayer LOCAL_PLAYER { get; private set; }
         public static bool LOCAL_PLAYER_VALID { get; private set; }
+
+        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Shortcuts ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+        //shortcuts to config so I don't have to keep adding ModContent
+        public static ConfigClient GetConfigClient { get { return GetInstance<ConfigClient>(); } }
+        public static ConfigServer GetConfigServer { get { return GetInstance<ConfigServer>(); } }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Methods ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -73,7 +80,7 @@ namespace ExperienceAndClasses {
         public static void LocalPlayerSet(EACPlayer eacplayer) {
             LOCAL_PLAYER = eacplayer;
             LOCAL_PLAYER_VALID = true;
-            WHO_AM_I = eacplayer.player.whoAmI;
+            WHO_AM_I = LOCAL_PLAYER.player.whoAmI;
         }
 
     }

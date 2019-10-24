@@ -21,12 +21,44 @@ namespace ExperienceAndClasses {
     class ConfigServer : ModConfig {
         public override ConfigScope Mode => ConfigScope.ServerSide;
 
+        [Header("$Mods.ExperienceAndClasses.Common.Config_Header_XP")]
+
+        [Label("$Mods.ExperienceAndClasses.Common.Config_XP_Rate_Label")]
+        [Range(0f,10f)]
+        [Increment(.05f)]
+        [DefaultValue(1f)]
+        public float XPRate { get; set; } //TODO - unused
+
+        [Label("$Mods.ExperienceAndClasses.Common.Config_XP_DeathPenalty_Label")]
+        [Range(0f, 1f)]
+        [Increment(.01f)]
+        [DefaultValue(0.05f)]
+        public float XPDeathPenalty { get; set; } //TODO - unused
+
+        [Label("$Mods.ExperienceAndClasses.Common.Config_XP_ModPerPlayer_Label")]
+        [Tooltip("$Mods.ExperienceAndClasses.Common.Config_XP_ModPerPlayer_Tooltip")]
+        [Range(0f, 1f)]
+        [Increment(0.01f)]
+        [DefaultValue(0.2f)]
+        public float XPModPerPlayer { get; set; } //TODO - unused
+
+        [Label("$Mods.ExperienceAndClasses.Common.Config_XP_Distance_Label")]
+        [Tooltip("$Mods.ExperienceAndClasses.Common.Config_XP_Distance_Tooltip")]
+        [Range(500f, 10000f)]
+        [Increment(100f)]
+        [DefaultValue(1000f)]
+        public float RewardDistance { get; set; } //TODO - unused
+
+
+
         [Header("$Mods.ExperienceAndClasses.Common.Config_Header_Debug")]
 
         [Label("$Mods.ExperienceAndClasses.Common.Config_Trace_Label")]
         [Tooltip("$Mods.ExperienceAndClasses.Common.Config_Trace_Tooltip")]
         [DefaultValue(true)]
         public bool PacketTrace { get; set; }
+
+
 
         public override bool AcceptClientChanges(ModConfig pendingConfig, int whoAmI, ref string message) {
             if (Systems.Password.PlayerHasAccess(whoAmI)) {
@@ -51,15 +83,15 @@ namespace ExperienceAndClasses {
 
         [Label("$Mods.ExperienceAndClasses.Common.Config_UIDrag_Label")]
         [DefaultValue(true)]
-        public bool UIMain_Drag; //TODO - unused
+        public bool UIMain_Drag { get; set; } //TODO - unused
 
         [Label("$Mods.ExperienceAndClasses.Common.Config_UIAutoMode_Label")]
         [DefaultValue(UIAutoMode.InventoryOpen)]
         [DrawTicks]
-        public UIAutoMode UIMain_AutoMode; //TODO - unused
+        public UIAutoMode UIMain_AutoMode { get; set; } //TODO - unused
 
         [Label("$Mods.ExperienceAndClasses.Common.Config_UIPosition_Label")]
-        public int[] UIMain_Position = new int[] { 100 , 100 }; //TODO - unused
+        public int[] UIMain_Position { get; set; } = new int[] { 100 , 100 }; //TODO - unused
 
 
 
@@ -67,15 +99,15 @@ namespace ExperienceAndClasses {
 
         [Label("$Mods.ExperienceAndClasses.Common.Config_UIDrag_Label")]
         [DefaultValue(true)]
-        public bool UIHUD_Drag = true; //TODO - unused
+        public bool UIHUD_Drag { get; set; } = true; //TODO - unused
 
         [Label("$Mods.ExperienceAndClasses.Common.Config_UIAutoMode_Label")]
         [DefaultValue(UIAutoMode.Always)]
         [DrawTicks]
-        public UIAutoMode UIHUD_AutoMode; //TODO - unused
+        public UIAutoMode UIHUD_AutoMode { get; set; } //TODO - unused
 
         [Label("$Mods.ExperienceAndClasses.Common.Config_UIPosition_Label")]
-        public int[] UIHUD_Position = new int[] { 50, 50 }; //TODO - unused
+        public int[] UIHUD_Position { get; set; } = new int[] { 50, 50 }; //TODO - unused
 
 
 

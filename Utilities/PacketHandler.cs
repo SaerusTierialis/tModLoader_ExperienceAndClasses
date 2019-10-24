@@ -51,7 +51,7 @@ namespace ExperienceAndClasses.Utilities {
             public void Recieve(BinaryReader reader, int origin) {
                 //do not read anything from reader here (called multiple times when processing full sync packet)
 
-                bool do_trace = GetInstance<ConfigServer>().PacketTrace;
+                bool do_trace = Shortcuts.GetConfigServer.PacketTrace;
 
                 if (do_trace) {
                     Logger.Trace("Handling " + ID + " originating from " + origin);
@@ -133,16 +133,16 @@ namespace ExperienceAndClasses.Utilities {
         public sealed class ClientPassword : Handler {
             public ClientPassword() : base(PACKET_TYPE.ClientPassword) { }
 
-            public static void Send() {
+            public static void Send(int target, int origin, string password) {
                 if (Shortcuts.IS_CLIENT) {
                     //get packet containing header
-                    ModPacket packet = LOOKUP[(byte)PACKET_TYPE.ClientPassword].GetPacket(Shortcuts.WHO_AM_I);
+                    ModPacket packet = LOOKUP[(byte)PACKET_TYPE.ClientPassword].GetPacket(origin);
 
                     //specific content
-                    packet.Write(Shortcuts.LOCAL_PLAYER.password);
+                    packet.Write(password);
 
                     //send
-                    packet.Send(-1, Shortcuts.WHO_AM_I);
+                    packet.Send(target, origin);
                 }
             }
 

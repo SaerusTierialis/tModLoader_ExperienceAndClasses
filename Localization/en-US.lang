@@ -1,3 +1,13 @@
+//Generic
+Common.XP=XP
+Common.experience=experience
+Common.Experience=Experience
+Common.orb=orbs
+Common.Orb=Orb
+Common.orbs=orbs
+Common.Orbs=Orbs
+
+
 //Mod Name
 Common.Mod_Name = ExperienceAndClasses
 
@@ -13,7 +23,20 @@ Common.Password_Command_Description=Check or set the world password ({$Mods.Expe
 
 
 //ConfigServer
+Common.Config_Header_XP={$Mods.ExperienceAndClasses.Common.Experience} and {$Mods.ExperienceAndClasses.Common.Orbs}
 Common.Config_Header_Debug=Debug
+
+Common.Config_XP_Rate_Label={$Mods.ExperienceAndClasses.Common.XP} Multiplier
+
+Common.Config_XP_DeathPenalty_Label={$Mods.ExperienceAndClasses.Common.XP} Death Penalty
+
+Common.Config_XP_ModPerPlayer_Label=Multiplayer Bonus {$Mods.ExperienceAndClasses.Common.XP} Multiplier Per Player
+Common.Config_XP_ModPerPlayer_Tooltip=Per player bonus to apply before splitting {$Mods.ExperienceAndClasses.Common.XP}
+
+Common.Config_XP_Distance_Label=Multiplayer Reward Distance
+Common.Config_XP_Distance_Tooltip=Distance to recieve rewards in multiplayer
+
+
 
 Common.Config_Trace_Label=Packet Trace
 Common.Config_Trace_Tooltip=Log packet trace messages for multiplayer debugging.
