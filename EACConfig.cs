@@ -51,15 +51,15 @@ namespace ExperienceAndClasses {
 
         [Label("$Mods.ExperienceAndClasses.Common.Config_UIDrag_Label")]
         [DefaultValue(true)]
-        public bool UIMain_Drag;
+        public bool UIMain_Drag; //TODO - unused
 
         [Label("$Mods.ExperienceAndClasses.Common.Config_UIAutoMode_Label")]
         [DefaultValue(UIAutoMode.InventoryOpen)]
         [DrawTicks]
-        public UIAutoMode UIMain_AutoMode;
+        public UIAutoMode UIMain_AutoMode; //TODO - unused
 
         [Label("$Mods.ExperienceAndClasses.Common.Config_UIPosition_Label")]
-        public int[] UIMain_Position = new int[] { 100 , 100 };
+        public int[] UIMain_Position = new int[] { 100 , 100 }; //TODO - unused
 
 
 
@@ -67,15 +67,16 @@ namespace ExperienceAndClasses {
 
         [Label("$Mods.ExperienceAndClasses.Common.Config_UIDrag_Label")]
         [DefaultValue(true)]
-        public bool UIHUD_Drag = true;
+        public bool UIHUD_Drag = true; //TODO - unused
 
         [Label("$Mods.ExperienceAndClasses.Common.Config_UIAutoMode_Label")]
         [DefaultValue(UIAutoMode.Always)]
         [DrawTicks]
-        public UIAutoMode UIHUD_AutoMode;
+        public UIAutoMode UIHUD_AutoMode; //TODO - unused
 
         [Label("$Mods.ExperienceAndClasses.Common.Config_UIPosition_Label")]
-        public int[] UIHUD_Position = new int[] { 50, 50 };
+        public int[] UIHUD_Position = new int[] { 50, 50 }; //TODO - unused
+
 
 
         [Header("$Mods.ExperienceAndClasses.Common.Config_Header_Permissions")]
