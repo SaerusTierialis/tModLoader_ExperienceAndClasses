@@ -10,7 +10,7 @@ using static Terraria.ModLoader.ModContent;
 namespace ExperienceAndClasses {
     class EACPlayer : ModPlayer {
 
-        public bool Is_Local_Player { get; private set; };
+        public bool Is_Local_Player { get; private set; }
         public string password;
 
         public override void Initialize() {
