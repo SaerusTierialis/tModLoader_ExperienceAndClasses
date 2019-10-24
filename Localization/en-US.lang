@@ -1,11 +1,16 @@
-Common.Hotkey_UI=Toggle UI
-
 //Mod Name
 Common.Mod_Name = ExperienceAndClasses
+
+
+//Hotkeys
+Common.Hotkey_UI=Toggle UI
+
 
 //Password System
 Common.Password_Display=The world password ({$Mods.ExperienceAndClasses.Common.Mod_Name}) is
 Common.Password_Command_Description=Check or set the world password ({$Mods.ExperienceAndClasses.Common.Mod_Name})
+
+
 
 //ConfigServer
 Common.Config_Header_Debug=Debug
@@ -13,9 +18,16 @@ Common.Config_Header_Debug=Debug
 Common.Config_Trace_Label=Packet Trace
 Common.Config_Trace_Tooltip=Log packet trace messages for multiplayer debugging.
 
+
+
 //ConfigClient
-Common.Config_Header_UI=Interface
-Common.Config_Header_Permissions=Permissions
+Common.Config_Header_UIMain=Main Interface
+Common.Config_Header_UIHUD=HUD
+Common.Config_Header_Permissions=Multiplayer Authentication
+
+Common.Config_UIDrag_Label=Right Click and Drag to Move
+Common.Config_UIAutoMode_Label=Display Mode
+Common.Config_UIPosition_Label=Position
 
 Common.Config_Password_Label=Password
 Common.Config_Password_Tooltip=Server settings can be adjusted during multiplayer\nif your client password matches the world's password.\nPlaying a world in singleplayer sets its password to\nthe client password. The console command eac_password\ncan also be used to set the password during multiplayer.

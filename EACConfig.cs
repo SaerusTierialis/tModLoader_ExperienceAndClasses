@@ -28,11 +28,6 @@ namespace ExperienceAndClasses {
         [DefaultValue(true)]
         public bool PacketTrace { get; set; }
 
-        [Label("TEST")]
-        [Tooltip("TEST")]
-        [DefaultValue(true)]
-        public bool Test { get; set; }
-
         public override bool AcceptClientChanges(ModConfig pendingConfig, int whoAmI, ref string message) {
             if (Systems.Password.PlayerHasAccess(whoAmI)) {
                 return true;
@@ -52,6 +47,37 @@ namespace ExperienceAndClasses {
     class ConfigClient : ModConfig {
         public override ConfigScope Mode => ConfigScope.ClientSide;
 
+        [Header("$Mods.ExperienceAndClasses.Common.Config_Header_UIMain")]
+
+        [Label("$Mods.ExperienceAndClasses.Common.Config_UIDrag_Label")]
+        [DefaultValue(true)]
+        public bool UIMain_Drag;
+
+        [Label("$Mods.ExperienceAndClasses.Common.Config_UIAutoMode_Label")]
+        [DefaultValue(UIAutoMode.InventoryOpen)]
+        [DrawTicks]
+        public UIAutoMode UIMain_AutoMode;
+
+        [Label("$Mods.ExperienceAndClasses.Common.Config_UIPosition_Label")]
+        public int[] UIMain_Position = new int[] { 100 , 100 };
+
+
+
+        [Header("$Mods.ExperienceAndClasses.Common.Config_Header_UIHUD")]
+
+        [Label("$Mods.ExperienceAndClasses.Common.Config_UIDrag_Label")]
+        [DefaultValue(true)]
+        public bool UIHUD_Drag = true;
+
+        [Label("$Mods.ExperienceAndClasses.Common.Config_UIAutoMode_Label")]
+        [DefaultValue(UIAutoMode.Always)]
+        [DrawTicks]
+        public UIAutoMode UIHUD_AutoMode;
+
+        [Label("$Mods.ExperienceAndClasses.Common.Config_UIPosition_Label")]
+        public int[] UIHUD_Position = new int[] { 50, 50 };
+
+
         [Header("$Mods.ExperienceAndClasses.Common.Config_Header_Permissions")]
 
         [Label("$Mods.ExperienceAndClasses.Common.Config_Password_Label")]
@@ -59,9 +85,22 @@ namespace ExperienceAndClasses {
         [DefaultValue("")]
         public string Password { get; set; }
 
+
+
         public override void OnChanged() {
+            //TODO - redraw UI
+
+
+            //update password
             Systems.Password.UpdateLocalPassword();
         }
+    }
+
+    public enum UIAutoMode {
+        Never,
+        InventoryOpen,
+        InventoryClosed,
+        Always
     }
 
 }
