@@ -21,6 +21,7 @@ namespace ExperienceAndClasses {
     class ConfigServer : ModConfig {
         public override ConfigScope Mode => ConfigScope.ServerSide;
 
+        //Rewards
         [Header("$Mods.ExperienceAndClasses.Common.Config_Header_XP")]
 
         [Label("$Mods.ExperienceAndClasses.Common.Config_XP_Rate_Label")]
@@ -42,15 +43,32 @@ namespace ExperienceAndClasses {
         [DefaultValue(0.2f)]
         public float XPModPerPlayer { get; set; } //TODO - unused
 
-        [Label("$Mods.ExperienceAndClasses.Common.Config_XP_Distance_Label")]
-        [Tooltip("$Mods.ExperienceAndClasses.Common.Config_XP_Distance_Tooltip")]
-        [Range(500f, 10000f)]
+        [Label("$Mods.ExperienceAndClasses.Common.Config_Reward_Distance_Label")]
+        [Tooltip("$Mods.ExperienceAndClasses.Common.Config_Reward_Distance_Tooltip")]
+        [Range(0f, 10000f)]
         [Increment(100f)]
         [DefaultValue(1000f)]
         public float RewardDistance { get; set; } //TODO - unused
 
 
 
+        //AFK
+        [Header("$Mods.ExperienceAndClasses.Common.Config_Header_AFK")]
+
+        [Label("$Mods.ExperienceAndClasses.Common.Config_Enabled")]
+        [Tooltip("$Mods.ExperienceAndClasses.Common.Config_AFK_Enabled_Tooltip")]
+        [DefaultValue(true)]
+        public bool AFKEnabled { get; set; } //TODO - unused
+
+        [Label("$Mods.ExperienceAndClasses.Common.Config_AFK_Seconds_Label")]
+        [Tooltip("$Mods.ExperienceAndClasses.Common.Config_AFK_Seconds_Tooltip")]
+        [Range(30,1800)]
+        [DefaultValue(60)]
+        public int AFKSeconds { get; set; } //TODO - unused
+
+
+
+        //DEBUG
         [Header("$Mods.ExperienceAndClasses.Common.Config_Header_Debug")]
 
         [Label("$Mods.ExperienceAndClasses.Common.Config_Trace_Label")]
@@ -67,7 +85,7 @@ namespace ExperienceAndClasses {
             else {
                 string client_password = "";
                 if ((whoAmI >= 0) && (whoAmI < Main.maxPlayers) && (Main.player[whoAmI].active)) {
-                    client_password = Main.player[whoAmI].GetModPlayer<EACPlayer>().password;
+                    client_password = Main.player[whoAmI].GetModPlayer<EACPlayer>().FieldsSyncServer.password;
                 }
                 message = "Client password does not match world password. Password attempted:"+client_password;
                 return false;
@@ -121,8 +139,11 @@ namespace ExperienceAndClasses {
 
 
         public override void OnChanged() {
-            //TODO - redraw UI
+            //TODO - hide ui if set never (main and hud)
 
+
+            //apply new auto ui states
+            Shortcuts.SetUIAutoStates();
 
             //update password
             Systems.Password.UpdateLocalPassword();

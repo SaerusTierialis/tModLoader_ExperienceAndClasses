@@ -7,7 +7,6 @@ Common.Orb=Orb
 Common.orbs=orbs
 Common.Orbs=Orbs
 
-
 //Mod Name
 Common.Mod_Name = ExperienceAndClasses
 
@@ -21,10 +20,14 @@ Common.Password_Display=The world password ({$Mods.ExperienceAndClasses.Common.M
 Common.Password_Command_Description=Check or set the world password ({$Mods.ExperienceAndClasses.Common.Mod_Name})
 
 
+//Config Common
+Common.Config_Enabled=Enabled
+
 
 //ConfigServer
 Common.Config_Header_XP={$Mods.ExperienceAndClasses.Common.Experience} and {$Mods.ExperienceAndClasses.Common.Orbs}
 Common.Config_Header_Debug=Debug
+Common.Config_Header_AFK=Away From Keyboard
 
 Common.Config_XP_Rate_Label={$Mods.ExperienceAndClasses.Common.XP} Multiplier
 
@@ -33,10 +36,13 @@ Common.Config_XP_DeathPenalty_Label={$Mods.ExperienceAndClasses.Common.XP} Death
 Common.Config_XP_ModPerPlayer_Label=Multiplayer Bonus {$Mods.ExperienceAndClasses.Common.XP} Multiplier Per Player
 Common.Config_XP_ModPerPlayer_Tooltip=Per player bonus to apply before splitting {$Mods.ExperienceAndClasses.Common.XP}
 
-Common.Config_XP_Distance_Label=Multiplayer Reward Distance
-Common.Config_XP_Distance_Tooltip=Distance to recieve rewards in multiplayer
+Common.Config_Reward_Distance_Label=Multiplayer Reward Distance
+Common.Config_Reward_Distance_Tooltip=Distance to recieve rewards in multiplayer\nPlayers who damaged the target are eligible regardless of distance\nPlayers are always eligible for boss rewards 
 
+Common.Config_AFK_Enabled_Tooltip=AFK mode activates when no inputs have been recieved recently\nand disables the death penalty and all rewards
 
+Common.Config_AFK_Seconds_Label=Seconds to Trigger
+Common.Config_AFK_Seconds_Tooltip=Enable AFK mode after this many seconds without input
 
 Common.Config_Trace_Label=Packet Trace
 Common.Config_Trace_Tooltip=Log packet trace messages for multiplayer debugging.

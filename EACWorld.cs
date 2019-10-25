@@ -23,7 +23,7 @@ namespace ExperienceAndClasses {
         }
 
         public override void Load(TagCompound tag) {
-            Systems.Password.world_password = tag.GetString("eac_password");
+            Systems.Password.world_password = Utilities.Commons.TryGet<string>(tag, "eac_password", "");
         }
 
     }

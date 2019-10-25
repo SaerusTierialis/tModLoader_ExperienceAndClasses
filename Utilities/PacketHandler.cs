@@ -148,7 +148,7 @@ namespace ExperienceAndClasses.Utilities {
 
             protected override void RecieveBody(BinaryReader reader, int origin, EACPlayer origin_mplayer) {
                 //read and set
-                origin_mplayer.password = reader.ReadString();
+                origin_mplayer.FieldsSyncServer.password = reader.ReadString();
             }
         }
 

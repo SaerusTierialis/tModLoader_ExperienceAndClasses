@@ -19,7 +19,7 @@ namespace ExperienceAndClasses.Systems {
 
         public static bool PlayerHasAccess(int player_index) {
             if ((world_password.Length > 0) && (player_index >= 0) && (player_index < Main.maxPlayers) && (Main.player[player_index].active)) {
-                return (world_password == Main.player[player_index].GetModPlayer<EACPlayer>().password);
+                return (world_password == Main.player[player_index].GetModPlayer<EACPlayer>().FieldsSyncServer.password);
             }
             else
                 return false;
@@ -36,9 +36,9 @@ namespace ExperienceAndClasses.Systems {
                     }
                 }
                 else if (Shortcuts.IS_CLIENT && Shortcuts.LOCAL_PLAYER_VALID) {
-                    if (password_new != Shortcuts.LOCAL_PLAYER.password) {
-                        Shortcuts.LOCAL_PLAYER.password = password_new;
-                        Utilities.PacketHandler.ClientPassword.Send(-1, Shortcuts.WHO_AM_I, Shortcuts.LOCAL_PLAYER.password);
+                    if (password_new != Shortcuts.LOCAL_PLAYER.FieldsSyncServer.password) {
+                        Shortcuts.LOCAL_PLAYER.FieldsSyncServer.password = password_new;
+                        Utilities.PacketHandler.ClientPassword.Send(-1, Shortcuts.WHO_AM_I, Shortcuts.LOCAL_PLAYER.FieldsSyncServer.password);
                     }
                 }
             }

@@ -1,4 +1,5 @@
-﻿using Terraria;
+﻿using Microsoft.Xna.Framework;
+using Terraria;
 using Terraria.ID;
 using Terraria.Localization;
 using Terraria.ModLoader;
@@ -23,6 +24,10 @@ namespace ExperienceAndClasses {
         //ModPlayer
         public static EACPlayer LOCAL_PLAYER { get; private set; }
         public static bool LOCAL_PLAYER_VALID { get; private set; }
+
+        //UI
+        public static UI.UIStateCombo[] UIs = new UI.UIStateCombo[0]; //set on entering world
+        public static bool Inventory_Open { get; private set; } = false;
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Shortcuts ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -81,6 +86,43 @@ namespace ExperienceAndClasses {
             LOCAL_PLAYER = eacplayer;
             LOCAL_PLAYER_VALID = true;
             WHO_AM_I = LOCAL_PLAYER.player.whoAmI;
+        }
+
+        public static void UpdateUIs(GameTime gameTime) {
+            //inventory auto states
+            if (Inventory_Open != Main.playerInventory) {
+                SetUIAutoStates();
+            }
+
+            //update UIs
+            foreach (UI.UIStateCombo ui in UIs) {
+                ui.Update(gameTime);
+            }
+        }
+
+        public static void SetUIAutoStates() {
+            Inventory_Open = Main.playerInventory;
+
+            ConfigClient config = GetConfigClient;
+            //ApplyUIAuto(UI.UIMain.Instance, config.UIMain_AutoMode);
+            //ApplyUIAuto(UI.UIHUD.Instance, config.UIHUD_AutoMode);
+        }
+
+        public static void ApplyUIAuto(UI.UIStateCombo ui, UIAutoMode mode) {
+            switch (mode) {
+                case UIAutoMode.Always:
+                    ui.Visibility = true;
+                    break;
+                case UIAutoMode.InventoryClosed:
+                    ui.Visibility = !Inventory_Open;
+                    break;
+                case UIAutoMode.InventoryOpen:
+                    ui.Visibility = Inventory_Open;
+                    break;
+                case UIAutoMode.Never:
+                    //manual
+                    break;
+            }
         }
 
     }
