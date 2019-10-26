@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using Terraria;
@@ -8,60 +9,50 @@ using Terraria.Utilities;
 using static Terraria.ModLoader.ModContent;
 
 namespace ExperienceAndClasses {
-    class EACPlayer : ModPlayer {
+    public class EACPlayer : ModPlayer {
 
-//Fields: Local
+        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Fields ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+        public FieldsContainer Fields { get; private set; }
         /// <summary>
-        /// Local fields
+        /// A container to store fields with defaults in a way that is easy to (re)initialize
         /// </summary>
-        public FieldContainerLocal FieldsLocal { get; private set; }
-        public class FieldContainerLocal {
+        public class FieldsContainer {
             /// <summary>
-            /// True when player is the local player
+            /// Set true when local player enters world and when other players are first synced
             /// </summary>
-            public bool Is_Local_Player = false;
-        }
+            public bool initialized = false;
 
-//Fields: Synced local to server only
-        /// <summary>
-        /// Fields synced from local to server
-        /// </summary>
-        public FieldContainerSyncServer FieldsSyncServer { get; private set; }
-        public class FieldContainerSyncServer {
             /// <summary>
             /// Client password for multiplayer authentication
+            /// | Not synced between clients
             /// </summary>
             public string password = "";
-
-            /// <summary>
-            /// True while player is AFK
-            /// </summary>
-            public bool AFK = false;
         }
 
-//Fields: Synced to all
         /// <summary>
-        /// Fields synced between all
+        /// Character sheet containing classes, attributes, etc.
         /// </summary>
-        public FieldContainerSyncAll FieldsSyncAll { get; private set; }
-        public struct FieldContainerSyncAll {
+        public Systems.CharacterSheet CSheet = new Systems.CharacterSheet();
 
-        }
+        /// <summary>
+        /// Thing can be a player or an NPC and is used by the Status and Ability systems.
+        /// </summary>
+        public Utilities.Containers.Thing Thing { get; private set; }
 
-//Init
+        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Init ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         public override void Initialize() {
-            FieldsLocal = new FieldContainerLocal();
-            FieldsSyncServer = new FieldContainerSyncServer();
-            FieldsSyncAll = new FieldContainerSyncAll();
+            Fields = new FieldsContainer();
+            CSheet = new Systems.CharacterSheet();
+            Thing = new Utilities.Containers.Thing(this);
         }
 
-//Overrides
+        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Overrides ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         public override void OnEnterWorld(Player player) {
             //Update netmode
             Shortcuts.UpdateNetmode();
 
             //set local player
-            FieldsLocal.Is_Local_Player = true;
             Shortcuts.LocalPlayerSet(this);
 
             //Set world password when entering in singleplayer, send password to server when entering multiplayer
@@ -70,7 +61,39 @@ namespace ExperienceAndClasses {
             //TODO - sync class etc.
         }
 
+        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ External Methods ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+        /// <summary>
+        /// Attempt to send mana. Returns true on success.
+        /// </summary>
+        /// <param name="cost"></param>
+        /// <param name="regen_delay"></param>
+        /// <returns></returns>
+        public bool UseMana(int cost, bool regen_delay = true) {
+            //mana flower: use potion if it makes the difference
+            if ((Main.LocalPlayer.statMana < cost) && Main.LocalPlayer.manaFlower) {
+                Item mana_item = Main.LocalPlayer.QuickMana_GetItemToUse();
+                if (mana_item != null) {
+                    if ((Main.LocalPlayer.statMana + mana_item.healMana) >= cost) {
+                        player.QuickMana();
+                    }
+                }
+            }
 
+            if (player.statMana >= cost) {
+                //take mana (has enough)
+                player.statMana -= cost;
+                if (player.statMana < 0) player.statMana = 0;
+                player.netMana = true;
+                if (regen_delay) {
+                    player.manaRegenDelay = Math.Min(200, player.manaRegenDelay + 50);
+                }
+                return true;
+            }
+            else {
+                //not enough mana
+                return false;
+            }
+        }
 
     }
 }
