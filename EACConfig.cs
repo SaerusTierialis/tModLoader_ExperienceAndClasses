@@ -85,7 +85,7 @@ namespace ExperienceAndClasses {
             else {
                 string client_password = "";
                 if ((whoAmI >= 0) && (whoAmI < Main.maxPlayers) && (Main.player[whoAmI].active)) {
-                    client_password = Main.player[whoAmI].GetModPlayer<EACPlayer>().Fields.password;
+                    client_password = Main.player[whoAmI].GetModPlayer<EACPlayer>().FieldsSyncServer.password;
                 }
                 message = "Client password does not match world password. Password attempted:"+client_password;
                 return false;

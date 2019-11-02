@@ -26,14 +26,5 @@ namespace ExperienceAndClasses {
             Systems.Password.world_password = Utilities.Commons.TryGet<string>(tag, "eac_password", "");
         }
 
-        public override void PostUpdate() {
-            Systems.NPCRewards.ServerProcessXPBuffer();
-
-            if (Shortcuts.IS_SERVER) {
-                //update time if server
-                Shortcuts.UpdateTime();
-            }
-        }
-
     }
 }

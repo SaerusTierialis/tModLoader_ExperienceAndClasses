@@ -18,7 +18,7 @@ namespace ExperienceAndClasses.Utilities {
                 if (Shortcuts.IS_CLIENT) {
                     message = "TRACE from Client" + Main.LocalPlayer.whoAmI + ": " + message;
                     Main.NewText("Sending " + message, UI.Constants.COLOUR_MESSAGE_TRACE);
-                    PacketHandler.Broadcast.Send(-1, (byte)Main.LocalPlayer.whoAmI, message, PacketHandler.Broadcast.BROADCAST_TYPE.TRACE);
+                    PacketHandler.ClientBroadcast.Send(-1, (byte)Main.LocalPlayer.whoAmI, message, PacketHandler.ClientBroadcast.BROADCAST_TYPE.TRACE);
                 }
                 else {
                     Main.NewText("TRACE: " + message, UI.Constants.COLOUR_MESSAGE_TRACE);
@@ -38,7 +38,7 @@ namespace ExperienceAndClasses.Utilities {
                 if (Shortcuts.IS_CLIENT) {
                     message = "ExperienceAndClasses-ERROR from Client" + Main.LocalPlayer.whoAmI + ": " + message;
                     Main.NewText("Sending " + message, UI.Constants.COLOUR_MESSAGE_ERROR);
-                    PacketHandler.Broadcast.Send(-1, (byte)Main.LocalPlayer.whoAmI, message, PacketHandler.Broadcast.BROADCAST_TYPE.ERROR);
+                    PacketHandler.ClientBroadcast.Send(-1, (byte)Main.LocalPlayer.whoAmI, message, PacketHandler.ClientBroadcast.BROADCAST_TYPE.ERROR);
                 }
                 else {
                     Main.NewText("ExperienceAndClasses-ERROR: " + message, UI.Constants.COLOUR_MESSAGE_TRACE);

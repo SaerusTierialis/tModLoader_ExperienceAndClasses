@@ -1,5 +1,4 @@
 ﻿using Microsoft.Xna.Framework;
-using System;
 using Terraria;
 using Terraria.ID;
 using Terraria.Localization;
@@ -9,18 +8,11 @@ using static Terraria.ModLoader.ModContent;
 namespace ExperienceAndClasses {
     class Shortcuts {
 
-        //Time
-        public static DateTime Now { get; private set; }
-
         //Mod Shortcut
         public static Mod MOD { get; private set; }
 
         //Hotkeys
         public static ModHotKey HOTKEY_UI { get; private set;}
-        public const byte NUMBER_ABILITY_SLOTS_PER_CLASS = 4;
-        public static ModHotKey[] HOTKEY_ABILITY_PRIMARY = new ModHotKey[NUMBER_ABILITY_SLOTS_PER_CLASS];
-        public static ModHotKey[] HOTKEY_ABILITY_SECONDARY = new ModHotKey[NUMBER_ABILITY_SLOTS_PER_CLASS];
-        public static ModHotKey HOTKEY_ALTERNATE_EFFECT;
 
         //Netmode
         public static bool IS_SERVER { get; private set; }
@@ -37,9 +29,6 @@ namespace ExperienceAndClasses {
         public static UI.UIStateCombo[] UIs = new UI.UIStateCombo[0]; //set on entering world
         public static bool Inventory_Open { get; private set; } = false;
 
-        //Recipe
-        public const string RECIPE_GROUP_MECHANICAL_SOUL = "ExperienceAndClasses:MechanicalSoul";
-
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Shortcuts ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         //shortcuts to config so I don't have to keep adding ModContent
@@ -53,16 +42,7 @@ namespace ExperienceAndClasses {
             MOD = mod;
 
             //hotkeys
-            HOTKEY_UI =                     MOD.RegisterHotKey(Language.GetTextValue("Mods.ExperienceAndClasses.Common.Hotkey_UI"), "P");
-            HOTKEY_ALTERNATE_EFFECT =       MOD.RegisterHotKey("Ability Alternate Effect", "LeftShift");
-            HOTKEY_ABILITY_PRIMARY[0] =     MOD.RegisterHotKey("Primary Class Ability 1", "Q");
-            HOTKEY_ABILITY_PRIMARY[1] =     MOD.RegisterHotKey("Primary Class Ability 2", "E");
-            HOTKEY_ABILITY_PRIMARY[2] =     MOD.RegisterHotKey("Primary Class Ability 3", "R");
-            HOTKEY_ABILITY_PRIMARY[3] =     MOD.RegisterHotKey("Primary Class Ability 4", "F");
-            HOTKEY_ABILITY_SECONDARY[0] =   MOD.RegisterHotKey("Secondary Class Ability 1", "Z");
-            HOTKEY_ABILITY_SECONDARY[1] =   MOD.RegisterHotKey("Secondary Class Ability 2", "X");
-            HOTKEY_ABILITY_SECONDARY[2] =   MOD.RegisterHotKey("Secondary Class Ability 3", "C");
-            HOTKEY_ABILITY_SECONDARY[3] =   MOD.RegisterHotKey("Secondary Class Ability 4", "V");
+            HOTKEY_UI = MOD.RegisterHotKey(Language.GetTextValue("Mods.ExperienceAndClasses.Common.Hotkey_UI"), "P");
 
             //netmode
             UpdateNetmode();
@@ -70,9 +50,7 @@ namespace ExperienceAndClasses {
             //clear local player;
             LocalPlayerClear();
 
-            //textures
-            Utilities.Textures.LoadTextures();
-
+            //TODO: textures
             //TODO: sounds
         }
 
@@ -108,13 +86,9 @@ namespace ExperienceAndClasses {
             LOCAL_PLAYER = eacplayer;
             LOCAL_PLAYER_VALID = true;
             WHO_AM_I = LOCAL_PLAYER.player.whoAmI;
-            LOCAL_PLAYER.CSheet.Character.SetLocal();
         }
 
         public static void UpdateUIs(GameTime gameTime) {
-            //update time if non-server
-            UpdateTime();
-
             //inventory auto states
             if (Inventory_Open != Main.playerInventory) {
                 SetUIAutoStates();
@@ -149,10 +123,6 @@ namespace ExperienceAndClasses {
                     //manual
                     break;
             }
-        }
-
-        public static void UpdateTime() {
-            Now = DateTime.Now;
         }
 
     }
