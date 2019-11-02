@@ -86,6 +86,8 @@ namespace ExperienceAndClasses {
             LOCAL_PLAYER = eacplayer;
             LOCAL_PLAYER_VALID = true;
             WHO_AM_I = LOCAL_PLAYER.player.whoAmI;
+            LOCAL_PLAYER.Fields.Is_Local = true;
+            LOCAL_PLAYER.CSheet.Character.SetAsLocal();
         }
 
         public static void UpdateUIs(GameTime gameTime) {

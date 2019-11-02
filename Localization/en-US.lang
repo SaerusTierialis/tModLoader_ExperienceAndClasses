@@ -15,10 +15,16 @@ Common.Mod_Name = ExperienceAndClasses
 Common.Hotkey_UI=Toggle UI
 
 
-//Password System
+//System - Password
 Common.Password_Display=The world password ({$Mods.ExperienceAndClasses.Common.Mod_Name}) is
 Common.Password_Command_Description=Check or set the world password ({$Mods.ExperienceAndClasses.Common.Mod_Name})
 
+//System - Misc
+Common.AFK_Start=You are now AFK. You will not gain or lose XP.
+Common.AFK_End=You are no longer AFK. You can gain and lose XP again.
+
+//System - Unlock
+Common.Unlock_WOF=Tier III Requirement Met: Defeat Wall of Flesh
 
 //Config Common
 Common.Config_Enabled=Enabled

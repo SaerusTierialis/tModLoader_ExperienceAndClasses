@@ -9,59 +9,44 @@ using static Terraria.ModLoader.ModContent;
 
 namespace ExperienceAndClasses {
     class EACPlayer : ModPlayer {
+        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Fields ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-//Fields: Local
+        public FieldsContainer Fields { get; private set; }
         /// <summary>
-        /// Local fields
+        /// A container to store fields with defaults in a way that is easy to (re)initialize
         /// </summary>
-        public FieldContainerLocal FieldsLocal { get; private set; }
-        public class FieldContainerLocal {
+        public class FieldsContainer {
             /// <summary>
-            /// True when player is the local player
+            /// Set true when local player enters world and when other players are first synced
             /// </summary>
-            public bool Is_Local_Player = false;
-        }
+            public bool initialized = false;
 
-//Fields: Synced local to server only
-        /// <summary>
-        /// Fields synced from local to server
-        /// </summary>
-        public FieldContainerSyncServer FieldsSyncServer { get; private set; }
-        public class FieldContainerSyncServer {
             /// <summary>
             /// Client password for multiplayer authentication
+            /// | Not synced between clients
             /// </summary>
             public string password = "";
 
-            /// <summary>
-            /// True while player is AFK
-            /// </summary>
-            public bool AFK = false;
+            public bool Is_Local = false; 
         }
 
-//Fields: Synced to all
         /// <summary>
-        /// Fields synced between all
+        /// Character sheet containing classes, attributes, etc.
         /// </summary>
-        public FieldContainerSyncAll FieldsSyncAll { get; private set; }
-        public struct FieldContainerSyncAll {
+        public Systems.CharacterSheet CSheet = new Systems.CharacterSheet();
 
-        }
-
-//Init
+        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Init ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         public override void Initialize() {
-            FieldsLocal = new FieldContainerLocal();
-            FieldsSyncServer = new FieldContainerSyncServer();
-            FieldsSyncAll = new FieldContainerSyncAll();
+            Fields = new FieldsContainer();
+            CSheet = new Systems.CharacterSheet();
         }
 
-//Overrides
+        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Overrides ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         public override void OnEnterWorld(Player player) {
             //Update netmode
             Shortcuts.UpdateNetmode();
 
             //set local player
-            FieldsLocal.Is_Local_Player = true;
             Shortcuts.LocalPlayerSet(this);
 
             //Set world password when entering in singleplayer, send password to server when entering multiplayer
@@ -70,7 +55,19 @@ namespace ExperienceAndClasses {
             //TODO - sync class etc.
         }
 
+        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Save/Load ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
+        public override void Load(TagCompound tag) {
+            base.Load(tag);
+            CSheet.Load(tag);
+        }
+
+        public override TagCompound Save() {
+            TagCompound tag = base.Save();
+            if (tag == null)
+                tag = new TagCompound();
+            return CSheet.Save(tag);
+        }
 
     }
 }
