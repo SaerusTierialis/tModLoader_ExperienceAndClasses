@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace ExperienceAndClasses.Systems {
-    class PlayerClass {
+    public class PlayerClass {
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Constants ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         public static readonly byte[] MAX_TIER_LEVEL = new byte[] { 0, 10, 50, 100 };

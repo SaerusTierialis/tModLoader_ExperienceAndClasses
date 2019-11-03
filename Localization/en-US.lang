@@ -7,6 +7,7 @@ Common.Orb=Orb
 Common.orbs=orbs
 Common.Orbs=Orbs
 
+
 //Mod Name
 Common.Mod_Name = ExperienceAndClasses
 
@@ -15,9 +16,17 @@ Common.Mod_Name = ExperienceAndClasses
 Common.Hotkey_UI=Toggle UI
 
 
+//Items
+ItemName.Orb_Monster=Ascension Orb
+ItemTooltip.Orb_Monster=A crystalline sphere that glows with the promise of power.\n\nUsed to unlock classes, reset attributes, or TODO
+ItemName.Orb_Boss=Transcendence Orb
+ItemTooltip.Orb_Boss=A crystalline sphere that shines with the promise of power.\n\nUsed to unlock clases, unlock subclass, or TODO
+
+
 //System - Password
 Common.Password_Display=The world password ({$Mods.ExperienceAndClasses.Common.Mod_Name}) is
-Common.Password_Command_Description=Check or set the world password ({$Mods.ExperienceAndClasses.Common.Mod_Name})
+Common.Password_CommandShow_Description=Display the world password ({$Mods.ExperienceAndClasses.Common.Mod_Name})
+Common.Password_CommandSet_Description=Set the world password ({$Mods.ExperienceAndClasses.Common.Mod_Name})
 
 //System - Misc
 Common.AFK_Start=You are now AFK. You will not gain or lose XP.
@@ -25,6 +34,7 @@ Common.AFK_End=You are no longer AFK. You can gain and lose XP again.
 
 //System - Unlock
 Common.Unlock_WOF=Tier III Requirement Met: Defeat Wall of Flesh
+
 
 //Config Common
 Common.Config_Enabled=Enabled
@@ -39,8 +49,8 @@ Common.Config_XP_Rate_Label={$Mods.ExperienceAndClasses.Common.XP} Multiplier
 
 Common.Config_XP_DeathPenalty_Label={$Mods.ExperienceAndClasses.Common.XP} Death Penalty
 
-Common.Config_XP_ModPerPlayer_Label=Multiplayer Bonus {$Mods.ExperienceAndClasses.Common.XP} Multiplier Per Player
-Common.Config_XP_ModPerPlayer_Tooltip=Per player bonus to apply before splitting {$Mods.ExperienceAndClasses.Common.XP}
+Common.Config_Reward_ModPerPlayer_Label=Bonus {$Mods.ExperienceAndClasses.Common.XP}/{$Mods.ExperienceAndClasses.Common.Orb} Multiplier Per Player
+Common.Config_Reward_ModPerPlayer_Tooltip=Per player bonus to apply before splitting rewards
 
 Common.Config_Reward_Distance_Label=Multiplayer Reward Distance
 Common.Config_Reward_Distance_Tooltip=Distance to recieve rewards in multiplayer\nPlayers who damaged the target are eligible regardless of distance\nPlayers are always eligible for boss rewards 
@@ -59,6 +69,7 @@ Common.Config_Trace_Tooltip=Log packet trace messages for multiplayer debugging.
 Common.Config_Header_UIMain=Main Interface
 Common.Config_Header_UIHUD=HUD
 Common.Config_Header_Permissions=Multiplayer Authentication
+Common.Config_Header_UIMessages=UI Miscellaneous
 
 Common.Config_UIDrag_Label=Right Click and Drag to Move
 Common.Config_UIAutoMode_Label=Display Mode
@@ -66,3 +77,5 @@ Common.Config_UIPosition_Label=Position
 
 Common.Config_Password_Label=Password
 Common.Config_Password_Tooltip=Server settings can be adjusted during multiplayer\nif your client password matches the world's password.\nPlaying a world in singleplayer sets its password to\nthe client password. The console command eac_password\ncan also be used to set the password during multiplayer.
+
+Common.Config_UIMessages_XPOverhead_Label=Display XP gain overhead

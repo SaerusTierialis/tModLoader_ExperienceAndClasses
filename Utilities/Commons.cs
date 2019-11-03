@@ -96,5 +96,10 @@ namespace ExperienceAndClasses.Utilities {
             Point point = position.ToTileCoordinates();
             return (Main.tile[point.X, point.Y].collisionType != 1);
         }
+
+        public static double Clamp(double value, double min, double max) {
+            return Math.Max(min, Math.Min(max, value));
+        }
+
     }
 }

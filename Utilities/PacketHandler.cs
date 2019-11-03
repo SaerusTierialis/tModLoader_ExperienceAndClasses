@@ -16,6 +16,8 @@ namespace ExperienceAndClasses.Utilities {
         public enum PACKET_TYPE : byte {
             ClientBroadcast,
             ClientPassword,
+            WOF,
+            XP,
 
             NUMBER_OF_TYPES, //must be last
         };
@@ -51,7 +53,7 @@ namespace ExperienceAndClasses.Utilities {
             public void Recieve(BinaryReader reader, int origin) {
                 //do not read anything from reader here (called multiple times when processing full sync packet)
 
-                bool do_trace = Shortcuts.GetConfigServer.PacketTrace;
+                bool do_trace = Shortcuts.GetConfigServer.PacketTrace && (ID != PACKET_TYPE.ClientBroadcast);
 
                 if (do_trace) {
                     Logger.Trace("Handling " + ID + " originating from " + origin);
@@ -149,6 +151,50 @@ namespace ExperienceAndClasses.Utilities {
             protected override void RecieveBody(BinaryReader reader, int origin, EACPlayer origin_mplayer) {
                 //read and set
                 origin_mplayer.Fields.password = reader.ReadString();
+            }
+        }
+
+        /// <summary>
+        /// When a client recieves this packet, WOF is marked as defeated
+        /// </summary>
+        public sealed class WOF : Handler {
+            public WOF() : base(PACKET_TYPE.WOF) { }
+
+            public static void Send(int target, int origin) {
+                //get packet containing header
+                ModPacket packet = LOOKUP[(byte)PACKET_TYPE.WOF].GetPacket(origin);
+
+                //no contents
+
+                //send
+                packet.Send(target, origin);
+            }
+
+            protected override void RecieveBody(BinaryReader reader, int origin, EACPlayer origin_eacplayer) {
+                Shortcuts.LOCAL_PLAYER.CSheet.Character.DefeatWOF();
+            }
+        }
+
+        public sealed class XP : Handler {
+            public XP() : base(PACKET_TYPE.XP) { }
+
+            public static void Send(int target, int origin, uint xp) {
+                //get packet containing header
+                ModPacket packet = LOOKUP[(byte)PACKET_TYPE.XP].GetPacket(origin);
+
+                //specific content
+                packet.Write(xp);
+
+                //send
+                packet.Send(target, origin);
+            }
+
+            protected override void RecieveBody(BinaryReader reader, int origin, EACPlayer origin_eacplayer) {
+                //read
+                uint xp = reader.ReadUInt32();
+
+                //set
+                Systems.XP.Adjustments.LocalAddXP(xp);
             }
         }
 

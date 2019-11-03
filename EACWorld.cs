@@ -16,6 +16,10 @@ namespace ExperienceAndClasses {
     class EACWorld : ModWorld {
         public static string password = "";
 
+        public override void PostUpdate() {
+            Systems.NPCRewards.ServerProcessXPBuffer();
+        }
+
         public override TagCompound Save() {
             return new TagCompound {
                 ["eac_password"] = Systems.Password.world_password

@@ -26,7 +26,7 @@ namespace ExperienceAndClasses.Systems {
         }
 
         public static void UpdateLocalPassword() {
-            if (Shortcuts.IS_PLAYER) {
+            if (Shortcuts.LOCAL_PLAYER_VALID) {
                 string password_new = Shortcuts.GetConfigClient.Password;
 
                 if (Shortcuts.IS_SINGLEPLAYER) {
@@ -45,14 +45,11 @@ namespace ExperienceAndClasses.Systems {
         }
 
         internal class PasswordCommand : ModCommand {
-            public override CommandType Type
-                => CommandType.Console;
+            public override CommandType Type => CommandType.Console;
 
-            public override string Command
-                => "eac_password";
+            public override string Command => "eac_password";
 
-            public override string Description
-                => Language.GetTextValue("Mods.ExperienceAndClasses.Common.Password_Command_Description");
+            public override string Description => Language.GetTextValue("Mods.ExperienceAndClasses.Common.Password_CommandShow_Description");
 
             public override void Action(CommandCaller caller, string input, string[] args) {
                 if (args.Length > 0) {
@@ -60,6 +57,16 @@ namespace ExperienceAndClasses.Systems {
                 }
                 System.Console.WriteLine(Language.GetTextValue("Mods.ExperienceAndClasses.Common.Password_Display") + ":" + world_password);
             }
+        }
+
+        internal class PasswordSetCommand : ModCommand {
+            public override CommandType Type => CommandType.Console;
+
+            public override string Command => "eac_password <pass>";
+
+            public override string Description => Language.GetTextValue("Mods.ExperienceAndClasses.Common.Password_CommandSet_Description");
+
+            public override void Action(CommandCaller caller, string input, string[] args) {}
         }
     }
 }

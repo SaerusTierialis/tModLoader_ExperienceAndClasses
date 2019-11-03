@@ -28,7 +28,7 @@ namespace ExperienceAndClasses {
         [Range(0f,10f)]
         [Increment(.05f)]
         [DefaultValue(1f)]
-        public float XPRate { get; set; } //TODO - unused
+        public float XPRate { get; set; }
 
         [Label("$Mods.ExperienceAndClasses.Common.Config_XP_DeathPenalty_Label")]
         [Range(0f, 1f)]
@@ -36,19 +36,19 @@ namespace ExperienceAndClasses {
         [DefaultValue(0.05f)]
         public float XPDeathPenalty { get; set; } //TODO - unused
 
-        [Label("$Mods.ExperienceAndClasses.Common.Config_XP_ModPerPlayer_Label")]
-        [Tooltip("$Mods.ExperienceAndClasses.Common.Config_XP_ModPerPlayer_Tooltip")]
+        [Label("$Mods.ExperienceAndClasses.Common.Config_Reward_ModPerPlayer_Label")]
+        [Tooltip("$Mods.ExperienceAndClasses.Common.Config_Reward_ModPerPlayer_Tooltip")]
         [Range(0f, 1f)]
         [Increment(0.01f)]
         [DefaultValue(0.2f)]
-        public float XPModPerPlayer { get; set; } //TODO - unused
+        public float RewardModPerPlayer { get; set; }
 
         [Label("$Mods.ExperienceAndClasses.Common.Config_Reward_Distance_Label")]
         [Tooltip("$Mods.ExperienceAndClasses.Common.Config_Reward_Distance_Tooltip")]
         [Range(0f, 10000f)]
         [Increment(100f)]
         [DefaultValue(1000f)]
-        public float RewardDistance { get; set; } //TODO - unused
+        public float RewardDistance { get; set; }
 
 
 
@@ -128,6 +128,14 @@ namespace ExperienceAndClasses {
         public int[] UIHUD_Position { get; set; } = new int[] { 50, 50 }; //TODO - unused
 
 
+
+        [Header("$Mods.ExperienceAndClasses.Common.Config_Header_UIMessages")]
+
+        [Label("$Mods.ExperienceAndClasses.Common.Config_UIMessages_XPOverhead_Label")]
+        [DefaultValue(true)]
+        public bool UIMisc_XPOverhead { get; set; } = true;
+
+        
 
         [Header("$Mods.ExperienceAndClasses.Common.Config_Header_Permissions")]
 
