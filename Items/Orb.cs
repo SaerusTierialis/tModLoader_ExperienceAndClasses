@@ -27,7 +27,7 @@ namespace ExperienceAndClasses.Items {
         }
 
         public override bool GrabStyle(Player player) {
-            item.velocity = item.DirectionTo(player.Center) * Math.Min(Math.Max(3000f / item.Distance(player.Center), 1f), 50f);
+            item.velocity = item.DirectionTo(player.Center) * (float)Utilities.Commons.Clamp(1000f / item.Distance(player.Center), 1f, 20f);
             Dust.NewDust(item.Center, 0, 0, DUST);
             Lighting.AddLight(item.Center, Color.White.ToVector3());
             return true;

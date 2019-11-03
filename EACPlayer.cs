@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using Terraria;
@@ -53,6 +54,18 @@ namespace ExperienceAndClasses {
             Systems.Password.UpdateLocalPassword();
 
             //TODO - sync class etc.
+        }
+
+        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Sync ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+        public override void SyncPlayer(int toWho, int fromWho, bool newPlayer) {
+            base.SyncPlayer(toWho, fromWho, newPlayer);
+            FullSync();
+        }
+
+        private void FullSync() {
+            Utilities.PacketHandler.FullSync.Send(this);
+            //TODO - send statuses
         }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Save/Load ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/

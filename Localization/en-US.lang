@@ -16,6 +16,10 @@ Common.Mod_Name = ExperienceAndClasses
 Common.Hotkey_UI=Toggle UI
 
 
+//Levelup
+Common.Levelup_Character=is now character level
+
+
 //Items
 ItemName.Orb_Monster=Ascension Orb
 ItemTooltip.Orb_Monster=A crystalline sphere that glows with the promise of power.\n\nUsed to unlock classes, reset attributes, or TODO

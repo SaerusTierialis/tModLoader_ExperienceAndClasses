@@ -113,6 +113,7 @@ namespace ExperienceAndClasses.Systems {
                 }
                 else {
                     Level = level;
+                    OnLevelChange();
                 }
             }
 
@@ -150,17 +151,46 @@ namespace ExperienceAndClasses.Systems {
             }
 
             public void LocalAddXP(uint xp) {
-                //TODO
+                XP = Utilities.Commons.SafeAdd(XP, xp);
                 LocalHandleXPChange();
             }
 
-            public void LocalDeathPenalty() {
-                //TODO
+            public void LocalSubtractXP(uint xp) {
+                XP = Utilities.Commons.SafeSubtract(XP, xp);
                 LocalHandleXPChange();
             }
 
             private void LocalHandleXPChange() {
-                //TODO levelup, xp needed for level, etc.
+                UpdateXPLevel();
+                bool leveled = false;
+
+                while (XP_Level_Remaining == 0 && (Level < Systems.XP.MAX_LEVEL)) {
+                    Level = Utilities.Commons.SafeAdd(Level, 1);
+                    XP = Utilities.Commons.SafeSubtract(XP, XP_Level_Total);
+                    UpdateXPLevel();
+                    leveled = true;
+                }
+
+                if (leveled) {
+                    if (Shortcuts.IS_CLIENT)
+                        Utilities.PacketHandler.CharLevel.Send(-1, Shortcuts.WHO_AM_I, Level, true);
+                    else
+                        Main.NewText(GetLevelupMessage(Main.LocalPlayer.name), UI.Constants.COLOUR_MESSAGE_SUCCESS);
+
+                    OnLevelChange();
+                }
+
+                Main.NewText(Level + " | " + XP + " | " + XP_Level_Remaining + " / " + XP_Level_Total);
+
+            }
+
+            private void OnLevelChange() {
+                //TODO
+            }
+
+            private void UpdateXPLevel() {
+                XP_Level_Total = Systems.XP.Requirements.GetXPReqCharacter(Level);
+                XP_Level_Remaining = Utilities.Commons.SafeSubtract(XP_Level_Total, XP);
             }
 
             public TagCompound Save(TagCompound tag) {
@@ -175,6 +205,12 @@ namespace ExperienceAndClasses.Systems {
                 XP = Utilities.Commons.TryGet<uint>(tag, TAG_NAMES.Character_XP, 1);
                 Defeated_WOF = Utilities.Commons.TryGet<bool>(tag, TAG_NAMES.WOF, false);
                 Secondary_Unlocked = Utilities.Commons.TryGet<bool>(tag, TAG_NAMES.UNLOCK_SUBCLASS, false);
+
+                UpdateXPLevel();
+            }
+
+            public string GetLevelupMessage(string name) {
+                return name + " " + Language.GetTextValue("Mods.ExperienceAndClasses.Common.Levelup_Character") + " " + Level + "!";
             }
         }
 

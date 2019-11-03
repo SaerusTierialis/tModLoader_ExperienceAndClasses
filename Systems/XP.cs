@@ -106,9 +106,6 @@ namespace ExperienceAndClasses.Systems {
                 if (Shortcuts.GetConfigClient.UIMisc_XPOverhead)
                     CombatText.NewText(Main.LocalPlayer.getRect(), UI.Constants.COLOUR_XP_BRIGHT, "+" + xp + " XP");
 
-                //TEMP
-                Main.NewText("+" + xp + " XP");
-
                 //add to player
                 Shortcuts.LOCAL_PLAYER.CSheet.Character.LocalAddXP(xp);
 
@@ -156,8 +153,6 @@ namespace ExperienceAndClasses.Systems {
                     xp *= 0.647725809f;
                     break;
             }
-
-            Main.NewText(npc.type + ": " + npc.lifeMax + " | " + npc.damage + " | " + npc.defense + " |= " + xp);
 
             return xp;
         }

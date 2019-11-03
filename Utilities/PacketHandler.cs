@@ -18,6 +18,8 @@ namespace ExperienceAndClasses.Utilities {
             ClientPassword,
             WOF,
             XP,
+            CharLevel,
+            FullSync,
 
             NUMBER_OF_TYPES, //must be last
         };
@@ -59,19 +61,19 @@ namespace ExperienceAndClasses.Utilities {
                     Logger.Trace("Handling " + ID + " originating from " + origin);
                 }
 
-                EACPlayer origin_mplayer = null;
+                EACPlayer origin_eacplayer = null;
                 if ((origin >= 0) && (origin <= Main.maxPlayers)) {
-                    origin_mplayer = Main.player[origin].GetModPlayer<EACPlayer>();
+                    origin_eacplayer = Main.player[origin].GetModPlayer<EACPlayer>();
                 }
 
-                RecieveBody(reader, origin, origin_mplayer);
+                RecieveBody(reader, origin, origin_eacplayer);
 
                 if (do_trace) {
                     Logger.Trace("Done handling " + ID + " originating from " + origin);
                 }
             }
 
-            protected abstract void RecieveBody(BinaryReader reader, int origin, EACPlayer origin_mplayer);
+            protected abstract void RecieveBody(BinaryReader reader, int origin, EACPlayer origin_eacplayer);
         }
 
         /// <summary>
@@ -100,7 +102,7 @@ namespace ExperienceAndClasses.Utilities {
                 packet.Send(target, origin);
             }
 
-            protected override void RecieveBody(BinaryReader reader, int origin, EACPlayer origin_mplayer) {
+            protected override void RecieveBody(BinaryReader reader, int origin, EACPlayer origin_eacplayer) {
                 //type
                 BROADCAST_TYPE type = (BROADCAST_TYPE)reader.ReadByte();
 
@@ -148,9 +150,9 @@ namespace ExperienceAndClasses.Utilities {
                 }
             }
 
-            protected override void RecieveBody(BinaryReader reader, int origin, EACPlayer origin_mplayer) {
+            protected override void RecieveBody(BinaryReader reader, int origin, EACPlayer origin_eacplayer) {
                 //read and set
-                origin_mplayer.Fields.password = reader.ReadString();
+                origin_eacplayer.Fields.password = reader.ReadString();
             }
         }
 
@@ -197,6 +199,79 @@ namespace ExperienceAndClasses.Utilities {
                 Systems.XP.Adjustments.LocalAddXP(xp);
             }
         }
+
+        public sealed class CharLevel : Handler {
+            public CharLevel() : base (PACKET_TYPE.CharLevel) { }
+
+            public static void Send(int target, int origin, byte level, bool levelup = false) {
+                //get packet containing header
+                ModPacket packet = LOOKUP[(byte)PACKET_TYPE.CharLevel].GetPacket(origin);
+
+                //specific content
+                WritePacketBody(packet, level, levelup);
+
+                //send
+                packet.Send(target, origin);
+            }
+
+            public static void WritePacketBody(ModPacket packet, byte level, bool levelup = false) {
+                packet.Write(level);
+                packet.Write(levelup);
+            }
+
+            protected override void RecieveBody(BinaryReader reader, int origin, EACPlayer origin_eacplayer) {
+                //read
+                byte level = reader.ReadByte();
+                bool levelup = reader.ReadBoolean();
+
+                //set level
+                origin_eacplayer.CSheet.Character.ForceLevel(level);
+
+                //levelup?
+                if (levelup && Shortcuts.IS_SERVER) {
+                    NetMessage.BroadcastChatMessage(NetworkText.FromLiteral(origin_eacplayer.CSheet.Character.GetLevelupMessage(origin_eacplayer.player.name)), UI.Constants.COLOUR_MESSAGE_SUCCESS);
+                }
+
+                //relay
+                if (Shortcuts.IS_SERVER) {
+                    Send(-1, origin, level, levelup);
+                }
+            }
+        }
+
+        public sealed class FullSync : Handler {
+            public FullSync() : base (PACKET_TYPE.FullSync) { }
+
+            public static void Send(EACPlayer eacplayer) {
+                //get packet containing header
+                int origin = eacplayer.player.whoAmI;
+                ModPacket packet = LOOKUP[(byte)PACKET_TYPE.FullSync].GetPacket(origin);
+
+                //specific content
+                CharLevel.WritePacketBody(packet, eacplayer.CSheet.Character.Level, false);
+                //TODO - other sync data
+
+                //send
+                packet.Send(-1, origin);
+            }
+
+            protected override void RecieveBody(BinaryReader reader, int origin, EACPlayer origin_eacplayer) {
+                //handle packet
+                LOOKUP[(byte)PACKET_TYPE.CharLevel].Recieve(reader, origin);
+                //TODO - other sync data
+
+                //is init
+                if (!origin_eacplayer.Fields.initialized) {
+                    origin_eacplayer.Fields.initialized = true;
+                }
+
+                //relay
+                if (Shortcuts.IS_SERVER) {
+                    Send(origin_eacplayer);
+                }
+            }
+        }
+
 
     }
 }

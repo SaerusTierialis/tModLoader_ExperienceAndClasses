@@ -101,5 +101,23 @@ namespace ExperienceAndClasses.Utilities {
             return Math.Max(min, Math.Min(max, value));
         }
 
+        public static uint SafeAdd(uint value, uint add) {
+            double result = value + add;
+            return result > uint.MaxValue ? uint.MaxValue : (uint)result;
+        }
+
+        public static byte SafeAdd(byte value, byte add) {
+            int result = value + add;
+            return result > byte.MaxValue ? byte.MaxValue : (byte)result;
+        }
+
+        public static uint SafeSubtract(uint value, uint subtract) {
+            return subtract > value ? 0 : (uint)(value - subtract);
+        }
+
+        public static byte SafeSubtract(byte value, byte subtract) {
+            return subtract > value ? (byte)0 : (byte)(value - subtract);
+        }
+
     }
 }
