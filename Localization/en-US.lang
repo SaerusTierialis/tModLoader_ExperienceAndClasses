@@ -16,8 +16,10 @@ Common.Mod_Name = ExperienceAndClasses
 Common.Hotkey_UI=Toggle UI
 
 
-//Levelup
+//Levelup+Unlock
 Common.Levelup_Character=is now character level
+Common.Levelup_Class=is now a level
+Common.Unlock=You have unlocked
 
 
 //Items
@@ -25,6 +27,14 @@ ItemName.Orb_Monster=Ascension Orb
 ItemTooltip.Orb_Monster=A crystalline sphere that glows with the promise of power.\n\nUsed to unlock classes, reset attributes, or TODO
 ItemName.Orb_Boss=Transcendence Orb
 ItemTooltip.Orb_Boss=A crystalline sphere that shines with the promise of power.\n\nUsed to unlock clases, unlock subclass, or TODO
+ItemName.Unlock_Tier2=Tier II Class Token
+ItemTooltip.Unlock_Tier2=A token that is used to unlock any standard Tier II class. Click on a class icon to open the unlock dialogue.
+ItemName.Unlock_Tier3=Tier III Class Token
+ItemTooltip.Unlock_Tier3=A token that is used to unlock any Tier III class. Click on a class icon to open the unlock dialogue.
+ItemName.Unlock_Subclass=Subclass Token
+ItemTooltip.Unlock_Subclass=A token that is used to unlock the Subclass system. Right click on any class icon to open the unlock diaglogue. This unlock is performed just once rather than per class. Once unlocked, right click a class to set it as the current subclass.
+ItemName.Unlock_Explorer=Explorer Token
+ItemTooltip.Unlock_Explorer=A token that is used to unlock the non-combat class. Click on the class icon to open the unlock dialogue.
 
 
 //System - Password
@@ -83,3 +93,56 @@ Common.Config_Password_Label=Password
 Common.Config_Password_Tooltip=Server settings can be adjusted during multiplayer\nif your client password matches the world's password.\nPlaying a world in singleplayer sets its password to\nthe client password. The console command eac_password\ncan also be used to set the password during multiplayer.
 
 Common.Config_UIMessages_XPOverhead_Label=Display XP gain overhead
+
+
+//Class - Names
+Common.Class_None_Name=None
+Common.Class_Novice_Name=Novice
+Common.Class_Warrior_Name=Warrior
+Common.Class_Ranger_Name=Ranger
+Common.Class_Traveler_Name=Traveler
+Common.Class_Rogue_Name=Rogue
+Common.Class_Summoner_Name=Summoner
+Common.Class_Cleric_Name=Cleric
+Common.Class_Hybrid_Name=Hybrid
+Common.Class_BloodKnight_Name=BloodKnight
+Common.Class_Berserker_Name=Berserker
+Common.Class_Guardian_Name=Guardian
+Common.Class_Tinkerer_Name=Tinkerer
+Common.Class_Artillery_Name=Artillery
+Common.Class_Chrono_Name=Chrono
+Common.Class_Controller_Name=Controller
+Common.Class_Shadow_Name=Shadow
+Common.Class_Assassin_Name=Assassin
+Common.Class_SoulBinder_Name=SoulBinder
+Common.Class_Tactician_Name=Tactician
+Common.Class_Saint_Name=Saint
+Common.Class_HybridPrime_Name=Hybrid Prime
+Common.Class_Explorer_Name=Explorer
+Common.Class_Oracle_Name=Oracle
+
+//Class - Descriptions
+Common.Class_None_Description=
+Common.Class_Novice_Description=TODO
+Common.Class_Warrior_Description=TODO
+Common.Class_Ranger_Description=TODO
+Common.Class_Traveler_Description=TODO
+Common.Class_Rogue_Description=TODO
+Common.Class_Summoner_Description=TODO
+Common.Class_Cleric_Description=TODO
+Common.Class_Hybrid_Description=TODO
+Common.Class_BloodKnight_Description=TODO
+Common.Class_Berserker_Description=TODO
+Common.Class_Guardian_Description=TODO
+Common.Class_Tinkerer_Description=TODO
+Common.Class_Artillery_Description=TODO
+Common.Class_Chrono_Description=TODO
+Common.Class_Controller_Description=TODO
+Common.Class_Shadow_Description=TODO
+Common.Class_Assassin_Description=TODO
+Common.Class_SoulBinder_Description=TODO
+Common.Class_Tactician_Description=TODO
+Common.Class_Saint_Description=TODO
+Common.Class_HybridPrime_Description=TODO
+Common.Class_Explorer_Description=TODO
+Common.Class_Oracle_Description=TODO

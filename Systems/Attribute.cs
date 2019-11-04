@@ -124,17 +124,17 @@ namespace ExperienceAndClasses.Systems {
         /// <summary>
         /// total allocation points available to player
         /// </summary>
-        /// <param name="csheet"></param>
+        /// <param name="psheet"></param>
         /// <returns></returns>
-        public static int LocalAllocationPointTotal(CharacterSheet csheet) {
+        public static int LocalAllocationPointTotal(PSheet psheet) {
             float sum = 0;
 
-            sum += csheet.Character.Level * ALLOCATION_POINTS_PER_CHARACTER_LEVEL;
+            sum += psheet.Character.Level * ALLOCATION_POINTS_PER_CHARACTER_LEVEL;
 
             //TODO - points from classes
             /*
-            for (byte i = 0; i < Shortcuts.LOCAL_PLAYER.CSheet.Class_Count; i++) {
-                sum += Shortcuts.LOCAL_PLAYER.CSheet.Classes[i].GetAllocationPoints();
+            for (byte i = 0; i < Shortcuts.LOCAL_PLAYER.psheet.Class_Count; i++) {
+                sum += Shortcuts.LOCAL_PLAYER.psheet.Classes[i].GetAllocationPoints();
             }
             */
 
@@ -146,7 +146,7 @@ namespace ExperienceAndClasses.Systems {
         /// </summary>
         /// <returns></returns>
         public static int LocalCalculateResetCost() {
-            int points = Shortcuts.LOCAL_PLAYER.CSheet.Attributes.Points_Spent - RESET_POINTS_FREE;
+            int points = Shortcuts.LOCAL_PLAYER.PSheet.Attributes.Points_Spent - RESET_POINTS_FREE;
             if (points > 0)
                 return (int)Math.Floor(Math.Pow(points, 0.5));
             else
@@ -262,10 +262,10 @@ namespace ExperienceAndClasses.Systems {
                 if (eacplayer.Fields.Is_Local) Bonus += "\n+" + bonus + " maximum minions (" + PER_POINT_MINION_CAP + " per point)";
 
                 //healing (use holy damage scaling)
-                float holy_damage_per = Math.Max(eacplayer.CSheet.Class_Primary.Class.Power_Scaling.Damage_Holy, eacplayer.CSheet.Class_Secondary.Class.Power_Scaling.Damage_Holy / 2);
+                float holy_damage_per = Math.Max(eacplayer.PSheet.Classes.Primary.Class.Power_Scaling.Damage_Holy, eacplayer.PSheet.Classes.Secondary.Class.Power_Scaling.Damage_Holy / 2);
                 float bonus_per_point = holy_damage_per * PER_POINT_HOLY_HEAL;
                 float bonus_float = bonus_per_point * points;
-                eacplayer.CSheet.Stats.Healing_Mult += bonus_float;
+                eacplayer.PSheet.Stats.Healing_Mult += bonus_float;
                 if (eacplayer.Fields.Is_Local) Bonus += "\n+" + Math.Round(bonus_float * 100, 3) + "% healing (" + Math.Round(bonus_per_point * 100, 3) + " per point)";
             }
         }
@@ -299,7 +299,7 @@ namespace ExperienceAndClasses.Systems {
 
                 //dodge
                 bonus_float = PER_POINT_DODGE * points;
-                eacplayer.CSheet.Stats.Dodge += bonus_float;
+                eacplayer.PSheet.Stats.Dodge += bonus_float;
                 if (eacplayer.Fields.Is_Local) Bonus += "\n+" + Math.Round(bonus_float * 100, 3) + "% dodge chance (" + Math.Round(PER_POINT_DODGE * 100, 3) + " per point)";
 
                 //max fly time
@@ -323,21 +323,21 @@ namespace ExperienceAndClasses.Systems {
 
                 //ability after use delay
                 bonus = PER_POINT_ABILITY_DELAY * points;
-                eacplayer.CSheet.Stats.Ability_Delay_Reduction += bonus;
+                eacplayer.PSheet.Stats.Ability_Delay_Reduction += bonus;
                 if (eacplayer.Fields.Is_Local) Bonus += "\n+" + Math.Round(bonus * 100, 3) + "% reduced ability delay (" + Math.Round(PER_POINT_ABILITY_DELAY * 100, 3) + " per point)";
 
                 //tool use time (if non-combat)
-                float fish_per = Math.Max(eacplayer.CSheet.Class_Primary.Class.Power_Scaling.Fish_Power, eacplayer.CSheet.Class_Secondary.Class.Power_Scaling.Fish_Power / 2);
+                float fish_per = Math.Max(eacplayer.PSheet.Classes.Primary.Class.Power_Scaling.Fish_Power, eacplayer.PSheet.Classes.Secondary.Class.Power_Scaling.Fish_Power / 2);
                 if (fish_per > 0f) {
                     float bonus_per_point = fish_per * PER_POINT_USE_SPEED;
                     bonus = bonus_per_point * points;
-                    eacplayer.CSheet.Stats.SpeedAdjust_Tool += bonus;
+                    eacplayer.PSheet.Stats.SpeedAdjust_Tool += bonus;
                     if (eacplayer.Fields.Is_Local) Bonus += "\n+" + Math.Round(bonus * 100, 3) + "% tool use speed (" + Math.Round(bonus_per_point * 100, 3) + " per point)";
                 }
 
                 //weapon use time
                 bonus = PER_POINT_USE_SPEED * points;
-                eacplayer.CSheet.Stats.SpeedAdjust_Weapon += bonus;
+                eacplayer.PSheet.Stats.SpeedAdjust_Weapon += bonus;
                 if (eacplayer.Fields.Is_Local) Bonus += "\n+" + Math.Round(bonus * 100, 3) + "% weapon use speed (" + Math.Round(PER_POINT_USE_SPEED * 100, 3) + " per point)";
             }
         }
@@ -418,16 +418,16 @@ namespace ExperienceAndClasses.Systems {
                 //calculate scaling values to use...
 
                 //core
-                float non_minion_per = Math.Max(eacplayer.CSheet.Class_Primary.Class.Power_Scaling.Damage_All_Non_Minion, eacplayer.CSheet.Class_Secondary.Class.Power_Scaling.Damage_All_Non_Minion / 2);
-                float minion_per = Math.Max(eacplayer.CSheet.Class_Primary.Class.Power_Scaling.Minion, eacplayer.CSheet.Class_Secondary.Class.Power_Scaling.Minion / 2);
+                float non_minion_per = Math.Max(eacplayer.PSheet.Classes.Primary.Class.Power_Scaling.Damage_All_Non_Minion, eacplayer.PSheet.Classes.Secondary.Class.Power_Scaling.Damage_All_Non_Minion / 2);
+                float minion_per = Math.Max(eacplayer.PSheet.Classes.Primary.Class.Power_Scaling.Minion, eacplayer.PSheet.Classes.Secondary.Class.Power_Scaling.Minion / 2);
 
                 //custom types
-                float close_range_damage_per = Math.Max(eacplayer.CSheet.Class_Primary.Class.Power_Scaling.Damage_Close_Range, eacplayer.CSheet.Class_Secondary.Class.Power_Scaling.Damage_Close_Range / 2);
-                float non_minion_projectile_damage_per = Math.Max(eacplayer.CSheet.Class_Primary.Class.Power_Scaling.Damage_Non_Minion_Projectile, eacplayer.CSheet.Class_Secondary.Class.Power_Scaling.Damage_Non_Minion_Projectile / 2);
-                float holy_damage_per = Math.Max(eacplayer.CSheet.Class_Primary.Class.Power_Scaling.Damage_Holy, eacplayer.CSheet.Class_Secondary.Class.Power_Scaling.Damage_Holy / 2);
+                float close_range_damage_per = Math.Max(eacplayer.PSheet.Classes.Primary.Class.Power_Scaling.Damage_Close_Range, eacplayer.PSheet.Classes.Secondary.Class.Power_Scaling.Damage_Close_Range / 2);
+                float non_minion_projectile_damage_per = Math.Max(eacplayer.PSheet.Classes.Primary.Class.Power_Scaling.Damage_Non_Minion_Projectile, eacplayer.PSheet.Classes.Secondary.Class.Power_Scaling.Damage_Non_Minion_Projectile / 2);
+                float holy_damage_per = Math.Max(eacplayer.PSheet.Classes.Primary.Class.Power_Scaling.Damage_Holy, eacplayer.PSheet.Classes.Secondary.Class.Power_Scaling.Damage_Holy / 2);
 
                 //non-combat
-                float fish_per = Math.Max(eacplayer.CSheet.Class_Primary.Class.Power_Scaling.Fish_Power, eacplayer.CSheet.Class_Secondary.Class.Power_Scaling.Fish_Power / 2);
+                float fish_per = Math.Max(eacplayer.PSheet.Classes.Primary.Class.Power_Scaling.Fish_Power, eacplayer.PSheet.Classes.Secondary.Class.Power_Scaling.Fish_Power / 2);
 
                 //non_minion_per does not stack with projectile_damage_per and close_range_damage_per
                 if ((non_minion_per > 0f) && (non_minion_projectile_damage_per > 0)) {
@@ -462,7 +462,7 @@ namespace ExperienceAndClasses.Systems {
                 if (non_minion_per > 0f) {
                     bonus_per_point = non_minion_per * Attribute.Power.PER_POINT_DAMAGE;
                     bonus_total = bonus_per_point * points;
-                    eacplayer.CSheet.Stats.NonMinionAll.Increase += bonus_total;
+                    eacplayer.PSheet.Stats.NonMinionAll.Increase += bonus_total;
                     if (eacplayer.Fields.Is_Local) {
                         bonus += "\n+" + Math.Round(bonus_total * 100, 3) + "% all non-minion damage* (" + Math.Round(bonus_per_point * 100, 3) + " per point)";
                         tooltip_damage_not_shown = true;
@@ -483,7 +483,7 @@ namespace ExperienceAndClasses.Systems {
                 if (close_range_damage_per > 0f) {
                     bonus_per_point = close_range_damage_per * Attribute.Power.PER_POINT_DAMAGE;
                     bonus_total = bonus_per_point * points;
-                    eacplayer.CSheet.Stats.AllNearby.Increase += bonus_total;
+                    eacplayer.PSheet.Stats.AllNearby.Increase += bonus_total;
                     if (eacplayer.Fields.Is_Local) {
                         bonus += "\n+" + Math.Round(bonus_total * 100, 3) + "% all damage on nearby targets* (" + Math.Round(bonus_per_point * 100, 3) + " per point)";
                         tooltip_damage_not_shown = true;
@@ -494,7 +494,7 @@ namespace ExperienceAndClasses.Systems {
                 if (non_minion_projectile_damage_per > 0f) {
                     bonus_per_point = non_minion_projectile_damage_per * Attribute.Power.PER_POINT_DAMAGE;
                     bonus_total = bonus_per_point * points;
-                    eacplayer.CSheet.Stats.NonMinionProjectile.Increase += bonus_total;
+                    eacplayer.PSheet.Stats.NonMinionProjectile.Increase += bonus_total;
                     if (eacplayer.Fields.Is_Local) {
                         bonus += "\n+" + Math.Round(bonus_total * 100, 3) + "% all non-minion projectile damage* (" + Math.Round(bonus_per_point * 100, 3) + " per point)";
                         tooltip_damage_not_shown = true;
@@ -505,7 +505,7 @@ namespace ExperienceAndClasses.Systems {
                 if (holy_damage_per > 0f) {
                     bonus_per_point = holy_damage_per * Attribute.Power.PER_POINT_DAMAGE;
                     bonus_total = bonus_per_point * points;
-                    eacplayer.CSheet.Stats.Holy.Increase += bonus_total;
+                    eacplayer.PSheet.Stats.Holy.Increase += bonus_total;
                     if (eacplayer.Fields.Is_Local) {
                         bonus += "\n+" + Math.Round(bonus_total * 100, 3) + "% holy damage (" + Math.Round(bonus_per_point * 100, 3) + " per point)";
                     }

@@ -21,6 +21,7 @@ namespace ExperienceAndClasses.Utilities {
             CharLevel,
             FullSync,
             Attributes,
+            Class,
 
             NUMBER_OF_TYPES, //must be last
         };
@@ -174,7 +175,7 @@ namespace ExperienceAndClasses.Utilities {
             }
 
             protected override void RecieveBody(BinaryReader reader, int origin, EACPlayer origin_eacplayer) {
-                Shortcuts.LOCAL_PLAYER.CSheet.Character.DefeatWOF();
+                Shortcuts.LOCAL_PLAYER.PSheet.Character.DefeatWOF();
             }
         }
 
@@ -226,11 +227,11 @@ namespace ExperienceAndClasses.Utilities {
                 bool levelup = reader.ReadBoolean();
 
                 //set level
-                origin_eacplayer.CSheet.Character.ForceLevel(level);
+                origin_eacplayer.PSheet.Character.ForceLevel(level);
 
                 //levelup?
                 if (levelup && Shortcuts.IS_SERVER) {
-                    NetMessage.BroadcastChatMessage(NetworkText.FromLiteral(origin_eacplayer.CSheet.Character.GetLevelupMessage(origin_eacplayer.player.name)), UI.Constants.COLOUR_MESSAGE_SUCCESS);
+                    NetMessage.BroadcastChatMessage(NetworkText.FromLiteral(origin_eacplayer.PSheet.Character.GetLevelupMessage()), UI.Constants.COLOUR_MESSAGE_SUCCESS);
                 }
 
                 //relay
@@ -249,8 +250,9 @@ namespace ExperienceAndClasses.Utilities {
                 ModPacket packet = LOOKUP[(byte)PACKET_TYPE.FullSync].GetPacket(origin);
 
                 //specific content
-                CharLevel.WritePacketBody(packet, eacplayer.CSheet.Character.Level, false);
-                Attributes.WritePacketBody(packet, eacplayer.CSheet.Attributes.Allocated_Effective);
+                CharLevel.WritePacketBody(packet, eacplayer.PSheet.Character.Level, false);
+                Attributes.WritePacketBody(packet, eacplayer.PSheet.Attributes.Allocated_Effective);
+                Class.WritePacketBody(packet, eacplayer.PSheet.Classes.Primary.ID, eacplayer.PSheet.Classes.Primary.Level, eacplayer.PSheet.Classes.Secondary.ID, eacplayer.PSheet.Classes.Secondary.Level);
                 //TODO - other sync data
 
                 //send
@@ -261,6 +263,7 @@ namespace ExperienceAndClasses.Utilities {
                 //handle packet
                 LOOKUP[(byte)PACKET_TYPE.CharLevel].Recieve(reader, origin);
                 LOOKUP[(byte)PACKET_TYPE.Attributes].Recieve(reader, origin);
+                LOOKUP[(byte)PACKET_TYPE.Class].Recieve(reader, origin);
                 //TODO - other sync data
 
                 //is init
@@ -297,7 +300,7 @@ namespace ExperienceAndClasses.Utilities {
                 }
 
                 //set
-                origin_eacplayer.CSheet.Attributes.ForceAllocatedEffective(attributes);
+                origin_eacplayer.PSheet.Attributes.ForceAllocatedEffective(attributes);
 
                 //relay
                 if (Shortcuts.IS_SERVER) {
@@ -309,6 +312,47 @@ namespace ExperienceAndClasses.Utilities {
                 for (byte i = 0; i < (byte)Systems.Attribute.IDs.NUMBER_OF_IDs; i++) {
                     packet.Write(attributes[i]);
                 }
+            }
+        }
+
+        public sealed class Class : Handler {
+            public Class() : base(PACKET_TYPE.Class) { }
+
+            public static void Send(int target, int origin, byte primary_id, byte primary_level, byte secondary_id, byte secondary_level, byte levelup_id = 0) {
+                //get packet containing header
+                ModPacket packet = LOOKUP[(byte)PACKET_TYPE.Class].GetPacket(origin);
+
+                //specific content
+                WritePacketBody(packet, primary_id, primary_level, secondary_id, secondary_level, levelup_id);
+
+                //send
+                packet.Send(target, origin);
+            }
+
+            protected override void RecieveBody(BinaryReader reader, int origin, EACPlayer origin_eacplayer) {
+                //read
+                byte[] bytes = reader.ReadBytes(5);
+
+                //set
+                origin_eacplayer.PSheet.Classes.ForceActive(bytes[0], bytes[1], bytes[2], bytes[3]);
+
+                //relay + levelup message
+                if (Shortcuts.IS_SERVER) {
+                    byte levelup = bytes[4];
+                    if (levelup > 0) {
+                        NetMessage.BroadcastChatMessage(NetworkText.FromLiteral(origin_eacplayer.PSheet.Classes.GetLevelupMessage(levelup)), UI.Constants.COLOUR_MESSAGE_SUCCESS);
+                    }
+
+                    Send(-1, origin, bytes[0], bytes[1], bytes[2], bytes[3], levelup);
+                }
+            }
+
+            public static void WritePacketBody(ModPacket packet, byte primary_id, byte primary_level, byte secondary_id, byte secondary_level, byte levelup_id = 0) {
+                packet.Write(primary_id);
+                packet.Write(primary_level);
+                packet.Write(secondary_id);
+                packet.Write(secondary_level);
+                packet.Write(levelup_id);
             }
         }
 

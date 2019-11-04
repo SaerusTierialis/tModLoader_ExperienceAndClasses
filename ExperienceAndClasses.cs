@@ -1,4 +1,7 @@
 using System.IO;
+using Terraria;
+using Terraria.ID;
+using Terraria.Localization;
 using Terraria.ModLoader;
 
 namespace ExperienceAndClasses
@@ -7,6 +10,8 @@ namespace ExperienceAndClasses
 	{
         public ExperienceAndClasses(){}
 
+        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Load/Unload ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
         public override void Load() {
             Shortcuts.DoModLoad(this);
         }
@@ -14,6 +19,8 @@ namespace ExperienceAndClasses
         public override void Unload() {
             Shortcuts.DoModUnload();
         }
+
+        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Packets ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         public override void HandlePacket(BinaryReader reader, int whoAmI) {
             //first 2 bytes are always type and origin
@@ -28,8 +35,21 @@ namespace ExperienceAndClasses
             }
         }
 
-        //public override void AddRecipeGroups()
-        //public override void AddRecipes()
+        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ RecipeGroup ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+        public override void AddRecipeGroups() {
+            base.AddRecipeGroups();
+
+            // Creates a new recipe group
+            RecipeGroup mechanical_soul = new RecipeGroup(() => Language.GetTextValue("LegacyMisc.37") + " Mechanical Boss Soul", new int[]
+            {
+                ItemID.SoulofFright,
+                ItemID.SoulofMight,
+                ItemID.SoulofSight
+            });
+            // Registers the new recipe group with the specified name
+            RecipeGroup.RegisterGroup(Shortcuts.RECIPE_GROUP_MECHANICAL_SOUL, mechanical_soul);
+        }
 
     }
 }

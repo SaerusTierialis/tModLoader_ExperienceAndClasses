@@ -107,7 +107,7 @@ namespace ExperienceAndClasses.Systems {
                     CombatText.NewText(Main.LocalPlayer.getRect(), UI.Constants.COLOUR_XP_BRIGHT, "+" + xp + " XP");
 
                 //add to player
-                Shortcuts.LOCAL_PLAYER.CSheet.Character.LocalAddXP(xp);
+                Shortcuts.LOCAL_PLAYER.PSheet.Character.LocalAddXP(xp);
 
                 //TODO - add to classes
             }

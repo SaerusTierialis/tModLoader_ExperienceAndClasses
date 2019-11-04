@@ -34,12 +34,12 @@ namespace ExperienceAndClasses {
         /// <summary>
         /// Character sheet containing classes, attributes, etc.
         /// </summary>
-        public Systems.CharacterSheet CSheet;
+        public Systems.PSheet PSheet { get; private set; }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Init ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         public override void Initialize() {
             Fields = new FieldsContainer();
-            CSheet = new Systems.CharacterSheet(this);
+            PSheet = new Systems.PSheet(this);
         }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Overrides ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
@@ -73,27 +73,27 @@ namespace ExperienceAndClasses {
         public override void PreUpdate() {
             base.PreUpdate();
 
-            CSheet.PreUpdate();
+            PSheet.PreUpdate();
         }
 
         public override void PostUpdate() {
             base.PostUpdate();
 
-            CSheet.PostUpdate();
+            PSheet.PostUpdate();
         }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Save/Load ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         public override void Load(TagCompound tag) {
             base.Load(tag);
-            CSheet.Load(tag);
+            PSheet.Load(tag);
         }
 
         public override TagCompound Save() {
             TagCompound tag = base.Save();
             if (tag == null)
                 tag = new TagCompound();
-            return CSheet.Save(tag);
+            return PSheet.Save(tag);
         }
 
     }

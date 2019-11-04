@@ -18,7 +18,7 @@ namespace ExperienceAndClasses.Utilities {
         /// <param name="key"></param>
         /// <param name="defaultValue"></param>
         /// <returns></returns>
-        public static T TryGet<T>(TagCompound tag, string key, T defaultValue) {
+        public static T TagTryGet<T>(TagCompound tag, string key, T defaultValue) {
             //new method does not detect if type is wrong
             if ((tag != null) && (tag.ContainsKey(key))) {
                 try {
@@ -31,6 +31,42 @@ namespace ExperienceAndClasses.Utilities {
             else {
                 return defaultValue;
             }
+        }
+
+        public static TagCompound TagAddArrayAsList<T>(TagCompound tag, string name, T[] array) {
+
+            //convert to list
+            List<T> list = new List<T>();
+            foreach (T value in array) {
+                list.Add(value);
+            }
+
+            //add list
+            tag.Add(name, list);
+
+            //return
+            return tag;
+        }
+
+        public static T[] TagLoadListAsArray<T>(TagCompound tag, string name, int length) {
+            //load list
+            List<T> list = Utilities.Commons.TagTryGet<List<T>>(tag, name, new List<T>());
+
+            //warn if list is too long
+            if (length < list.Count) {
+                Utilities.Logger.Error("Error loading " + name + ". Loaded array is too long. Excess entries will be lost.");
+            }
+
+            //create array (if list was too long, produce a larger array in case this helps prevent data loss)
+            T[] array = new T[Math.Max(length, list.Count)];
+
+            //populate array
+            for (int i = 0; i < list.Count; i++) {
+                array[i] = list[i];
+            }
+
+            //return
+            return array;
         }
 
         /// <summary>

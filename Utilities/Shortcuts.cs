@@ -29,6 +29,9 @@ namespace ExperienceAndClasses {
         public static UI.UIStateCombo[] UIs = new UI.UIStateCombo[0]; //set on entering world
         public static bool Inventory_Open { get; private set; } = false;
 
+        //Recipe
+        public const string RECIPE_GROUP_MECHANICAL_SOUL = "ExperienceAndClasses:MechanicalSoul";
+
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Shortcuts ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         //shortcuts to config so I don't have to keep adding ModContent

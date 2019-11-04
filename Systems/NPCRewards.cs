@@ -100,7 +100,7 @@ namespace ExperienceAndClasses.Systems {
 
                     eacplayer = player.GetModPlayer<EACPlayer>();
                     //must not be afk
-                    if (!eacplayer.CSheet.Character.AFK) {
+                    if (!eacplayer.PSheet.Character.AFK) {
                         //must have hit the target or be nearby (unless boss)
                         if (treat_as_boss || (!player.dead && (npc.playerInteraction[player_index] || (player.Distance(npc.position) <= range)))) {
                             eligible_players.Add((byte)player.whoAmI);
@@ -140,11 +140,11 @@ namespace ExperienceAndClasses.Systems {
             foreach (byte player_index in eligible_players) {
                 EACPlayer = Main.player[player_index].GetModPlayer<EACPlayer>();
 
-                if (Main.rand.NextDouble() <= CalculateOrbChanceMonster(base_xp, EACPlayer.CSheet.Character.Level, reward_multiplier)) {
+                if (Main.rand.NextDouble() <= CalculateOrbChanceMonster(base_xp, EACPlayer.PSheet.Character.Level, reward_multiplier)) {
                     orb_monster_interactions[player_index] = true;
                     any_orb_monster = true;
                 }
-                if (treat_as_boss && (Main.rand.NextDouble() <= CalculateOrbChanceBoss(base_xp, EACPlayer.CSheet.Character.Level, reward_multiplier))) {
+                if (treat_as_boss && (Main.rand.NextDouble() <= CalculateOrbChanceBoss(base_xp, EACPlayer.PSheet.Character.Level, reward_multiplier))) {
                     orb_boss_interactions[player_index] = true;
                     any_orb_boss = true;
                 }
@@ -194,7 +194,7 @@ namespace ExperienceAndClasses.Systems {
                     Utilities.PacketHandler.WOF.Send(player_index, -1);
                 }
                 else {
-                    Shortcuts.LOCAL_PLAYER.CSheet.Character.DefeatWOF();
+                    Shortcuts.LOCAL_PLAYER.PSheet.Character.DefeatWOF();
                 }
             }
         }
