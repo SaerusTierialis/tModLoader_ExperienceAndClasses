@@ -20,6 +20,7 @@ namespace ExperienceAndClasses.Utilities {
             XP,
             CharLevel,
             FullSync,
+            Attributes,
 
             NUMBER_OF_TYPES, //must be last
         };
@@ -249,6 +250,7 @@ namespace ExperienceAndClasses.Utilities {
 
                 //specific content
                 CharLevel.WritePacketBody(packet, eacplayer.CSheet.Character.Level, false);
+                Attributes.WritePacketBody(packet, eacplayer.CSheet.Attributes.Allocated_Effective);
                 //TODO - other sync data
 
                 //send
@@ -258,6 +260,7 @@ namespace ExperienceAndClasses.Utilities {
             protected override void RecieveBody(BinaryReader reader, int origin, EACPlayer origin_eacplayer) {
                 //handle packet
                 LOOKUP[(byte)PACKET_TYPE.CharLevel].Recieve(reader, origin);
+                LOOKUP[(byte)PACKET_TYPE.Attributes].Recieve(reader, origin);
                 //TODO - other sync data
 
                 //is init
@@ -272,6 +275,42 @@ namespace ExperienceAndClasses.Utilities {
             }
         }
 
+        public sealed class Attributes : Handler {
+            public Attributes() : base(PACKET_TYPE.Attributes) { }
+
+            public static void Send(int target, int origin, int[] attributes) {
+                //get packet containing header
+                ModPacket packet = LOOKUP[(byte)PACKET_TYPE.Attributes].GetPacket(origin);
+
+                //specific content
+                WritePacketBody(packet, attributes);
+
+                //send
+                packet.Send(target, origin);
+            }
+
+            protected override void RecieveBody(BinaryReader reader, int origin, EACPlayer origin_eacplayer) {
+                //read
+                int[] attributes = new int[(byte)Systems.Attribute.IDs.NUMBER_OF_IDs];
+                for (byte i = 0; i < (byte)Systems.Attribute.IDs.NUMBER_OF_IDs; i++) {
+                    attributes[i] = reader.ReadInt32();
+                }
+
+                //set
+                origin_eacplayer.CSheet.Attributes.ForceAllocatedEffective(attributes);
+
+                //relay
+                if (Shortcuts.IS_SERVER) {
+                    Send(-1, origin, attributes);
+                }
+            }
+
+            public static void WritePacketBody(ModPacket packet, int[] attributes) {
+                for (byte i = 0; i < (byte)Systems.Attribute.IDs.NUMBER_OF_IDs; i++) {
+                    packet.Write(attributes[i]);
+                }
+            }
+        }
 
     }
 }

@@ -9,7 +9,7 @@ using Terraria.Utilities;
 using static Terraria.ModLoader.ModContent;
 
 namespace ExperienceAndClasses {
-    class EACPlayer : ModPlayer {
+    public class EACPlayer : ModPlayer {
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Fields ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         public FieldsContainer Fields { get; private set; }
@@ -34,12 +34,12 @@ namespace ExperienceAndClasses {
         /// <summary>
         /// Character sheet containing classes, attributes, etc.
         /// </summary>
-        public Systems.CharacterSheet CSheet = new Systems.CharacterSheet();
+        public Systems.CharacterSheet CSheet;
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Init ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         public override void Initialize() {
             Fields = new FieldsContainer();
-            CSheet = new Systems.CharacterSheet();
+            CSheet = new Systems.CharacterSheet(this);
         }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Overrides ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
@@ -66,6 +66,20 @@ namespace ExperienceAndClasses {
         private void FullSync() {
             Utilities.PacketHandler.FullSync.Send(this);
             //TODO - send statuses
+        }
+
+        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Update ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+        public override void PreUpdate() {
+            base.PreUpdate();
+
+            CSheet.PreUpdate();
+        }
+
+        public override void PostUpdate() {
+            base.PostUpdate();
+
+            CSheet.PostUpdate();
         }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Save/Load ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/

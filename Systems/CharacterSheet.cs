@@ -1,32 +1,228 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Terraria;
 using Terraria.Localization;
 using Terraria.ModLoader.IO;
 
 namespace ExperienceAndClasses.Systems {
-    class CharacterSheet {
+    public class CharacterSheet {
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Constructor ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-
+        public readonly EACPlayer eacplayer;
+        public CharacterSheet(EACPlayer owner) {
+            eacplayer = owner;
+            Attributes = new AttributesContainer(this);
+            Stats = new StatsContainer(this);
+            Character = new CharacterMethods(this);
+        }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Classes ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Attributes + Points ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+        public readonly AttributesContainer Attributes;
+        public class AttributesContainer : ContainerTemplate {
+            public AttributesContainer(CharacterSheet csheet) : base(csheet) { }
 
+            public static byte Count { get { return (byte)Attribute.IDs.NUMBER_OF_IDs; } }
+
+            /// <summary>
+            /// From allocated points
+            /// | not synced
+            /// </summary>
+            public int[] Allocated { get; protected set; } = new int[Count];
+
+            /// <summary>
+            /// Dynamic zero point
+            /// | not synced
+            /// </summary>
+            public int Zero_Point { get; protected set; } = 0;
+
+            /// <summary>
+            /// From allocated points after applying zero point
+            /// | synced
+            /// </summary>
+            public int[] Allocated_Effective { get; protected set; } = new int[Count];
+
+            /// <summary>
+            /// From active class bonuses
+            /// | not synced (deterministic)
+            /// </summary>
+            public int[] From_Class { get; protected set; } = new int[Count];
+
+
+            /// <summary>
+            /// Calculated on each update. Attributes from status, passive, etc.
+            /// | not synced (deterministic)
+            /// </summary>
+            public int[] Bonuses = new int[Count];
+
+            /// <summary>
+            /// Calculated on each update. Equals Allocated_Effective + From_Class + Bonuses
+            /// | not synced (deterministic)
+            /// </summary>
+            public int[] Final { get; protected set; } = new int[Count];
+
+            public int[] Point_Costs { get; protected set; } = new int[Count];
+            public int Points_Available { get; protected set; } = 0;
+            public int Points_Spent { get; protected set; } = 0;
+            public int Points_Total { get; protected set; } = 0;
+
+            /// <summary>
+            /// Reset bonus attributes (to be called before each update)
+            /// </summary>
+            public void ResetBonuses() {
+                Bonuses = new int[Count];
+            }
+
+            /// <summary>
+            /// Apply attribute effects (to be called on each update)
+            /// </summary>
+            public void Apply() {
+                for (byte i = 0; i < Count; i++) {
+                    //calculate
+                    Final[i] = Allocated_Effective[i] + From_Class[i] + Bonuses[i];
+                    //apply
+                    Attribute.LOOKUP[i].ApplyEffect(CSheet.eacplayer, Final[i]);
+                }
+            }
+
+            public void UpdateFromClass() {
+                //TODO
+                From_Class = new int[Count];
+            }
+
+            /// <summary>
+            /// Attempt to allocate attribute point
+            /// </summary>
+            /// <param name="id"></param>
+            /// <returns></returns>
+            public bool AllocatePoint(byte id) {
+                //can allocate?
+                bool success = Point_Costs[id] <= Points_Available;
+
+                if (success) {
+                    //add point
+                    Allocated[id]++;
+
+                    //update effective values
+                    UpdateAllocatedEffective();
+
+                    //recalc points
+                    UpdatePoints();
+
+                    //sync
+                    SyncAttributesEffective();
+                }
+
+                return success;
+            }
+
+            private void SyncAttributesEffective() {
+                if (Shortcuts.IS_CLIENT) {
+                    if (CSheet.eacplayer.Fields.Is_Local)
+                        Utilities.PacketHandler.Attributes.Send(-1, Shortcuts.WHO_AM_I, Allocated_Effective);
+                    else
+                        Utilities.Logger.Error("SendPacketAttributesEffective called by non-local");
+                }
+            }
+
+            private void UpdatePoints() {
+                //calculate spent + update costs for next point
+                Points_Spent = 0;
+                for (byte i = 0; i < Count; i++) {
+                    Point_Costs[i] = Attribute.AllocationPointCost(Allocated[i]);
+                    Points_Spent += Attribute.AllocationPointCostTotal(Allocated[i]);
+                }
+
+                //calculate total points available
+                Points_Total = Attribute.LocalAllocationPointTotal(CSheet);
+
+                //calculte remaining points
+                Points_Available = Points_Total - Points_Spent;
+            }
+
+            private void Reset(bool allow_sync = true) {
+                //clear allocated
+                Allocated = new int[Count];
+
+                //update
+                UpdateAllocatedEffective();
+                UpdatePoints();
+
+                //sync?
+                if (allow_sync)
+                    SyncAttributesEffective();
+            }
+
+            private void UpdateAllocatedEffective() {
+                //calculate average allocated
+                float sum = 0;
+                float count = 0;
+                for (byte i = 0; i < Count; i++) {
+                    if (Attribute.LOOKUP[i].Active) {
+                        sum += Allocated[i];
+                        count++;
+                    }
+                }
+                float average = sum / count;
+
+                //recalc zero point
+                Zero_Point = Attribute.CalculateZeroPoint(average);
+
+                //apply zero point
+                for (byte i = 0; i < Count; i ++) {
+                    Allocated_Effective[i] = Allocated[i] - Zero_Point;
+                }
+            }
+
+            public void ForceAllocatedEffective(int[] attribute) {
+                if (CSheet.eacplayer.Fields.Is_Local) {
+                    Utilities.Logger.Error("ForceAllocatedEffective called by local");
+                }
+                else {
+                    Allocated_Effective = attribute;
+                }
+            }
+
+            public TagCompound Save(TagCompound tag) {
+                tag = TagAddArrayAsList<int>(tag, TAG_NAMES.Attributes_Allocated, Allocated);
+                return tag;
+            }
+            public void Load(TagCompound tag) {
+                Allocated = TagLoadListAsArray<int>(tag, TAG_NAMES.Attributes_Allocated, Count);
+
+                //unallocate any attribute that is no longer active
+                for (byte i = 0; i < Count; i++) {
+                    if (!Attribute.LOOKUP[i].Active) {
+                        Allocated[i] = 0;
+                    }
+                }
+
+                //calculate effective allocated
+                UpdateAllocatedEffective();
+
+                //calculate points
+                UpdatePoints();
+
+                //if too few points, reset allocations
+                if (Points_Available < 0)
+                    Reset(false);
+            }
+        }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Custom Stats ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         /// <summary>
         /// Reset on each update cycle
         /// </summary>
-        public StatsContainer Stats { get; } = new StatsContainer();
-        public class StatsContainer {
+        public readonly StatsContainer Stats;
+        public class StatsContainer : ContainerTemplate {
+            public StatsContainer(CharacterSheet csheet) : base(csheet) {
+                Reset();
+            }
+
             public bool Can_Use_Abilities; //TODO - unused
             public bool Channelling; //TODO - unused
-
+            
             public float Healing_Mult; //TODO - unused
 
             public float Dodge; //TODO - unused
@@ -46,11 +242,7 @@ namespace ExperienceAndClasses.Systems {
             public DamageModifier NonMinionProjectile = new DamageModifier(); //TODO - unused
             public DamageModifier NonMinionAll = new DamageModifier(); //TODO - unused
 
-            public StatsContainer() {
-                Clear();
-            }
-
-            public void Clear() {
+            public void Reset() {
                 Can_Use_Abilities = true;
                 Channelling = false;
 
@@ -70,8 +262,10 @@ namespace ExperienceAndClasses.Systems {
         }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Character ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-        public CharacterMethods Character { get; } = new CharacterMethods();
-        public class CharacterMethods {
+        public readonly CharacterMethods Character;
+        public class CharacterMethods : ContainerTemplate {
+            public CharacterMethods(CharacterSheet csheet) : base(csheet) { }
+
             public byte Level { get; private set; } = 1;
             public uint XP { get; private set; } = 0;
 
@@ -102,13 +296,8 @@ namespace ExperienceAndClasses.Systems {
             /// </summary>
             public bool Secondary_Unlocked { get; private set; } = false; //TODO - not used
 
-            /// <summary>
-            /// True when player is the local player
-            /// </summary>
-            public bool Is_Local { get; private set; } = false;
-
             public void ForceLevel(byte level) {
-                if (Is_Local) {
+                if (CSheet.eacplayer.Fields.Is_Local) {
                     Utilities.Logger.Error("ForceLevel called by local");
                 }
                 else {
@@ -117,13 +306,9 @@ namespace ExperienceAndClasses.Systems {
                 }
             }
 
-            public void SetAsLocal() {
-                Is_Local = true;
-            }
-
             public void SetAFK(bool afk) {
                 AFK = afk;
-                if (Is_Local) {
+                if (CSheet.eacplayer.Fields.Is_Local) {
                     if (AFK) {
                         Main.NewText(Language.GetTextValue("Mods.ExperienceAndClasses.Common.AFK_Start"), UI.Constants.COLOUR_MESSAGE_ERROR);
                     }
@@ -138,7 +323,7 @@ namespace ExperienceAndClasses.Systems {
             }
 
             public void DefeatWOF() {
-                if (Is_Local && !Defeated_WOF) {
+                if (CSheet.eacplayer.Fields.Is_Local && !Defeated_WOF) {
                     Defeated_WOF = true;
                     Main.NewText(Language.GetTextValue("Mods.ExperienceAndClasses.Common.Unlock_WOF"), UI.Constants.COLOUR_MESSAGE_SUCCESS);
                     //TODO
@@ -214,6 +399,17 @@ namespace ExperienceAndClasses.Systems {
             }
         }
 
+        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Update ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+        public void PreUpdate() {
+            Attributes.ResetBonuses();
+            Stats.Reset();
+        }
+
+        public void PostUpdate() {
+            Attributes.Apply();
+        }
+
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Save/Load ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         private static class TAG_NAMES {
             public static string PREFIX = "eac_";
@@ -222,7 +418,7 @@ namespace ExperienceAndClasses.Systems {
             //TODO
 
             //Attribute Allocations
-            //TODO
+            public static string Attributes_Allocated = PREFIX + "attribute_allocation";
 
             //Character
             public static string Character_Level = PREFIX + "character_level";
@@ -236,7 +432,7 @@ namespace ExperienceAndClasses.Systems {
             //TODO
 
             //Attribute Allocations
-            //TODO
+            Attributes.Load(tag);
 
             //Character
             Character.Load(tag);
@@ -247,12 +443,59 @@ namespace ExperienceAndClasses.Systems {
             //TODO
 
             //Attribute Allocations
-            //TODO
+            tag = Attributes.Save(tag);
 
             //Character
             tag = Character.Save(tag);
 
             return tag;
         }
+
+
+        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Container Template ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+        public abstract class ContainerTemplate {
+            protected readonly CharacterSheet CSheet;
+            public ContainerTemplate(CharacterSheet csheet) {
+                CSheet = csheet;
+            }
+        }
+
+        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Helper Methods ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+        protected static TagCompound TagAddArrayAsList<T>(TagCompound tag, string name, T[] array) {
+
+            //convert to list
+            List<T> list = new List<T>();
+            foreach (T value in array) {
+                list.Add(value);
+            }
+
+            //add list
+            tag.Add(name, list);
+
+            //return
+            return tag;
+        }
+
+        protected static T[] TagLoadListAsArray<T>(TagCompound tag, string name, int length) {
+            //load list
+            List<T> list = Utilities.Commons.TryGet<List<T>>(tag, name, new List<T>());
+
+            //warn if list is too long
+            if (length < list.Count) {
+                Utilities.Logger.Error("Error loading " + name + ". Loaded array is too long. Excess entries will be lost.");
+            }
+
+            //create array (if list was too long, produce a larger array in case this helps prevent data loss)
+            T[] array = new T[Math.Max(length, list.Count)];
+
+            //populate array
+            for (int i = 0; i < list.Count; i++) {
+                array[i] = list[i];
+            }
+
+            //return
+            return array;
+        }
+
     }
 }
