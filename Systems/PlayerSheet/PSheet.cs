@@ -17,10 +17,10 @@ namespace ExperienceAndClasses.Systems {
 
         public PSheet(EACPlayer owner) {
             eacplayer = owner;
-            Classes = new ClassSheet(this);
-            Attributes = new AttributeSheet(this);
             Stats = new StatsSheet(this);
+            Attributes = new AttributeSheet(this);
             Character = new CharacterSheet(this);
+            Classes = new ClassSheet(this);
         }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Update ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
