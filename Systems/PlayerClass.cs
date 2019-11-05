@@ -40,6 +40,8 @@ namespace ExperienceAndClasses.Systems {
             HybridPrime,
             Explorer,
             Oracle,
+            Bard,
+            Minstrel,
 
             //insert here
 
@@ -73,6 +75,8 @@ namespace ExperienceAndClasses.Systems {
         private static readonly Color COLOUR_TRICKERY_3 = new Color(107, 107, 107);
         private static readonly Color COLOUR_HYBRID_2 = new Color(204, 87, 138);
         private static readonly Color COLOUR_HYBRID_3 = new Color(193, 36, 104);
+        private static readonly Color COLOUR_MUSIC_2 = new Color(204, 87, 138);
+        private static readonly Color COLOUR_MUSIC_3 = new Color(193, 36, 104);
 
         public readonly static PlayerClass[] LOOKUP;
 
@@ -602,6 +606,20 @@ namespace ExperienceAndClasses.Systems {
             }
         }
 
+        public class Bard : Tier2 {
+            public Bard() : base(IDs.Bard, Attribute.PowerScaling.IDs.AllCore) {
+                Class_Locations[0, 4] = ID_num;
+                Attribute_Growth[(byte)Attribute.IDs.Power] = 2;
+                Attribute_Growth[(byte)Attribute.IDs.Vitality] = 2;
+                Attribute_Growth[(byte)Attribute.IDs.Mind] = 2;
+                Attribute_Growth[(byte)Attribute.IDs.Spirit] = 2;
+                Attribute_Growth[(byte)Attribute.IDs.Agility] = 2;
+                Attribute_Growth[(byte)Attribute.IDs.Dexterity] = 2;
+                Colour = COLOUR_MUSIC_2;
+                implementation_status = IMPLEMENTATION_STATUS.ATTRIBUTE_ONLY;
+            }
+        }
+
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Tier 3 Classes ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         public class BloodKnight : Tier3 {
@@ -755,6 +773,20 @@ namespace ExperienceAndClasses.Systems {
                 Attribute_Growth[(byte)Attribute.IDs.Agility] = 2.5f;
                 Attribute_Growth[(byte)Attribute.IDs.Dexterity] = 2.5f;
                 Colour = COLOUR_HYBRID_3;
+                implementation_status = IMPLEMENTATION_STATUS.ATTRIBUTE_ONLY;
+            }
+        }
+
+        public class Minstrel : Tier3 {
+            public Minstrel() : base(IDs.Minstrel, Attribute.PowerScaling.IDs.AllCore, IDs.Bard) {
+                Class_Locations[0, 5] = ID_num;
+                Attribute_Growth[(byte)Attribute.IDs.Power] = 2.5f;
+                Attribute_Growth[(byte)Attribute.IDs.Vitality] = 2.5f;
+                Attribute_Growth[(byte)Attribute.IDs.Mind] = 2.5f;
+                Attribute_Growth[(byte)Attribute.IDs.Spirit] = 2.5f;
+                Attribute_Growth[(byte)Attribute.IDs.Agility] = 2.5f;
+                Attribute_Growth[(byte)Attribute.IDs.Dexterity] = 2.5f;
+                Colour = COLOUR_MUSIC_3;
                 implementation_status = IMPLEMENTATION_STATUS.ATTRIBUTE_ONLY;
             }
         }
