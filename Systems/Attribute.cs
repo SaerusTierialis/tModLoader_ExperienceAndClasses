@@ -411,6 +411,7 @@ namespace ExperienceAndClasses.Systems {
             protected float Damage_Close_Range { get; private set; } = 0f;
             protected float Damage_Non_Minion_Projectile { get; private set; } = 0f;
             public float Damage_Holy { get; private set; } = 0f;
+            public float Damage_Musical { get; private set; } = 0f;
 
             //healing
             public float Healing { get; private set; } = 0f;
@@ -446,6 +447,7 @@ namespace ExperienceAndClasses.Systems {
                 float close_range_damage_per = Math.Max(eacplayer.PSheet.Classes.Primary.Class.Power_Scaling.Damage_Close_Range, eacplayer.PSheet.Classes.Secondary.Class.Power_Scaling.Damage_Close_Range / 2);
                 float non_minion_projectile_damage_per = Math.Max(eacplayer.PSheet.Classes.Primary.Class.Power_Scaling.Damage_Non_Minion_Projectile, eacplayer.PSheet.Classes.Secondary.Class.Power_Scaling.Damage_Non_Minion_Projectile / 2);
                 float holy_damage_per = Math.Max(eacplayer.PSheet.Classes.Primary.Class.Power_Scaling.Damage_Holy, eacplayer.PSheet.Classes.Secondary.Class.Power_Scaling.Damage_Holy / 2);
+                float music_damage_per = Math.Max(eacplayer.PSheet.Classes.Primary.Class.Power_Scaling.Damage_Musical, eacplayer.PSheet.Classes.Secondary.Class.Power_Scaling.Damage_Musical / 2);
 
                 //non-combat
                 float fish_per = Math.Max(eacplayer.PSheet.Classes.Primary.Class.Power_Scaling.Fish_Power, eacplayer.PSheet.Classes.Secondary.Class.Power_Scaling.Fish_Power / 2);
@@ -532,6 +534,16 @@ namespace ExperienceAndClasses.Systems {
                     }
                 }
 
+                //music
+                if (music_damage_per > 0f) {
+                    bonus_per_point = music_damage_per * Attribute.Power.PER_POINT_DAMAGE;
+                    bonus_total = bonus_per_point * points;
+                    eacplayer.PSheet.Stats.Musical.Increase += bonus_total;
+                    if (eacplayer.Fields.Is_Local) {
+                        bonus += "\n+" + Math.Round(bonus_total * 100, 3) + "% musical damage (" + Math.Round(bonus_per_point * 100, 3) + " per point)";
+                    }
+                }
+
                 //fish
                 if (fish_per > 0f) {
                     bonus_per_point = fish_per * Attribute.Power.PER_POINT_FISH;
@@ -603,6 +615,8 @@ namespace ExperienceAndClasses.Systems {
                     Primary_Types = "All Damage";
                     Damage_All_Non_Minion = SCALE_PRIMARY;
                     Minion = SCALE_PRIMARY;
+                    Damage_Musical = SCALE_PRIMARY;
+
                     Healing = SCALE_SECONDARY;
                 }
             }
@@ -611,11 +625,12 @@ namespace ExperienceAndClasses.Systems {
                 public Holy_AllCore() : base(IDs.Holy_AllCore) {
                     Primary_Types = "Holy";
                     Damage_Holy = SCALE_PRIMARY;
-                    Healing = SCALE_PRIMARY;
 
                     Secondary_Types = "All Damage";
                     Damage_All_Non_Minion = SCALE_SECONDARY;
                     Minion = SCALE_SECONDARY;
+
+                    Healing = SCALE_PRIMARY;
                 }
             }
 
