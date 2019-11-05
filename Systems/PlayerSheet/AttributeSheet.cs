@@ -73,8 +73,10 @@ namespace ExperienceAndClasses.Systems.PlayerSheet {
         }
 
         public void UpdateFromClass() {
-            //TODO
             From_Class = new int[Count];
+
+            //TODO
+            //use Level_Effective
         }
 
         /// <summary>

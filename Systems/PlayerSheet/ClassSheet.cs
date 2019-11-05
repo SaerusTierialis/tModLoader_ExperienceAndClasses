@@ -174,7 +174,7 @@ namespace ExperienceAndClasses.Systems.PlayerSheet {
         }
 
         private void OnClassOrLevelChange() {
-            PSHEET.Attributes.UpdatePoints();
+            PSHEET.Attributes.UpdateFromClass();
 
             //TODO - ability, passive, etc.
         }
