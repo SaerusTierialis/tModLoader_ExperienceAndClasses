@@ -129,14 +129,16 @@ namespace ExperienceAndClasses.Systems {
         public static int LocalAllocationPointTotal(PSheet psheet) {
             float sum = 0;
 
+            //points from character
             sum += psheet.Character.Level * ALLOCATION_POINTS_PER_CHARACTER_LEVEL;
 
-            //TODO - points from classes
-            /*
-            for (byte i = 0; i < Shortcuts.LOCAL_PLAYER.psheet.Class_Count; i++) {
-                sum += Shortcuts.LOCAL_PLAYER.psheet.Classes[i].GetAllocationPoints();
+            //get class levels
+            int[] class_level_per_tier = psheet.Classes.GetTierTotalLevels(true);
+
+            //points from classes
+            for (byte i = 0; i < PlayerClass.MAX_TIER; i++) {
+                sum += class_level_per_tier[i] * ALLOCATION_POINTS_PER_LEVEL_TIERS[i];
             }
-            */
 
             return (int)Math.Floor(sum);
         }
@@ -151,6 +153,21 @@ namespace ExperienceAndClasses.Systems {
                 return (int)Math.Floor(Math.Pow(points, 0.5));
             else
                 return 0;
+        }
+
+        public static int GetClassBonus(PSheet psheet, byte id) {
+            float value_primary = psheet.Classes.Primary.Class.Attribute_Growth[id] * psheet.Classes.Primary.Level_Effective;
+            float value_secondary = psheet.Classes.Secondary.Class.Attribute_Growth[id] * psheet.Classes.Secondary.Level_Effective;
+
+            if (psheet.Classes.Primary.Valid_Class && psheet.Classes.Secondary.Valid_Class) {
+                return (int)Math.Floor((value_primary * SUBCLASS_PENALTY_ATTRIBUTE_MULTIPLIER_PRIMARY) + (value_secondary * SUBCLASS_PENALTY_ATTRIBUTE_MULTIPLIER_SECONDARY));
+            }
+            else if (psheet.Classes.Primary.Valid_Class){
+                return (int)Math.Floor(value_primary);
+            }
+            else {
+                return 0;
+            }
         }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Attributes ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/

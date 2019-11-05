@@ -58,15 +58,23 @@ namespace ExperienceAndClasses.Systems.PlayerSheet {
             public bool Is_Secondary { get { return ID == CONTAINER.ID_Active_Secondary; } }
 
             public bool Unlocked { get { return CONTAINER.Data_Unlock[ID]; } private set { CONTAINER.Data_Unlock[ID] = value; } }
-            public byte Level { get { return CONTAINER.Data_Level[ID]; } private set { CONTAINER.Data_Level[ID] = value; } }
+
+            public byte Level {
+                get {
+                    return Math.Min(PlayerClass.MAX_TIER_LEVEL[Class.Tier], CONTAINER.Data_Level[ID]);
+                }
+                private set {
+                    CONTAINER.Data_Level[ID] = value; }
+            }
+
             public uint XP { get { return CONTAINER.Data_XP[ID]; } private set { CONTAINER.Data_XP[ID] = value; } }
 
             public uint XP_Level_Total { get; private set; } = 0;
             public uint XP_Level_Remaining { get; private set; } = 0;
 
-            public uint Level_Effective { get {
+            public byte Level_Effective { get {
                     if (Is_Secondary)
-                        return (uint)Math.Ceiling(Level / 2.0);
+                        return (byte)Math.Ceiling(Level / 2.0);
                     else
                         return Level;
                 }
@@ -74,7 +82,7 @@ namespace ExperienceAndClasses.Systems.PlayerSheet {
 
             public bool Valid_Class {
                 get {
-                    return Class.Tier > 0;
+                    return (Class.Tier > 0) && (Class.Enabled);
                 }
             }
 
@@ -212,6 +220,18 @@ namespace ExperienceAndClasses.Systems.PlayerSheet {
                 //changes
                 OnClassOrLevelChange();
             }
+        }
+
+        public int[] GetTierTotalLevels(bool require_gives_allocation = false) {
+            int[] totals = new int[PlayerClass.MAX_TIER + 1];
+
+            for (byte i=0; i<Count; i++) {
+                if (Data_Class[i].Valid_Class && (!require_gives_allocation || Data_Class[i].Class.Gives_Allocation_Attributes)) {
+                    totals[Data_Class[i].Class.Tier] += Data_Class[i].Level;
+                }
+            }
+
+            return totals;
         }
 
         public TagCompound Save(TagCompound tag) {

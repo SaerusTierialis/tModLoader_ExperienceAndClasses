@@ -75,8 +75,11 @@ namespace ExperienceAndClasses.Systems.PlayerSheet {
         public void UpdateFromClass() {
             From_Class = new int[Count];
 
-            //TODO
-            //use Level_Effective
+            for (byte i = 0; i < Count; i++) {
+                if (Attribute.LOOKUP[i].Active) {
+                    From_Class[i] = Attribute.GetClassBonus(PSHEET, i);
+                }
+            }
         }
 
         /// <summary>
