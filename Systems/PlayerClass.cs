@@ -508,7 +508,7 @@ namespace ExperienceAndClasses.Systems {
                 Attribute_Growth[(byte)Attribute.IDs.Dexterity] = 2f;
                 Colour = COLOUR_NONCOMBAT;
                 implementation_status = IMPLEMENTATION_STATUS.ATTRIBUTE_ONLY;
-                XP_Multiplier_Combat = 0.25f;
+                XP_Multiplier_Combat = 0.1f;
                 XP_Multiplier_NonCombat = 10.0f;
             }
         }
