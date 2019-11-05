@@ -33,7 +33,7 @@ namespace ExperienceAndClasses.Systems {
         //allocation points
         public const double ALLOCATION_POINTS_PER_INCREASED_COST = 5d;
         public const float ALLOCATION_POINTS_PER_CHARACTER_LEVEL = 5f;
-        public static readonly float[] ALLOCATION_POINTS_PER_LEVEL_TIERS = new float[] { 0f, 0.1f, 0.2f, 0.3f }; //TODO - unused
+        public static readonly float[] ALLOCATION_POINTS_PER_LEVEL_TIERS = new float[] { 0f, 0.2f, 0.3f, 0.5f };
 
         //reset
         public static readonly ModItem RESET_COST_ITEM = ModContent.GetInstance<Items.Orb_Monster>();
