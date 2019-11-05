@@ -55,7 +55,7 @@ namespace ExperienceAndClasses.Systems {
                 if (args.Length > 0) {
                     world_password = args[0];
                 }
-                System.Console.WriteLine(Language.GetTextValue("Mods.ExperienceAndClasses.Common.Password_Display") + ":" + world_password);
+                System.Console.WriteLine(Language.GetTextValue("Mods.ExperienceAndClasses.Common.Password_Display", world_password));
             }
         }
 

@@ -123,7 +123,7 @@ namespace ExperienceAndClasses.Systems.PlayerSheet {
         }
 
         public string GetLevelupMessage(byte id) {
-            return PSHEET.eacplayer.player.name + " " + Language.GetTextValue("Mods.ExperienceAndClasses.Common.Levelup_Class") + " " + Data_Class[id].Level + " " + Data_Class[id].Class.Name + "!";
+            return Language.GetTextValue("Mods.ExperienceAndClasses.Common.Levelup_Class", PSHEET.eacplayer.player.name, Data_Class[id].Level, Data_Class[id].Class.Name);
         }
 
         public void SetPrimary(byte id, bool sync = true) {

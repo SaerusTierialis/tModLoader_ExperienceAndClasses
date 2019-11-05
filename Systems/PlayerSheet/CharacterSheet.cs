@@ -125,7 +125,7 @@ namespace ExperienceAndClasses.Systems.PlayerSheet {
         }
 
         public string GetLevelupMessage() {
-            return PSHEET.eacplayer.player.name + " " + Language.GetTextValue("Mods.ExperienceAndClasses.Common.Levelup_Character") + " " + Level + "!";
+            return Language.GetTextValue("Mods.ExperienceAndClasses.Common.Levelup_Character", PSHEET.eacplayer.player.name, Level);
         }
 
         public TagCompound Save(TagCompound tag) {

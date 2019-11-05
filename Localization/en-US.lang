@@ -1,11 +1,5 @@
 //Generic
-Common.XP=XP
-Common.experience=experience
-Common.Experience=Experience
-Common.orb=orbs
-Common.Orb=Orb
-Common.orbs=orbs
-Common.Orbs=Orbs
+
 
 
 //Mod Name
@@ -17,9 +11,9 @@ Common.Hotkey_UI=Toggle UI
 
 
 //Levelup+Unlock
-Common.Levelup_Character=is now character level
-Common.Levelup_Class=is now a level
-Common.Unlock=You have unlocked
+Common.Levelup_Character={0} is now character level {1}!
+Common.Levelup_Class={0} is now a level {1} {2}!
+Common.Unlock=You have unlocked {0}!
 
 
 //Items
@@ -38,7 +32,7 @@ ItemTooltip.Unlock_Explorer=A token that is used to unlock the non-combat class.
 
 
 //System - Password
-Common.Password_Display=The world password ({$Mods.ExperienceAndClasses.Common.Mod_Name}) is
+Common.Password_Display=The world password ({$Mods.ExperienceAndClasses.Common.Mod_Name}) is:{0}
 Common.Password_CommandShow_Description=Display the world password ({$Mods.ExperienceAndClasses.Common.Mod_Name})
 Common.Password_CommandSet_Description=Set the world password ({$Mods.ExperienceAndClasses.Common.Mod_Name})
 
@@ -55,16 +49,16 @@ Common.Config_Enabled=Enabled
 
 
 //ConfigServer
-Common.Config_Header_XP={$Mods.ExperienceAndClasses.Common.Experience} and {$Mods.ExperienceAndClasses.Common.Orbs}
+Common.Config_Header_XP=Experience and Orbs
 Common.Config_Header_Debug=Debug
 Common.Config_Header_AFK=Away From Keyboard
 
-Common.Config_XP_Rate_Label={$Mods.ExperienceAndClasses.Common.XP} Multiplier
+Common.Config_XP_Rate_Label=XP Multiplier
 
-Common.Config_XP_DeathPenalty_Label={$Mods.ExperienceAndClasses.Common.XP} Death Penalty
+Common.Config_XP_DeathPenalty_Label=XP Death Penalty
 
-Common.Config_Reward_ModPerPlayer_Label=Bonus {$Mods.ExperienceAndClasses.Common.XP}/{$Mods.ExperienceAndClasses.Common.Orb} Multiplier Per Player
-Common.Config_Reward_ModPerPlayer_Tooltip=Per player bonus to apply before splitting rewards
+Common.Config_Reward_ModPerPlayer_Label=Bonus Reward Multiplier Per Player
+Common.Config_Reward_ModPerPlayer_Tooltip=Bonus to apply before splitting rewards per player after the first
 
 Common.Config_Reward_Distance_Label=Multiplayer Reward Distance
 Common.Config_Reward_Distance_Tooltip=Distance to recieve rewards in multiplayer\nPlayers who damaged the target are eligible regardless of distance\nPlayers are always eligible for boss rewards 
