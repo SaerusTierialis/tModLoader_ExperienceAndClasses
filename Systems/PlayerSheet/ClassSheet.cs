@@ -32,6 +32,8 @@ namespace ExperienceAndClasses.Systems.PlayerSheet {
         public ClassInfo Primary { get { return Data_Class[ID_Active_Primary]; } }
         public ClassInfo Secondary { get { return Data_Class[ID_Active_Secondary]; } }
 
+        public bool Has_Subclass { get { return Secondary.Valid_Class; } }
+
         protected bool[] Data_Unlock = new bool[Count];
         protected byte[] Data_Level = new byte[Count];
         protected uint[] Data_XP = new uint[Count];
@@ -61,6 +63,14 @@ namespace ExperienceAndClasses.Systems.PlayerSheet {
 
             public uint XP_Level_Total { get; private set; } = 0;
             public uint XP_Level_Remaining { get; private set; } = 0;
+
+            public uint Level_Effective { get {
+                    if (Is_Secondary)
+                        return (uint)Math.Ceiling(Level / 2.0);
+                    else
+                        return Level;
+                }
+            }
 
             public bool Valid_Class {
                 get {
