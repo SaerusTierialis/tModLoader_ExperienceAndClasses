@@ -72,6 +72,8 @@ namespace ExperienceAndClasses.Systems.PlayerSheet {
         public static string Class_Unlock = PREFIX + "class_unlock";
         public static string Class_XP = PREFIX + "class_xp";
         public static string Class_Level = PREFIX + "class_level";
+        public static string Class_Active_Primary = PREFIX + "class_current_primary";
+        public static string Class_Active_Secondary = PREFIX + "class_current_secondary";
 
         //Attribute Allocations
         public static string Attributes_Allocated = PREFIX + "attribute_allocation";

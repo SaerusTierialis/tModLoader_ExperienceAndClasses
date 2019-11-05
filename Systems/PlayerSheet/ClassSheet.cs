@@ -263,9 +263,14 @@ namespace ExperienceAndClasses.Systems.PlayerSheet {
         }
 
         public TagCompound Save(TagCompound tag) {
+            //class data arrays
             tag = Utilities.Commons.TagAddArrayAsList(tag, TAG_NAMES.Class_Unlock, Data_Unlock);
             tag = Utilities.Commons.TagAddArrayAsList(tag, TAG_NAMES.Class_Level, Data_Level);
             tag = Utilities.Commons.TagAddArrayAsList(tag, TAG_NAMES.Class_XP, Data_XP);
+
+            //active classes
+            tag.Add(TAG_NAMES.Class_Active_Primary, ID_Active_Primary);
+            tag.Add(TAG_NAMES.Class_Active_Secondary, ID_Active_Secondary);
 
             return tag;
         }
@@ -278,6 +283,10 @@ namespace ExperienceAndClasses.Systems.PlayerSheet {
             for (byte i = 0; i < Count; i++) {
                 Data_Class[i].UpdateXPForLevel();
             }
+
+            //active classes
+            ID_Active_Primary = Utilities.Commons.TagTryGet(tag, TAG_NAMES.Class_Active_Primary, (byte)PlayerClass.IDs.Novice);
+            ID_Active_Secondary = Utilities.Commons.TagTryGet(tag, TAG_NAMES.Class_Active_Secondary, (byte)PlayerClass.IDs.None);
 
             //set attributes, abilities, etc.
             OnClassOrLevelChange();
