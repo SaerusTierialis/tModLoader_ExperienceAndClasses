@@ -278,9 +278,9 @@ namespace ExperienceAndClasses.Systems {
                 eacplayer.player.maxMinions += bonus;
                 if (eacplayer.Fields.Is_Local) Bonus += "\n+" + bonus + " maximum minions (" + PER_POINT_MINION_CAP + " per point)";
 
-                //healing (use holy damage scaling)
-                float holy_damage_per = Math.Max(eacplayer.PSheet.Classes.Primary.Class.Power_Scaling.Damage_Holy, eacplayer.PSheet.Classes.Secondary.Class.Power_Scaling.Damage_Holy / 2);
-                float bonus_per_point = holy_damage_per * PER_POINT_HOLY_HEAL;
+                //healing
+                float healing_per = Math.Max(eacplayer.PSheet.Classes.Primary.Class.Power_Scaling.Healing, eacplayer.PSheet.Classes.Secondary.Class.Power_Scaling.Healing / 2);
+                float bonus_per_point = healing_per * PER_POINT_HOLY_HEAL;
                 float bonus_float = bonus_per_point * points;
                 eacplayer.PSheet.Stats.Healing_Mult += bonus_float;
                 if (eacplayer.Fields.Is_Local) Bonus += "\n+" + Math.Round(bonus_float * 100, 3) + "% healing (" + Math.Round(bonus_per_point * 100, 3) + " per point)";
@@ -373,6 +373,7 @@ namespace ExperienceAndClasses.Systems {
                 MinionOnly,
                 NonCombat,
                 Rogue,
+                Musical,
 
                 //insert here
 
@@ -410,6 +411,9 @@ namespace ExperienceAndClasses.Systems {
             protected float Damage_Close_Range { get; private set; } = 0f;
             protected float Damage_Non_Minion_Projectile { get; private set; } = 0f;
             public float Damage_Holy { get; private set; } = 0f;
+
+            //healing
+            public float Healing { get; private set; } = 0f;
 
             //non-combat
             public float Fish_Power { get; private set; } = 0f;
@@ -594,10 +598,20 @@ namespace ExperienceAndClasses.Systems {
                 }
             }
 
+            public class Musical : PowerScaling {
+                public Musical() : base(IDs.Musical) {
+                    Primary_Types = "All Damage";
+                    Damage_All_Non_Minion = SCALE_PRIMARY;
+                    Minion = SCALE_PRIMARY;
+                    Healing = SCALE_SECONDARY;
+                }
+            }
+
             public class Holy_AllCore : PowerScaling {
                 public Holy_AllCore() : base(IDs.Holy_AllCore) {
                     Primary_Types = "Holy";
                     Damage_Holy = SCALE_PRIMARY;
+                    Healing = SCALE_PRIMARY;
 
                     Secondary_Types = "All Damage";
                     Damage_All_Non_Minion = SCALE_SECONDARY;

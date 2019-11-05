@@ -607,7 +607,7 @@ namespace ExperienceAndClasses.Systems {
         }
 
         public class Bard : Tier2 {
-            public Bard() : base(IDs.Bard, Attribute.PowerScaling.IDs.AllCore) {
+            public Bard() : base(IDs.Bard, Attribute.PowerScaling.IDs.Musical) {
                 Class_Locations[0, 4] = ID_num;
                 Attribute_Growth[(byte)Attribute.IDs.Power] = 2;
                 Attribute_Growth[(byte)Attribute.IDs.Vitality] = 2;
@@ -778,7 +778,7 @@ namespace ExperienceAndClasses.Systems {
         }
 
         public class Minstrel : Tier3 {
-            public Minstrel() : base(IDs.Minstrel, Attribute.PowerScaling.IDs.AllCore, IDs.Bard) {
+            public Minstrel() : base(IDs.Minstrel, Attribute.PowerScaling.IDs.Musical, IDs.Bard) {
                 Class_Locations[0, 5] = ID_num;
                 Attribute_Growth[(byte)Attribute.IDs.Power] = 2.5f;
                 Attribute_Growth[(byte)Attribute.IDs.Vitality] = 2.5f;
