@@ -10,8 +10,8 @@ namespace ExperienceAndClasses.Systems {
     public static class XP {
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Constants ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-        public const double SUBCLASS_PENALTY_XP_MULTIPLIER_PRIMARY = 0.7; //TODO - unused
-        public const double SUBCLASS_PENALTY_XP_MULTIPLIER_SECONDARY = 0.3; //TODO - unused
+        public const double SUBCLASS_PENALTY_XP_MULTIPLIER_PRIMARY = 0.7;
+        public const double SUBCLASS_PENALTY_XP_MULTIPLIER_SECONDARY = 0.3;
 
         public const byte MAX_LEVEL = 255;
 
@@ -89,7 +89,7 @@ namespace ExperienceAndClasses.Systems {
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ XP Adjustments ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         
         public static class Adjustments {
-            public static void LocalAddXP(uint xp) {
+            public static void LocalAddXP(uint xp, bool is_combat = true) {
                 //convert to double temporarily
                 double xpd = xp;
 
@@ -102,14 +102,25 @@ namespace ExperienceAndClasses.Systems {
                 //round up
                 xp = (uint)Math.Ceiling(xpd);
 
+                //sheet
+                PSheet psheet = Shortcuts.LOCAL_PLAYER.PSheet;
+
                 //display?
                 if (Shortcuts.GetConfigClient.UIMisc_XPOverhead)
                     CombatText.NewText(Main.LocalPlayer.getRect(), UI.Constants.COLOUR_XP_BRIGHT, "+" + xp + " XP");
 
                 //add to player
-                Shortcuts.LOCAL_PLAYER.PSheet.Character.LocalAddXP(xp);
+                psheet.Character.LocalAddXP(xp);
 
-                //TODO - add to classes
+                //add to classes
+                if (psheet.Classes.Has_Subclass) {
+                    psheet.Classes.Primary.AddXP((uint)Math.Ceiling(xp * SUBCLASS_PENALTY_XP_MULTIPLIER_PRIMARY), is_combat);
+                    psheet.Classes.Secondary.AddXP((uint)Math.Ceiling(xp * SUBCLASS_PENALTY_XP_MULTIPLIER_SECONDARY), is_combat);
+                }
+                else
+                {
+                    psheet.Classes.Primary.AddXP(xp, is_combat);
+                }
             }
 
             public static void LocalDeathPenalty(uint xp) {

@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Terraria;
 using Terraria.Localization;
 using Terraria.ModLoader;
 
@@ -118,6 +119,9 @@ namespace ExperienceAndClasses.Systems {
 
         protected IMPLEMENTATION_STATUS implementation_status = IMPLEMENTATION_STATUS.UNKNOWN;
 
+        public float XP_Multiplier_Combat { get; protected set; } = 1.0f;
+        public float XP_Multiplier_NonCombat { get; protected set; } = 1.0f;
+
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Instance ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         public PlayerClass(IDs id) {
@@ -129,7 +133,317 @@ namespace ExperienceAndClasses.Systems {
             Description = Language.GetTextValue("Mods.ExperienceAndClasses.Common.Class_" + Enum.GetName(typeof(IDs), id) + "_Description");
         }
 
-        //TODO - add back several methods
+        public void LoadTextureAndSetTooltip() {
+            //load texture
+            if (Has_Texture) {
+                Texture = ModContent.GetTexture("ExperienceAndClasses/Textures/Class/" + Name);
+            }
+            else {
+                //no texture loaded, set blank
+                Texture = Utilities.Textures.TEXTURE_CLASS_DEFAULT;
+            }
+
+            //set tooltip title
+            Tooltip_Title = Name;
+            if (ID_num == (byte)Systems.PlayerClass.IDs.Explorer) {
+                Tooltip_Title += " [Unique]";
+            }
+            else {
+                Tooltip_Title += " [Tier " + new string('I', Tier) + "]";
+            }
+
+            //implementation status
+            string implementation_status_text = "Implementation State: ";
+            switch (implementation_status) {
+                case IMPLEMENTATION_STATUS.ATTRIBUTE_ONLY:
+                    implementation_status_text += "attributes only";
+                    break;
+
+                case IMPLEMENTATION_STATUS.ATTRIBUTE_PLUS_PARTIAL_ABILITY:
+                    implementation_status_text += "some abilities/passives";
+                    break;
+
+                case IMPLEMENTATION_STATUS.COMPLETE:
+                    implementation_status_text += "complete";
+                    break;
+
+                case IMPLEMENTATION_STATUS.UNKNOWN:
+                default:
+                    implementation_status_text += "unknown";
+                    break;
+            }
+
+            //set tooltip
+            Tooltip_Main = implementation_status_text + "\n\n" + Description + "\n\n" + "POWER SCALING:\nPrimary:   " + Power_Scaling.Primary_Types + "\nSecondary: " + Power_Scaling.Secondary_Types + "\n\nATTRIBUTES:";
+            bool first = true;
+            string attribute_names = "";
+            Tooltip_Attribute_Growth = "";
+            foreach (byte id in Systems.Attribute.ATTRIBUTES_UI_ORDER) {
+                if (first) {
+                    first = false;
+                }
+                else {
+                    attribute_names += "\n";
+                    Tooltip_Attribute_Growth += "\n";
+                }
+                attribute_names += Systems.Attribute.LOOKUP[id].Specifc_Name + ":";
+
+                for (byte i = 0; i < 5; i++) {
+                    if (Attribute_Growth[id] >= (i + 1)) {
+                        Tooltip_Attribute_Growth += "★";
+                    }
+                    else if (Attribute_Growth[id] > i) {
+                        Tooltip_Attribute_Growth += "✯";
+                    }
+                    else {
+                        Tooltip_Attribute_Growth += "☆";
+                    }
+                }
+            }
+            Tooltip_Main += "\n" + attribute_names;
+        }
+
+        /// <summary>
+        /// Check if player meets class prereqs
+        /// </summary>
+        /// <returns></returns>
+        public bool HasPrereqClass(PSheet psheet) {
+            Systems.PlayerClass pre = Prereq;
+            while (pre != null) {
+                if (psheet.Classes.GetClassLevel(pre.ID_num) < pre.Max_Level) {
+                    //level requirement not met
+                    return false;
+                }
+                else {
+                    pre = pre.Prereq;
+                }
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// Try to unlock this class (called from UI)
+        /// </summary>
+        /// <returns></returns>
+        public bool LocalTryUnlockClass() {
+            PSheet psheet = Shortcuts.LOCAL_PLAYER.PSheet;
+
+            //check locked
+            if (psheet.Classes.GetClassUnlocked(ID_num)) {
+                Utilities.Logger.Error("Trying to unlock already unlocked class " + Name);
+                return false;
+            }
+
+            //tier 3 requirement
+            if (Tier == 3 && !CanUnlockTier3(psheet)) {
+                if (!psheet.Character.Defeated_WOF) {
+                    Main.NewText(Language.GetTextValue("Mods.ExperienceAndClasses.Common.Unlock_Class_Fail_WOF"), UI.Constants.COLOUR_MESSAGE_ERROR);
+                }
+                else {
+                    Utilities.Logger.Error("LocalCanUnlockTier3 returned false for unknown reasons! Please Report!");
+                }
+                return false;
+            }
+
+            //level requirements
+            if (!HasPrereqClass(psheet)) {
+                Main.NewText(Language.GetTextValue("Mods.ExperienceAndClasses.Common.Unlock_Class_Fail_Prereq", Prereq.Max_Level, Prereq.Name, Name), UI.Constants.COLOUR_MESSAGE_ERROR);
+                return false;
+            }
+
+            //item requirements
+            if (Unlock_Item != null) {
+                if (!Shortcuts.LOCAL_PLAYER.player.HasItem(Unlock_Item.item.type)) {
+                    //item requirement not met
+                    Main.NewText(Language.GetTextValue("Mods.ExperienceAndClasses.Common.Unlock_Class_Fail_Item", Unlock_Item.Name, Name), UI.Constants.COLOUR_MESSAGE_ERROR);
+                    return false;
+                }
+            }
+
+            //requirements met..
+
+            //take item
+            Shortcuts.LOCAL_PLAYER.player.ConsumeItem(Unlock_Item.item.type);
+
+            //unlock class
+            psheet.Classes.UnlockClass(ID_num, true);
+
+            return true;
+        }
+
+        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Local Setting Active Class ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+        /// <summary>
+        /// Return from LocalCheckClassValid
+        /// </summary>
+        private enum CLASS_VALIDITY : byte {
+            VALID,
+            INVALID_UNKNOWN,
+            INVALID_LOCKED,
+            INVALID_COMBINATION,
+            INVALID_MINIONS,
+            INVALID_COMBAT,
+        }
+
+        /// <summary>
+        /// Check if switch to this class would be valid
+        /// </summary>
+        /// <param name="is_primary"></param>
+        /// <returns></returns>
+        private CLASS_VALIDITY LocalCheckClassValid(bool is_primary) {
+            PSheet psheet = Shortcuts.LOCAL_PLAYER.PSheet;
+
+            if (psheet.Character.In_Combat) {
+                return CLASS_VALIDITY.INVALID_COMBAT;
+            }
+            else if (ID_num == (byte)Systems.PlayerClass.IDs.None) {
+                return CLASS_VALIDITY.VALID; //setting to no class is always allowed (unless in combat)
+            }
+            else {
+                Systems.PlayerClass class_same_slot, class_other_slot;
+                if (is_primary) {
+                    class_same_slot = psheet.Classes.Primary.Class;
+                    class_other_slot = psheet.Classes.Secondary.Class;
+                }
+                else {
+                    class_same_slot = psheet.Classes.Secondary.Class;
+                    class_other_slot = psheet.Classes.Primary.Class;
+                }
+
+                if (((psheet.Classes.GetClassLevel(ID_num) <= 0) || !psheet.Classes.GetClassUnlocked(ID_num) || !Enabled) && (ID_num != (byte)Systems.PlayerClass.IDs.None)) {
+                    return CLASS_VALIDITY.INVALID_LOCKED; //locked class
+                }
+                else {
+                    if (ID_num != class_same_slot.ID_num) {
+                        Systems.PlayerClass pre = class_other_slot;
+                        while (pre != null) {
+                            if (ID_num == pre.ID_num) {
+                                return CLASS_VALIDITY.INVALID_COMBINATION; //invalid combination (same as other class or one of its prereqs)
+                            }
+                            else {
+                                pre = pre.Prereq;
+                            }
+                        }
+                        pre = Systems.PlayerClass.LOOKUP[ID_num].Prereq;
+                        while (pre != null) {
+                            if (class_other_slot.ID_num == pre.ID_num) {
+                                return CLASS_VALIDITY.INVALID_COMBINATION; //invalid combination (same as other class or one of its prereqs)
+                            }
+                            else {
+                                pre = pre.Prereq;
+                            }
+                        }
+
+                        //valid choice
+                        return CLASS_VALIDITY.VALID;
+                    }
+                }
+                //default
+                return CLASS_VALIDITY.INVALID_UNKNOWN;
+            }
+        }
+
+        /// <summary>
+        /// Set local class (with checks + updates) (called by UI)
+        /// </summary>
+        /// <param name="is_primary"></param>
+        /// <returns></returns>
+        public bool LocalTrySetClass(bool is_primary) {
+            PSheet psheet = Shortcuts.LOCAL_PLAYER.PSheet;
+
+            //fail if secondary not allowed
+            if (!is_primary && !psheet.Character.Secondary_Unlocked) {
+                Main.NewText("Failed to set class because multiclassing is locked!", UI.Constants.COLOUR_MESSAGE_ERROR);
+                return false;
+            }
+
+            byte id_other;
+            if (is_primary) {
+                id_other = psheet.Classes.Secondary.Class.ID_num;
+            }
+            else {
+                id_other = psheet.Classes.Primary.Class.ID_num;
+            }
+            if ((ID_num == id_other) && (ID_num != (byte)Systems.PlayerClass.IDs.None)) {
+                //if setting to other set class, just swap
+                if (is_primary)
+                    psheet.Classes.SetPrimary(ID_num, true, true);
+                else
+                    psheet.Classes.SetSecondary(ID_num, true, true);
+                return true;
+            }
+            else {
+                CLASS_VALIDITY valid = LocalCheckClassValid(is_primary);
+                switch (valid) {
+                    case Systems.PlayerClass.CLASS_VALIDITY.VALID:
+                        if (is_primary)
+                            psheet.Classes.SetPrimary(ID_num, true, true);
+                        else
+                            psheet.Classes.SetSecondary(ID_num, true, true);
+
+                        return true;
+
+                    case CLASS_VALIDITY.INVALID_COMBINATION:
+                        //SetClass_Fail_Combination
+                        Main.NewText(Language.GetTextValue("Mods.ExperienceAndClasses.Common.SetClass_Fail_Combination"), UI.Constants.COLOUR_MESSAGE_ERROR);
+                        break;
+
+                    case CLASS_VALIDITY.INVALID_LOCKED:
+                        Main.NewText(Language.GetTextValue("Mods.ExperienceAndClasses.Common.SetClass_Fail_Locked"), UI.Constants.COLOUR_MESSAGE_ERROR);
+                        break;
+
+                    case CLASS_VALIDITY.INVALID_COMBAT:
+                        Main.NewText(Language.GetTextValue("Mods.ExperienceAndClasses.Common.SetClass_Fail_Combat"), UI.Constants.COLOUR_MESSAGE_ERROR);
+                        break;
+
+                    default:
+                        Utilities.Logger.Error("Failed to set class for unknown reasons! (please report)");
+                        break;
+                }
+
+                //default
+                return false;
+            }
+        }
+
+        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Static ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+        /// <summary>
+        /// Check if player meets extra requirements for tier 3
+        /// </summary>
+        /// <returns></returns>
+        public static bool CanUnlockTier3(PSheet psheet) {
+            return psheet.Character.Defeated_WOF;
+        }
+
+        /// <summary>
+        /// Try to unlock subclassing (called from UI)
+        /// </summary>
+        public static void LocalTryUnlockSubclass() {
+            //check locked
+            if (Shortcuts.LOCAL_PLAYER.PSheet.Character.Secondary_Unlocked) {
+                Utilities.Logger.Error("Trying to unlock multiclassing when already unlocked");
+            }
+            else {
+                //item requirements
+                Item item = ModContent.GetInstance<Items.Unlock_Subclass>().item;
+                if (!Shortcuts.LOCAL_PLAYER.player.HasItem(item.type)) {
+                    //item requirement not met
+                    Main.NewText(Language.GetTextValue("Mods.ExperienceAndClasses.Common.Unlock_Multiclass_NoItem", item.Name), UI.Constants.COLOUR_MESSAGE_ERROR);
+                }
+                else {
+                    //requirements met..
+
+                    //take item
+                    Shortcuts.LOCAL_PLAYER.player.ConsumeItem(item.type);
+
+                    //unlock class
+                    Shortcuts.LOCAL_PLAYER.PSheet.Character.UnlockSecondary();
+                }
+            }
+        }
+
+        //TODO - add set class
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Subtypes ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -194,6 +508,8 @@ namespace ExperienceAndClasses.Systems {
                 Attribute_Growth[(byte)Attribute.IDs.Dexterity] = 2f;
                 Colour = COLOUR_NONCOMBAT;
                 implementation_status = IMPLEMENTATION_STATUS.ATTRIBUTE_ONLY;
+                XP_Multiplier_Combat = 0.25f;
+                XP_Multiplier_NonCombat = 10.0f;
             }
         }
 

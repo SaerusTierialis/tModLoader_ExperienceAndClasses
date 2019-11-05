@@ -70,12 +70,16 @@ namespace ExperienceAndClasses.Systems.PlayerSheet {
             if (PSHEET.eacplayer.Fields.Is_Local && !Defeated_WOF) {
                 Defeated_WOF = true;
                 Main.NewText(Language.GetTextValue("Mods.ExperienceAndClasses.Common.Unlock_WOF"), UI.Constants.COLOUR_MESSAGE_SUCCESS);
-                //TODO
-                /*
-                if (Systems.PlayerClass.LocalCanUnlockTier3()) {
-                    Main.NewText("You can now unlock tier III classes!", UI.Constants.COLOUR_MESSAGE_SUCCESS);
+                if (PlayerClass.CanUnlockTier3(PSHEET)) {
+                    Main.NewText(Language.GetTextValue("Mods.ExperienceAndClasses.Common.Unlock_T3"), UI.Constants.COLOUR_MESSAGE_SUCCESS);
                 }
-                */
+            }
+        }
+
+        public void UnlockSecondary() {
+            if (!Secondary_Unlocked) {
+                Secondary_Unlocked = true;
+                Main.NewText(Language.GetTextValue("Mods.ExperienceAndClasses.Common.Unlock_Multiclass"), UI.Constants.COLOUR_MESSAGE_SUCCESS);
             }
         }
 

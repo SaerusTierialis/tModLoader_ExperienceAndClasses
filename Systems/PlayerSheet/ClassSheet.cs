@@ -16,8 +16,8 @@ namespace ExperienceAndClasses.Systems.PlayerSheet {
             }
 
             //unlock defaults
-            Data_Class[(byte)PlayerClass.IDs.None].Unlock();
-            Data_Class[(byte)PlayerClass.IDs.Novice].Unlock();
+            UnlockClass((byte)PlayerClass.IDs.None, false);
+            UnlockClass((byte)PlayerClass.IDs.Novice, false);
 
             //default class selection
             SetPrimary((byte)PlayerClass.IDs.Novice, false);
@@ -88,7 +88,7 @@ namespace ExperienceAndClasses.Systems.PlayerSheet {
 
             public void Unlock(bool announce = false) {
                 if (!Unlocked && announce) {
-                    Main.NewText(Language.GetTextValue("Mods.ExperienceAndClasses.Common.Unlock") + " " + Class.Name + "!", UI.Constants.COLOUR_MESSAGE_SUCCESS);
+                    Main.NewText(Language.GetTextValue("Mods.ExperienceAndClasses.Common.Unlock", Class.Name), UI.Constants.COLOUR_MESSAGE_SUCCESS);
                 }
 
                 //set
@@ -102,15 +102,22 @@ namespace ExperienceAndClasses.Systems.PlayerSheet {
             }
 
             public void AddXP(uint xp, bool from_combat = true) {
-                //TODO - non-combat
+                if (Valid_Class) {
+                    if (from_combat)
+                        xp = (uint)Math.Ceiling(xp * Class.XP_Multiplier_Combat);
+                    else
+                        xp = (uint)Math.Ceiling(xp * Class.XP_Multiplier_NonCombat);
 
-                XP = Utilities.Commons.SafeAdd(XP, xp);
-                LocalHandleXPChange();
+                    XP = Utilities.Commons.SafeAdd(XP, xp);
+                    LocalHandleXPChange();
+                }
             }
 
             public void SubtractXP(uint xp) {
-                XP = Utilities.Commons.SafeSubtract(XP, xp);
-                LocalHandleXPChange();
+                if (Valid_Class) {
+                    XP = Utilities.Commons.SafeSubtract(XP, xp);
+                    LocalHandleXPChange();
+                }
             }
 
             public void UpdateXPForLevel() {
@@ -135,6 +142,10 @@ namespace ExperienceAndClasses.Systems.PlayerSheet {
                     else
                         Main.NewText(CONTAINER.GetLevelupMessage(ID), UI.Constants.COLOUR_MESSAGE_SUCCESS);
 
+                    if ((Class.Tier < PlayerClass.MAX_TIER) && (Level == Class.Max_Level)) {
+                        Main.NewText(Language.GetTextValue("Mods.ExperienceAndClasses.Common.Unlock_Class_Prereq_Met", new string('I', Class.Tier + 1), Class.Name, Level), UI.Constants.COLOUR_MESSAGE_SUCCESS);
+                    }
+
                     CONTAINER.OnClassOrLevelChange();
                 }
             }
@@ -144,7 +155,19 @@ namespace ExperienceAndClasses.Systems.PlayerSheet {
             return Language.GetTextValue("Mods.ExperienceAndClasses.Common.Levelup_Class", PSHEET.eacplayer.player.name, Data_Class[id].Level, Data_Class[id].Class.Name);
         }
 
-        public void SetPrimary(byte id, bool sync = true) {
+        public byte GetClassLevel(byte id) {
+            return Data_Class[id].Level;
+        }
+
+        public bool GetClassUnlocked(byte id) {
+            return Data_Unlock[id];
+        }
+
+        public void UnlockClass(byte id, bool announce = true) {
+            Data_Class[id].Unlock(announce);
+        }
+
+        public void SetPrimary(byte id, bool sync = true, bool destroy_minions = false) {
             //set
             if (ID_Active_Primary == id) {
                 //toggle off class
@@ -161,14 +184,14 @@ namespace ExperienceAndClasses.Systems.PlayerSheet {
             }
 
             //changes
-            OnClassOrLevelChange();
+            OnClassOrLevelChange(destroy_minions);
 
             //sync?
             if (sync && Shortcuts.IS_CLIENT)
                 SyncClass();
         }
 
-        public void SetSecondary(byte id, bool sync = true) {
+        public void SetSecondary(byte id, bool sync = true, bool destroy_minions = false) {
             //set
             if (ID_Active_Secondary == id) {
                 //toggle off class
@@ -184,15 +207,20 @@ namespace ExperienceAndClasses.Systems.PlayerSheet {
             }
 
             //changes
-            OnClassOrLevelChange();
+            OnClassOrLevelChange(destroy_minions);
 
             //sync?
             if (sync && Shortcuts.IS_CLIENT)
                 SyncClass();
         }
 
-        private void OnClassOrLevelChange() {
+        private void OnClassOrLevelChange(bool destroy_minions = false) {
             PSHEET.Attributes.UpdateFromClass();
+
+            //TODO destroy_minions
+            if (destroy_minions) {
+
+            }
 
             //TODO - ability, passive, etc.
         }

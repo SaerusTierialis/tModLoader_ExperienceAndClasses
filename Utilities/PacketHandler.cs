@@ -182,12 +182,13 @@ namespace ExperienceAndClasses.Utilities {
         public sealed class XP : Handler {
             public XP() : base(PACKET_TYPE.XP) { }
 
-            public static void Send(int target, int origin, uint xp) {
+            public static void Send(int target, int origin, uint xp, bool is_combat = true) {
                 //get packet containing header
                 ModPacket packet = LOOKUP[(byte)PACKET_TYPE.XP].GetPacket(origin);
 
                 //specific content
                 packet.Write(xp);
+                packet.Write(is_combat);
 
                 //send
                 packet.Send(target, origin);
@@ -196,9 +197,10 @@ namespace ExperienceAndClasses.Utilities {
             protected override void RecieveBody(BinaryReader reader, int origin, EACPlayer origin_eacplayer) {
                 //read
                 uint xp = reader.ReadUInt32();
+                bool is_combat = reader.ReadBoolean();
 
                 //set
-                Systems.XP.Adjustments.LocalAddXP(xp);
+                Systems.XP.Adjustments.LocalAddXP(xp, is_combat);
             }
         }
 

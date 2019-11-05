@@ -53,7 +53,11 @@ namespace ExperienceAndClasses {
             //clear local player;
             LocalPlayerClear();
 
-            //TODO: textures
+            //textures
+            if (IS_PLAYER) {
+                Utilities.Textures.LoadTextures();
+            }
+
             //TODO: sounds
         }
 

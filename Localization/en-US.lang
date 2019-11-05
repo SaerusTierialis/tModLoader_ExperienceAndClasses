@@ -14,7 +14,19 @@ Common.Hotkey_UI=Toggle UI
 Common.Levelup_Character={0} is now character level {1}!
 Common.Levelup_Class={0} is now a level {1} {2}!
 Common.Unlock=You have unlocked {0}!
+Common.Unlock_T3=You can now unlock Tier 3 classes!
+Common.Unlock_Multiclass_NoItem=You require a {0} to unlock multiclassing!
+Common.Unlock_Multiclass=You can now multiclass! Right click a class to set it as your subclass.
+Common.Unlock_Class_Prereq_Met=Tier {0} Requirement Met: {1} Level {2}
+Common.Unlock_WOF=Tier III Requirement Met: Defeat Wall of Flesh
+Common.Unlock_Class_Fail_WOF=You must defeat the Wall of Flesh to unlock tier 3 classes!
+Common.Unlock_Class_Fail_Prereq=You must reach level {0} {1} to unlock {2}
+Common.Unlock_Class_Fail_Item=You require a {0} to unlock {1}
 
+//Set Class
+Common.SetClass_Fail_Combination=Failed to set class because combination is invalid!
+Common.SetClass_Fail_Locked=Failed to set class because it is locked!
+Common.SetClass_Fail_Combat=Failed to set class because you are in combat!
 
 //Items
 ItemName.Orb_Monster=Ascension Orb
@@ -39,9 +51,6 @@ Common.Password_CommandSet_Description=Set the world password ({$Mods.Experience
 //System - Misc
 Common.AFK_Start=You are now AFK. You will not gain or lose XP.
 Common.AFK_End=You are no longer AFK. You can gain and lose XP again.
-
-//System - Unlock
-Common.Unlock_WOF=Tier III Requirement Met: Defeat Wall of Flesh
 
 
 //Config Common
