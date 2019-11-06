@@ -18,10 +18,6 @@ namespace ExperienceAndClasses.Systems.PlayerSheet {
             //unlock defaults
             UnlockClass((byte)PlayerClass.IDs.None, false);
             UnlockClass((byte)PlayerClass.IDs.Novice, false);
-
-            //default class selection
-            SetPrimary((byte)PlayerClass.IDs.Novice, false);
-            SetSecondary((byte)PlayerClass.IDs.None, false);
         }
 
         public static byte Count { get { return (byte)PlayerClass.IDs.NUMBER_OF_IDs; } }
@@ -149,6 +145,12 @@ namespace ExperienceAndClasses.Systems.PlayerSheet {
                     CONTAINER.OnClassOrLevelChange();
                 }
             }
+        }
+
+        public void SetDefaultClass() {
+            //default class selection
+            SetPrimary((byte)PlayerClass.IDs.Novice, false);
+            SetSecondary((byte)PlayerClass.IDs.None, false);
         }
 
         public string GetLevelupMessage(byte id) {

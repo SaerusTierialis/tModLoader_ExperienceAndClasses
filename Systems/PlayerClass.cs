@@ -98,12 +98,7 @@ namespace ExperienceAndClasses.Systems {
         public readonly IDs ID;
         public readonly byte ID_num;
 
-        public readonly string Name;
-        public readonly string Description;
-
-        public string Tooltip_Main { get; private set; } = "???_Tooltip";
-        public string Tooltip_Title { get; private set; } = "???_Tooltip_Title";
-        public string Tooltip_Attribute_Growth { get; private set; } = "???_Tooltip_Attribute_Growth";
+        private string InternalName;
 
         public byte Tier { get; protected set; } = 0;
         public byte Max_Level { get; protected set; } = 0;
@@ -133,78 +128,89 @@ namespace ExperienceAndClasses.Systems {
             ID = id;
             ID_num = (byte)id;
 
-            Name = Language.GetTextValue("Mods.ExperienceAndClasses.Common.Class_" + Enum.GetName(typeof(IDs), id) + "_Name");
-            Description = Language.GetTextValue("Mods.ExperienceAndClasses.Common.Class_" + Enum.GetName(typeof(IDs), id) + "_Description");
+            InternalName = Enum.GetName(typeof(IDs), ID_num);
         }
 
-        public void LoadTextureAndSetTooltip() {
+        public string Name { get { return Language.GetTextValue("Mods.ExperienceAndClasses.Common.Class_" + InternalName + "_Name"); } }
+        public string Description {  get { return Language.GetTextValue("Mods.ExperienceAndClasses.Common.Class_" + InternalName + "_Description"); } }
+
+        public string Tooltip_Title {
+            get {
+                if (ID_num == (byte)Systems.PlayerClass.IDs.Explorer) {
+                    return Name + " [Unique]";
+                }
+                else {
+                    return Name + " [Tier " + new string('I', Tier) + "]";
+                }
+            }
+        }
+
+        public void LoadTexture() {
             //load texture
             if (Has_Texture) {
-                Texture = ModContent.GetTexture("ExperienceAndClasses/Textures/Class/" + Name);
+                Texture = ModContent.GetTexture("ExperienceAndClasses/Textures/Class/" + InternalName);
             }
             else {
                 //no texture loaded, set blank
                 Texture = Utilities.Textures.TEXTURE_CLASS_DEFAULT;
             }
+        }
 
-            //set tooltip title
-            Tooltip_Title = Name;
-            if (ID_num == (byte)Systems.PlayerClass.IDs.Explorer) {
-                Tooltip_Title += " [Unique]";
-            }
-            else {
-                Tooltip_Title += " [Tier " + new string('I', Tier) + "]";
-            }
+        public Tuple<string, string> Tooltip_Main {
+            get {
+                //implementation status
+                string implementation_status_text = "Implementation State: ";
+                switch (implementation_status) {
+                    case IMPLEMENTATION_STATUS.ATTRIBUTE_ONLY:
+                        implementation_status_text += "attributes only";
+                        break;
 
-            //implementation status
-            string implementation_status_text = "Implementation State: ";
-            switch (implementation_status) {
-                case IMPLEMENTATION_STATUS.ATTRIBUTE_ONLY:
-                    implementation_status_text += "attributes only";
-                    break;
+                    case IMPLEMENTATION_STATUS.ATTRIBUTE_PLUS_PARTIAL_ABILITY:
+                        implementation_status_text += "some abilities/passives";
+                        break;
 
-                case IMPLEMENTATION_STATUS.ATTRIBUTE_PLUS_PARTIAL_ABILITY:
-                    implementation_status_text += "some abilities/passives";
-                    break;
+                    case IMPLEMENTATION_STATUS.COMPLETE:
+                        implementation_status_text += "complete";
+                        break;
 
-                case IMPLEMENTATION_STATUS.COMPLETE:
-                    implementation_status_text += "complete";
-                    break;
-
-                case IMPLEMENTATION_STATUS.UNKNOWN:
-                default:
-                    implementation_status_text += "unknown";
-                    break;
-            }
-
-            //set tooltip
-            Tooltip_Main = implementation_status_text + "\n\n" + Description + "\n\n" + "POWER SCALING:\nPrimary:   " + Power_Scaling.Primary_Types + "\nSecondary: " + Power_Scaling.Secondary_Types + "\n\nATTRIBUTES:";
-            bool first = true;
-            string attribute_names = "";
-            Tooltip_Attribute_Growth = "";
-            foreach (byte id in Systems.Attribute.ATTRIBUTES_UI_ORDER) {
-                if (first) {
-                    first = false;
+                    case IMPLEMENTATION_STATUS.UNKNOWN:
+                    default:
+                        implementation_status_text += "unknown";
+                        break;
                 }
-                else {
-                    attribute_names += "\n";
-                    Tooltip_Attribute_Growth += "\n";
-                }
-                attribute_names += Systems.Attribute.LOOKUP[id].Specifc_Name + ":";
 
-                for (byte i = 0; i < 5; i++) {
-                    if (Attribute_Growth[id] >= (i + 1)) {
-                        Tooltip_Attribute_Growth += "★";
-                    }
-                    else if (Attribute_Growth[id] > i) {
-                        Tooltip_Attribute_Growth += "✯";
+                //set tooltip
+                string tooltip_main = implementation_status_text + "\n\n" + Description + "\n\n" + "POWER SCALING:\nPrimary:   " + Power_Scaling.Primary_Types + "\nSecondary: " + Power_Scaling.Secondary_Types + "\n\nATTRIBUTES:";
+                bool first = true;
+                string attribute_names = "";
+                string tooltip_attribute_growth = "";
+                foreach (byte id in Systems.Attribute.ATTRIBUTES_UI_ORDER) {
+                    if (first) {
+                        first = false;
                     }
                     else {
-                        Tooltip_Attribute_Growth += "☆";
+                        attribute_names += "\n";
+                        tooltip_attribute_growth += "\n";
+                    }
+                    attribute_names += Systems.Attribute.LOOKUP[id].Specifc_Name + ":";
+
+                    for (byte i = 0; i < 5; i++) {
+                        if (Attribute_Growth[id] >= (i + 1)) {
+                            tooltip_attribute_growth += "★";
+                        }
+                        else if (Attribute_Growth[id] > i) {
+                            tooltip_attribute_growth += "✯";
+                        }
+                        else {
+                            tooltip_attribute_growth += "☆";
+                        }
                     }
                 }
+                tooltip_main += "\n" + attribute_names;
+
+                //return
+                return new Tuple<string, string>(tooltip_main, tooltip_attribute_growth);
             }
-            Tooltip_Main += "\n" + attribute_names;
         }
 
         /// <summary>

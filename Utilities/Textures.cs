@@ -49,6 +49,7 @@ namespace ExperienceAndClasses.Utilities {
         /// Autoload does not seem to work if loading is done in static variable declarations or in static constructors (because these are not recreated on reload)
         /// </summary>
         public static void LoadTextures() {
+
             TEXTURE_BLANK = GetTexture("ExperienceAndClasses/Textures/Blank");
 
             TEXTURE_BUTTON_PLUS = GetTexture("ExperienceAndClasses/Textures/UI/ButtonPlus");
@@ -85,7 +86,7 @@ namespace ExperienceAndClasses.Utilities {
             TEXTURE_RESOURCE_DOT = GetTexture("ExperienceAndClasses/Textures/Resource/Dot");
 
             foreach (Systems.PlayerClass c in Systems.PlayerClass.LOOKUP) {
-                c.LoadTextureAndSetTooltip();
+                c.LoadTexture();
             }
 
             /*
@@ -105,7 +106,6 @@ namespace ExperienceAndClasses.Utilities {
                 p.LoadTexture();
             }
             */
-
         }
 
     }

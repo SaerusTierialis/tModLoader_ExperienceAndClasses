@@ -21,6 +21,9 @@ namespace ExperienceAndClasses.Systems {
             Attributes = new AttributeSheet(this);
             Character = new CharacterSheet(this);
             Classes = new ClassSheet(this);
+
+            //init
+            Classes.SetDefaultClass();
         }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Update ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
