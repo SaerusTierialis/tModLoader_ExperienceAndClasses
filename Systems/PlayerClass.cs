@@ -150,7 +150,7 @@ namespace ExperienceAndClasses.Systems {
             }
         }
 
-        public void LoadTexture() {
+        public void LoadTextureAndItem() {
             //load texture
             if (Has_Texture) {
                 Texture = ModContent.GetTexture("ExperienceAndClasses/Textures/Class/" + InternalName);
@@ -183,6 +183,12 @@ namespace ExperienceAndClasses.Systems {
                     }
                 }
             }
+
+            Unlock_Item = GetUnlockItem();
+        }
+
+        protected virtual Items.Unlock GetUnlockItem() {
+            return null;
         }
 
         public string Tooltip_Main {
@@ -281,7 +287,7 @@ namespace ExperienceAndClasses.Systems {
             if (Unlock_Item != null) {
                 if (!Shortcuts.LOCAL_PLAYER.player.HasItem(Unlock_Item.item.type)) {
                     //item requirement not met
-                    Main.NewText(Language.GetTextValue("Mods.ExperienceAndClasses.Common.Unlock_Class_Fail_Item", Unlock_Item.Name, Name), UI.Constants.COLOUR_MESSAGE_ERROR);
+                    Main.NewText(Language.GetTextValue("Mods.ExperienceAndClasses.Common.Unlock_Class_Fail_Item", Unlock_Item.item.Name, Name), UI.Constants.COLOUR_MESSAGE_ERROR);
                     return false;
                 }
             }
@@ -493,18 +499,24 @@ namespace ExperienceAndClasses.Systems {
         public abstract class Tier2 : RealClass {
             public Tier2(IDs id, Attribute.PowerScaling.IDs power_scaling) : base(id, power_scaling) {
                 Tier = 2;
-                Unlock_Item = ModContent.GetInstance<Items.Unlock_Tier2>();
                 Max_Level = MAX_TIER_LEVEL[Tier];
                 Prereq = LOOKUP[(byte)IDs.Novice];
+            }
+
+            protected override Items.Unlock GetUnlockItem() {
+                return ModContent.GetInstance<Items.Unlock_Tier2>();
             }
         }
 
         public abstract class Tier3 : RealClass {
             public Tier3(IDs id, Attribute.PowerScaling.IDs power_scaling, IDs prereq) : base(id, power_scaling) {
                 Tier = 3;
-                Unlock_Item = ModContent.GetInstance<Items.Unlock_Tier3>();
                 Max_Level = MAX_TIER_LEVEL[Tier];
                 Prereq = LOOKUP[(byte)prereq];
+            }
+
+            protected override Items.Unlock GetUnlockItem() {
+                return ModContent.GetInstance<Items.Unlock_Tier3>();
             }
         }
 
@@ -525,7 +537,6 @@ namespace ExperienceAndClasses.Systems {
         public class Explorer : Tier2 {
             public Explorer() : base(IDs.Explorer, Attribute.PowerScaling.IDs.NonCombat) {
                 Max_Level = MAX_TIER_LEVEL[3]; //tier 2 class with tier 3 level cap
-                Unlock_Item = ModContent.GetInstance<Items.Unlock_Explorer>();
                 Class_Locations[0, 6] = ID_num;
                 Attribute_Growth[(byte)Attribute.IDs.Power] = 2f;
                 Attribute_Growth[(byte)Attribute.IDs.Vitality] = 2f;
@@ -537,6 +548,10 @@ namespace ExperienceAndClasses.Systems {
                 implementation_status = IMPLEMENTATION_STATUS.ATTRIBUTE_ONLY;
                 XP_Multiplier_Combat = 0.1f;
                 XP_Multiplier_NonCombat = 10.0f;
+            }
+
+            protected override Items.Unlock GetUnlockItem() {
+                return ModContent.GetInstance<Items.Unlock_Explorer>();
             }
         }
 

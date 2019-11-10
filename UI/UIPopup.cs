@@ -58,6 +58,10 @@ namespace ExperienceAndClasses.UI {
         private TextButton button_yes, button_no;
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Initialize ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+        public UIPopup() {
+            auto = UIAutoMode.Never;
+        }
+
         protected override void InitializeState() {
             mode = MODE.HOVER;
             unlock_mode = INPUT_MODE.SUBCLASS;
@@ -255,7 +259,7 @@ namespace ExperienceAndClasses.UI {
 
         public void ShowTextAttribute(UIElement source, Systems.Attribute attribute) {
             string title = attribute.Specifc_Name;
-            string text = attribute.Specific_Description + "\n" + attribute.Bonus;
+            string text = attribute.Specific_Description + "\n" + attribute.Effect_Text;
             ShowText(source, title, text, WIDTH_ATTRIBUTE);
         }
 
@@ -281,7 +285,13 @@ namespace ExperienceAndClasses.UI {
                 str += "Defeat the Wall of Flesh\n";
             }
 
-            str += c.Prereq.Name + " Level " + c.Prereq.Max_Level + "\n" + item.item.Name + "\n\nToken Recipe:\n" + item.GetRecipeString(true) + "\n(Work Bench)";
+            //str += c.Prereq.Name + " Level " + c.Prereq.Max_Level + "\n" + item.item.Name + "\n\nToken Recipe:\n" + item.GetRecipeString(true) + "\n(Work Bench)";
+
+            str += c.Prereq.Name;
+            str += " Level " + c.Prereq.Max_Level + "\n";
+            //str += item.item.Name;
+            //str += "\n\nToken Recipe:\n" + item.GetRecipeString(true);
+            str += "\n(Work Bench)";
 
             mode = MODE.INPUT;
             unlock_mode = INPUT_MODE.CLASS;

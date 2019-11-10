@@ -71,7 +71,18 @@ namespace ExperienceAndClasses.Systems.PlayerSheet {
 
             public byte Level_Effective { get {
                     if (Is_Secondary)
-                        return (byte)Math.Ceiling(Level / 2.0);
+                        if (CONTAINER.Primary.Class.Tier > Class.Tier) {
+                            //primary is higher tier, no limit
+                            return Level;
+                        }
+                        else if (CONTAINER.Primary.Class.Tier < Class.Tier) {
+                            //primary is lower tier, limit to 1
+                            return 1;
+                        }
+                        else {
+                            //primary is same tier, limit to half primary
+                            return (byte)Math.Min(Level, Math.Ceiling(CONTAINER.Primary.Level_Effective / 2.0));
+                        }
                     else
                         return Level;
                 }
@@ -101,6 +112,9 @@ namespace ExperienceAndClasses.Systems.PlayerSheet {
 
                 //update xp needed
                 UpdateXPForLevel();
+
+                //update UI
+                Shortcuts.UpdateUIPSheet(CONTAINER.PSHEET);
             }
 
             public void AddXP(uint xp, bool from_combat = true) {
@@ -149,6 +163,9 @@ namespace ExperienceAndClasses.Systems.PlayerSheet {
                     }
 
                     CONTAINER.OnClassOrLevelChange();
+                }
+                else {
+                    UI.UIHUD.Instance.UpdateXP();
                 }
             }
         }
@@ -290,6 +307,12 @@ namespace ExperienceAndClasses.Systems.PlayerSheet {
             //active classes
             ID_Active_Primary = Utilities.Commons.TagTryGet(tag, TAG_NAMES.Class_Active_Primary, (byte)PlayerClass.IDs.Novice);
             ID_Active_Secondary = Utilities.Commons.TagTryGet(tag, TAG_NAMES.Class_Active_Secondary, (byte)PlayerClass.IDs.None);
+
+            //ensure that base and active classes are unlocked
+            Data_Unlock[(byte)PlayerClass.IDs.None] = true;
+            Data_Unlock[(byte)PlayerClass.IDs.Novice] = true;
+            Data_Unlock[ID_Active_Primary] = true;
+            Data_Unlock[ID_Active_Secondary] = true;
 
             //set attributes, abilities, etc.
             OnClassOrLevelChange();

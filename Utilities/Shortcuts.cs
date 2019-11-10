@@ -34,7 +34,7 @@ namespace ExperienceAndClasses {
 
         //UI
         public static bool UI_Initialized { get; private set; } = false;
-        private static UI.UIStateCombo[] UIs = new UI.UIStateCombo[0];
+        private static UI.UIStateCombo[] UIs = new UI.UIStateCombo[] { UI.UIHUD.Instance, UI.UIMain.Instance, UI.UIPopup.Instance, UI.UIOverlay.Instance };
         public static bool Inventory_Open { get; private set; } = false;
 
         //Recipe
@@ -118,8 +118,6 @@ namespace ExperienceAndClasses {
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Overall UI ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         public static void InitializeUIs() {
-            UIs = new UI.UIStateCombo[] { UI.UIHUD.Instance , UI.UIMain.Instance , UI.UIPopup.Instance };
-
             foreach (UI.UIStateCombo ui in UIs) {
                 ui.Initialize();
             }
@@ -163,6 +161,7 @@ namespace ExperienceAndClasses {
                         InterfaceScaleType.UI)
                     );
                 }
+                UI.UIOverlay.Instance.UpdatePosition();
             }
         }
 

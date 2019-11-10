@@ -119,6 +119,9 @@ namespace ExperienceAndClasses.Systems.PlayerSheet {
 
                 Shortcuts.UpdateUIPSheet(PSHEET);
             }
+            else {
+                UI.UIHUD.Instance.UpdateXP();
+            }
         }
 
         private void SyncCharacterLevel(bool is_levelup = false) {

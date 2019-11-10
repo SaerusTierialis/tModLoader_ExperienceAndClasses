@@ -89,6 +89,8 @@ namespace ExperienceAndClasses {
             base.PostUpdate();
 
             PSheet.PostUpdate();
+
+            //Main.NewText("test=" + PSheet.Classes.Primary.Class.Name + " " + PSheet.Classes.Primary.Unlocked);
         }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Save/Load ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/

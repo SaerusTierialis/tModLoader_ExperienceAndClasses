@@ -544,17 +544,19 @@ namespace ExperienceAndClasses.UI {
         }
 
         public void Update() {
-            string str = "" + Shortcuts.LOCAL_PLAYER.PSheet.Attributes.Final[attribute.ID_num];
+            Systems.PSheet psheet = Shortcuts.LOCAL_PLAYER.PSheet;
+
+            string str = "" + psheet.Attributes.Final[attribute.ID_num];
             final.SetText(str);
             final.Left.Set(left_final - (Main.fontMouseText.MeasureString(str).X * scale), 0f);
 
-            int allocation_cost = Shortcuts.LOCAL_PLAYER.PSheet.Attributes.Point_Costs[attribute.ID_num];;
+            int allocation_cost = psheet.Attributes.Point_Costs[attribute.ID_num];;
             cost.SetText("" + allocation_cost);
 
             float width_cutoff = final.Left.Pixels - sum.Left.Pixels - 5f;
 
-            str = Shortcuts.LOCAL_PLAYER.PSheet.Attributes.Allocated_Effective[attribute.ID_num] + "+" +
-                    (Shortcuts.LOCAL_PLAYER.PSheet.Attributes.From_Class[attribute.ID_num] + Shortcuts.LOCAL_PLAYER.PSheet.Attributes.Bonuses[attribute.ID_num]);
+            str = psheet.Attributes.Allocated_Effective[attribute.ID_num] + "+" +
+                    psheet.Attributes.From_Class[attribute.ID_num] + "+" + psheet.Attributes.Bonuses[attribute.ID_num];
 
             if ((Main.fontMouseText.MeasureString(str).X * SCALE_SUM) >= width_cutoff) {
                 sum_small.SetText(str);
@@ -565,7 +567,7 @@ namespace ExperienceAndClasses.UI {
                 sum.SetText(str);
             }
 
-            if (allocation_cost <= Shortcuts.LOCAL_PLAYER.PSheet.Attributes.Points_Available) {
+            if (allocation_cost <= psheet.Attributes.Points_Available) {
                 button_add.SetVisibility(1f, 0.8f);
             }
             else {
@@ -875,14 +877,14 @@ namespace ExperienceAndClasses.UI {
         }
 
         public override void RightMouseDown(UIMouseEvent evt) {
-            base.MouseDown(evt);
+            base.RightMouseDown(evt);
             if (can_drag && UIPopup.AllowClicks()) {
                 DragStart(evt);
             }
         }
 
         public override void RightMouseUp(UIMouseEvent evt) {
-            base.MouseUp(evt);
+            base.RightMouseUp(evt);
             DragEnd(evt);
         }
 

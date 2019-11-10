@@ -86,7 +86,7 @@ namespace ExperienceAndClasses.Utilities {
             TEXTURE_RESOURCE_DOT = GetTexture("ExperienceAndClasses/Textures/Resource/Dot");
 
             foreach (Systems.PlayerClass c in Systems.PlayerClass.LOOKUP) {
-                c.LoadTexture();
+                c.LoadTextureAndItem();
             }
 
             /*

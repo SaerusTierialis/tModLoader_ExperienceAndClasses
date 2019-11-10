@@ -64,11 +64,16 @@ namespace ExperienceAndClasses.Systems.PlayerSheet {
         /// Apply attribute effects (to be called on each update)
         /// </summary>
         public void Apply() {
+            CalculateFinal();
             for (byte i = 0; i < Count; i++) {
-                //calculate
-                Final[i] = Allocated_Effective[i] + From_Class[i] + Bonuses[i];
                 //apply
                 Attribute.LOOKUP[i].ApplyEffect(PSHEET.eacplayer, Final[i]);
+            }
+        }
+
+        private void CalculateFinal() {
+            for (byte i = 0; i < Count; i++) {
+                Final[i] = Allocated_Effective[i] + From_Class[i] + Bonuses[i];
             }
         }
 
@@ -109,6 +114,10 @@ namespace ExperienceAndClasses.Systems.PlayerSheet {
                 //update effective values
                 UpdateAllocatedEffective();
 
+                //ui
+                CalculateFinal();
+                Shortcuts.UpdateUIPSheet(PSHEET);
+
                 //sync
                 SyncAttributesEffective();
             }
@@ -140,13 +149,17 @@ namespace ExperienceAndClasses.Systems.PlayerSheet {
             Points_Available = Points_Total - Points_Spent;
         }
 
-        private void Reset(bool allow_sync = true) {
+        public void Reset(bool allow_sync = true) {
             //clear allocated
             Allocated = new int[Count];
 
             //update
             UpdateAllocatedEffective();
             UpdatePoints();
+
+            //ui
+            CalculateFinal();
+            Shortcuts.UpdateUIPSheet(PSHEET);
 
             //sync?
             if (allow_sync)

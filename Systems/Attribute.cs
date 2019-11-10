@@ -63,7 +63,7 @@ namespace ExperienceAndClasses.Systems {
 
         public IDs ID { get; private set; } = IDs.NONE;
         public byte ID_num { get; private set; } = (byte)IDs.NONE;
-        public string Bonus { get; private set; } = "";
+        public string Effect_Text { get; private set; } = "";
 
         /// <summary>
         /// set false to disable attribute effects
@@ -84,6 +84,8 @@ namespace ExperienceAndClasses.Systems {
 
         public void ApplyEffect(EACPlayer eacplayer, int points) {
             if (Active) {
+                //clear effect text
+                Effect_Text = "";
                 //do specific effect
                 Effect(eacplayer, points);
             }
@@ -144,7 +146,20 @@ namespace ExperienceAndClasses.Systems {
         }
 
         public static void LocalTryReset() {
-            //TODO
+            //item cost
+            int cost = LocalCalculateResetCost();
+            int type = RESET_COST_ITEM.item.type;
+            int held = Shortcuts.LOCAL_PLAYER.player.CountItem(type);
+
+            //do reset
+            if (held >= cost) {
+                //consume
+                for (int i = 0; i < cost; i++)
+                    Shortcuts.LOCAL_PLAYER.player.ConsumeItem(type);
+
+                //reset
+                Shortcuts.LOCAL_PLAYER.PSheet.Attributes.Reset();
+            }
         }
 
         /// <summary>
@@ -186,7 +201,7 @@ namespace ExperienceAndClasses.Systems {
                 Specific_Description = "TODO";
             }
             protected override void Effect(EACPlayer eacplayer, int points) {
-                Bonus += PowerScaling.ApplyPower(eacplayer, points);
+                Effect_Text += PowerScaling.ApplyPower(eacplayer, points);
             }
         }
 
@@ -206,17 +221,17 @@ namespace ExperienceAndClasses.Systems {
                 //life
                 bonus = (int)Math.Floor(PER_POINT_LIFE * points);
                 eacplayer.player.statLifeMax2 += bonus;
-                if (eacplayer.Fields.Is_Local) Bonus += "\n+" + bonus + " maximum life (" + PER_POINT_LIFE + " per point)";
+                if (eacplayer.Fields.Is_Local) Effect_Text += "\n+" + bonus + " maximum life (" + PER_POINT_LIFE + " per point)";
 
                 //life regen
                 bonus = (int)Math.Floor(PER_POINT_LIFE_REGEN * points);
                 eacplayer.player.lifeRegen += bonus;
-                if (eacplayer.Fields.Is_Local) Bonus += "\n+" + bonus + " life regeneration (" + PER_POINT_LIFE_REGEN + " per point)";
+                if (eacplayer.Fields.Is_Local) Effect_Text += "\n+" + bonus + " life regeneration (" + PER_POINT_LIFE_REGEN + " per point)";
 
                 //defense
                 bonus = (int)Math.Floor(PER_POINT_DEFENSE * points);
                 eacplayer.player.statDefense += bonus;
-                if (eacplayer.Fields.Is_Local) Bonus += "\n+" + bonus + " defense (" + PER_POINT_DEFENSE + " per point)";
+                if (eacplayer.Fields.Is_Local) Effect_Text += "\n+" + bonus + " defense (" + PER_POINT_DEFENSE + " per point)";
             }
         }
 
@@ -236,12 +251,12 @@ namespace ExperienceAndClasses.Systems {
                 //mana
                 bonus = (int)Math.Floor(PER_POINT_MANA * points);
                 eacplayer.player.statManaMax2 += bonus;
-                if (eacplayer.Fields.Is_Local) Bonus += "\n+" + bonus + " maximum mana (" + PER_POINT_MANA + " per point)";
+                if (eacplayer.Fields.Is_Local) Effect_Text += "\n+" + bonus + " maximum mana (" + PER_POINT_MANA + " per point)";
 
                 //mana regen
                 bonus = (int)Math.Floor(PER_POINT_MANA_REGEN * points);
                 eacplayer.player.manaRegenBonus += bonus;
-                if (eacplayer.Fields.Is_Local) Bonus += "\n+" + bonus + " mana regeneration (" + PER_POINT_MANA_REGEN + " per point)";
+                if (eacplayer.Fields.Is_Local) Effect_Text += "\n+" + bonus + " mana regeneration (" + PER_POINT_MANA_REGEN + " per point)";
 
                 //mana delay
                 bonus = (int)Math.Floor(PER_POINT_MANA_DELAY * points);
@@ -249,7 +264,7 @@ namespace ExperienceAndClasses.Systems {
                     int new_delay = (int)Math.Max(Math.Round(eacplayer.player.manaRegenDelay * (100f / (100f + bonus))), 50);
                     eacplayer.player.manaRegenDelayBonus += eacplayer.player.manaRegenDelay - new_delay;
                 }
-                if (eacplayer.Fields.Is_Local) Bonus += "\n+" + bonus + "% reduced mana delay (" + PER_POINT_MANA_DELAY + " per point)";
+                if (eacplayer.Fields.Is_Local) Effect_Text += "\n+" + bonus + "% reduced mana delay (" + PER_POINT_MANA_DELAY + " per point)";
             }
         }
 
@@ -269,25 +284,25 @@ namespace ExperienceAndClasses.Systems {
                 //crit
                 bonus = (int)Math.Floor(PER_POINT_CRIT * points);
                 eacplayer.player.meleeCrit += bonus;
-                if (eacplayer.Fields.Is_Local) Bonus += "\n+" + bonus + "% melee critical chance (" + PER_POINT_CRIT + " per point)";
+                if (eacplayer.Fields.Is_Local) Effect_Text += "\n+" + bonus + "% melee critical chance (" + PER_POINT_CRIT + " per point)";
                 eacplayer.player.rangedCrit += bonus;
-                if (eacplayer.Fields.Is_Local) Bonus += "\n+" + bonus + "% ranged critical chance (" + PER_POINT_CRIT + " per point)";
+                if (eacplayer.Fields.Is_Local) Effect_Text += "\n+" + bonus + "% ranged critical chance (" + PER_POINT_CRIT + " per point)";
                 eacplayer.player.magicCrit += bonus;
-                if (eacplayer.Fields.Is_Local) Bonus += "\n+" + bonus + "% magic critical chance (" + PER_POINT_CRIT + " per point)";
+                if (eacplayer.Fields.Is_Local) Effect_Text += "\n+" + bonus + "% magic critical chance (" + PER_POINT_CRIT + " per point)";
                 eacplayer.player.thrownCrit += bonus;
-                if (eacplayer.Fields.Is_Local) Bonus += "\n+" + bonus + "% throwing critical chance (" + PER_POINT_CRIT + " per point)";
+                if (eacplayer.Fields.Is_Local) Effect_Text += "\n+" + bonus + "% throwing critical chance (" + PER_POINT_CRIT + " per point)";
 
                 //minion cap
                 bonus = (int)Math.Floor(PER_POINT_MINION_CAP * points);
                 eacplayer.player.maxMinions += bonus;
-                if (eacplayer.Fields.Is_Local) Bonus += "\n+" + bonus + " maximum minions (" + PER_POINT_MINION_CAP + " per point)";
+                if (eacplayer.Fields.Is_Local) Effect_Text += "\n+" + bonus + " maximum minions (" + PER_POINT_MINION_CAP + " per point)";
 
                 //healing
                 float healing_per = Math.Max(eacplayer.PSheet.Classes.Primary.Class.Power_Scaling.Healing, eacplayer.PSheet.Classes.Secondary.Class.Power_Scaling.Healing / 2);
                 float bonus_per_point = healing_per * PER_POINT_HOLY_HEAL;
                 float bonus_float = bonus_per_point * points;
                 eacplayer.PSheet.Stats.Healing_Mult += bonus_float;
-                if (eacplayer.Fields.Is_Local) Bonus += "\n+" + Math.Round(bonus_float * 100, 3) + "% healing (" + Math.Round(bonus_per_point * 100, 3) + " per point)";
+                if (eacplayer.Fields.Is_Local) Effect_Text += "\n+" + Math.Round(bonus_float * 100, 3) + "% healing (" + Math.Round(bonus_per_point * 100, 3) + " per point)";
             }
         }
 
@@ -311,22 +326,22 @@ namespace ExperienceAndClasses.Systems {
                 eacplayer.player.maxRunSpeed *= (1f + bonus_float);
                 eacplayer.player.runAcceleration *= (1f + bonus_float);
                 eacplayer.player.runSlowdown *= (1f / (1f + bonus_float));
-                if (eacplayer.Fields.Is_Local) Bonus += "\n+" + Math.Round(bonus_float * 100, 3) + "% movement speed (" + Math.Round(PER_POINT_MOVEMENT * 100, 3) + " per point)";
+                if (eacplayer.Fields.Is_Local) Effect_Text += "\n+" + Math.Round(bonus_float * 100, 3) + "% movement speed (" + Math.Round(PER_POINT_MOVEMENT * 100, 3) + " per point)";
 
                 //jump
                 bonus_float = PER_POINT_JUMP * points;
                 eacplayer.player.jumpSpeedBoost += (bonus_float * 5);
-                if (eacplayer.Fields.Is_Local) Bonus += "\n+" + Math.Round(bonus_float * 100, 3) + "% increased jump (" + Math.Round(PER_POINT_JUMP * 100, 3) + " per point)";
+                if (eacplayer.Fields.Is_Local) Effect_Text += "\n+" + Math.Round(bonus_float * 100, 3) + "% increased jump (" + Math.Round(PER_POINT_JUMP * 100, 3) + " per point)";
 
                 //dodge
                 bonus_float = PER_POINT_DODGE * points;
                 eacplayer.PSheet.Stats.Dodge += bonus_float;
-                if (eacplayer.Fields.Is_Local) Bonus += "\n+" + Math.Round(bonus_float * 100, 3) + "% dodge chance (" + Math.Round(PER_POINT_DODGE * 100, 3) + " per point)";
+                if (eacplayer.Fields.Is_Local) Effect_Text += "\n+" + Math.Round(bonus_float * 100, 3) + "% dodge chance (" + Math.Round(PER_POINT_DODGE * 100, 3) + " per point)";
 
                 //max fly time
                 bonus_int = (int)Math.Floor(PER_POINT_FLY * points);
                 eacplayer.player.wingTimeMax += bonus_int;
-                if (eacplayer.Fields.Is_Local) Bonus += "\n+" + bonus_int + " wing time (" + PER_POINT_FLY + " per point)";
+                if (eacplayer.Fields.Is_Local) Effect_Text += "\n+" + bonus_int + " wing time (" + PER_POINT_FLY + " per point)";
             }
         }
 
@@ -345,7 +360,7 @@ namespace ExperienceAndClasses.Systems {
                 //ability after use delay
                 bonus = PER_POINT_ABILITY_DELAY * points;
                 eacplayer.PSheet.Stats.Ability_Delay_Reduction += bonus;
-                if (eacplayer.Fields.Is_Local) Bonus += "\n+" + Math.Round(bonus * 100, 3) + "% reduced ability delay (" + Math.Round(PER_POINT_ABILITY_DELAY * 100, 3) + " per point)";
+                if (eacplayer.Fields.Is_Local) Effect_Text += "\n+" + Math.Round(bonus * 100, 3) + "% reduced ability delay (" + Math.Round(PER_POINT_ABILITY_DELAY * 100, 3) + " per point)";
 
                 //tool use time (if non-combat)
                 float fish_per = Math.Max(eacplayer.PSheet.Classes.Primary.Class.Power_Scaling.Fish_Power, eacplayer.PSheet.Classes.Secondary.Class.Power_Scaling.Fish_Power / 2);
@@ -353,13 +368,13 @@ namespace ExperienceAndClasses.Systems {
                     float bonus_per_point = fish_per * PER_POINT_USE_SPEED;
                     bonus = bonus_per_point * points;
                     eacplayer.PSheet.Stats.SpeedAdjust_Tool += bonus;
-                    if (eacplayer.Fields.Is_Local) Bonus += "\n+" + Math.Round(bonus * 100, 3) + "% tool use speed (" + Math.Round(bonus_per_point * 100, 3) + " per point)";
+                    if (eacplayer.Fields.Is_Local) Effect_Text += "\n+" + Math.Round(bonus * 100, 3) + "% tool use speed (" + Math.Round(bonus_per_point * 100, 3) + " per point)";
                 }
 
                 //weapon use time
                 bonus = PER_POINT_USE_SPEED * points;
                 eacplayer.PSheet.Stats.SpeedAdjust_Weapon += bonus;
-                if (eacplayer.Fields.Is_Local) Bonus += "\n+" + Math.Round(bonus * 100, 3) + "% weapon use speed (" + Math.Round(PER_POINT_USE_SPEED * 100, 3) + " per point)";
+                if (eacplayer.Fields.Is_Local) Effect_Text += "\n+" + Math.Round(bonus * 100, 3) + "% weapon use speed (" + Math.Round(PER_POINT_USE_SPEED * 100, 3) + " per point)";
             }
         }
 
