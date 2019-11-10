@@ -83,29 +83,37 @@ namespace ExperienceAndClasses.Systems.PlayerSheet {
         }
 
         /// <summary>
-        /// Attempt to allocate attribute point
+        /// Attempt to allocate attribute points. Returns true if any points where allocated.
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public bool AllocatePoint(byte id) {
-            //can allocate?
-            bool success = Point_Costs[id] <= Points_Available;
+        public bool AllocatePoint(byte id, int points = 1) {
+            //default
+            bool any_allocated = false;
 
-            if (success) {
+            while ((points > 0) && (Point_Costs[id] <= Points_Available)) {
                 //add point
                 Allocated[id]++;
 
-                //update effective values
-                UpdateAllocatedEffective();
+                //one less point to add
+                points--;
 
                 //recalc points
                 UpdatePoints();
+
+                //mark success
+                any_allocated = true;
+            }
+
+            if (any_allocated) {
+                //update effective values
+                UpdateAllocatedEffective();
 
                 //sync
                 SyncAttributesEffective();
             }
 
-            return success;
+            return any_allocated;
         }
 
         private void SyncAttributesEffective() {

@@ -108,24 +108,18 @@ namespace ExperienceAndClasses {
         [DrawTicks]
         public UIAutoMode UIMain_AutoMode { get; set; } //TODO - unused
 
-        [Label("$Mods.ExperienceAndClasses.Common.Config_UIPosition_Label")]
-        public int[] UIMain_Position { get; set; } = new int[] { 100 , 100 }; //TODO - unused
-
 
 
         [Header("$Mods.ExperienceAndClasses.Common.Config_Header_UIHUD")]
 
         [Label("$Mods.ExperienceAndClasses.Common.Config_UIDrag_Label")]
         [DefaultValue(true)]
-        public bool UIHUD_Drag { get; set; } = true; //TODO - unused
+        public bool UIHUD_Drag { get; set; } = true;
 
         [Label("$Mods.ExperienceAndClasses.Common.Config_UIAutoMode_Label")]
         [DefaultValue(UIAutoMode.Always)]
         [DrawTicks]
-        public UIAutoMode UIHUD_AutoMode { get; set; } //TODO - unused
-
-        [Label("$Mods.ExperienceAndClasses.Common.Config_UIPosition_Label")]
-        public int[] UIHUD_Position { get; set; } = new int[] { 50, 50 }; //TODO - unused
+        public UIAutoMode UIHUD_AutoMode { get; set; }
 
 
 
@@ -147,15 +141,13 @@ namespace ExperienceAndClasses {
 
 
         public override void OnChanged() {
-            //TODO - hide ui if set never (main and hud)
-
-
-            //apply new auto ui states
-            Shortcuts.SetUIAutoStates();
+            //UI
+            Shortcuts.ApplyUIConfig();
 
             //update password
             Systems.Password.UpdateLocalPassword();
         }
+        
     }
 
     public enum UIAutoMode {

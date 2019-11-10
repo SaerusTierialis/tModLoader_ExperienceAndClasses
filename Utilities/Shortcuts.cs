@@ -1,8 +1,11 @@
 ﻿using Microsoft.Xna.Framework;
+using System;
+using System.Collections.Generic;
 using Terraria;
 using Terraria.ID;
 using Terraria.Localization;
 using Terraria.ModLoader;
+using Terraria.UI;
 using static Terraria.ModLoader.ModContent;
 
 namespace ExperienceAndClasses {
@@ -11,8 +14,12 @@ namespace ExperienceAndClasses {
         //Mod Shortcut
         public static Mod MOD { get; private set; }
 
+        //Time (wall)
+        public static DateTime Now { get; private set; }
+
         //Hotkeys
         public static ModHotKey HOTKEY_UI { get; private set;}
+        public static ModHotKey HOTKEY_ALTERNATE_EFFECT { get; private set; }
 
         //Netmode
         public static bool IS_SERVER { get; private set; }
@@ -26,7 +33,8 @@ namespace ExperienceAndClasses {
         public static bool LOCAL_PLAYER_VALID { get; private set; }
 
         //UI
-        public static UI.UIStateCombo[] UIs = new UI.UIStateCombo[0]; //set on entering world
+        public static bool UI_Initialized { get; private set; } = false;
+        private static UI.UIStateCombo[] UIs = new UI.UIStateCombo[0];
         public static bool Inventory_Open { get; private set; } = false;
 
         //Recipe
@@ -38,14 +46,15 @@ namespace ExperienceAndClasses {
         public static ConfigClient GetConfigClient { get { return GetInstance<ConfigClient>(); } }
         public static ConfigServer GetConfigServer { get { return GetInstance<ConfigServer>(); } }
 
-        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Methods ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Mod Save/Load ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         public static void DoModLoad(Mod mod) {
             //mod
             MOD = mod;
 
-            //hotkeys
-            HOTKEY_UI = MOD.RegisterHotKey(Language.GetTextValue("Mods.ExperienceAndClasses.Common.Hotkey_UI"), "P");
+            //hotkeys (can't use localization, caused issues)
+            HOTKEY_UI = MOD.RegisterHotKey("Toggle UI", "P");
+            HOTKEY_ALTERNATE_EFFECT = MOD.RegisterHotKey("Ability Alternate Effect", "LeftShift");
 
             //netmode
             UpdateNetmode();
@@ -65,13 +74,19 @@ namespace ExperienceAndClasses {
 
             //hotkeys
             HOTKEY_UI = null;
+            HOTKEY_ALTERNATE_EFFECT = null;
 
             //clear local player;
             LocalPlayerClear();
 
+            //not initialized
+            UI_Initialized = false;
+
             //TODO: textures
             //TODO: sounds
         }
+
+        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Net Mode ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         public static void UpdateNetmode() {
             IS_SERVER = (Main.netMode == NetmodeID.Server);
@@ -94,40 +109,108 @@ namespace ExperienceAndClasses {
             LOCAL_PLAYER.Fields.Is_Local = true;
         }
 
-        public static void UpdateUIs(GameTime gameTime) {
-            //inventory auto states
-            if (Inventory_Open != Main.playerInventory) {
-                SetUIAutoStates();
-            }
+        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Timing ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-            //update UIs
+        public static void UpdateTime() {
+            Now = DateTime.Now;
+        }
+
+        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Overall UI ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+        public static void InitializeUIs() {
+            UIs = new UI.UIStateCombo[] { UI.UIHUD.Instance , UI.UIMain.Instance , UI.UIPopup.Instance };
+
             foreach (UI.UIStateCombo ui in UIs) {
-                ui.Update(gameTime);
+                ui.Initialize();
+            }
+
+            UI_Initialized = true;
+
+            ApplyUIConfig();
+            UpdateUIPSheet(LOCAL_PLAYER.PSheet);
+        }
+
+        public static void UpdateUIs(GameTime gameTime) {
+            //update time if non-server
+            UpdateTime();
+
+            if (UI_Initialized) {
+
+                //inventory auto states
+                if (Inventory_Open != Main.playerInventory) {
+                    SetUIAutoStates();
+                }
+
+                //update UIs
+                foreach (UI.UIStateCombo ui in UIs) {
+                    ui.Update(gameTime);
+                }
+
             }
         }
 
-        public static void SetUIAutoStates() {
-            Inventory_Open = Main.playerInventory;
-
-            ConfigClient config = GetConfigClient;
-            //ApplyUIAuto(UI.UIMain.Instance, config.UIMain_AutoMode);
-            //ApplyUIAuto(UI.UIHUD.Instance, config.UIHUD_AutoMode);
+        public static void SetUILayers(List<GameInterfaceLayer> layers) {
+            if (UI_Initialized) {
+                int MouseTextIndex = layers.FindIndex(layer => layer.Name.Equals("Vanilla: Mouse Text"));
+                if (MouseTextIndex != -1) {
+                    layers.Insert(MouseTextIndex, new LegacyGameInterfaceLayer("EAC_UIMain",
+                        delegate {
+                            foreach (UI.UIStateCombo ui in UIs) {
+                                ui.Draw();
+                            }
+                            return true;
+                        },
+                        InterfaceScaleType.UI)
+                    );
+                }
+            }
         }
 
-        public static void ApplyUIAuto(UI.UIStateCombo ui, UIAutoMode mode) {
-            switch (mode) {
-                case UIAutoMode.Always:
-                    ui.Visibility = true;
-                    break;
-                case UIAutoMode.InventoryClosed:
-                    ui.Visibility = !Inventory_Open;
-                    break;
-                case UIAutoMode.InventoryOpen:
-                    ui.Visibility = Inventory_Open;
-                    break;
-                case UIAutoMode.Never:
-                    //manual
-                    break;
+        public static void SetUIAutoStates(bool hide_if_never = false) {
+            Inventory_Open = Main.playerInventory;
+            foreach (UI.UIStateCombo ui in UIs) {
+                ApplyUIAuto(ui, hide_if_never);
+            }
+        }
+
+        private static void ApplyUIAuto(UI.UIStateCombo ui, bool hide_if_never = false) {
+            if (UI_Initialized) {
+                switch (ui.auto) {
+                    case UIAutoMode.Always:
+                        ui.Visibility = true;
+                        break;
+                    case UIAutoMode.InventoryClosed:
+                        ui.Visibility = !Inventory_Open;
+                        break;
+                    case UIAutoMode.InventoryOpen:
+                        ui.Visibility = Inventory_Open;
+                        break;
+                    case UIAutoMode.Never:
+                        if (hide_if_never)
+                            ui.Visibility = false;
+                        break;
+                }
+            }
+        }
+
+        public static void UpdateUIPSheet(Systems.PSheet psheet) {
+            if (UI_Initialized && psheet.eacplayer.Fields.Is_Local) {
+                UI.UIHUD.Instance.UpdatePSheet(psheet);
+                UI.UIMain.Instance.UpdatePSheet(psheet);
+            }
+        }
+
+        public static void ApplyUIConfig() {
+            if (UI_Initialized) {
+                ConfigClient config = GetConfigClient;
+
+                UI.UIMain.Instance.auto = config.UIMain_AutoMode;
+                UI.UIMain.Instance.panel.can_drag = config.UIMain_Drag;
+
+                UI.UIHUD.Instance.auto = config.UIHUD_AutoMode;
+                UI.UIHUD.Instance.panel.can_drag = config.UIHUD_Drag;
+
+                SetUIAutoStates(true);
             }
         }
 

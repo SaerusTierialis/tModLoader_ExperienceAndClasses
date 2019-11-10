@@ -10,6 +10,14 @@ namespace ExperienceAndClasses.Systems {
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Main ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         public readonly EACPlayer eacplayer;
 
+        //these will probably change later
+        public Utilities.Containers.LevelSortedPassives Passives { get; private set; }
+        public Dictionary<Resource.IDs, Resource> Resources { get; private set; }
+        public Ability[] Abilities_Primary { get; private set; }
+        public Ability[] Abilities_Primary_Alt { get; private set; }
+        public Ability[] Abilities_Secondary { get; private set; }
+        public Ability[] Abilities_Secondary_Alt { get; private set; }
+
         public readonly ClassSheet Classes;
         public readonly AttributeSheet Attributes;
         public readonly StatsSheet Stats;
@@ -17,6 +25,15 @@ namespace ExperienceAndClasses.Systems {
 
         public PSheet(EACPlayer owner) {
             eacplayer = owner;
+
+            //these will probably change later
+            Passives = new Utilities.Containers.LevelSortedPassives();
+            Resources = new Dictionary<Resource.IDs, Resource>();
+            Abilities_Primary = new Ability[Ability.NUMBER_ABILITY_SLOTS_PER_CLASS];
+            Abilities_Primary_Alt = new Ability[Ability.NUMBER_ABILITY_SLOTS_PER_CLASS];
+            Abilities_Secondary = new Ability[Ability.NUMBER_ABILITY_SLOTS_PER_CLASS];
+            Abilities_Secondary_Alt = new Ability[Ability.NUMBER_ABILITY_SLOTS_PER_CLASS];
+
             Stats = new StatsSheet(this);
             Attributes = new AttributeSheet(this);
             Character = new CharacterSheet(this);
@@ -48,6 +65,12 @@ namespace ExperienceAndClasses.Systems {
 
             //Character
             Character.Load(tag);
+
+            //UI
+            Misc.UIMain_Left = (float)Utilities.Commons.TagTryGet<double>(tag, TAG_NAMES.UI_UIMAIN_LEFT, 0);
+            Misc.UIMain_Top = (float)Utilities.Commons.TagTryGet<double>(tag, TAG_NAMES.UI_UIMAIN_TOP, 0);
+            Misc.UIHUD_Left = (float)Utilities.Commons.TagTryGet<double>(tag, TAG_NAMES.UI_UIHUD_LEFT, 0);
+            Misc.UIHUD_Top = (float)Utilities.Commons.TagTryGet<double>(tag, TAG_NAMES.UI_UIHUD_TOP, 0);
         }
 
         public TagCompound Save(TagCompound tag) {
@@ -60,7 +83,27 @@ namespace ExperienceAndClasses.Systems {
             //Character
             tag = Character.Save(tag);
 
+            //UI
+            tag.Add(TAG_NAMES.UI_UIMAIN_LEFT, (double)UI.UIMain.Instance.panel.GetLeft());
+            tag.Add(TAG_NAMES.UI_UIMAIN_TOP, (double)UI.UIMain.Instance.panel.GetTop());
+            tag.Add(TAG_NAMES.UI_UIHUD_LEFT, (double)UI.UIHUD.Instance.panel.GetLeft());
+            tag.Add(TAG_NAMES.UI_UIHUD_TOP, (double)UI.UIHUD.Instance.panel.GetTop());
+
             return tag;
+        }
+
+        public MiscDataContainer Misc = new MiscDataContainer();
+        public class MiscDataContainer {
+            public float UIMain_Left = 0;
+            public float UIMain_Top = 0;
+            public float UIHUD_Left = 0;
+            public float UIHUD_Top = 0;
+        }
+
+        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Internal Methods ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+        protected void Passives_Clear() {
+            Passives = new Utilities.Containers.LevelSortedPassives();
         }
 
     }
@@ -86,11 +129,17 @@ namespace ExperienceAndClasses.Systems.PlayerSheet {
         public static string Character_XP = PREFIX + "character_xp";
         public static string WOF = PREFIX + "wof";
         public static string UNLOCK_SUBCLASS = PREFIX + "class_subclass_unlocked";
+
+        //UI
+        public static string UI_UIMAIN_LEFT = PREFIX + "ui_uimain_left";
+        public static string UI_UIMAIN_TOP = PREFIX + "ui_uimain_top";
+        public static string UI_UIHUD_LEFT = PREFIX + "ui_uihud_left";
+        public static string UI_UIHUD_TOP = PREFIX + "ui_uihud_top";
     }
 
     /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Templates ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
     public abstract class ContainerTemplate {
-        protected readonly PSheet PSHEET;
+        public readonly PSheet PSHEET;
         public ContainerTemplate(PSheet psheet) {
             PSHEET = psheet;
         }

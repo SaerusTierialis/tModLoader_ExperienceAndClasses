@@ -16,8 +16,8 @@ namespace ExperienceAndClasses.Systems.PlayerSheet {
             }
 
             //unlock defaults
-            UnlockClass((byte)PlayerClass.IDs.None, false);
-            UnlockClass((byte)PlayerClass.IDs.Novice, false);
+            Data_Class[(byte)PlayerClass.IDs.None].Unlock(false);
+            Data_Class[(byte)PlayerClass.IDs.Novice].Unlock(false);
         }
 
         public static byte Count { get { return (byte)PlayerClass.IDs.NUMBER_OF_IDs; } }
@@ -36,7 +36,7 @@ namespace ExperienceAndClasses.Systems.PlayerSheet {
 
         private readonly ClassInfo[] Data_Class;
         public class ClassInfo {
-            private readonly ClassSheet CONTAINER;
+            public readonly ClassSheet CONTAINER;
             public ClassInfo(ClassSheet container, byte id) {
                 CONTAINER = container;
                 ID = id;
@@ -52,6 +52,7 @@ namespace ExperienceAndClasses.Systems.PlayerSheet {
 
             public bool Is_Primary { get { return ID == CONTAINER.ID_Active_Primary; } }
             public bool Is_Secondary { get { return ID == CONTAINER.ID_Active_Secondary; } }
+            public bool Is_Active { get { return (Is_Primary || Is_Secondary); } }
 
             public bool Unlocked { get { return CONTAINER.Data_Unlock[ID]; } private set { CONTAINER.Data_Unlock[ID] = value; } }
 
@@ -82,7 +83,12 @@ namespace ExperienceAndClasses.Systems.PlayerSheet {
                 }
             }
 
-            public void Unlock(bool announce = false) {
+            public bool Maxed { get {
+                    return (Level >= Class.Max_Level);
+                }
+            }
+
+            public void Unlock(bool announce = true) {
                 if (!Unlocked && announce) {
                     Main.NewText(Language.GetTextValue("Mods.ExperienceAndClasses.Common.Unlock", Class.Name), UI.Constants.COLOUR_MESSAGE_SUCCESS);
                 }
@@ -157,16 +163,8 @@ namespace ExperienceAndClasses.Systems.PlayerSheet {
             return Language.GetTextValue("Mods.ExperienceAndClasses.Common.Levelup_Class", PSHEET.eacplayer.player.name, Data_Class[id].Level, Data_Class[id].Class.Name);
         }
 
-        public byte GetClassLevel(byte id) {
-            return Data_Class[id].Level;
-        }
-
-        public bool GetClassUnlocked(byte id) {
-            return Data_Unlock[id];
-        }
-
-        public void UnlockClass(byte id, bool announce = true) {
-            Data_Class[id].Unlock(announce);
+        public ClassInfo GetClassInfo(byte id) {
+            return Data_Class[id];
         }
 
         public void SetPrimary(byte id, bool sync = true, bool destroy_minions = false) {
@@ -225,6 +223,9 @@ namespace ExperienceAndClasses.Systems.PlayerSheet {
             }
 
             //TODO - ability, passive, etc.
+
+            //UI
+            Shortcuts.UpdateUIPSheet(PSHEET);
         }
 
         private void SyncClass(byte id_levelup = 0) {

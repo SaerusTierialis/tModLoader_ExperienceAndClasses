@@ -121,6 +121,9 @@ namespace ExperienceAndClasses.Systems {
                 {
                     psheet.Classes.Primary.AddXP(xp, is_combat);
                 }
+
+                //update UI
+                UI.UIHUD.Instance.UpdateXP();
             }
 
             public static void LocalDeathPenalty(uint xp) {

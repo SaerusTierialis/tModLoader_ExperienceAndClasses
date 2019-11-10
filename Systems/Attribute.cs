@@ -143,6 +143,10 @@ namespace ExperienceAndClasses.Systems {
             return (int)Math.Floor(sum);
         }
 
+        public static void LocalTryReset() {
+            //TODO
+        }
+
         /// <summary>
         /// number of RESET_COST_ITEM for reset cost
         /// </summary>

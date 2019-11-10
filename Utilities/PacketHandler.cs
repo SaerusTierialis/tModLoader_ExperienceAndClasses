@@ -23,6 +23,7 @@ namespace ExperienceAndClasses.Utilities {
             Attributes,
             Class,
 
+
             NUMBER_OF_TYPES, //must be last
         };
 
@@ -357,6 +358,10 @@ namespace ExperienceAndClasses.Utilities {
                 packet.Write(levelup_id);
             }
         }
+
+
+
+
 
     }
 }

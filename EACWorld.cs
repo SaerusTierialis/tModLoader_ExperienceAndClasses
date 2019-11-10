@@ -19,6 +19,11 @@ namespace ExperienceAndClasses {
 
         public override void PostUpdate() {
             Systems.NPCRewards.ServerProcessXPBuffer();
+
+            if (Shortcuts.IS_SERVER) {
+                //update time if server
+                Shortcuts.UpdateTime();
+            }
         }
 
         public override TagCompound Save() {

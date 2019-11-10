@@ -36,10 +36,16 @@ namespace ExperienceAndClasses {
         /// </summary>
         public Systems.PSheet PSheet { get; private set; }
 
+        /// <summary>
+        /// Entity can be a player or an NPC and is used by the Status and Ability systems.
+        /// </summary>
+        public Utilities.Containers.Entity Entity { get; private set; }
+
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Init ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         public override void Initialize() {
             Fields = new FieldsContainer();
             PSheet = new Systems.PSheet(this);
+            Entity = new Utilities.Containers.Entity(this);
         }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Overrides ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
@@ -52,6 +58,9 @@ namespace ExperienceAndClasses {
 
             //Set world password when entering in singleplayer, send password to server when entering multiplayer
             Systems.Password.UpdateLocalPassword();
+
+            //initialize UI
+            Shortcuts.InitializeUIs();
 
             //TODO - sync class etc.
         }
@@ -94,6 +103,41 @@ namespace ExperienceAndClasses {
             if (tag == null)
                 tag = new TagCompound();
             return PSheet.Save(tag);
+        }
+
+        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Misc ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+        /// <summary>
+        /// Attempt to send mana. Returns true on success.
+        /// </summary>
+        /// <param name="cost"></param>
+        /// <param name="regen_delay"></param>
+        /// <returns></returns>
+        public bool UseMana(int cost, bool regen_delay = true) {
+            //mana flower: use potion if it makes the difference
+            if ((Main.LocalPlayer.statMana < cost) && Main.LocalPlayer.manaFlower) {
+                Item mana_item = Main.LocalPlayer.QuickMana_GetItemToUse();
+                if (mana_item != null) {
+                    if ((Main.LocalPlayer.statMana + mana_item.healMana) >= cost) {
+                        player.QuickMana();
+                    }
+                }
+            }
+
+            if (player.statMana >= cost) {
+                //take mana (has enough)
+                player.statMana -= cost;
+                if (player.statMana < 0) player.statMana = 0;
+                player.netMana = true;
+                if (regen_delay) {
+                    player.manaRegenDelay = Math.Min(200, player.manaRegenDelay + 50);
+                }
+                return true;
+            }
+            else {
+                //not enough mana
+                return false;
+            }
         }
 
     }

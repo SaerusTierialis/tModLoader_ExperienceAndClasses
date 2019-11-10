@@ -100,6 +100,8 @@ namespace ExperienceAndClasses.Systems {
 
         private string InternalName;
 
+        public string Tooltip_Attribute_Growth { get; private set; }
+
         public byte Tier { get; protected set; } = 0;
         public byte Max_Level { get; protected set; } = 0;
 
@@ -120,6 +122,9 @@ namespace ExperienceAndClasses.Systems {
 
         public float XP_Multiplier_Combat { get; protected set; } = 1.0f;
         public float XP_Multiplier_NonCombat { get; protected set; } = 1.0f;
+
+        public Ability[] Abilities = new Ability[Ability.NUMBER_ABILITY_SLOTS_PER_CLASS];
+        public Ability[] Abilities_Alt = new Ability[Ability.NUMBER_ABILITY_SLOTS_PER_CLASS];
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Instance ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -154,9 +159,33 @@ namespace ExperienceAndClasses.Systems {
                 //no texture loaded, set blank
                 Texture = Utilities.Textures.TEXTURE_CLASS_DEFAULT;
             }
+
+            //also set attribute string
+            bool first = true;
+            Tooltip_Attribute_Growth = "";
+            foreach (byte id in Systems.Attribute.ATTRIBUTES_UI_ORDER) {
+                if (first) {
+                    first = false;
+                }
+                else {
+                    Tooltip_Attribute_Growth += "\n";
+                }
+
+                for (byte i = 0; i < 5; i++) {
+                    if (Attribute_Growth[id] >= (i + 1)) {
+                        Tooltip_Attribute_Growth += "★";
+                    }
+                    else if (Attribute_Growth[id] > i) {
+                        Tooltip_Attribute_Growth += "✯";
+                    }
+                    else {
+                        Tooltip_Attribute_Growth += "☆";
+                    }
+                }
+            }
         }
 
-        public Tuple<string, string> Tooltip_Main {
+        public string Tooltip_Main {
             get {
                 //implementation status
                 string implementation_status_text = "Implementation State: ";
@@ -183,33 +212,19 @@ namespace ExperienceAndClasses.Systems {
                 string tooltip_main = implementation_status_text + "\n\n" + Description + "\n\n" + "POWER SCALING:\nPrimary:   " + Power_Scaling.Primary_Types + "\nSecondary: " + Power_Scaling.Secondary_Types + "\n\nATTRIBUTES:";
                 bool first = true;
                 string attribute_names = "";
-                string tooltip_attribute_growth = "";
                 foreach (byte id in Systems.Attribute.ATTRIBUTES_UI_ORDER) {
                     if (first) {
                         first = false;
                     }
                     else {
                         attribute_names += "\n";
-                        tooltip_attribute_growth += "\n";
                     }
                     attribute_names += Systems.Attribute.LOOKUP[id].Specifc_Name + ":";
-
-                    for (byte i = 0; i < 5; i++) {
-                        if (Attribute_Growth[id] >= (i + 1)) {
-                            tooltip_attribute_growth += "★";
-                        }
-                        else if (Attribute_Growth[id] > i) {
-                            tooltip_attribute_growth += "✯";
-                        }
-                        else {
-                            tooltip_attribute_growth += "☆";
-                        }
-                    }
                 }
                 tooltip_main += "\n" + attribute_names;
 
                 //return
-                return new Tuple<string, string>(tooltip_main, tooltip_attribute_growth);
+                return tooltip_main;
             }
         }
 
@@ -217,10 +232,10 @@ namespace ExperienceAndClasses.Systems {
         /// Check if player meets class prereqs
         /// </summary>
         /// <returns></returns>
-        public bool HasPrereqClass(PSheet psheet) {
+        public bool MeetsClassPrereq(PSheet psheet) {
             Systems.PlayerClass pre = Prereq;
             while (pre != null) {
-                if (psheet.Classes.GetClassLevel(pre.ID_num) < pre.Max_Level) {
+                if (!psheet.Classes.GetClassInfo(pre.ID_num).Maxed) {
                     //level requirement not met
                     return false;
                 }
@@ -237,9 +252,10 @@ namespace ExperienceAndClasses.Systems {
         /// <returns></returns>
         public bool LocalTryUnlockClass() {
             PSheet psheet = Shortcuts.LOCAL_PLAYER.PSheet;
+            PlayerSheet.ClassSheet.ClassInfo info = psheet.Classes.GetClassInfo(ID_num);
 
             //check locked
-            if (psheet.Classes.GetClassUnlocked(ID_num)) {
+            if (info.Unlocked) {
                 Utilities.Logger.Error("Trying to unlock already unlocked class " + Name);
                 return false;
             }
@@ -256,7 +272,7 @@ namespace ExperienceAndClasses.Systems {
             }
 
             //level requirements
-            if (!HasPrereqClass(psheet)) {
+            if (!MeetsClassPrereq(psheet)) {
                 Main.NewText(Language.GetTextValue("Mods.ExperienceAndClasses.Common.Unlock_Class_Fail_Prereq", Prereq.Max_Level, Prereq.Name, Name), UI.Constants.COLOUR_MESSAGE_ERROR);
                 return false;
             }
@@ -276,7 +292,7 @@ namespace ExperienceAndClasses.Systems {
             Shortcuts.LOCAL_PLAYER.player.ConsumeItem(Unlock_Item.item.type);
 
             //unlock class
-            psheet.Classes.UnlockClass(ID_num, true);
+            info.Unlock(true);
 
             return true;
         }
@@ -320,7 +336,8 @@ namespace ExperienceAndClasses.Systems {
                     class_other_slot = psheet.Classes.Primary.Class;
                 }
 
-                if (((psheet.Classes.GetClassLevel(ID_num) <= 0) || !psheet.Classes.GetClassUnlocked(ID_num) || !Enabled) && (ID_num != (byte)Systems.PlayerClass.IDs.None)) {
+                PlayerSheet.ClassSheet.ClassInfo info = psheet.Classes.GetClassInfo(ID_num);
+                if (((info.Level <= 0) || !info.Unlocked || !Enabled) && (ID_num != (byte)Systems.PlayerClass.IDs.None)) {
                     return CLASS_VALIDITY.INVALID_LOCKED; //locked class
                 }
                 else {

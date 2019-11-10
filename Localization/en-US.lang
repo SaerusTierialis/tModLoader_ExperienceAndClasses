@@ -6,9 +6,6 @@
 Common.Mod_Name = ExperienceAndClasses
 
 
-//Hotkeys
-Common.Hotkey_UI=Toggle UI
-
 
 //Levelup+Unlock
 Common.Levelup_Character={0} is now character level {1}!
