@@ -347,7 +347,11 @@ namespace ExperienceAndClasses.Systems {
                     return CLASS_VALIDITY.INVALID_LOCKED; //locked class
                 }
                 else {
-                    if (ID_num != class_same_slot.ID_num) {
+                    if (ID_num == class_same_slot.ID_num) {
+                        //toggling off a class
+                        return CLASS_VALIDITY.VALID;
+                    }
+                    else {
                         Systems.PlayerClass pre = class_other_slot;
                         while (pre != null) {
                             if (ID_num == pre.ID_num) {
@@ -371,8 +375,6 @@ namespace ExperienceAndClasses.Systems {
                         return CLASS_VALIDITY.VALID;
                     }
                 }
-                //default
-                return CLASS_VALIDITY.INVALID_UNKNOWN;
             }
         }
 

@@ -115,7 +115,7 @@ namespace ExperienceAndClasses.Systems.PlayerSheet {
                 else
                     Main.NewText(GetLevelupMessage(), UI.Constants.COLOUR_MESSAGE_SUCCESS);
 
-                PSHEET.Attributes.UpdatePoints();
+                PSHEET.Attributes.UpdatePointsAndEffective();
 
                 Shortcuts.UpdateUIPSheet(PSHEET);
             }

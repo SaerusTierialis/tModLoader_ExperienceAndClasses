@@ -41,7 +41,7 @@ namespace ExperienceAndClasses.UI {
 
         private void Click(UIMouseEvent evt, UIElement listeningElement) {
             UIMain.Instance.Visibility = !UIMain.Instance.Visibility;
-            //UIHelpSettings.Instance.Visibility = false;
+            UIHelp.Instance.Visibility = false;
         }
     }
 }

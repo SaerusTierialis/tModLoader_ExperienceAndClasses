@@ -28,9 +28,9 @@ namespace ExperienceAndClasses.UI {
         private const float HEIGHT_ABILITY = (HEIGHT - HEIGHT_ATTRIBUTES) - (Constants.UI_PADDING * 2) + 1;
 
         private const float WIDTH_HELP_AND_PASSIVES = 180f;
-        private static readonly float HEIGHT_UNLOCK = HEIGHT - HEIGHT_HELP + 1 - (Constants.UI_PADDING * 2) + 1;
+        private static readonly float HEIGHT_PASSIVES = HEIGHT - HEIGHT_HELP + 1 - (Constants.UI_PADDING * 2) + 1;
 
-        private const float HEIGHT_HELP = 65f;
+        private const float HEIGHT_HELP = 35f;
 
         private static readonly float WIDTH = CLASS_WIDTH + WIDTH_ATTRIBUTES + WIDTH_HELP_AND_PASSIVES + (Constants.UI_PADDING * 2) - 4;
         private const float HEIGHT = 430f;
@@ -211,7 +211,7 @@ namespace ExperienceAndClasses.UI {
             }
 
             //unlock panel
-            DragableUIPanel panel_passive = new DragableUIPanel(WIDTH_HELP_AND_PASSIVES, HEIGHT_UNLOCK, Color.Transparent, this, false, false, false);
+            DragableUIPanel panel_passive = new DragableUIPanel(WIDTH_HELP_AND_PASSIVES, HEIGHT_PASSIVES, Color.Transparent, this, false, false, false);
             panel_passive.Left.Set(panel_ability.Left.Pixels + panel_ability.Width.Pixels - 2f, 0f);
             panel_passive.Top.Set(Constants.UI_PADDING, 0f);
             panel.Append(panel_passive);
@@ -234,7 +234,7 @@ namespace ExperienceAndClasses.UI {
 
             //help button
             TextButton help = new TextButton("Help", FONT_SCALE_HELP, FONT_SCALE_HELP + 0.1f);
-            //help.OnClick += new UIElement.MouseEvent(ClickHelp);
+            help.OnClick += new UIElement.MouseEvent(ClickHelp);
             help.HAlign = 0.5f;
             help.Top.Set(Constants.UI_PADDING * 2, 0f);
             panel_help.Append(help);
@@ -377,11 +377,9 @@ namespace ExperienceAndClasses.UI {
             UIPopup.Instance.ShowResetAttributes(listeningElement);
         }
 
-        /*
         private void ClickHelp(UIMouseEvent evt, UIElement listeningElement) {
-            UIHelpSettings.Instance.OpenHelp();
+            UIHelp.Instance.OpenHelp();
         }
-        */
 
     }
 }

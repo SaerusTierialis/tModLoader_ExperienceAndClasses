@@ -104,16 +104,13 @@ namespace ExperienceAndClasses.Systems.PlayerSheet {
                 points--;
 
                 //recalc points
-                UpdatePoints();
+                UpdatePointsAndEffective();
 
                 //mark success
                 any_allocated = true;
             }
 
             if (any_allocated) {
-                //update effective values
-                UpdateAllocatedEffective();
-
                 //ui
                 CalculateFinal();
                 Shortcuts.UpdateUIPSheet(PSHEET);
@@ -134,7 +131,7 @@ namespace ExperienceAndClasses.Systems.PlayerSheet {
             }
         }
 
-        public void UpdatePoints() {
+        public void UpdatePointsAndEffective() {
             //calculate spent + update costs for next point
             Points_Spent = 0;
             for (byte i = 0; i < Count; i++) {
@@ -147,6 +144,14 @@ namespace ExperienceAndClasses.Systems.PlayerSheet {
 
             //calculte remaining points
             Points_Available = Points_Total - Points_Spent;
+
+            //recalc zero point
+            Zero_Point = Attribute.CalculateZeroPoint(PSHEET);
+
+            //apply zero point
+            for (byte i = 0; i < Count; i++) {
+                Allocated_Effective[i] = Allocated[i] - Zero_Point;
+            }
         }
 
         public void Reset(bool allow_sync = true) {
@@ -154,8 +159,7 @@ namespace ExperienceAndClasses.Systems.PlayerSheet {
             Allocated = new int[Count];
 
             //update
-            UpdateAllocatedEffective();
-            UpdatePoints();
+            UpdatePointsAndEffective();
 
             //ui
             CalculateFinal();
@@ -164,27 +168,6 @@ namespace ExperienceAndClasses.Systems.PlayerSheet {
             //sync?
             if (allow_sync)
                 SyncAttributesEffective();
-        }
-
-        private void UpdateAllocatedEffective() {
-            //calculate average allocated
-            float sum = 0;
-            float count = 0;
-            for (byte i = 0; i < Count; i++) {
-                if (Attribute.LOOKUP[i].Active) {
-                    sum += Allocated[i];
-                    count++;
-                }
-            }
-            float average = sum / count;
-
-            //recalc zero point
-            Zero_Point = Attribute.CalculateZeroPoint(average);
-
-            //apply zero point
-            for (byte i = 0; i < Count; i++) {
-                Allocated_Effective[i] = Allocated[i] - Zero_Point;
-            }
         }
 
         public void ForceAllocatedEffective(int[] attribute) {
@@ -210,11 +193,11 @@ namespace ExperienceAndClasses.Systems.PlayerSheet {
                 }
             }
 
-            //calculate effective allocated
-            UpdateAllocatedEffective();
-
             //calculate points
-            UpdatePoints();
+            UpdatePointsAndEffective();
+
+            //calculate final
+            CalculateFinal();
 
             //if too few points, reset allocations
             if (Points_Available < 0)

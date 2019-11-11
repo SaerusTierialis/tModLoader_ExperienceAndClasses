@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Terraria;
+using Terraria.Localization;
 using Terraria.ModLoader;
 
 namespace ExperienceAndClasses.Systems {
@@ -27,6 +29,8 @@ namespace ExperienceAndClasses.Systems {
         //this may be reordered, UI uses this order
         public static IDs[] ATTRIBUTES_UI_ORDER = new IDs[] { IDs.Power, IDs.Vitality, IDs.Mind, IDs.Spirit, IDs.Agility, IDs.Dexterity }; //TODO - unused
 
+        //attribute bonus from active class
+        public const float LEVELS_PER_ATTRIBUTE_POINT_PER_STAR = 10f;
         public const float SUBCLASS_PENALTY_ATTRIBUTE_MULTIPLIER_PRIMARY = 0.7f;
         public const float SUBCLASS_PENALTY_ATTRIBUTE_MULTIPLIER_SECONDARY = 0.3f;
 
@@ -34,6 +38,9 @@ namespace ExperienceAndClasses.Systems {
         public const double ALLOCATION_POINTS_PER_INCREASED_COST = 5d;
         public const float ALLOCATION_POINTS_PER_CHARACTER_LEVEL = 5f;
         public static readonly float[] ALLOCATION_POINTS_PER_LEVEL_TIERS = new float[] { 0f, 0.2f, 0.3f, 0.5f };
+
+        //zero point calculation
+        public const float PENALTY_RATIO = 0.05f;
 
         //reset
         public static readonly ModItem RESET_COST_ITEM = ModContent.GetInstance<Items.Orb_Monster>();
@@ -52,6 +59,8 @@ namespace ExperienceAndClasses.Systems {
                 LOOKUP[i] = Utilities.Commons.CreateObjectFromName<Attribute>(Enum.GetName(typeof(IDs), i));
             }
         }
+
+        public static byte Count { get { return (byte)IDs.NUMBER_OF_IDs; } }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Instance Vars (specific) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -94,12 +103,12 @@ namespace ExperienceAndClasses.Systems {
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Static Methods ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         /// <summary>
-        /// Calculate the zero point for attributes based on average allocated
+        /// Calculate the zero point for attributes based on allocations
         /// </summary>
-        /// <param name="average"></param>
+        /// <param name="psheet"></param>
         /// <returns></returns>
-        public static int CalculateZeroPoint(float average) {
-            return (int)Math.Floor(average * 0.7);
+        public static int CalculateZeroPoint(PSheet psheet) {
+            return (int)Math.Floor(psheet.Attributes.Points_Spent * PENALTY_RATIO);
         }
 
         /// <summary>
@@ -152,14 +161,21 @@ namespace ExperienceAndClasses.Systems {
             int held = Shortcuts.LOCAL_PLAYER.player.CountItem(type);
 
             //do reset
-            if (held >= cost) {
+            if (Shortcuts.LOCAL_PLAYER.PSheet.Attributes.Points_Spent <= 0)
+                Main.NewText(Language.GetTextValue("Mods.ExperienceAndClasses.Common.Attribute_Reset_NoPoints"), UI.Constants.COLOUR_MESSAGE_ERROR);
+            else if (held >= cost) {
                 //consume
                 for (int i = 0; i < cost; i++)
                     Shortcuts.LOCAL_PLAYER.player.ConsumeItem(type);
 
                 //reset
                 Shortcuts.LOCAL_PLAYER.PSheet.Attributes.Reset();
+
+                //message
+                Main.NewText(Language.GetTextValue("Mods.ExperienceAndClasses.Common.Attribute_Reset_Success"), UI.Constants.COLOUR_MESSAGE_SUCCESS);
             }
+            else
+                Main.NewText(Language.GetTextValue("Mods.ExperienceAndClasses.Common.Attribute_Reset_Fail"), UI.Constants.COLOUR_MESSAGE_ERROR);
         }
 
         /// <summary>
@@ -176,7 +192,24 @@ namespace ExperienceAndClasses.Systems {
 
         public static int GetClassBonus(PSheet psheet, byte id) {
             float value_primary = psheet.Classes.Primary.Class.Attribute_Growth[id] * psheet.Classes.Primary.Level_Effective;
+            PlayerClass p = psheet.Classes.Primary.Class.Prereq;
+            while (p != null) {
+                if (p.Gives_Allocation_Attributes) {
+                    value_primary += p.Attribute_Growth[id] * p.Max_Level;
+                }
+                p = p.Prereq;
+            }
+            value_primary /= LEVELS_PER_ATTRIBUTE_POINT_PER_STAR;
+
             float value_secondary = psheet.Classes.Secondary.Class.Attribute_Growth[id] * psheet.Classes.Secondary.Level_Effective;
+            p = psheet.Classes.Secondary.Class.Prereq;
+            while (p != null) {
+                if (p.Gives_Allocation_Attributes) {
+                    value_secondary += p.Attribute_Growth[id] * p.Max_Level;
+                }
+                p = p.Prereq;
+            }
+            value_secondary /= LEVELS_PER_ATTRIBUTE_POINT_PER_STAR;
 
             if (psheet.Classes.Primary.Valid_Class && psheet.Classes.Secondary.Valid_Class) {
                 return (int)Math.Floor((value_primary * SUBCLASS_PENALTY_ATTRIBUTE_MULTIPLIER_PRIMARY) + (value_secondary * SUBCLASS_PENALTY_ATTRIBUTE_MULTIPLIER_SECONDARY));

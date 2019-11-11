@@ -60,17 +60,14 @@ namespace ExperienceAndClasses.Systems {
             //Class
             Classes.Load(tag);
 
-            //Attribute Allocations
-            Attributes.Load(tag);
-
             //Character
             Character.Load(tag);
 
-            //UI
-            Misc.UIMain_Left = (float)Utilities.Commons.TagTryGet<double>(tag, TAG_NAMES.UI_UIMAIN_LEFT, 0);
-            Misc.UIMain_Top = (float)Utilities.Commons.TagTryGet<double>(tag, TAG_NAMES.UI_UIMAIN_TOP, 0);
-            Misc.UIHUD_Left = (float)Utilities.Commons.TagTryGet<double>(tag, TAG_NAMES.UI_UIHUD_LEFT, 0);
-            Misc.UIHUD_Top = (float)Utilities.Commons.TagTryGet<double>(tag, TAG_NAMES.UI_UIHUD_TOP, 0);
+            //Attribute Allocations
+            Attributes.Load(tag);
+
+            //Misc
+            Misc.Load(tag);
         }
 
         public TagCompound Save(TagCompound tag) {
@@ -83,21 +80,44 @@ namespace ExperienceAndClasses.Systems {
             //Character
             tag = Character.Save(tag);
 
-            //UI
-            tag.Add(TAG_NAMES.UI_UIMAIN_LEFT, (double)UI.UIMain.Instance.panel.GetLeft());
-            tag.Add(TAG_NAMES.UI_UIMAIN_TOP, (double)UI.UIMain.Instance.panel.GetTop());
-            tag.Add(TAG_NAMES.UI_UIHUD_LEFT, (double)UI.UIHUD.Instance.panel.GetLeft());
-            tag.Add(TAG_NAMES.UI_UIHUD_TOP, (double)UI.UIHUD.Instance.panel.GetTop());
+            //Misc
+            tag = Misc.Save(tag);
 
             return tag;
         }
 
         public MiscDataContainer Misc = new MiscDataContainer();
         public class MiscDataContainer {
-            public float UIMain_Left = 0;
-            public float UIMain_Top = 0;
-            public float UIHUD_Left = 0;
-            public float UIHUD_Top = 0;
+            //defaults
+            public float UIMain_Left { get; private set; } = 0;
+            public float UIMain_Top { get; private set; } = 0;
+            public float UIHUD_Left { get; private set; } = 0;
+            public float UIHUD_Top { get; private set; } = 0;
+            public int[] Loaded_Version { get; private set; } = new int[3];
+
+            public TagCompound Save(TagCompound tag) {
+                //UI
+                tag.Add(TAG_NAMES.UI_UIMAIN_LEFT, (double)UI.UIMain.Instance.panel.GetLeft());
+                tag.Add(TAG_NAMES.UI_UIMAIN_TOP, (double)UI.UIMain.Instance.panel.GetTop());
+                tag.Add(TAG_NAMES.UI_UIHUD_LEFT, (double)UI.UIHUD.Instance.panel.GetLeft());
+                tag.Add(TAG_NAMES.UI_UIHUD_TOP, (double)UI.UIHUD.Instance.panel.GetTop());
+
+                //version
+                tag = Utilities.Commons.TagAddArrayAsList(tag, TAG_NAMES.VERSION, Shortcuts.Version);
+
+                return tag;
+            }
+
+            public void Load(TagCompound tag) {
+                //UI
+                UIMain_Left = (float)Utilities.Commons.TagTryGet<double>(tag, TAG_NAMES.UI_UIMAIN_LEFT, 0);
+                UIMain_Top = (float)Utilities.Commons.TagTryGet<double>(tag, TAG_NAMES.UI_UIMAIN_TOP, 0);
+                UIHUD_Left = (float)Utilities.Commons.TagTryGet<double>(tag, TAG_NAMES.UI_UIHUD_LEFT, 0);
+                UIHUD_Top = (float)Utilities.Commons.TagTryGet<double>(tag, TAG_NAMES.UI_UIHUD_TOP, 0);
+
+                //version
+                Loaded_Version = Utilities.Commons.TagLoadListAsArray<int>(tag, TAG_NAMES.VERSION, 3);
+            }
         }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Internal Methods ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
@@ -135,6 +155,9 @@ namespace ExperienceAndClasses.Systems.PlayerSheet {
         public static string UI_UIMAIN_TOP = PREFIX + "ui_uimain_top";
         public static string UI_UIHUD_LEFT = PREFIX + "ui_uihud_left";
         public static string UI_UIHUD_TOP = PREFIX + "ui_uihud_top";
+
+        //misc
+        public static string VERSION = PREFIX + "version";
     }
 
     /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Templates ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/

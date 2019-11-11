@@ -50,8 +50,8 @@ namespace ExperienceAndClasses.Systems.PlayerSheet {
 
             public readonly byte ID;
 
-            public bool Is_Primary { get { return ID == CONTAINER.ID_Active_Primary; } }
-            public bool Is_Secondary { get { return ID == CONTAINER.ID_Active_Secondary; } }
+            public bool Is_Primary { get { return (Valid_Class && ID == CONTAINER.ID_Active_Primary); } }
+            public bool Is_Secondary { get { return (Valid_Class && ID == CONTAINER.ID_Active_Secondary); } }
             public bool Is_Active { get { return (Is_Primary || Is_Secondary); } }
 
             public bool Unlocked { get { return CONTAINER.Data_Unlock[ID]; } private set { CONTAINER.Data_Unlock[ID] = value; } }
@@ -209,6 +209,12 @@ namespace ExperienceAndClasses.Systems.PlayerSheet {
         }
 
         public void SetSecondary(byte id, bool sync = true, bool destroy_minions = false) {
+            //redirect to primary if no primary
+            if (!Primary.Valid_Class) {
+                SetPrimary(id, sync, destroy_minions);
+                return;
+            }
+
             //set
             if (ID_Active_Secondary == id) {
                 //toggle off class

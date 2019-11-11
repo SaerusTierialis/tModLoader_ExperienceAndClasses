@@ -555,8 +555,9 @@ namespace ExperienceAndClasses.UI {
 
             float width_cutoff = final.Left.Pixels - sum.Left.Pixels - 5f;
 
-            str = psheet.Attributes.Allocated_Effective[attribute.ID_num] + "+" +
-                    psheet.Attributes.From_Class[attribute.ID_num] + "+" + psheet.Attributes.Bonuses[attribute.ID_num];
+            str = psheet.Attributes.Allocated[attribute.ID_num] + "+" +
+                    (psheet.Attributes.From_Class[attribute.ID_num] + psheet.Attributes.Bonuses[attribute.ID_num]) +
+                    "-" + psheet.Attributes.Zero_Point;
 
             if ((Main.fontMouseText.MeasureString(str).X * SCALE_SUM) >= width_cutoff) {
                 sum_small.SetText(str);

@@ -31,13 +31,13 @@ ItemTooltip.Orb_Monster=A crystalline sphere that glows with the promise of powe
 ItemName.Orb_Boss=Transcendence Orb
 ItemTooltip.Orb_Boss=A crystalline sphere that shines with the promise of power.\n\nUsed to unlock clases, unlock subclass, or TODO
 ItemName.Unlock_Tier2=Tier II Class Token
-ItemTooltip.Unlock_Tier2=A token that is used to unlock any standard Tier II class. Click on a class icon to open the unlock dialogue.
+ItemTooltip.Unlock_Tier2=A token that is used to unlock any standard Tier II class.\nClick on a class icon to open the unlock dialogue.
 ItemName.Unlock_Tier3=Tier III Class Token
-ItemTooltip.Unlock_Tier3=A token that is used to unlock any Tier III class. Click on a class icon to open the unlock dialogue.
+ItemTooltip.Unlock_Tier3=A token that is used to unlock any Tier III class.\nClick on a class icon to open the unlock dialogue.
 ItemName.Unlock_Subclass=Subclass Token
-ItemTooltip.Unlock_Subclass=A token that is used to unlock the Subclass system. Right click on any class icon to open the unlock diaglogue. This unlock is performed just once rather than per class. Once unlocked, right click a class to set it as the current subclass.
+ItemTooltip.Unlock_Subclass=A token that is used to unlock the Subclass system.\nRight click on any class icon to open the unlock diaglogue.\nThis unlock is performed just once rather than per class.\nOnce unlocked, right click a class to set it as the current subclass.
 ItemName.Unlock_Explorer=Explorer Token
-ItemTooltip.Unlock_Explorer=A token that is used to unlock the non-combat class. Click on the class icon to open the unlock dialogue.
+ItemTooltip.Unlock_Explorer=A token that is used to unlock the non-combat class.\nClick on the class icon to open the unlock dialogue.
 
 
 //System - Password
@@ -146,3 +146,8 @@ Common.Class_Saint_Description=TODO
 Common.Class_HybridPrime_Description=TODO
 Common.Class_Explorer_Description=TODO
 Common.Class_Oracle_Description=TODO
+
+//Attributes
+Common.Attribute_Reset_Success=Attributes have been reset!
+Common.Attribute_Reset_Fail=Attribute reset requirement was not met.
+Common.Attribute_Reset_NoPoints=Cannot reset attributes because no points have been allocated.
