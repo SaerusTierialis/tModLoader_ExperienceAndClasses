@@ -89,15 +89,17 @@ namespace ExperienceAndClasses.Systems {
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ XP Adjustments ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         
         public static class Adjustments {
-            public static void LocalAddXP(uint xp, bool is_combat = true) {
+            public static void LocalAddXP(uint xp, bool is_combat = true, bool allow_multipliers = true) {
                 //convert to double temporarily
                 double xpd = xp;
 
                 //apply any player-specific bonuses
-                if (Main.LocalPlayer.wellFed) {
-                    xpd *= 1.05;
+                if (allow_multipliers) {
+                    if (Main.LocalPlayer.wellFed) {
+                        xpd *= 1.05;
+                    }
+                    //TODO - any other bonuses
                 }
-                //TODO - any other bonuses
 
                 //round up
                 xp = (uint)Math.Ceiling(xpd);
@@ -114,12 +116,12 @@ namespace ExperienceAndClasses.Systems {
 
                 //add to classes
                 if (psheet.Classes.Has_Subclass) {
-                    psheet.Classes.Primary.AddXP((uint)Math.Ceiling(xp * SUBCLASS_PENALTY_XP_MULTIPLIER_PRIMARY), is_combat);
-                    psheet.Classes.Secondary.AddXP((uint)Math.Ceiling(xp * SUBCLASS_PENALTY_XP_MULTIPLIER_SECONDARY), is_combat);
+                    psheet.Classes.Primary.AddXP((uint)Math.Ceiling(xp * SUBCLASS_PENALTY_XP_MULTIPLIER_PRIMARY), is_combat, allow_multipliers);
+                    psheet.Classes.Secondary.AddXP((uint)Math.Ceiling(xp * SUBCLASS_PENALTY_XP_MULTIPLIER_SECONDARY), is_combat, allow_multipliers);
                 }
                 else
                 {
-                    psheet.Classes.Primary.AddXP(xp, is_combat);
+                    psheet.Classes.Primary.AddXP(xp, is_combat, allow_multipliers);
                 }
             }
 

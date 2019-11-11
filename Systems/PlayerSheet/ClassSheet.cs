@@ -88,6 +88,12 @@ namespace ExperienceAndClasses.Systems.PlayerSheet {
                 }
             }
 
+            public bool Can_Gain_XP {
+                get {
+                    return (Valid_Class && !Maxed);
+                }
+            }
+
             public bool Valid_Class {
                 get {
                     return (Class.Tier > 0) && (Class.Enabled);
@@ -117,12 +123,14 @@ namespace ExperienceAndClasses.Systems.PlayerSheet {
                 Shortcuts.UpdateUIPSheet(CONTAINER.PSHEET);
             }
 
-            public void AddXP(uint xp, bool from_combat = true) {
+            public void AddXP(uint xp, bool from_combat = true, bool allow_multipliers = true) {
                 if (Valid_Class) {
-                    if (from_combat)
-                        xp = (uint)Math.Ceiling(xp * Class.XP_Multiplier_Combat);
-                    else
-                        xp = (uint)Math.Ceiling(xp * Class.XP_Multiplier_NonCombat);
+                    if (allow_multipliers) {
+                        if (from_combat)
+                            xp = (uint)Math.Ceiling(xp * Class.XP_Multiplier_Combat);
+                        else
+                            xp = (uint)Math.Ceiling(xp * Class.XP_Multiplier_NonCombat);
+                    }
 
                     XP = Utilities.Commons.SafeAdd(XP, xp);
                     LocalHandleXPChange();
@@ -167,6 +175,12 @@ namespace ExperienceAndClasses.Systems.PlayerSheet {
                 else {
                     UI.UIHUD.Instance.UpdateXP();
                 }
+            }
+        }
+
+        public bool Can_Gain_XP {
+            get {
+                return Primary.Can_Gain_XP || Secondary.Can_Gain_XP;
             }
         }
 

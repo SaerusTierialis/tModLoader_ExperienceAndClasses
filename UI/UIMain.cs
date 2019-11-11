@@ -65,6 +65,8 @@ namespace ExperienceAndClasses.UI {
 
         private ScrollPanel passives;
 
+        private TextButton old_xp_button;
+
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Initialize ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         protected override void InitializeState() {
             //main panel
@@ -118,6 +120,18 @@ namespace ExperienceAndClasses.UI {
                     }
                 }
             }
+
+            //old xp button
+            old_xp_button = new TextButton("Apply Legacy XP", FONT_SCALE_ATTRIBUTE, FONT_SCALE_ATTRIBUTE + 0.1f);
+            old_xp_button.OnClick += new UIElement.MouseEvent(ClickPreRevampXP);
+            old_xp_button.OnMouseOver += new UIElement.MouseEvent(MouseOverPreRevampXP);
+            old_xp_button.OnMouseOut += new UIElement.MouseEvent(MouseOutPreRevampXP);
+            old_xp_button.HAlign = 1f;
+            old_xp_button.VAlign = 1f;
+            old_xp_button.Left.Set(old_xp_button.Left.Pixels - (Constants.UI_PADDING * 2f), 0f);
+            old_xp_button.Top.Set(old_xp_button.Top.Pixels - (Constants.UI_PADDING * 2f), 0f);
+            old_xp_button.visible = false;
+            panel_class.Append(old_xp_button);
 
             //attribute panel
             DragableUIPanel panel_attribute = new DragableUIPanel(WIDTH_ATTRIBUTES, HEIGHT_ATTRIBUTES, Constants.COLOUR_SUBPANEL, this, false, false, false);
@@ -331,6 +345,18 @@ namespace ExperienceAndClasses.UI {
                 passive_icons.Add(new PassiveIcon(passive));
             }
             passives.SetItems(passive_icons);
+
+            //apply prerevamp xp
+            UpdatePreRevampXPButtonVisible();
+        }
+
+        public void UpdatePreRevampXPButtonVisible() {
+            if (Main.LocalPlayer.GetModPlayer<Systems.Legacy.MyPlayer>().GetXPAvailable() > 0) {
+                old_xp_button.visible = true;
+            }
+            else {
+                old_xp_button.visible = false;
+            }
         }
 
         private void UpdateAttributePoints() {
@@ -379,6 +405,61 @@ namespace ExperienceAndClasses.UI {
 
         private void ClickHelp(UIMouseEvent evt, UIElement listeningElement) {
             UIHelp.Instance.OpenHelp();
+        }
+
+        private void ClickPreRevampXP(UIMouseEvent evt, UIElement listeningElement) {
+            if (old_xp_button.visible) {
+                Systems.PSheet psheet = Shortcuts.LOCAL_PLAYER.PSheet;
+
+                if (psheet.Classes.Can_Gain_XP) {
+                    Systems.Legacy.MyPlayer old_modplayer = Main.LocalPlayer.GetModPlayer<Systems.Legacy.MyPlayer>();
+
+                    uint max_xp_to_add = uint.MaxValue;
+                    if (psheet.Classes.Primary.Can_Gain_XP) {
+                        max_xp_to_add = psheet.Classes.Primary.XP_Level_Remaining;
+                        if (psheet.Classes.Secondary.Can_Gain_XP) {
+                            max_xp_to_add = (uint)Math.Ceiling(max_xp_to_add / Systems.XP.SUBCLASS_PENALTY_XP_MULTIPLIER_PRIMARY);
+                        }
+                    }
+
+                    if (psheet.Classes.Secondary.Can_Gain_XP) {
+                        max_xp_to_add = (uint)Math.Min(max_xp_to_add, Math.Ceiling(psheet.Classes.Secondary.XP_Level_Remaining / Systems.XP.SUBCLASS_PENALTY_XP_MULTIPLIER_SECONDARY));
+                    }
+
+                    uint xp_to_apply = (uint)Math.Ceiling(Math.Min(max_xp_to_add, old_modplayer.GetXPAvailable()));
+                    old_modplayer.SpendXP(xp_to_apply);
+                    Systems.XP.Adjustments.LocalAddXP(xp_to_apply, false, false);
+
+                    Main.NewText(xp_to_apply + " legacy experience has been redistribution! " + old_modplayer.GetXPAvailable() + " remains.");
+                    MouseOverPreRevampXP(evt, listeningElement);
+
+                    UpdatePreRevampXPButtonVisible();
+
+                }
+                else {
+                    Main.NewText("Cannot currently gain XP!");
+                }
+            }
+        }
+
+        private void MouseOverPreRevampXP(UIMouseEvent evt, UIElement listeningElement) {
+            if (old_xp_button.visible) {
+                Systems.Legacy.MyPlayer old_modplayer = Main.LocalPlayer.GetModPlayer<Systems.Legacy.MyPlayer>();
+                double xp_available = old_modplayer.GetXPAvailable();
+                if (xp_available > 0) {
+                    UIPopup.Instance.ShowHelpText(old_xp_button, xp_available + " XP is available", "Legacy Redistribution");
+                }
+                else {
+                    UIPopup.Instance.EndText(old_xp_button);
+                }
+            }
+            else {
+                UIPopup.Instance.EndText(old_xp_button);
+            }
+        }
+
+        private void MouseOutPreRevampXP(UIMouseEvent evt, UIElement listeningElement) {
+            UIPopup.Instance.EndText(old_xp_button);
         }
 
     }

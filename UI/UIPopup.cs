@@ -314,8 +314,8 @@ namespace ExperienceAndClasses.UI {
         public void ShowResetAttributes(UIElement source) {
             int cost = Systems.Attribute.LocalCalculateResetCost();
 
-            string str = "Resetting attributes is free when less than " + (Systems.Attribute.RESET_POINTS_FREE + 1) +
-                " points are allocated. Each point beyond that increases the number of " + Systems.Attribute.RESET_COST_ITEM.item.Name + "s required.\n\n" +
+            string str = "Resetting attributes is free for the first " + (Systems.Attribute.RESET_POINTS_FREE + 1) +
+                " points. After that, " + Systems.Attribute.RESET_COST_ITEM.item.Name + " are required.\n\n" +
                 "Allocated: " + Shortcuts.LOCAL_PLAYER.PSheet.Attributes.Points_Spent + "\n" +
                 "Cost: " + cost + " " + Systems.Attribute.RESET_COST_ITEM.item.Name + "(s)\n" +
                 "\nWould you like to reset your attributes?";
