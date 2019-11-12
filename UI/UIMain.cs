@@ -415,18 +415,24 @@ namespace ExperienceAndClasses.UI {
                     Systems.Legacy.MyPlayer old_modplayer = Main.LocalPlayer.GetModPlayer<Systems.Legacy.MyPlayer>();
 
                     uint max_xp_to_add = uint.MaxValue;
+                    uint xp;
                     if (psheet.Classes.Primary.Can_Gain_XP) {
-                        max_xp_to_add = psheet.Classes.Primary.XP_Level_Remaining;
+                        xp = psheet.Classes.Primary.XP_Level_Remaining;
                         if (psheet.Classes.Secondary.Can_Gain_XP) {
-                            max_xp_to_add = (uint)Math.Ceiling(max_xp_to_add / Systems.XP.SUBCLASS_PENALTY_XP_MULTIPLIER_PRIMARY);
+                            xp = (uint)Math.Ceiling(max_xp_to_add / Systems.XP.SUBCLASS_PENALTY_XP_MULTIPLIER_PRIMARY);
                         }
+                        max_xp_to_add = (uint)Math.Min(xp, max_xp_to_add);
                     }
 
                     if (psheet.Classes.Secondary.Can_Gain_XP) {
-                        max_xp_to_add = (uint)Math.Min(max_xp_to_add, Math.Ceiling(psheet.Classes.Secondary.XP_Level_Remaining / Systems.XP.SUBCLASS_PENALTY_XP_MULTIPLIER_SECONDARY));
+                        xp = psheet.Classes.Secondary.XP_Level_Remaining;
+                        if (psheet.Classes.Primary.Can_Gain_XP) {
+                            xp = (uint)Math.Ceiling(max_xp_to_add / Systems.XP.SUBCLASS_PENALTY_XP_MULTIPLIER_SECONDARY);
+                        }
+                        max_xp_to_add = (uint)Math.Min(xp, max_xp_to_add);
                     }
 
-                    uint xp_to_apply = (uint)Math.Ceiling(Math.Min(max_xp_to_add, old_modplayer.GetXPAvailable()));
+                    uint xp_to_apply = (uint)Math.Min(max_xp_to_add, old_modplayer.GetXPAvailable());
                     old_modplayer.SpendXP(xp_to_apply);
                     Systems.XP.Adjustments.LocalAddXP(xp_to_apply, false, false);
 

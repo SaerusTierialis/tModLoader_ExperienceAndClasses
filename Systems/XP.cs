@@ -115,13 +115,26 @@ namespace ExperienceAndClasses.Systems {
                 psheet.Character.LocalAddXP(xp);
 
                 //add to classes
-                if (psheet.Classes.Has_Subclass) {
-                    psheet.Classes.Primary.AddXP((uint)Math.Ceiling(xp * SUBCLASS_PENALTY_XP_MULTIPLIER_PRIMARY), is_combat, allow_multipliers);
-                    psheet.Classes.Secondary.AddXP((uint)Math.Ceiling(xp * SUBCLASS_PENALTY_XP_MULTIPLIER_SECONDARY), is_combat, allow_multipliers);
-                }
-                else
-                {
-                    psheet.Classes.Primary.AddXP(xp, is_combat, allow_multipliers);
+                if (psheet.Classes.Can_Gain_XP) { //primary and/or secondary can gain xp
+                    if (psheet.Classes.Has_Subclass) {
+                        if (!psheet.Classes.Primary.Can_Gain_XP) {
+                            //secondary only (maxed primary)
+                            psheet.Classes.Secondary.AddXP(xp, is_combat, allow_multipliers);
+                        }
+                        else if (!psheet.Classes.Secondary.Can_Gain_XP) {
+                            //primary only (maxed secondary)
+                            psheet.Classes.Primary.AddXP(xp, is_combat, allow_multipliers);
+                        }
+                        else {
+                            //both
+                            psheet.Classes.Primary.AddXP((uint)Math.Ceiling(xp * SUBCLASS_PENALTY_XP_MULTIPLIER_PRIMARY), is_combat, allow_multipliers);
+                            psheet.Classes.Secondary.AddXP((uint)Math.Ceiling(xp * SUBCLASS_PENALTY_XP_MULTIPLIER_SECONDARY), is_combat, allow_multipliers);
+                        }
+                    }
+                    else {
+                        //primary only (no secondary)
+                        psheet.Classes.Primary.AddXP(xp, is_combat, allow_multipliers);
+                    }
                 }
             }
 
