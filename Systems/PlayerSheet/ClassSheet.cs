@@ -326,6 +326,15 @@ namespace ExperienceAndClasses.Systems.PlayerSheet {
             ID_Active_Primary = Utilities.Commons.TagTryGet(tag, TAG_NAMES.Class_Active_Primary, (byte)PlayerClass.IDs.Novice);
             ID_Active_Secondary = Utilities.Commons.TagTryGet(tag, TAG_NAMES.Class_Active_Secondary, (byte)PlayerClass.IDs.None);
 
+            //deactivate disabled classes
+            if (!PlayerClass.LOOKUP[ID_Active_Secondary].Enabled) {
+                ID_Active_Secondary = (byte)PlayerClass.IDs.None;
+            }
+            if (!PlayerClass.LOOKUP[ID_Active_Primary].Enabled) {
+                ID_Active_Primary = ID_Active_Secondary;
+                ID_Active_Secondary = (byte)PlayerClass.IDs.None;
+            }
+
             //ensure that base and active classes are unlocked
             Data_Unlock[(byte)PlayerClass.IDs.None] = true;
             Data_Unlock[(byte)PlayerClass.IDs.Novice] = true;

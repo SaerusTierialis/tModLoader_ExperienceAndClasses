@@ -98,17 +98,20 @@ Common.Config_UIMessages_XPOverhead_Label=Display XP gain overhead
 //Class - Names
 Common.Class_None_Name=None
 Common.Class_Novice_Name=Novice
+Common.Class_Explorer_Name=Explorer
+
 Common.Class_Warrior_Name=Warrior
 Common.Class_Ranger_Name=Ranger
 Common.Class_Traveler_Name=Traveler
 Common.Class_Rogue_Name=Rogue
 Common.Class_Summoner_Name=Summoner
 Common.Class_Cleric_Name=Cleric
+Common.Class_Bard_Name=Bard
 Common.Class_Hybrid_Name=Hybrid
-Common.Class_BloodKnight_Name=BloodKnight
+
+Common.Class_BloodKnight_Name=Blood Knight
 Common.Class_Berserker_Name=Berserker
 Common.Class_Guardian_Name=Guardian
-Common.Class_Tinkerer_Name=Tinkerer
 Common.Class_Artillery_Name=Artillery
 Common.Class_Chrono_Name=Chrono
 Common.Class_Controller_Name=Controller
@@ -117,24 +120,27 @@ Common.Class_Assassin_Name=Assassin
 Common.Class_SoulBinder_Name=SoulBinder
 Common.Class_Tactician_Name=Tactician
 Common.Class_Saint_Name=Saint
-Common.Class_HybridPrime_Name=Hybrid Prime
-Common.Class_Explorer_Name=Explorer
 Common.Class_Oracle_Name=Oracle
+Common.Class_Minstrel_Name=Minstrel
+Common.Class_HybridPrime_Name=Hybrid Prime
 
 //Class - Descriptions
 Common.Class_None_Description=
 Common.Class_Novice_Description=TODO
+Common.Class_Explorer_Description=TODO
+
 Common.Class_Warrior_Description=TODO
 Common.Class_Ranger_Description=TODO
 Common.Class_Traveler_Description=TODO
 Common.Class_Rogue_Description=TODO
 Common.Class_Summoner_Description=TODO
 Common.Class_Cleric_Description=TODO
+Common.Class_Bard_Description=TODO
 Common.Class_Hybrid_Description=TODO
+
 Common.Class_BloodKnight_Description=TODO
 Common.Class_Berserker_Description=TODO
 Common.Class_Guardian_Description=TODO
-Common.Class_Tinkerer_Description=TODO
 Common.Class_Artillery_Description=TODO
 Common.Class_Chrono_Description=TODO
 Common.Class_Controller_Description=TODO
@@ -143,9 +149,9 @@ Common.Class_Assassin_Description=TODO
 Common.Class_SoulBinder_Description=TODO
 Common.Class_Tactician_Description=TODO
 Common.Class_Saint_Description=TODO
-Common.Class_HybridPrime_Description=TODO
-Common.Class_Explorer_Description=TODO
 Common.Class_Oracle_Description=TODO
+Common.Class_Minstrel_Description=TODO
+Common.Class_HybridPrime_Description=TODO
 
 //Attributes
 Common.Attribute_Reset_Success=Attributes have been reset!

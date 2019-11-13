@@ -666,9 +666,9 @@ namespace ExperienceAndClasses.Systems {
 
         public class BloodKnight : Tier3 {
             public BloodKnight() : base(IDs.BloodKnight, Attribute.PowerScaling.IDs.CloseRange, IDs.Warrior) {
-                Class_Locations[2, 0] = ID_num;
-                Attribute_Growth[(byte)Attribute.IDs.Power] = 5;
-                Attribute_Growth[(byte)Attribute.IDs.Vitality] = 3;
+                Class_Locations[3, 0] = ID_num;
+                Attribute_Growth[(byte)Attribute.IDs.Power] = 4;
+                Attribute_Growth[(byte)Attribute.IDs.Vitality] = 4;
                 Colour = COLOUR_CLOSE_RANGE_3;
                 implementation_status = IMPLEMENTATION_STATUS.ATTRIBUTE_ONLY;
             }
@@ -676,7 +676,7 @@ namespace ExperienceAndClasses.Systems {
 
         public class Berserker : Tier3 {
             public Berserker() : base(IDs.Berserker, Attribute.PowerScaling.IDs.CloseRange, IDs.Warrior) {
-                Class_Locations[3, 0] = ID_num;
+                Class_Locations[2, 0] = ID_num;
                 Attribute_Growth[(byte)Attribute.IDs.Power] = 2;
                 Attribute_Growth[(byte)Attribute.IDs.Vitality] = 2;
                 Attribute_Growth[(byte)Attribute.IDs.Agility] = 2;
@@ -688,7 +688,11 @@ namespace ExperienceAndClasses.Systems {
 
         public class Guardian : Tier3 {
             public Guardian() : base(IDs.Guardian, Attribute.PowerScaling.IDs.CloseRange, IDs.Warrior) {
-                Class_Locations[4, 0] = ID_num;
+
+                //DISABLED
+                //Class_Locations[4, 0] = ID_num;
+                Enabled = false;
+
                 Attribute_Growth[(byte)Attribute.IDs.Power] = 3;
                 Attribute_Growth[(byte)Attribute.IDs.Vitality] = 5;
                 Colour = COLOUR_CLOSE_RANGE_3;
@@ -708,7 +712,11 @@ namespace ExperienceAndClasses.Systems {
 
         public class Tinkerer : Tier3 {
             public Tinkerer() : base(IDs.Tinkerer, Attribute.PowerScaling.IDs.ProjectileAndMinion, IDs.Ranger) {
-                Class_Locations[3, 1] = ID_num;
+
+                //DISABLED
+                //Class_Locations[3, 1] = ID_num;
+                Enabled = false;
+
                 Attribute_Growth[(byte)Attribute.IDs.Power] = 3;
                 Attribute_Growth[(byte)Attribute.IDs.Vitality] = 3;
                 Attribute_Growth[(byte)Attribute.IDs.Spirit] = 2;
@@ -754,7 +762,7 @@ namespace ExperienceAndClasses.Systems {
 
         public class Chrono : Tier3 {
             public Chrono() : base(IDs.Chrono, Attribute.PowerScaling.IDs.Projectile, IDs.Ranger) {
-                Class_Locations[4, 1] = ID_num;
+                Class_Locations[3, 1] = ID_num;
                 Attribute_Growth[(byte)Attribute.IDs.Power] = 2;
                 Attribute_Growth[(byte)Attribute.IDs.Spirit] = 2;
                 Attribute_Growth[(byte)Attribute.IDs.Dexterity] = 5;

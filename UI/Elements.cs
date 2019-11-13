@@ -580,7 +580,7 @@ namespace ExperienceAndClasses.UI {
     class ClassButton : UIImageButton {
         private const float TEXT_SCALE = 0.7f;
         private const float TEXT_OFFSET = 5f;
-        private const float LOW_VISIBILITY = 0.7f;
+        private const float LOW_VISIBILITY = 0.8f;
         private static readonly Color COLOUR_GRAY_OUT = new Color(170, 170, 170, 255);
 
         private float button_size = 0f;
