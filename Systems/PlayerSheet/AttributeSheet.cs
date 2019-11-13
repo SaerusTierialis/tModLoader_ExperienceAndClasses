@@ -9,13 +9,11 @@ namespace ExperienceAndClasses.Systems.PlayerSheet {
     public class AttributeSheet : ContainerTemplate {
         public AttributeSheet(PSheet psheet) : base(psheet) { }
 
-        public static byte Count { get { return (byte)Attribute.IDs.NUMBER_OF_IDs; } }
-
         /// <summary>
         /// From allocated points
         /// | not synced
         /// </summary>
-        public int[] Allocated { get; protected set; } = new int[Count];
+        public int[] Allocated { get; protected set; } = new int[Attribute.Count];
 
         /// <summary>
         /// Dynamic zero point
@@ -27,28 +25,28 @@ namespace ExperienceAndClasses.Systems.PlayerSheet {
         /// From allocated points after applying zero point
         /// | synced
         /// </summary>
-        public int[] Allocated_Effective { get; protected set; } = new int[Count];
+        public int[] Allocated_Effective { get; protected set; } = new int[Attribute.Count];
 
         /// <summary>
         /// From active class bonuses
         /// | not synced (deterministic)
         /// </summary>
-        public int[] From_Class { get; protected set; } = new int[Count];
+        public int[] From_Class { get; protected set; } = new int[Attribute.Count];
 
 
         /// <summary>
         /// Calculated on each update. Attributes from status, passive, etc.
         /// | not synced (deterministic)
         /// </summary>
-        public int[] Bonuses = new int[Count];
+        public int[] Bonuses = new int[Attribute.Count];
 
         /// <summary>
         /// Calculated on each update. Equals Allocated_Effective + From_Class + Bonuses
         /// | not synced (deterministic)
         /// </summary>
-        public int[] Final { get; protected set; } = new int[Count];
+        public int[] Final { get; protected set; } = new int[Attribute.Count];
 
-        public int[] Point_Costs { get; protected set; } = new int[Count];
+        public int[] Point_Costs { get; protected set; } = new int[Attribute.Count];
         public int Points_Available { get; protected set; } = 0;
         public int Points_Spent { get; protected set; } = 0;
         public int Points_Total { get; protected set; } = 0;
@@ -57,7 +55,7 @@ namespace ExperienceAndClasses.Systems.PlayerSheet {
         /// Reset bonus attributes (to be called before each update)
         /// </summary>
         public void ResetBonuses() {
-            Bonuses = new int[Count];
+            Bonuses = new int[Attribute.Count];
         }
 
         /// <summary>
@@ -65,22 +63,22 @@ namespace ExperienceAndClasses.Systems.PlayerSheet {
         /// </summary>
         public void Apply() {
             CalculateFinal();
-            for (byte i = 0; i < Count; i++) {
+            for (byte i = 0; i < Attribute.Count; i++) {
                 //apply
                 Attribute.LOOKUP[i].ApplyEffect(PSHEET.eacplayer, Final[i]);
             }
         }
 
         private void CalculateFinal() {
-            for (byte i = 0; i < Count; i++) {
+            for (byte i = 0; i < Attribute.Count; i++) {
                 Final[i] = Allocated_Effective[i] + From_Class[i] + Bonuses[i];
             }
         }
 
         public void UpdateFromClass() {
-            From_Class = new int[Count];
+            From_Class = new int[Attribute.Count];
 
-            for (byte i = 0; i < Count; i++) {
+            for (byte i = 0; i < Attribute.Count; i++) {
                 if (Attribute.LOOKUP[i].Active) {
                     From_Class[i] = Attribute.GetClassBonus(PSHEET, i);
                 }
@@ -134,7 +132,7 @@ namespace ExperienceAndClasses.Systems.PlayerSheet {
         public void UpdatePointsAndEffective() {
             //calculate spent + update costs for next point
             Points_Spent = 0;
-            for (byte i = 0; i < Count; i++) {
+            for (byte i = 0; i < Attribute.Count; i++) {
                 Point_Costs[i] = Attribute.AllocationPointCost(Allocated[i]);
                 Points_Spent += Attribute.AllocationPointCostTotal(Allocated[i]);
             }
@@ -149,14 +147,14 @@ namespace ExperienceAndClasses.Systems.PlayerSheet {
             Zero_Point = Attribute.CalculateZeroPoint(PSHEET);
 
             //apply zero point
-            for (byte i = 0; i < Count; i++) {
+            for (byte i = 0; i < Attribute.Count; i++) {
                 Allocated_Effective[i] = Allocated[i] - Zero_Point;
             }
         }
 
         public void Reset(bool allow_sync = true) {
             //clear allocated
-            Allocated = new int[Count];
+            Allocated = new int[Attribute.Count];
 
             //update
             UpdatePointsAndEffective();
@@ -184,10 +182,10 @@ namespace ExperienceAndClasses.Systems.PlayerSheet {
             return tag;
         }
         public void Load(TagCompound tag) {
-            Allocated = Utilities.Commons.TagLoadListAsArray<int>(tag, TAG_NAMES.Attributes_Allocated, Count);
+            Allocated = Utilities.Commons.TagLoadListAsArray<int>(tag, TAG_NAMES.Attributes_Allocated, Attribute.Count);
 
             //unallocate any attribute that is no longer active
-            for (byte i = 0; i < Count; i++) {
+            for (byte i = 0; i < Attribute.Count; i++) {
                 if (!Attribute.LOOKUP[i].Active) {
                     Allocated[i] = 0;
                 }

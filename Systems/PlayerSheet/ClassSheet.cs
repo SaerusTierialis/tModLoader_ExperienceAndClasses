@@ -10,8 +10,8 @@ using Terraria.ModLoader.IO;
 namespace ExperienceAndClasses.Systems.PlayerSheet {
     public class ClassSheet : ContainerTemplate {
         public ClassSheet(PSheet psheet) : base(psheet) {
-            Data_Class = new ClassInfo[Count];
-            for (byte i = 0; i < Count; i++) {
+            Data_Class = new ClassInfo[PlayerClass.Count];
+            for (byte i = 0; i < PlayerClass.Count; i++) {
                 Data_Class[i] = new ClassInfo(this, i);
             }
 
@@ -19,8 +19,6 @@ namespace ExperienceAndClasses.Systems.PlayerSheet {
             Data_Class[(byte)PlayerClass.IDs.None].Unlock(false);
             Data_Class[(byte)PlayerClass.IDs.Novice].Unlock(false);
         }
-
-        public static byte Count { get { return (byte)PlayerClass.IDs.NUMBER_OF_IDs; } }
 
         public byte ID_Active_Primary { get; private set; } = 0;
         public byte ID_Active_Secondary { get; private set; } = 0;
@@ -30,9 +28,9 @@ namespace ExperienceAndClasses.Systems.PlayerSheet {
 
         public bool Has_Subclass { get { return Secondary.Valid_Class; } }
 
-        protected bool[] Data_Unlock = new bool[Count];
-        protected byte[] Data_Level = new byte[Count];
-        protected uint[] Data_XP = new uint[Count];
+        protected bool[] Data_Unlock = new bool[PlayerClass.Count];
+        protected byte[] Data_Level = new byte[PlayerClass.Count];
+        protected uint[] Data_XP = new uint[PlayerClass.Count];
 
         private readonly ClassInfo[] Data_Class;
         public class ClassInfo {
@@ -293,7 +291,7 @@ namespace ExperienceAndClasses.Systems.PlayerSheet {
         public int[] GetTierTotalLevels(bool require_gives_allocation = false) {
             int[] totals = new int[PlayerClass.MAX_TIER + 1];
 
-            for (byte i=0; i<Count; i++) {
+            for (byte i=0; i< PlayerClass.Count; i++) {
                 if (Data_Class[i].Valid_Class && (!require_gives_allocation || Data_Class[i].Class.Gives_Allocation_Attributes)) {
                     totals[Data_Class[i].Class.Tier] += Data_Class[i].Level;
                 }
@@ -315,12 +313,12 @@ namespace ExperienceAndClasses.Systems.PlayerSheet {
             return tag;
         }
         public void Load(TagCompound tag) {
-            Data_Unlock = Utilities.Commons.TagLoadListAsArray<bool>(tag, TAG_NAMES.Class_Unlock, Count);
-            Data_Level = Utilities.Commons.TagLoadListAsArray<byte>(tag, TAG_NAMES.Class_Level, Count);
-            Data_XP = Utilities.Commons.TagLoadListAsArray<uint>(tag, TAG_NAMES.Class_XP, Count);
+            Data_Unlock = Utilities.Commons.TagLoadListAsArray<bool>(tag, TAG_NAMES.Class_Unlock, PlayerClass.Count);
+            Data_Level = Utilities.Commons.TagLoadListAsArray<byte>(tag, TAG_NAMES.Class_Level, PlayerClass.Count);
+            Data_XP = Utilities.Commons.TagLoadListAsArray<uint>(tag, TAG_NAMES.Class_XP, PlayerClass.Count);
 
             //update xp needed to level
-            for (byte i = 0; i < Count; i++) {
+            for (byte i = 0; i < PlayerClass.Count; i++) {
                 Data_Class[i].UpdateXPForLevel();
             }
 

@@ -83,6 +83,8 @@ namespace ExperienceAndClasses.Systems {
         //which classes to show in ui and where
         public readonly static byte[,] Class_Locations;
 
+        public readonly static byte Count = (byte)IDs.NUMBER_OF_IDs;
+
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Auto-Populate Lookup ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         static PlayerClass() {

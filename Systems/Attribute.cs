@@ -60,7 +60,7 @@ namespace ExperienceAndClasses.Systems {
             }
         }
 
-        public static byte Count { get { return (byte)IDs.NUMBER_OF_IDs; } }
+        public readonly static byte Count = (byte)IDs.NUMBER_OF_IDs;
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Instance Vars (specific) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
