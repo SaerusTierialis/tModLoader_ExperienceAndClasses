@@ -75,8 +75,8 @@ namespace ExperienceAndClasses.Systems {
         private static readonly Color COLOUR_TRICKERY_3 = new Color(107, 107, 107);
         private static readonly Color COLOUR_HYBRID_2 = new Color(204, 87, 138);
         private static readonly Color COLOUR_HYBRID_3 = new Color(193, 36, 104);
-        private static readonly Color COLOUR_MUSIC_2 = new Color(204, 87, 138);
-        private static readonly Color COLOUR_MUSIC_3 = new Color(193, 36, 104);
+        private static readonly Color COLOUR_MUSIC_2 = new Color(102, 225, 139);
+        private static readonly Color COLOUR_MUSIC_3 = new Color(34, 177, 76);
 
         public readonly static PlayerClass[] LOOKUP;
 
@@ -88,7 +88,7 @@ namespace ExperienceAndClasses.Systems {
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Auto-Populate Lookup ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         static PlayerClass() {
-            Class_Locations = new byte[5, 7];
+            Class_Locations = new byte[5, 8];
             LOOKUP = new PlayerClass[(byte)PlayerClass.IDs.NUMBER_OF_IDs];
             for (byte i = 0; i < LOOKUP.Length; i++) {
                 LOOKUP[i] = Utilities.Commons.CreateObjectFromName<PlayerClass>(Enum.GetName(typeof(IDs), i));
@@ -541,7 +541,7 @@ namespace ExperienceAndClasses.Systems {
         public class Explorer : Tier2 {
             public Explorer() : base(IDs.Explorer, Attribute.PowerScaling.IDs.NonCombat) {
                 Max_Level = MAX_TIER_LEVEL[3]; //tier 2 class with tier 3 level cap
-                Class_Locations[0, 6] = ID_num;
+                Class_Locations[0, 4] = ID_num;
                 Attribute_Growth[(byte)Attribute.IDs.Power] = 2f;
                 Attribute_Growth[(byte)Attribute.IDs.Vitality] = 2f;
                 Attribute_Growth[(byte)Attribute.IDs.Mind] = 2f;
@@ -636,7 +636,7 @@ namespace ExperienceAndClasses.Systems {
 
         public class Hybrid : Tier2 {
             public Hybrid() : base(IDs.Hybrid, Attribute.PowerScaling.IDs.AllCore) {
-                Class_Locations[1, 6] = ID_num;
+                Class_Locations[1, 7] = ID_num;
                 Attribute_Growth[(byte)Attribute.IDs.Power] = 2;
                 Attribute_Growth[(byte)Attribute.IDs.Vitality] = 2;
                 Attribute_Growth[(byte)Attribute.IDs.Mind] = 2;
@@ -650,7 +650,7 @@ namespace ExperienceAndClasses.Systems {
 
         public class Bard : Tier2 {
             public Bard() : base(IDs.Bard, Attribute.PowerScaling.IDs.Musical) {
-                Class_Locations[0, 4] = ID_num;
+                Class_Locations[1, 6] = ID_num;
                 Attribute_Growth[(byte)Attribute.IDs.Power] = 2;
                 Attribute_Growth[(byte)Attribute.IDs.Vitality] = 2;
                 Attribute_Growth[(byte)Attribute.IDs.Mind] = 2;
@@ -807,7 +807,7 @@ namespace ExperienceAndClasses.Systems {
 
         public class HybridPrime : Tier3 {
             public HybridPrime() : base(IDs.HybridPrime, Attribute.PowerScaling.IDs.AllCore, IDs.Hybrid) {
-                Class_Locations[2, 6] = ID_num;
+                Class_Locations[2, 7] = ID_num;
                 Attribute_Growth[(byte)Attribute.IDs.Power] = 2.5f;
                 Attribute_Growth[(byte)Attribute.IDs.Vitality] = 2.5f;
                 Attribute_Growth[(byte)Attribute.IDs.Mind] = 2.5f;
@@ -821,7 +821,7 @@ namespace ExperienceAndClasses.Systems {
 
         public class Minstrel : Tier3 {
             public Minstrel() : base(IDs.Minstrel, Attribute.PowerScaling.IDs.Musical, IDs.Bard) {
-                Class_Locations[0, 5] = ID_num;
+                Class_Locations[2, 6] = ID_num;
                 Attribute_Growth[(byte)Attribute.IDs.Power] = 2.5f;
                 Attribute_Growth[(byte)Attribute.IDs.Vitality] = 2.5f;
                 Attribute_Growth[(byte)Attribute.IDs.Mind] = 2.5f;
