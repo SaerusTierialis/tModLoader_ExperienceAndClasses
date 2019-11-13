@@ -101,12 +101,12 @@ namespace ExperienceAndClasses {
 
         [Label("$Mods.ExperienceAndClasses.Common.Config_UIDrag_Label")]
         [DefaultValue(true)]
-        public bool UIMain_Drag { get; set; } //TODO - unused
+        public bool UIMain_Drag { get; set; }
 
         [Label("$Mods.ExperienceAndClasses.Common.Config_UIAutoMode_Label")]
         [DefaultValue(UIAutoMode.InventoryOpen)]
         [DrawTicks]
-        public UIAutoMode UIMain_AutoMode { get; set; } //TODO - unused
+        public UIAutoMode UIMain_AutoMode { get; set; }
 
 
 
