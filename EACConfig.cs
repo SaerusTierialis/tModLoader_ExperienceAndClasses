@@ -58,13 +58,13 @@ namespace ExperienceAndClasses {
         [Label("$Mods.ExperienceAndClasses.Common.Config_Enabled")]
         [Tooltip("$Mods.ExperienceAndClasses.Common.Config_AFK_Enabled_Tooltip")]
         [DefaultValue(true)]
-        public bool AFKEnabled { get; set; } //TODO - unused
+        public bool AFKEnabled { get; set; }
 
         [Label("$Mods.ExperienceAndClasses.Common.Config_AFK_Seconds_Label")]
         [Tooltip("$Mods.ExperienceAndClasses.Common.Config_AFK_Seconds_Tooltip")]
         [Range(30,1800)]
         [DefaultValue(60)]
-        public int AFKSeconds { get; set; } //TODO - unused
+        public int AFKSeconds { get; set; }
 
 
 

@@ -51,15 +51,23 @@ namespace ExperienceAndClasses.Systems.PlayerSheet {
         }
 
         public void SetAFK(bool afk) {
-            AFK = afk;
             if (PSHEET.eacplayer.Fields.Is_Local) {
-                if (AFK) {
+                //show local message
+                if (afk) {
                     Main.NewText(Language.GetTextValue("Mods.ExperienceAndClasses.Common.AFK_Start"), UI.Constants.COLOUR_MESSAGE_ERROR);
                 }
                 else {
                     Main.NewText(Language.GetTextValue("Mods.ExperienceAndClasses.Common.AFK_End"), UI.Constants.COLOUR_MESSAGE_SUCCESS);
                 }
+
+                //sync change
+                if (Shortcuts.IS_CLIENT && (afk != AFK)) {
+                    Utilities.PacketHandler.AFK.Send(-1, Shortcuts.WHO_AM_I, afk);
+                }
             }
+
+            //set
+            AFK = afk;
         }
 
         public void SetInCombat(bool combat_state) {

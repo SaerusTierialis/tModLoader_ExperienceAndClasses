@@ -22,6 +22,7 @@ namespace ExperienceAndClasses.Utilities {
             FullSync,
             Attributes,
             Class,
+            AFK,
 
 
             NUMBER_OF_TYPES, //must be last
@@ -359,7 +360,30 @@ namespace ExperienceAndClasses.Utilities {
             }
         }
 
+        /// <summary>
+        /// Client tells server its local password
+        /// </summary>
+        public sealed class AFK : Handler {
+            public AFK() : base(PACKET_TYPE.AFK) { }
 
+            public static void Send(int target, int origin, bool status) {
+                if (Shortcuts.IS_CLIENT) {
+                    //get packet containing header
+                    ModPacket packet = LOOKUP[(byte)PACKET_TYPE.AFK].GetPacket(origin);
+
+                    //specific content
+                    packet.Write(status);
+
+                    //send
+                    packet.Send(target, origin);
+                }
+            }
+
+            protected override void RecieveBody(BinaryReader reader, int origin, EACPlayer origin_eacplayer) {
+                //read and set
+                origin_eacplayer.PSheet.Character.SetAFK(reader.ReadBoolean());
+            }
+        }
 
 
 

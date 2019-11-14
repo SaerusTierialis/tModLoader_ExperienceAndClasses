@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using Terraria;
+using Terraria.GameInput;
 using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
 using Terraria.Utilities;
@@ -28,7 +29,9 @@ namespace ExperienceAndClasses {
             /// </summary>
             public string password = "";
 
-            public bool Is_Local = false; 
+            public bool Is_Local = false;
+
+            public DateTime AFK_Time = DateTime.MaxValue; 
         }
 
         /// <summary>
@@ -62,7 +65,8 @@ namespace ExperienceAndClasses {
             //initialize UI
             Shortcuts.InitializeUIs();
 
-            //TODO - sync class etc.
+            //reset afk time
+            NotAFK();
         }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Sync ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
@@ -91,6 +95,25 @@ namespace ExperienceAndClasses {
             PSheet.PostUpdate();
 
             //Main.NewText("test=" + PSheet.Classes.Primary.Class.Name + " " + PSheet.Classes.Primary.Unlocked);
+
+            if (Fields.Is_Local) {
+                ConfigServer config = Shortcuts.GetConfigServer;
+
+                //afk (must be in post, not pre)
+                if (config.AFKEnabled) {
+                    //become afk?
+                    if (!PSheet.Character.AFK && (Shortcuts.Now.CompareTo(Fields.AFK_Time) > 0)) {
+                        PSheet.Character.SetAFK(true);
+                    }
+                }
+                else {
+                    //stop afk?
+                    if (PSheet.Character.AFK) {
+                        NotAFK();
+                    }
+                }
+
+            }
         }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Save/Load ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
@@ -140,6 +163,34 @@ namespace ExperienceAndClasses {
                 //not enough mana
                 return false;
             }
+        }
+
+        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Hotkeys ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+        public override void ProcessTriggers(TriggersSet triggersSet) {
+            //AFK
+            if (triggersSet.KeyStatus.ContainsValue(true)) {
+                NotAFK();
+            }
+
+            //Hotkey - UI
+            if (Shortcuts.HOTKEY_UI.JustPressed) {
+                if (UI.UIMain.Instance.Visibility) {
+                    Main.PlaySound(Terraria.ID.SoundID.MenuClose);
+                }
+                else {
+                    Main.PlaySound(Terraria.ID.SoundID.MenuOpen);
+                }
+                UI.UIHelp.Instance.Visibility = false;
+                UI.UIMain.Instance.Visibility = !UI.UIMain.Instance.Visibility;
+            }
+        }
+
+        private void NotAFK() {
+            if (PSheet.Character.AFK) {
+                PSheet.Character.SetAFK(false);
+            }
+            Fields.AFK_Time = Shortcuts.Now.AddSeconds(Shortcuts.GetConfigServer.AFKSeconds);
         }
 
     }
