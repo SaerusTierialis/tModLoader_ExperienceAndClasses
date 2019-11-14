@@ -120,7 +120,7 @@ namespace ExperienceAndClasses.Systems.PlayerSheet {
                 Shortcuts.UpdateUIPSheet(PSHEET);
             }
             else {
-                UI.UIHUD.Instance.UpdateXP();
+                Shortcuts.UpdateUIXP();
             }
         }
 

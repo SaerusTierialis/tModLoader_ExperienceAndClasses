@@ -18,14 +18,17 @@ namespace ExperienceAndClasses.UI {
         private const float CLASS_ROW_PADDING = 40f;
         private const float CLASS_COL_PADDING = 10f;
         private static readonly float CLASS_WIDTH = (Constants.UI_PADDING * 4) + ((CLASS_BUTTON_SIZE + CLASS_COL_PADDING) * Systems.PlayerClass.Class_Locations.GetLength(1)) - CLASS_COL_PADDING;
+        private const float CLASS_HEIGHT = HEIGHT - Constants.UI_PADDING - HEIGHT_ABILITY;
 
         private const float WIDTH_ATTRIBUTES = 264f;
         private const float HEIGHT_ATTRIBUTES = 250f;
         private const float HEIGHT_ATTRIBUTE = 30f;
         private const float WIDTH_ATTRIBUTES_RESET = 135f;
 
-        private const float WIDTH_ABILITY = WIDTH_ATTRIBUTES;
-        private const float HEIGHT_ABILITY = (HEIGHT - HEIGHT_ATTRIBUTES) - (Constants.UI_PADDING * 2) + 1;
+        private const float HEIGHT_CHARACTER = (HEIGHT - HEIGHT_ATTRIBUTES) - (Constants.UI_PADDING * 2) + 1;
+
+        private static readonly float WIDTH_ABILITY = CLASS_WIDTH;
+        private const float HEIGHT_ABILITY = 80f;
 
         private const float WIDTH_HELP_AND_PASSIVES = 180f;
         private static readonly float HEIGHT_PASSIVES = HEIGHT - HEIGHT_HELP + 1 - (Constants.UI_PADDING * 2) + 1;
@@ -61,7 +64,9 @@ namespace ExperienceAndClasses.UI {
         private HelpTextPanel attribute_point_text;
 
         private AbilityIcon[] ability_primary, ability_secondary;
-        private HelpTextPanel level_primary, level_secondary;
+        private HelpTextPanel level_character, level_primary, level_secondary;
+        private CharacterXPBar xp_character;
+        private ClassXPBar xp_primary, xp_secondary;
 
         private ScrollPanel passives;
 
@@ -73,7 +78,7 @@ namespace ExperienceAndClasses.UI {
             panel = new DragableUIPanel(WIDTH, HEIGHT, Constants.COLOUR_UI_PANEL_BACKGROUND, this, true, true);
 
             //class panel
-            DragableUIPanel panel_class = new DragableUIPanel(CLASS_WIDTH, (HEIGHT - (Constants.UI_PADDING * 2)), Constants.COLOUR_SUBPANEL, this, false, false, false);
+            DragableUIPanel panel_class = new DragableUIPanel(CLASS_WIDTH, CLASS_HEIGHT, Constants.COLOUR_SUBPANEL, this, false, false, false);
             panel_class.Left.Set(Constants.UI_PADDING, 0f);
             panel_class.Top.Set(Constants.UI_PADDING, 0f);
             panel.Append(panel_class);
@@ -173,29 +178,79 @@ namespace ExperienceAndClasses.UI {
             attribute_point_text.BorderColor = Color.Transparent;
             panel_attribute.Append(attribute_point_text);
 
+            //character panel
+            DragableUIPanel panel_character = new DragableUIPanel(WIDTH_ATTRIBUTES, HEIGHT_CHARACTER, Constants.COLOUR_SUBPANEL, this, false, false, false);
+            panel_character.Left.Set(panel_attribute.Left.Pixels, 0f);
+            panel_character.Top.Set(Constants.UI_PADDING, 0f);
+            panel.Append(panel_character);
+
+            //character title
+            panel_character.SetTitle("Level", FONT_SCALE_TITLE, true, "TODO", "Level");
+            top = panel_character.top_space;
+
+            //character level
+            level_character = new HelpTextPanel("DEFAULT", FONT_SCALE_ABILITY, false, "TODO", "Character Level", false, true);
+            level_character.Left.Set(Constants.UI_PADDING, 0f);
+            level_character.Top.Set(top, 0f);
+            top += level_character.Height.Pixels - 2 * Constants.UI_PADDING;
+            level_character.Height.Set(45f, 0f);
+            level_character.Width.Set(panel_character.Width.Pixels - (Constants.UI_PADDING * 2f), 0f);
+            panel_character.Append(level_character);
+
+            //character xp
+            xp_character = new CharacterXPBar(panel_character.Width.Pixels - (Constants.UI_PADDING * 2f), Shortcuts.LOCAL_PLAYER.PSheet.Character);
+            xp_character.Top.Set(top, 0f);
+            xp_character.Left.Set(Constants.UI_PADDING, 0f);
+            panel_character.Append(xp_character);
+            top = level_character.Top.Pixels + level_character.Height.Pixels;
+
+            //character primary level
+            level_primary = new HelpTextPanel("DEFAULT", FONT_SCALE_ABILITY, false, "TODO", "Primary Class Level", false, true);
+            level_primary.Left.Set(Constants.UI_PADDING, 0f);
+            level_primary.Top.Set(top, 0f);
+            top += level_primary.Height.Pixels - 2 * Constants.UI_PADDING;
+            level_primary.Height.Set(45f, 0f);
+            level_primary.Width.Set(panel_character.Width.Pixels - (Constants.UI_PADDING * 2f), 0f);
+            panel_character.Append(level_primary);
+
+            //character primary xp
+            xp_primary = new ClassXPBar(panel_character.Width.Pixels - (Constants.UI_PADDING * 2f));
+            xp_primary.Top.Set(top, 0f);
+            xp_primary.Left.Set(Constants.UI_PADDING, 0f);
+            panel_character.Append(xp_primary);
+            top = level_primary.Top.Pixels + level_primary.Height.Pixels;
+
+            //character secondary level
+            level_secondary = new HelpTextPanel("DEFAULT", FONT_SCALE_ABILITY, false, "TODO", "Secondary Class Level (Effective)", false, true);
+            level_secondary.Left.Set(Constants.UI_PADDING, 0f);
+            level_secondary.Top.Set(top, 0f);
+            top += level_secondary.Height.Pixels - 2 * Constants.UI_PADDING;
+            level_secondary.Height.Set(45f, 0f);
+            level_secondary.Width.Set(panel_character.Width.Pixels - (Constants.UI_PADDING * 2f), 0f);
+            panel_character.Append(level_secondary);
+
+            //character secondary xp
+            xp_secondary = new ClassXPBar(panel_character.Width.Pixels - (Constants.UI_PADDING * 2f));
+            xp_secondary.Top.Set(top, 0f);
+            xp_secondary.Left.Set(Constants.UI_PADDING, 0f);
+            panel_character.Append(xp_secondary);
+            top = level_secondary.Top.Pixels + level_secondary.Height.Pixels;
+
             //ability panel
             DragableUIPanel panel_ability = new DragableUIPanel(WIDTH_ABILITY, HEIGHT_ABILITY, Constants.COLOUR_SUBPANEL, this, false, false, false);
-            panel_ability.Left.Set(panel_attribute.Left.Pixels, 0f);
-            panel_ability.Top.Set(Constants.UI_PADDING, 0f);
+            panel_ability.Left.Set(panel_class.Left.Pixels, 0f);
+            panel_ability.Top.Set(HEIGHT - Constants.UI_PADDING - HEIGHT_ABILITY, 0f);
             panel.Append(panel_ability);
 
             //ability title
             panel_ability.SetTitle("Abilities", FONT_SCALE_TITLE, true, "To use the class abilities, you must first set the mod hotkeys in settings. After setting the hotkeys, the keys shown in the tooltips will not update until you next level up or toggle a class.", "Class Abilities");
 
-            //ability panel primary info
-            level_primary = new HelpTextPanel("DEFAULT", FONT_SCALE_ABILITY, false, "The level shown here is your effective level. The level of the secondary class is capped at half the level of the primary. If the secondary class is a higher tier, then it is capped at level 1.", "Effective Level", true, true);
-            level_primary.Left.Set(Constants.UI_PADDING, 0f);
-            level_primary.Top.Set(panel_ability.top_space + Constants.UI_PADDING, 0f);
-            level_primary.Width.Set(panel_ability.Width.Pixels - (Constants.UI_PADDING * 2f), 0f);
-            panel_ability.Append(level_primary);
-
             //ability panel primary skills
             ability_primary = new AbilityIcon[Systems.Ability.NUMBER_ABILITY_SLOTS_PER_CLASS * 2];
-            top = level_primary.Top.Pixels + level_primary.Height.Pixels;
             float left = Constants.UI_PADDING;
             for (byte i = 0; i < ability_primary.Length; i++) {
                 ability_primary[i] = new AbilityIcon(1);
-                ability_primary[i].Top.Set(top, 0f);
+                ability_primary[i].Top.Set(Constants.UI_PADDING, 0f);
                 ability_primary[i].Left.Set(left, 0f);
                 ability_primary[i].Width.Set(AbilityIcon.SIZE, 0f);
                 ability_primary[i].Height.Set(AbilityIcon.SIZE, 0f);
@@ -203,20 +258,11 @@ namespace ExperienceAndClasses.UI {
                 left += ability_primary[i].Width.Pixels + SPACING_ABILITY_ICON;
             }
 
-            //ability panel secondary info
-            level_secondary = new HelpTextPanel("DEFAULT", FONT_SCALE_ABILITY, false, "The level shown here is your effective level. The level of the secondary class is capped at half the level of the primary. If the secondary class is a higher tier, then it is capped at level 1.", "Effective Level", true, true);
-            level_secondary.Left.Set(Constants.UI_PADDING, 0f);
-            level_secondary.Top.Set(ability_primary[0].Top.Pixels + ability_primary[0].Height.Pixels + (Constants.UI_PADDING * 2f), 0f);
-            level_secondary.Width.Set(panel_ability.Width.Pixels - (Constants.UI_PADDING * 2f), 0f);
-            panel_ability.Append(level_secondary);
-
             //ability panel secondary skills
             ability_secondary = new AbilityIcon[Systems.Ability.NUMBER_ABILITY_SLOTS_PER_CLASS * 2];
-            top = level_secondary.Top.Pixels + level_secondary.Height.Pixels;
-            left = Constants.UI_PADDING;
             for (byte i = 0; i < ability_secondary.Length; i++) {
                 ability_secondary[i] = new AbilityIcon();
-                ability_secondary[i].Top.Set(top, 0f);
+                ability_secondary[i].Top.Set(Constants.UI_PADDING, 0f);
                 ability_secondary[i].Left.Set(left, 0f);
                 ability_secondary[i].Width.Set(AbilityIcon.SIZE, 0f);
                 ability_secondary[i].Height.Set(AbilityIcon.SIZE, 0f);
@@ -226,7 +272,7 @@ namespace ExperienceAndClasses.UI {
 
             //unlock panel
             DragableUIPanel panel_passive = new DragableUIPanel(WIDTH_HELP_AND_PASSIVES, HEIGHT_PASSIVES, Color.Transparent, this, false, false, false);
-            panel_passive.Left.Set(panel_ability.Left.Pixels + panel_ability.Width.Pixels - 2f, 0f);
+            panel_passive.Left.Set(panel_attribute.Left.Pixels + panel_attribute.Width.Pixels - 2f, 0f);
             panel_passive.Top.Set(Constants.UI_PADDING, 0f);
             panel.Append(panel_passive);
 
@@ -288,10 +334,20 @@ namespace ExperienceAndClasses.UI {
             //attribute points
             UpdateAttributePoints();
 
+            //character level
+            level_character.SetText("Character Lv " + psheet.Character.Level);
+
+            //set class xp
+            xp_primary.SetClass(psheet.Classes.Primary);
+            xp_secondary.SetClass(psheet.Classes.Secondary);
+
+            //update xp
+            UpdateXP();
+
             //primary effective level
             Systems.PlayerClass c = psheet.Classes.Primary.Class;
             if (c != null && c.Tier > 0) {
-                level_primary.SetText(c.Name + " Lv" + psheet.Classes.Primary.Level_Effective);
+                level_primary.SetText(c.Name + " Lv " + psheet.Classes.Primary.Level_Effective);
             }
             else {
                 level_primary.SetText("No Primary Class");
@@ -317,7 +373,7 @@ namespace ExperienceAndClasses.UI {
             //secondary effective level
             c = psheet.Classes.Secondary.Class;
             if (c != null && c.Tier > 0) {
-                level_secondary.SetText(c.Name + " Lv" + psheet.Classes.Secondary.Level_Effective);
+                level_secondary.SetText(c.Name + " Lv " + psheet.Classes.Secondary.Level_Effective);
             }
             else {
                 level_secondary.SetText("No Secondary Class");
@@ -357,6 +413,12 @@ namespace ExperienceAndClasses.UI {
             else {
                 old_xp_button.visible = false;
             }
+        }
+
+        public void UpdateXP() {
+            xp_character.Update();
+            xp_primary.Update();
+            xp_secondary.Update();
         }
 
         private void UpdateAttributePoints() {

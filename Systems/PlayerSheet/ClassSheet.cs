@@ -171,7 +171,7 @@ namespace ExperienceAndClasses.Systems.PlayerSheet {
                     CONTAINER.OnClassOrLevelChange();
                 }
                 else {
-                    UI.UIHUD.Instance.UpdateXP();
+                    Shortcuts.UpdateUIXP();
                 }
             }
         }

@@ -208,6 +208,13 @@ namespace ExperienceAndClasses {
             }
         }
 
+        public static void UpdateUIXP() {
+            if (UI_Initialized) {
+                UI.UIHUD.Instance.UpdateXP();
+                UI.UIMain.Instance.UpdateXP();
+            }
+        }
+
         public static void ApplyUIConfig() {
             if (UI_Initialized) {
                 ConfigClient config = GetConfigClient;
