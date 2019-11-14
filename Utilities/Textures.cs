@@ -15,6 +15,8 @@ namespace ExperienceAndClasses.Utilities {
         public static Texture2D TEXTURE_BUTTON_MINUS { get; private set; }
         public static float TEXTURE_BUTTON_SIZE { get; private set; }
 
+        public static Texture2D TEXTURE_CHARACTER { get; private set; }
+
         public static Texture2D TEXTURE_CORNER_BUTTON_CLOSE { get; private set; }
         public static Texture2D TEXTURE_CORNER_BUTTON_AUTO { get; private set; }
         public static Texture2D TEXTURE_CORNER_BUTTON_NO_AUTO { get; private set; }
@@ -55,6 +57,8 @@ namespace ExperienceAndClasses.Utilities {
             TEXTURE_BUTTON_PLUS = GetTexture("ExperienceAndClasses/Textures/UI/ButtonPlus");
             TEXTURE_BUTTON_MINUS = GetTexture("ExperienceAndClasses/Textures/UI/ButtonMinus");
             TEXTURE_BUTTON_SIZE = TEXTURE_BUTTON_PLUS.Width;
+
+            TEXTURE_CHARACTER = GetTexture("ExperienceAndClasses/Textures/UI/Character");
 
             TEXTURE_CORNER_BUTTON_CLOSE = GetTexture("Terraria/UI/ButtonDelete");
             TEXTURE_CORNER_BUTTON_AUTO = GetTexture("Terraria/UI/ButtonFavoriteActive");

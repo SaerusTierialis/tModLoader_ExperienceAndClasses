@@ -233,9 +233,15 @@ namespace ExperienceAndClasses.Systems.PlayerSheet {
                 ID_Active_Secondary = (byte)PlayerClass.IDs.None;
             }
             else if (ID_Active_Primary == id) {
-                //swap primary and secondary
-                ID_Active_Primary = ID_Active_Secondary;
-                ID_Active_Secondary = id;
+                if (!Secondary.Valid_Class) {
+                    //invalid
+                    return;
+                }
+                else {
+                    //swap primary and secondary
+                    ID_Active_Primary = ID_Active_Secondary;
+                    ID_Active_Secondary = id;
+                }
             }
             else {
                 ID_Active_Secondary = id;

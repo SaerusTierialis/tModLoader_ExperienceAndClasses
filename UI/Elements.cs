@@ -343,11 +343,95 @@ namespace ExperienceAndClasses.UI {
     }
     */
 
-    class XPBar : UIElement {
+    class CharacterXPBar : UIElement {
+        private const float TEXT_SCALE = 1f;
+        private const float BAR_HEIGHT = 24f;
+        private const float ICON_SCALE = 2f;
+        private const float ICON_LEFT = 12f;
+        private const float ICON_TOP = 10f;
+        private static readonly float LEFT_BAR = ClassXPBar.ICON_SIZE + Constants.UI_PADDING;
+        private UIImage icon;
+        private ProgressBar bar;
+        private UIText text_xp;
+
+        public Systems.PlayerSheet.CharacterSheet Character_Sheet { get; private set; }
+
+        public CharacterXPBar(float width, Systems.PlayerSheet.CharacterSheet csheet) {
+            Character_Sheet = csheet;
+
+            SetPadding(0f);
+
+            icon = new UIImage(Utilities.Textures.TEXTURE_CHARACTER);
+            icon.ImageScale = ICON_SCALE;
+            icon.Top.Set(ICON_TOP, 0f);
+            icon.Left.Set(ICON_LEFT, 0f);
+            Append(icon);
+
+            bar = new ProgressBar(width - LEFT_BAR, BAR_HEIGHT, Constants.COLOUR_XP_DIM);
+            bar.Left.Set(LEFT_BAR, 0f);
+            bar.Top.Set((ClassXPBar.ICON_SIZE - bar.Height.Pixels) / 2f, 0f);
+            Append(bar);
+
+            text_xp = new UIText("0123 / 45679", TEXT_SCALE);
+            text_xp.Top.Set(bar.Top.Pixels + ((bar.Height.Pixels - (Main.fontMouseText.MeasureString(text_xp.Text).Y * TEXT_SCALE / 2f)) / 2f), 0f);
+            Append(text_xp);
+
+            Width.Set(width, 0f);
+            Height.Set(Math.Max(ClassXPBar.ICON_SIZE, bar.Height.Pixels), 0f);
+
+            Update();
+        }
+
+        public void SetWidth(float width) {
+            Width.Set(width, 0f);
+            bar.Width.Set(width - LEFT_BAR, 0f);
+        }
+
+        public void Update() {
+            uint xp = Character_Sheet.XP;
+            uint xp_needed = Character_Sheet.XP_Level_Total;
+
+            float percent;
+            bool maxed;
+            if (xp_needed <= 0) {
+                percent = 1f;
+                maxed = true;
+            }
+            else {
+                percent = (float)xp / xp_needed;
+                maxed = false;
+            }
+
+            //progress bar
+            bar.SetProgress(percent);
+
+            //text
+            string str;
+            float string_width;
+            if (maxed) {
+                str = "MAX";
+                string_width = Main.fontMouseText.MeasureString(str).X * TEXT_SCALE;
+            }
+            else {
+                str = xp + " / " + xp_needed;
+                string_width = Main.fontMouseText.MeasureString(xp_needed + " / " + xp_needed).X * TEXT_SCALE;
+
+                if (string_width > bar.Width.Pixels) {
+                    str = (Math.Round(percent * 10000f) / 100) + "%";
+                    string_width = Main.fontMouseText.MeasureString(str).X * TEXT_SCALE;
+                }
+            }
+            text_xp.SetText(str);
+            text_xp.Left.Set(bar.Left.Pixels + ((bar.Width.Pixels - string_width) / 2), 0f);
+        }
+    }
+
+    class ClassXPBar : UIElement {
+        private const float ICON_TOP = -3f;
         private const float TEXT_SCALE = 1f;
         private const float ICON_SCALE = 0.8f;
         private const float BAR_HEIGHT = 24f;
-        private static readonly int ICON_SIZE = (int)Math.Ceiling(Utilities.Textures.TEXTURE_CLASS_DEFAULT.Width * ICON_SCALE);
+        public static readonly int ICON_SIZE = (int)Math.Ceiling(Utilities.Textures.TEXTURE_CLASS_DEFAULT.Width * ICON_SCALE);
 
         private UITransparantImage icon_background;
         private UIImage icon;
@@ -356,19 +440,21 @@ namespace ExperienceAndClasses.UI {
         private float left;
 
         public bool visible;
-        public Systems.PlayerClass Class_Tracked { get; private set; }
+        public Systems.PlayerSheet.ClassSheet.ClassInfo Class_Info { get; private set; }
 
-        public XPBar(float width) {
+        public ClassXPBar(float width) {
             visible = false;
             
             SetPadding(0f);
 
             icon_background = new UITransparantImage(Utilities.Textures.TEXTURE_CLASS_BACKGROUND, Systems.PlayerClass.COLOUR_DEFAULT);
             icon_background.ImageScale = ICON_SCALE;
+            icon_background.Top.Set(ICON_TOP, 0f);
             Append(icon_background);
 
             icon = new UIImage(Utilities.Textures.TEXTURE_CLASS_DEFAULT);
             icon.ImageScale = ICON_SCALE;
+            icon.Top.Set(ICON_TOP, 0f);
             Append(icon);
 
             left = ICON_SIZE + Constants.UI_PADDING;
@@ -390,22 +476,20 @@ namespace ExperienceAndClasses.UI {
             bar.Width.Set(width - left, 0f);
         }
 
-        public void SetClass(Systems.PlayerClass class_new) {
-            Class_Tracked = class_new;
-            icon.SetImage(Class_Tracked.Texture);
-            icon_background.color = class_new.Colour;
+        public void SetClass(Systems.PlayerSheet.ClassSheet.ClassInfo class_info) {
+            Class_Info = class_info;
+            icon.SetImage(Class_Info.Class.Texture);
+            icon_background.color = Class_Info.Class.Colour;
 
-            visible = (Class_Tracked.Tier >= 1);
+            visible = (Class_Info.Valid_Class);
 
             Update();
         }
 
         public void Update() {
             if (visible) {
-                Systems.PlayerSheet.ClassSheet.ClassInfo cinfo = Shortcuts.LOCAL_PLAYER.PSheet.Classes.GetClassInfo(Class_Tracked.ID_num);
-
-                uint xp = cinfo.XP;
-                uint xp_needed = cinfo.XP_Level_Total;
+                uint xp = Class_Info.XP;
+                uint xp_needed = Class_Info.XP_Level_Total;
 
                 float percent;
                 bool maxed;

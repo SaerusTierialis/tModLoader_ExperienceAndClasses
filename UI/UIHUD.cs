@@ -25,7 +25,8 @@ namespace ExperienceAndClasses.UI {
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Variables ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         public DragableUIPanel panel { get; private set; }
-        private XPBar[] xp_bars;
+        private CharacterXPBar char_xp_bar;
+        private ClassXPBar[] xp_bars;
         private DragableUIPanel panel_resource, panel_cooldown;
         private AbilityIconCooldown[] ability_icons;
         private List<ResourceBar> resource_bars;
@@ -40,15 +41,21 @@ namespace ExperienceAndClasses.UI {
             time_next_cooldown_update = Shortcuts.Now;
             panel = new DragableUIPanel(WIDTH, HEIGHT, Constants.COLOUR_BAR_UI, this, false);
 
-            //xp bars
-            xp_bars = new XPBar[2];
+            //character xp bar
+            char_xp_bar = new CharacterXPBar(MAX_WIDTH_PER_ITEM_ROW, Shortcuts.LOCAL_PLAYER.PSheet.Character);
+            char_xp_bar.Top.Set(Constants.UI_PADDING, 0f);
+            char_xp_bar.Left.Set(Constants.UI_PADDING, 0f);
+            panel.Append(char_xp_bar);
 
-            xp_bars[0] = new XPBar(MAX_WIDTH_PER_ITEM_ROW);
-            xp_bars[0].Top.Set(Constants.UI_PADDING, 0f);
+            //xp bars
+            xp_bars = new ClassXPBar[2];
+
+            xp_bars[0] = new ClassXPBar(MAX_WIDTH_PER_ITEM_ROW);
+            xp_bars[0].Top.Set(Constants.UI_PADDING + char_xp_bar.Height.Pixels + SPACING, 0f);
             xp_bars[0].Left.Set(Constants.UI_PADDING, 0f);
             panel.Append(xp_bars[0]);
 
-            xp_bars[1] = new XPBar(MAX_WIDTH_PER_ITEM_ROW);
+            xp_bars[1] = new ClassXPBar(MAX_WIDTH_PER_ITEM_ROW);
             xp_bars[1].Top.Set(xp_bars[0].Top.Pixels + xp_bars[0].Height.Pixels + SPACING, 0f);
             xp_bars[1].Left.Set(Constants.UI_PADDING, 0f);
             panel.Append(xp_bars[1]);
@@ -102,7 +109,8 @@ namespace ExperienceAndClasses.UI {
         }
 
         public void UpdateXP() {
-            foreach (XPBar xp_bar in xp_bars) {
+            char_xp_bar.Update();
+            foreach (ClassXPBar xp_bar in xp_bars) {
                 xp_bar.Update();
             }
         }
@@ -136,9 +144,9 @@ namespace ExperienceAndClasses.UI {
                 float final_height;
 
                 //xp bars
-                xp_bars[0].SetClass(psheet.Classes.Primary.Class);
+                xp_bars[0].SetClass(psheet.Classes.Primary);
                 if (psheet.Classes.Secondary.Valid_Class) {
-                    xp_bars[1].SetClass(psheet.Classes.Secondary.Class);
+                    xp_bars[1].SetClass(psheet.Classes.Secondary);
                     xp_bars[1].visible = true;
                     final_height = xp_bars[1].Top.Pixels + xp_bars[1].Height.Pixels;
                 }
