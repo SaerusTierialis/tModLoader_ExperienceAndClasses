@@ -301,7 +301,7 @@ namespace ExperienceAndClasses.UI {
             }
 
             //unlock panel
-            DragableUIPanel panel_passive = new DragableUIPanel(WIDTH_HELP_AND_PASSIVES, HEIGHT_PASSIVES, Color.Transparent, this, false, false, false);
+            DragableUIPanel panel_passive = new DragableUIPanel(WIDTH_HELP_AND_PASSIVES, HEIGHT_PASSIVES, Constants.COLOUR_SUBPANEL, this, false, false, false);
             panel_passive.Left.Set(panel_attribute.Left.Pixels + panel_attribute.Width.Pixels - 2f, 0f);
             panel_passive.Top.Set(HEIGHT - HEIGHT_PASSIVES - Constants.UI_PADDING, 0f);
             panel.Append(panel_passive);

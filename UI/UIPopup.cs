@@ -258,8 +258,16 @@ namespace ExperienceAndClasses.UI {
         }
 
         public void ShowTextAttribute(UIElement source, Systems.Attribute attribute) {
-            string title = attribute.Specifc_Name;
-            string text = attribute.Specific_Description + "\n" + attribute.Effect_Text;
+            string title = attribute.Name;
+
+            Systems.PlayerSheet.AttributeSheet sheet = Shortcuts.LOCAL_PLAYER.PSheet.Attributes;
+            string points = "Zero Point: -" + sheet.Zero_Point + " (based on total allocated points)\n" +
+                            "From Allocated: " + sheet.Allocated[attribute.ID_num] + "\n" +
+                            "From Class(es): " + sheet.From_Class[attribute.ID_num] + "\n" +
+                            "From Other: " + sheet.Bonuses[attribute.ID_num] + "\n" +
+                            "Total: " + sheet.Final[attribute.ID_num];
+
+            string text = attribute.Description + "\n\n" + points + "\n" + attribute.Effect_Text;
             ShowText(source, title, text, WIDTH_ATTRIBUTE);
         }
 

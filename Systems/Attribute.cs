@@ -62,16 +62,11 @@ namespace ExperienceAndClasses.Systems {
 
         public readonly static byte Count = (byte)IDs.NUMBER_OF_IDs;
 
-        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Instance Vars (specific) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-
-        public string Specifc_Name { get; private set; } = "default_name";
-        public string Specific_Name_Short { get; private set; } = "default_name_short";
-        public string Specific_Description { get; private set; } = "default_description";
-
-        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Instance Vars (generic) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Instance ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         public IDs ID { get; private set; } = IDs.NONE;
         public byte ID_num { get; private set; } = (byte)IDs.NONE;
+        private readonly string INTERNAL_NAME;
         public string Effect_Text { get; private set; } = "";
 
         /// <summary>
@@ -79,11 +74,16 @@ namespace ExperienceAndClasses.Systems {
         /// </summary>
         public bool Active { get; private set; } = true;
 
+        public string Name { get { return Language.GetTextValue("Mods.ExperienceAndClasses.Common.Attribute_" + INTERNAL_NAME + "_Name"); } }
+        public string Shortform { get { return Language.GetTextValue("Mods.ExperienceAndClasses.Common.Attribute_" + INTERNAL_NAME + "_Shortform"); } }
+        public string Description { get { return Language.GetTextValue("Mods.ExperienceAndClasses.Common.Attribute_" + INTERNAL_NAME + "_Description"); } }
+
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Constructor ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         public Attribute(IDs id) {
             ID = id;
             ID_num = (byte)ID;
+            INTERNAL_NAME = Enum.GetName(typeof(IDs), id);
         }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Overrides ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
@@ -94,7 +94,7 @@ namespace ExperienceAndClasses.Systems {
         public void ApplyEffect(EACPlayer eacplayer, int points, bool do_effects = true) {
             if (Active) {
                 //clear effect text
-                Effect_Text = "";
+                if (eacplayer.Fields.Is_Local) Effect_Text = "";
                 //do specific effect
                 Effect(eacplayer, points, do_effects);
             }
@@ -228,11 +228,7 @@ namespace ExperienceAndClasses.Systems {
             public const float PER_POINT_DAMAGE = 0.0025f;
             public const float PER_POINT_FISH = 0.1f;
 
-            public Power() : base(IDs.Power) {
-                Specifc_Name = "Power";
-                Specific_Name_Short = "PWR";
-                Specific_Description = "TODO";
-            }
+            public Power() : base(IDs.Power) {}
             protected override void Effect(EACPlayer eacplayer, int points, bool do_effects = true) {
                 Effect_Text += PowerScaling.ApplyPower(eacplayer, points, do_effects);
             }
@@ -243,11 +239,7 @@ namespace ExperienceAndClasses.Systems {
             private const float PER_POINT_LIFE_REGEN = 0.2f;
             private const float PER_POINT_DEFENSE = 0.1f;
 
-            public Vitality() : base(IDs.Vitality) {
-                Specifc_Name = "Vitality";
-                Specific_Name_Short = "VIT";
-                Specific_Description = "TODO";
-            }
+            public Vitality() : base(IDs.Vitality) {}
             protected override void Effect(EACPlayer eacplayer, int points, bool do_effects = true) {
                 int bonus;
 
@@ -273,11 +265,7 @@ namespace ExperienceAndClasses.Systems {
             private const float PER_POINT_MANA_REGEN = 0.5f;
             private const float PER_POINT_MANA_DELAY = 0.5f;
 
-            public Mind() : base(IDs.Mind) {
-                Specifc_Name = "Mind";
-                Specific_Name_Short = "MND";
-                Specific_Description = "TODO";
-            }
+            public Mind() : base(IDs.Mind) {}
             protected override void Effect(EACPlayer eacplayer, int points, bool do_effects = true) {
                 int bonus;
 
@@ -306,11 +294,7 @@ namespace ExperienceAndClasses.Systems {
             private const float PER_POINT_MINION_CAP = 0.025f;
             private const float PER_POINT_HOLY_HEAL = 0.01f;
 
-            public Spirit() : base(IDs.Spirit) {
-                Specifc_Name = "Spirit";
-                Specific_Name_Short = "SPT";
-                Specific_Description = "TODO";
-            }
+            public Spirit() : base(IDs.Spirit) {}
             protected override void Effect(EACPlayer eacplayer, int points, bool do_effects = true) {
                 int bonus;
 
@@ -345,11 +329,7 @@ namespace ExperienceAndClasses.Systems {
             private const float PER_POINT_DODGE = 0.0025f;
             private const float PER_POINT_FLY = 0.5f;
 
-            public Agility() : base(IDs.Agility) {
-                Specifc_Name = "Agility";
-                Specific_Name_Short = "AGI";
-                Specific_Description = "TODO";
-            }
+            public Agility() : base(IDs.Agility) {}
             protected override void Effect(EACPlayer eacplayer, int points, bool do_effects = true) {
                 float bonus_float;
                 int bonus_int;
@@ -382,11 +362,7 @@ namespace ExperienceAndClasses.Systems {
             private const float PER_POINT_USE_SPEED = 0.0025f;
             private const float PER_POINT_ABILITY_DELAY = 0.01f;
 
-            public Dexterity() : base(IDs.Dexterity) {
-                Specifc_Name = "Dexterity";
-                Specific_Name_Short = "DEX";
-                Specific_Description = "TODO";
-            }
+            public Dexterity() : base(IDs.Dexterity) {}
             protected override void Effect(EACPlayer eacplayer, int points, bool do_effects = true) {
                 float bonus;
 

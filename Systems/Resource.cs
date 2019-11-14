@@ -19,7 +19,7 @@ namespace ExperienceAndClasses.Systems {
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Instance Fields ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-        private readonly string Internal_Name;
+        private readonly string INTERNAL_NAME;
 
         public readonly IDs ID;
         public readonly ushort ID_num;
@@ -28,7 +28,7 @@ namespace ExperienceAndClasses.Systems {
 
         public Texture2D Texture { get; protected set; }
 
-        public string Name { get { return Language.GetTextValue("Mods.ExperienceAndClasses.Common.Resource_" + Internal_Name + "_Name"); } }
+        public string Name { get { return Language.GetTextValue("Mods.ExperienceAndClasses.Common.Resource_" + INTERNAL_NAME + "_Name"); } }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Instance Variables ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -40,7 +40,7 @@ namespace ExperienceAndClasses.Systems {
         public Resource(IDs id, PlayerClass.IDs class_id, byte level) {
             ID = id;
             ID_num = (ushort)id;
-            Internal_Name = Enum.GetName(typeof(IDs), ID_num);
+            INTERNAL_NAME = Enum.GetName(typeof(IDs), ID_num);
             Colour = PlayerClass.LOOKUP[(byte)class_id].Colour;
         }
 

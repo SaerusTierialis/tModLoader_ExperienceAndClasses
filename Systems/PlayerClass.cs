@@ -100,7 +100,7 @@ namespace ExperienceAndClasses.Systems {
         public readonly IDs ID;
         public readonly byte ID_num;
 
-        private string InternalName;
+        private string INTERNAL_NAME;
 
         public string Tooltip_Attribute_Growth { get; private set; }
 
@@ -135,11 +135,11 @@ namespace ExperienceAndClasses.Systems {
             ID = id;
             ID_num = (byte)id;
 
-            InternalName = Enum.GetName(typeof(IDs), ID_num);
+            INTERNAL_NAME = Enum.GetName(typeof(IDs), ID_num);
         }
 
-        public string Name { get { return Language.GetTextValue("Mods.ExperienceAndClasses.Common.Class_" + InternalName + "_Name"); } }
-        public string Description {  get { return Language.GetTextValue("Mods.ExperienceAndClasses.Common.Class_" + InternalName + "_Description"); } }
+        public string Name { get { return Language.GetTextValue("Mods.ExperienceAndClasses.Common.Class_" + INTERNAL_NAME + "_Name"); } }
+        public string Description {  get { return Language.GetTextValue("Mods.ExperienceAndClasses.Common.Class_" + INTERNAL_NAME + "_Description"); } }
 
         public string Tooltip_Title {
             get {
@@ -155,7 +155,7 @@ namespace ExperienceAndClasses.Systems {
         public void LoadTextureAndItem() {
             //load texture
             if (Has_Texture) {
-                Texture = ModContent.GetTexture("ExperienceAndClasses/Textures/Class/" + InternalName);
+                Texture = ModContent.GetTexture("ExperienceAndClasses/Textures/Class/" + INTERNAL_NAME);
             }
             else {
                 //no texture loaded, set blank
@@ -227,7 +227,7 @@ namespace ExperienceAndClasses.Systems {
                     else {
                         attribute_names += "\n";
                     }
-                    attribute_names += Systems.Attribute.LOOKUP[id].Specifc_Name + ":";
+                    attribute_names += Systems.Attribute.LOOKUP[id].Name + ":";
                 }
                 tooltip_main += "\n" + attribute_names;
 

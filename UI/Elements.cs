@@ -560,7 +560,7 @@ namespace ExperienceAndClasses.UI {
             BackgroundColor = UI.Constants.COLOUR_UI_PANEL_HIGHLIGHT;
 
             float top = ((height - (Main.fontMouseText.MeasureString("A").Y * scale)) / 2f) + UI.Constants.UI_PADDING;
-            title = new UIText(attribute.Specifc_Name, scale);
+            title = new UIText(attribute.Name, scale);
             title.Left.Set(UI.Constants.UI_PADDING, 0f);
             title.Top.Set(top, 0f);
             Append(title);
@@ -639,9 +639,8 @@ namespace ExperienceAndClasses.UI {
 
             float width_cutoff = final.Left.Pixels - sum.Left.Pixels - 5f;
 
-            str = psheet.Attributes.Allocated[attribute.ID_num] + "+" +
-                    (psheet.Attributes.From_Class[attribute.ID_num] + psheet.Attributes.Bonuses[attribute.ID_num]) +
-                    "-" + psheet.Attributes.Zero_Point;
+            str = psheet.Attributes.Allocated[attribute.ID_num] + " + " +
+                    (psheet.Attributes.From_Class[attribute.ID_num] + psheet.Attributes.Bonuses[attribute.ID_num]);
 
             if ((Main.fontMouseText.MeasureString(str).X * SCALE_SUM) >= width_cutoff) {
                 sum_small.SetText(str);

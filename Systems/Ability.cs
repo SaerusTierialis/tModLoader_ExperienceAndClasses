@@ -21,7 +21,7 @@ namespace ExperienceAndClasses.Systems {
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Instance Fields ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-        private readonly string Internal_Name;
+        private readonly string INTERNAL_NAME;
 
         public readonly IDs ID;
         public readonly ushort ID_num;
@@ -33,8 +33,8 @@ namespace ExperienceAndClasses.Systems {
 
         public Texture2D Texture { get; protected set; }
 
-        public string Name { get { return Language.GetTextValue("Mods.ExperienceAndClasses.Common.Ability_" + Internal_Name + "_Name"); } }
-        public string Description { get { return Language.GetTextValue("Mods.ExperienceAndClasses.Common.Ability_" + Internal_Name + "_Description"); } }
+        public string Name { get { return Language.GetTextValue("Mods.ExperienceAndClasses.Common.Ability_" + INTERNAL_NAME + "_Name"); } }
+        public string Description { get { return Language.GetTextValue("Mods.ExperienceAndClasses.Common.Ability_" + INTERNAL_NAME + "_Description"); } }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Instance Variables ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -45,7 +45,7 @@ namespace ExperienceAndClasses.Systems {
         public Ability(IDs id, PlayerClass.IDs class_id, byte level) {
             ID = id;
             ID_num = (ushort)id;
-            Internal_Name = Enum.GetName(typeof(IDs), ID_num);
+            INTERNAL_NAME = Enum.GetName(typeof(IDs), ID_num);
             Required_Class = class_id;
             Required_Class_num = (byte)class_id;
             Required_Level = level;

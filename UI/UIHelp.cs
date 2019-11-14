@@ -40,7 +40,7 @@ namespace ExperienceAndClasses.UI {
             //create list of help
             SortedDictionary<string, UIElement> sorted_items = new SortedDictionary<string, UIElement>();
 
-            string power = Systems.Attribute.LOOKUP[(byte)Systems.Attribute.IDs.Power].Specifc_Name;
+            string power = Systems.Attribute.LOOKUP[(byte)Systems.Attribute.IDs.Power].Name;
 
             /*
             AddHelpTextPanel("Nearby Targets", "Some classes gain a damage bonus again nearby targets. This refers to any hit that occurs within a distance of " + Systems.Damage.DISTANCE_CLOSE_RANGE + ". For reference, this distance is equal to the width of " + (Systems.Damage.DISTANCE_CLOSE_RANGE / Main.LocalPlayer.width) + " players.\n\n" + 
