@@ -64,8 +64,7 @@ namespace ExperienceAndClasses.Items {
             recipe.AddRecipeGroup("Wood", 50); //any wood
             recipe.AddRecipeGroup("IronBar", 1); //iron or tin
             recipe.AddIngredient(ItemID.FallenStar, 1);
-            recipe.SetResult(this, 1);
-            recipe.AddRecipe();
+            QuckRecipe(mod, new int[,] { { }, { } }, this, 1, recipe);
         }
     }
 }

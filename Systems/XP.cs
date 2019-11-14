@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Terraria;
 using Terraria.ID;
+using Terraria.ModLoader;
 
 namespace ExperienceAndClasses.Systems {
     public static class XP {
@@ -98,7 +99,9 @@ namespace ExperienceAndClasses.Systems {
                     if (Main.LocalPlayer.wellFed) {
                         xpd *= 1.05;
                     }
-                    //TODO - any other bonuses
+                    if (Main.LocalPlayer.HasBuff(ModContent.BuffType<Items.XP_Buff>())) {
+                        xpd *= Items.XP_Buff.MULTIPLIER;
+                    }
                 }
 
                 //round up

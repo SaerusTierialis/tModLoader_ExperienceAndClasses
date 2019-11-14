@@ -14,8 +14,8 @@ namespace ExperienceAndClasses.Items {
 
         private const int WIDTH = 20;
         private const int HEIGTH = 20;
-        private const bool CONSUMABLE = true;
-        private const bool CONSUMABLE_AUTO = true;
+        private const bool CONSUMABLE = false;
+        private const bool CONSUMABLE_AUTO = false;
 
         protected Orb(string texture, int rarity, short dust) : base(texture, CONSUMABLE, WIDTH, HEIGTH, rarity, CONSUMABLE_AUTO) {
             DUST = dust;
