@@ -61,11 +61,11 @@ namespace ExperienceAndClasses.Systems.PlayerSheet {
         /// <summary>
         /// Apply attribute effects (to be called on each update)
         /// </summary>
-        public void Apply() {
+        public void Apply(bool do_effects = true) {
             CalculateFinal();
             for (byte i = 0; i < Attribute.Count; i++) {
                 //apply
-                Attribute.LOOKUP[i].ApplyEffect(PSHEET.eacplayer, Final[i]);
+                Attribute.LOOKUP[i].ApplyEffect(PSHEET.eacplayer, Final[i], do_effects);
             }
         }
 

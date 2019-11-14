@@ -200,6 +200,9 @@ namespace ExperienceAndClasses {
 
         public static void UpdateUIPSheet(Systems.PSheet psheet) {
             if (UI_Initialized && psheet.eacplayer.Fields.Is_Local) {
+                //update attribute text
+                psheet.Attributes.Apply(false);
+
                 UI.UIHUD.Instance.UpdatePSheet(psheet);
                 UI.UIMain.Instance.UpdatePSheet(psheet);
             }
