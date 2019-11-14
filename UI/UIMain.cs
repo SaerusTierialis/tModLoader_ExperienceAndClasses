@@ -49,6 +49,7 @@ namespace ExperienceAndClasses.UI {
         private const float FONT_SCALE_HELP = 1.2f;
         private const float FONT_SCALE_ATTRIBUTE = 1f;
         private const float FONT_SCALE_ABILITY = 0.9f;
+        private const float FONT_SCALE_LEVEL = 0.9f;
 
         public const float SPACING_ABILITY_ICON = 2f;
 
@@ -64,7 +65,9 @@ namespace ExperienceAndClasses.UI {
         private HelpTextPanel attribute_point_text;
 
         private AbilityIcon[] ability_primary, ability_secondary;
-        private HelpTextPanel level_character, level_primary, level_secondary;
+        private HelpTextPanel label_character, label_primary, label_secondary;
+        private UIText level_character, level_primary, level_secondary;
+        private UIText level_label_character, level_label_primary, level_label_secondary;
         private CharacterXPBar xp_character;
         private ClassXPBar xp_primary, xp_secondary;
 
@@ -189,12 +192,21 @@ namespace ExperienceAndClasses.UI {
             top = panel_character.top_space;
 
             //character level
-            level_character = new HelpTextPanel("DEFAULT", FONT_SCALE_ABILITY, false, "TODO", "Character Level", false, true);
-            level_character.Left.Set(Constants.UI_PADDING, 0f);
-            level_character.Top.Set(top, 0f);
-            top += level_character.Height.Pixels - 2 * Constants.UI_PADDING;
-            level_character.Height.Set(45f, 0f);
-            level_character.Width.Set(panel_character.Width.Pixels - (Constants.UI_PADDING * 2f), 0f);
+            label_character = new HelpTextPanel("Character", FONT_SCALE_LEVEL, false, "TODO", "Character Level", false, true);
+            label_character.Left.Set(Constants.UI_PADDING, 0f);
+            label_character.Top.Set(top, 0f);
+            top += label_character.Height.Pixels - 2 * Constants.UI_PADDING;
+            label_character.Height.Set(45f, 0f);
+            label_character.Width.Set(panel_character.Width.Pixels - (Constants.UI_PADDING * 2f), 0f);
+            panel_character.Append(label_character);
+
+            level_label_character = new UIText("Level", FONT_SCALE_LEVEL, false);
+            level_label_character.Left.Set(panel_character.Width.Pixels - 70f, 0f);
+            level_label_character.Top.Set(label_character.Top.Pixels, 0f);
+            panel_character.Append(level_label_character);
+
+            level_character = new UIText("000", FONT_SCALE_LEVEL, false);
+            level_character.Top.Set(label_character.Top.Pixels, 0f);
             panel_character.Append(level_character);
 
             //character xp
@@ -202,15 +214,24 @@ namespace ExperienceAndClasses.UI {
             xp_character.Top.Set(top, 0f);
             xp_character.Left.Set(Constants.UI_PADDING, 0f);
             panel_character.Append(xp_character);
-            top = level_character.Top.Pixels + level_character.Height.Pixels;
+            top = label_character.Top.Pixels + label_character.Height.Pixels;
 
             //character primary level
-            level_primary = new HelpTextPanel("DEFAULT", FONT_SCALE_ABILITY, false, "TODO", "Primary Class Level", false, true);
-            level_primary.Left.Set(Constants.UI_PADDING, 0f);
-            level_primary.Top.Set(top, 0f);
-            top += level_primary.Height.Pixels - 2 * Constants.UI_PADDING;
-            level_primary.Height.Set(45f, 0f);
-            level_primary.Width.Set(panel_character.Width.Pixels - (Constants.UI_PADDING * 2f), 0f);
+            label_primary = new HelpTextPanel("DEFAULT", FONT_SCALE_LEVEL, false, "TODO", "Primary Class Level", false, true);
+            label_primary.Left.Set(Constants.UI_PADDING, 0f);
+            label_primary.Top.Set(top, 0f);
+            top += label_primary.Height.Pixels - 2 * Constants.UI_PADDING;
+            label_primary.Height.Set(45f, 0f);
+            label_primary.Width.Set(panel_character.Width.Pixels - (Constants.UI_PADDING * 2f), 0f);
+            panel_character.Append(label_primary);
+
+            level_label_primary = new UIText("Level", FONT_SCALE_LEVEL, false);
+            level_label_primary.Left.Set(panel_character.Width.Pixels - 70f, 0f);
+            level_label_primary.Top.Set(label_primary.Top.Pixels, 0f);
+            panel_character.Append(level_label_primary);
+
+            level_primary = new UIText("000", FONT_SCALE_LEVEL, false);
+            level_primary.Top.Set(label_primary.Top.Pixels, 0f);
             panel_character.Append(level_primary);
 
             //character primary xp
@@ -218,15 +239,24 @@ namespace ExperienceAndClasses.UI {
             xp_primary.Top.Set(top, 0f);
             xp_primary.Left.Set(Constants.UI_PADDING, 0f);
             panel_character.Append(xp_primary);
-            top = level_primary.Top.Pixels + level_primary.Height.Pixels;
+            top = label_primary.Top.Pixels + label_primary.Height.Pixels;
 
             //character secondary level
-            level_secondary = new HelpTextPanel("DEFAULT", FONT_SCALE_ABILITY, false, "TODO", "Secondary Class Level (Effective)", false, true);
-            level_secondary.Left.Set(Constants.UI_PADDING, 0f);
-            level_secondary.Top.Set(top, 0f);
-            top += level_secondary.Height.Pixels - 2 * Constants.UI_PADDING;
-            level_secondary.Height.Set(45f, 0f);
-            level_secondary.Width.Set(panel_character.Width.Pixels - (Constants.UI_PADDING * 2f), 0f);
+            label_secondary = new HelpTextPanel("DEFAULT", FONT_SCALE_LEVEL, false, "TODO", "Secondary Class Level (Effective)", false, true);
+            label_secondary.Left.Set(Constants.UI_PADDING, 0f);
+            label_secondary.Top.Set(top, 0f);
+            top += label_secondary.Height.Pixels - 2 * Constants.UI_PADDING;
+            label_secondary.Height.Set(45f, 0f);
+            label_secondary.Width.Set(panel_character.Width.Pixels - (Constants.UI_PADDING * 2f), 0f);
+            panel_character.Append(label_secondary);
+
+            level_label_secondary = new UIText("Level", FONT_SCALE_LEVEL, false);
+            level_label_secondary.Left.Set(panel_character.Width.Pixels - 70f, 0f);
+            level_label_secondary.Top.Set(label_secondary.Top.Pixels, 0f);
+            panel_character.Append(level_label_secondary);
+
+            level_secondary = new UIText("000", FONT_SCALE_LEVEL, false);
+            level_secondary.Top.Set(label_secondary.Top.Pixels, 0f);
             panel_character.Append(level_secondary);
 
             //character secondary xp
@@ -234,7 +264,7 @@ namespace ExperienceAndClasses.UI {
             xp_secondary.Top.Set(top, 0f);
             xp_secondary.Left.Set(Constants.UI_PADDING, 0f);
             panel_character.Append(xp_secondary);
-            top = level_secondary.Top.Pixels + level_secondary.Height.Pixels;
+            top = label_secondary.Top.Pixels + label_secondary.Height.Pixels;
 
             //ability panel
             DragableUIPanel panel_ability = new DragableUIPanel(WIDTH_ABILITY, HEIGHT_ABILITY, Constants.COLOUR_SUBPANEL, this, false, false, false);
@@ -335,7 +365,9 @@ namespace ExperienceAndClasses.UI {
             UpdateAttributePoints();
 
             //character level
-            level_character.SetText("Character Lv " + psheet.Character.Level);
+            string str = "" + psheet.Character.Level;
+            level_character.SetText(str);
+            level_character.Left.Set(WIDTH_ATTRIBUTES - Constants.UI_PADDING - (Main.fontMouseText.MeasureString(str).X * FONT_SCALE_ABILITY), 0f);
 
             //set class xp
             xp_primary.SetClass(psheet.Classes.Primary);
@@ -347,10 +379,18 @@ namespace ExperienceAndClasses.UI {
             //primary effective level
             Systems.PlayerClass c = psheet.Classes.Primary.Class;
             if (c != null && c.Tier > 0) {
-                level_primary.SetText(c.Name + " Lv " + psheet.Classes.Primary.Level_Effective);
+                label_primary.SetText(c.Name);
+
+                str = "" + psheet.Classes.Primary.Level_Effective;
+                level_primary.SetText(str);
+                level_primary.Left.Set(WIDTH_ATTRIBUTES - Constants.UI_PADDING - (Main.fontMouseText.MeasureString(str).X * FONT_SCALE_ABILITY), 0f);
+
+                level_label_primary.SetText("Level");
             }
             else {
-                level_primary.SetText("No Primary Class");
+                label_primary.SetText("No Primary Class");
+                level_primary.SetText("");
+                level_label_primary.SetText("");
             }
 
             //primary ability
@@ -373,10 +413,18 @@ namespace ExperienceAndClasses.UI {
             //secondary effective level
             c = psheet.Classes.Secondary.Class;
             if (c != null && c.Tier > 0) {
-                level_secondary.SetText(c.Name + " Lv " + psheet.Classes.Secondary.Level_Effective);
+                label_secondary.SetText(c.Name);
+
+                str = "" + psheet.Classes.Secondary.Level_Effective;
+                level_secondary.SetText(str);
+                level_secondary.Left.Set(WIDTH_ATTRIBUTES - Constants.UI_PADDING - (Main.fontMouseText.MeasureString(str).X * FONT_SCALE_ABILITY), 0f);
+
+                level_label_secondary.SetText("Level");
             }
             else {
-                level_secondary.SetText("No Secondary Class");
+                label_secondary.SetText("No Secondary Class");
+                level_secondary.SetText("");
+                level_label_secondary.SetText("");
             }
 
             //secondary ability
