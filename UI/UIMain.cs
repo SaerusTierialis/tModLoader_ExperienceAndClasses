@@ -78,7 +78,7 @@ namespace ExperienceAndClasses.UI {
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Initialize ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         protected override void InitializeState() {
             //main panel
-            panel = new DragableUIPanel(WIDTH, HEIGHT, Constants.COLOUR_UI_PANEL_BACKGROUND, this, true, true);
+            panel = new DragableUIPanel(WIDTH, HEIGHT, Constants.COLOUR_UI_PANEL_BACKGROUND, this, false, true);
 
             //class panel
             DragableUIPanel panel_class = new DragableUIPanel(CLASS_WIDTH, CLASS_HEIGHT, Constants.COLOUR_SUBPANEL, this, false, false, false);
@@ -201,7 +201,7 @@ namespace ExperienceAndClasses.UI {
             panel_character.Append(label_character);
 
             level_label_character = new UIText("Level", FONT_SCALE_LEVEL, false);
-            level_label_character.Left.Set(panel_character.Width.Pixels - 70f, 0f);
+            level_label_character.Left.Set(panel_character.Width.Pixels - 75f, 0f);
             level_label_character.Top.Set(label_character.Top.Pixels, 0f);
             panel_character.Append(level_label_character);
 
@@ -226,7 +226,7 @@ namespace ExperienceAndClasses.UI {
             panel_character.Append(label_primary);
 
             level_label_primary = new UIText("Level", FONT_SCALE_LEVEL, false);
-            level_label_primary.Left.Set(panel_character.Width.Pixels - 70f, 0f);
+            level_label_primary.Left.Set(panel_character.Width.Pixels - 75f, 0f);
             level_label_primary.Top.Set(label_primary.Top.Pixels, 0f);
             panel_character.Append(level_label_primary);
 
@@ -251,7 +251,7 @@ namespace ExperienceAndClasses.UI {
             panel_character.Append(label_secondary);
 
             level_label_secondary = new UIText("Level", FONT_SCALE_LEVEL, false);
-            level_label_secondary.Left.Set(panel_character.Width.Pixels - 70f, 0f);
+            level_label_secondary.Left.Set(panel_character.Width.Pixels - 75f, 0f);
             level_label_secondary.Top.Set(label_secondary.Top.Pixels, 0f);
             panel_character.Append(level_label_secondary);
 
@@ -303,7 +303,7 @@ namespace ExperienceAndClasses.UI {
             //unlock panel
             DragableUIPanel panel_passive = new DragableUIPanel(WIDTH_HELP_AND_PASSIVES, HEIGHT_PASSIVES, Color.Transparent, this, false, false, false);
             panel_passive.Left.Set(panel_attribute.Left.Pixels + panel_attribute.Width.Pixels - 2f, 0f);
-            panel_passive.Top.Set(Constants.UI_PADDING, 0f);
+            panel_passive.Top.Set(HEIGHT - HEIGHT_PASSIVES - Constants.UI_PADDING, 0f);
             panel.Append(panel_passive);
 
             //passives title
@@ -317,7 +317,7 @@ namespace ExperienceAndClasses.UI {
             //help panel
             DragableUIPanel panel_help = new DragableUIPanel(WIDTH_HELP_AND_PASSIVES, HEIGHT_HELP, Constants.COLOUR_SUBPANEL, this, false, false, false);
             panel_help.Left.Set(panel_passive.Left.Pixels, 0f);
-            panel_help.Top.Set(HEIGHT - Constants.UI_PADDING - HEIGHT_HELP, 0f);
+            panel_help.Top.Set(Constants.UI_PADDING, 0f);
             panel_help.BackgroundColor = Color.Transparent;
             panel_help.BorderColor = Color.Transparent;
             panel.Append(panel_help);
@@ -325,9 +325,15 @@ namespace ExperienceAndClasses.UI {
             //help button
             TextButton help = new TextButton("Help", FONT_SCALE_HELP, FONT_SCALE_HELP + 0.1f);
             help.OnClick += new UIElement.MouseEvent(ClickHelp);
-            help.HAlign = 0.5f;
-            help.Top.Set(Constants.UI_PADDING * 2, 0f);
+            help.HAlign = 0.2f;
+            help.Top.Set(Constants.UI_PADDING, 0f);
             panel_help.Append(help);
+
+            TextButton close = new TextButton("Close", FONT_SCALE_HELP, FONT_SCALE_HELP + 0.1f);
+            close.OnClick += new UIElement.MouseEvent(ClickClose);
+            close.HAlign = 0.8f;
+            close.Top.Set(Constants.UI_PADDING, 0f);
+            panel_help.Append(close);
 
             //done adding to main panel
             state.Append(panel);
@@ -367,7 +373,7 @@ namespace ExperienceAndClasses.UI {
             //character level
             string str = "" + psheet.Character.Level;
             level_character.SetText(str);
-            level_character.Left.Set(WIDTH_ATTRIBUTES - Constants.UI_PADDING - (Main.fontMouseText.MeasureString(str).X * FONT_SCALE_ABILITY), 0f);
+            level_character.Left.Set(WIDTH_ATTRIBUTES - Constants.UI_PADDING * 2 - (Main.fontMouseText.MeasureString(str).X * FONT_SCALE_ABILITY), 0f);
 
             //set class xp
             xp_primary.SetClass(psheet.Classes.Primary);
@@ -383,7 +389,7 @@ namespace ExperienceAndClasses.UI {
 
                 str = "" + psheet.Classes.Primary.Level_Effective;
                 level_primary.SetText(str);
-                level_primary.Left.Set(WIDTH_ATTRIBUTES - Constants.UI_PADDING - (Main.fontMouseText.MeasureString(str).X * FONT_SCALE_ABILITY), 0f);
+                level_primary.Left.Set(WIDTH_ATTRIBUTES - Constants.UI_PADDING * 2 - (Main.fontMouseText.MeasureString(str).X * FONT_SCALE_ABILITY), 0f);
 
                 level_label_primary.SetText("Level");
             }
@@ -417,7 +423,7 @@ namespace ExperienceAndClasses.UI {
 
                 str = "" + psheet.Classes.Secondary.Level_Effective;
                 level_secondary.SetText(str);
-                level_secondary.Left.Set(WIDTH_ATTRIBUTES - Constants.UI_PADDING - (Main.fontMouseText.MeasureString(str).X * FONT_SCALE_ABILITY), 0f);
+                level_secondary.Left.Set(WIDTH_ATTRIBUTES - Constants.UI_PADDING * 2 - (Main.fontMouseText.MeasureString(str).X * FONT_SCALE_ABILITY), 0f);
 
                 level_label_secondary.SetText("Level");
             }
@@ -515,6 +521,10 @@ namespace ExperienceAndClasses.UI {
 
         private void ClickHelp(UIMouseEvent evt, UIElement listeningElement) {
             UIHelp.Instance.OpenHelp();
+        }
+
+        private void ClickClose(UIMouseEvent evt, UIElement listeningElement) {
+            Visibility = false;
         }
 
         private void ClickPreRevampXP(UIMouseEvent evt, UIElement listeningElement) {
