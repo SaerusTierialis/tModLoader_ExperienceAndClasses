@@ -83,6 +83,8 @@ namespace ExperienceAndClasses.Systems.PlayerSheet {
                     From_Class[i] = Attribute.GetClassBonus(PSHEET, i);
                 }
             }
+
+            CalculateFinal();
         }
 
         /// <summary>
