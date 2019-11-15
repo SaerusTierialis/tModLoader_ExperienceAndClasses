@@ -261,7 +261,7 @@ namespace ExperienceAndClasses.UI {
             string title = attribute.Name;
 
             Systems.PlayerSheet.AttributeSheet sheet = Shortcuts.LOCAL_PLAYER.PSheet.Attributes;
-            string points = "Zero Point: -" + sheet.Zero_Point + " (based on total allocated points)\n" +
+            string points = "Zero Point: -" + sheet.Zero_Point + " (based on allocation points spent)\n" +
                             "From Allocated: " + sheet.Allocated[attribute.ID_num] + "\n" +
                             "From Class(es): " + sheet.From_Class[attribute.ID_num] + "\n" +
                             "From Other: " + sheet.Bonuses[attribute.ID_num] + "\n" +

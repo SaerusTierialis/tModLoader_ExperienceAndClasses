@@ -27,8 +27,10 @@ namespace ExperienceAndClasses.Systems.PlayerSheet {
         public float SpeedAdjust_Weapon; //TODO - unused
         public float SpeedAdjust_Tool; //TODO - unused
 
+        /*
         public DamageModifier Holy = new DamageModifier(); //TODO - unused (may stack with other types)
         public DamageModifier Musical = new DamageModifier(); //TODO - unused (may stack with other types)
+        */
         public DamageModifier AllNearby = new DamageModifier(); //TODO - unused
         public DamageModifier NonMinionProjectile = new DamageModifier(); //TODO - unused
         public DamageModifier NonMinionAll = new DamageModifier(); //TODO - unused
@@ -43,8 +45,10 @@ namespace ExperienceAndClasses.Systems.PlayerSheet {
 
             SpeedAdjust_Melee = SpeedAdjust_Ranged = SpeedAdjust_Magic = SpeedAdjust_Throwing = SpeedAdjust_Minion = SpeedAdjust_Weapon = SpeedAdjust_Tool = 0f;
 
-            Holy.Increase = Musical.Increase = AllNearby.Increase = NonMinionProjectile.Increase = NonMinionAll.Increase = 0f;
-            Holy.FinalMultAdd = Musical.FinalMultAdd = AllNearby.FinalMultAdd = NonMinionProjectile.FinalMultAdd = NonMinionAll.FinalMultAdd = 0f;
+            //Holy.Increase = Musical.Increase = 
+            AllNearby.Increase = NonMinionProjectile.Increase = NonMinionAll.Increase = 0f;
+            //Holy.FinalMultAdd = Musical.FinalMultAdd = 
+            AllNearby.FinalMultAdd = NonMinionProjectile.FinalMultAdd = NonMinionAll.FinalMultAdd = 0f;
         }
 
         public class DamageModifier {
