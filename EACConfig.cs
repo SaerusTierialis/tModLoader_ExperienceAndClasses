@@ -52,6 +52,17 @@ namespace ExperienceAndClasses {
 
 
 
+        //Attributes
+        [Header("$Mods.ExperienceAndClasses.Common.Config_Header_Attrbutes")]
+
+        [Label("$Mods.ExperienceAndClasses.Common.Config_Attribute_Effect_Label")]
+        [Tooltip("$Mods.ExperienceAndClasses.Common.Config_Attribute_Effect_Tooltip")]
+        [Range(0f, 10f)]
+        [Increment(0.1f)]
+        [DefaultValue(1f)]
+        public float AttributeEffect { get; set; }
+
+
         //AFK
         [Header("$Mods.ExperienceAndClasses.Common.Config_Header_AFK")]
 
@@ -90,6 +101,12 @@ namespace ExperienceAndClasses {
                 message = "Client password does not match world password. Password attempted:"+client_password;
                 return false;
             }
+        }
+
+        public override void OnChanged() {
+            Systems.Attribute.ATTRIBUTE_BONUS_MULTIPLIER = AttributeEffect;
+            if (Shortcuts.IS_PLAYER && Shortcuts.LOCAL_PLAYER_VALID)
+                Shortcuts.LOCAL_PLAYER.PSheet.Attributes.Apply(false);
         }
 
     }

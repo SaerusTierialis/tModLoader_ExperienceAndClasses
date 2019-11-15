@@ -3,7 +3,7 @@
 
 
 //Mod Name
-Common.Mod_Name = ExperienceAndClasses
+Common.Mod_Name=ExperienceAndClasses
 
 
 
@@ -63,8 +63,9 @@ Common.Config_Enabled=Enabled
 
 //ConfigServer
 Common.Config_Header_XP=Experience and Orbs
-Common.Config_Header_Debug=Debug
+Common.Config_Header_Attrbutes=Attributes
 Common.Config_Header_AFK=Away From Keyboard
+Common.Config_Header_Debug=Debug
 
 Common.Config_XP_Rate_Label=XP Multiplier
 
@@ -75,6 +76,9 @@ Common.Config_Reward_ModPerPlayer_Tooltip=Bonus to apply before splitting reward
 
 Common.Config_Reward_Distance_Label=Multiplayer Reward Distance
 Common.Config_Reward_Distance_Tooltip=Distance to recieve rewards in multiplayer\nPlayers who damaged the target are eligible regardless of distance\nPlayers are always eligible for boss rewards 
+
+Common.Config_Attribute_Effect_Label=Effect Multiplier
+Common.Config_Attribute_Effect_Tooltip=Adjustment multiplier for all per-point bonuses
 
 Common.Config_AFK_Enabled_Tooltip=AFK mode activates when no inputs have been recieved recently\nand disables the death penalty and all rewards
 

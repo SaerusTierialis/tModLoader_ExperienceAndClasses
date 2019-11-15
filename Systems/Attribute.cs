@@ -26,6 +26,9 @@ namespace ExperienceAndClasses.Systems {
             NONE, //leave this last
         }
 
+        //set by modconfig
+        public static float ATTRIBUTE_BONUS_MULTIPLIER = 1f;
+
         //this may be reordered, UI uses this order
         public static IDs[] ATTRIBUTES_UI_ORDER = new IDs[] { IDs.Power, IDs.Vitality, IDs.Mind, IDs.Spirit, IDs.Agility, IDs.Dexterity }; //TODO - unused
 
@@ -43,7 +46,7 @@ namespace ExperienceAndClasses.Systems {
         public const float PENALTY_RATIO = 0.05f;
 
         //reset
-        public static readonly ModItem RESET_COST_ITEM = ModContent.GetInstance<Items.Orb_Monster>();
+        public static ModItem RESET_COST_ITEM;
         public const int RESET_POINTS_FREE = 99;
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Auto-Populated Lookup ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
@@ -242,7 +245,7 @@ namespace ExperienceAndClasses.Systems {
 
         private static int RoundIntBonus(float value) {
             if (value > 0) {
-                return (int) Math.Floor(value);
+                return (int)Math.Floor(value);
             }
             else {
                 return (int)Math.Ceiling(value);
@@ -252,8 +255,8 @@ namespace ExperienceAndClasses.Systems {
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Attributes ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         public class Power : Attribute {
-            public const float PER_POINT_DAMAGE = 0.0025f;
-            public const float PER_POINT_FISH = 0.1f;
+            public static float PER_POINT_DAMAGE { get { return 0.0025f * ATTRIBUTE_BONUS_MULTIPLIER; } }
+            public static float PER_POINT_FISH { get { return 0.1f * ATTRIBUTE_BONUS_MULTIPLIER; } }
 
             public Power() : base(IDs.Power) {}
             protected override void Effect(EACPlayer eacplayer, int points, bool do_effects = true) {
@@ -262,9 +265,9 @@ namespace ExperienceAndClasses.Systems {
         }
 
         public class Vitality : Attribute {
-            private const float PER_POINT_LIFE = 0.5f;
-            private const float PER_POINT_LIFE_REGEN = 0.2f;
-            private const float PER_POINT_DEFENSE = 0.1f;
+            private static float PER_POINT_LIFE { get { return 0.5f * ATTRIBUTE_BONUS_MULTIPLIER; } }
+            private static float PER_POINT_LIFE_REGEN { get { return 0.2f * ATTRIBUTE_BONUS_MULTIPLIER; } }
+            private static float PER_POINT_DEFENSE { get { return 0.1f * ATTRIBUTE_BONUS_MULTIPLIER; } }
 
             public Vitality() : base(IDs.Vitality) {}
             protected override void Effect(EACPlayer eacplayer, int points, bool do_effects = true) {
@@ -288,9 +291,9 @@ namespace ExperienceAndClasses.Systems {
         }
 
         public class Mind : Attribute {
-            private const float PER_POINT_MANA = 0.5f;
-            private const float PER_POINT_MANA_REGEN = 0.5f;
-            private const float PER_POINT_MANA_DELAY = 0.5f;
+            private static float PER_POINT_MANA { get { return 0.5f * ATTRIBUTE_BONUS_MULTIPLIER; } }
+            private static float PER_POINT_MANA_REGEN { get { return 0.5f * ATTRIBUTE_BONUS_MULTIPLIER; } }
+            private static float PER_POINT_MANA_DELAY { get { return 0.5f * ATTRIBUTE_BONUS_MULTIPLIER; } }
 
             public Mind() : base(IDs.Mind) {}
             protected override void Effect(EACPlayer eacplayer, int points, bool do_effects = true) {
@@ -317,10 +320,10 @@ namespace ExperienceAndClasses.Systems {
         }
 
         public class Spirit : Attribute {
-            private const float PER_POINT_CRIT = 0.15f;
-            private const float PER_POINT_MINION_CAP = 0.04f;
-            private const float PER_POINT_HOLY_HEAL = 0.01f;
-
+            private static float PER_POINT_CRIT { get { return 0.15f * ATTRIBUTE_BONUS_MULTIPLIER; } }
+            private static float PER_POINT_MINION_CAP { get { return 0.04f * ATTRIBUTE_BONUS_MULTIPLIER; } }
+            private static float PER_POINT_HOLY_HEAL { get { return 0.01f * ATTRIBUTE_BONUS_MULTIPLIER; } }
+            
             public Spirit() : base(IDs.Spirit) {}
             protected override void Effect(EACPlayer eacplayer, int points, bool do_effects = true) {
                 int bonus;
@@ -351,10 +354,10 @@ namespace ExperienceAndClasses.Systems {
         }
 
         public class Agility : Attribute {
-            private const float PER_POINT_MOVEMENT = 0.005f;
-            private const float PER_POINT_JUMP = 0.01f;
-            private const float PER_POINT_DODGE = 0.0025f;
-            private const float PER_POINT_FLY = 0.5f;
+            private static float PER_POINT_MOVEMENT { get { return 0.005f * ATTRIBUTE_BONUS_MULTIPLIER; } }
+            private static float PER_POINT_JUMP { get { return 0.01f * ATTRIBUTE_BONUS_MULTIPLIER; } }
+            private static float PER_POINT_DODGE { get { return 0.0025f * ATTRIBUTE_BONUS_MULTIPLIER; } }
+            private static float PER_POINT_FLY { get { return 0.5f * ATTRIBUTE_BONUS_MULTIPLIER; } }
 
             public Agility() : base(IDs.Agility) {}
             protected override void Effect(EACPlayer eacplayer, int points, bool do_effects = true) {
@@ -386,8 +389,8 @@ namespace ExperienceAndClasses.Systems {
         }
 
         public class Dexterity : Attribute {
-            private const float PER_POINT_USE_SPEED = 0.0025f;
-            private const float PER_POINT_ABILITY_DELAY = 0.01f;
+            private static float PER_POINT_USE_SPEED { get { return 0.0025f * ATTRIBUTE_BONUS_MULTIPLIER; } }
+            private static float PER_POINT_ABILITY_DELAY { get { return 0.01f * ATTRIBUTE_BONUS_MULTIPLIER; } }
 
             public Dexterity() : base(IDs.Dexterity) {}
             protected override void Effect(EACPlayer eacplayer, int points, bool do_effects = true) {

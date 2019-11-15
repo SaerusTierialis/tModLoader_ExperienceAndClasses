@@ -71,6 +71,9 @@ namespace ExperienceAndClasses {
             //textures
             Utilities.Textures.LoadTextures();
 
+            //set global item instances
+            Systems.Attribute.RESET_COST_ITEM = GetInstance<Items.Orb_Monster>();
+
             //TODO: sounds
         }
 
