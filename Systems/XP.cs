@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Terraria;
 using Terraria.ID;
+using Terraria.Localization;
 using Terraria.ModLoader;
 
 namespace ExperienceAndClasses.Systems {
@@ -141,8 +142,47 @@ namespace ExperienceAndClasses.Systems {
                 }
             }
 
-            public static void LocalDeathPenalty(uint xp) {
-                //TODO
+            public static void LocalDeathPenalty() {
+                //config
+                ConfigServer config = Shortcuts.GetConfigServer;
+
+                if (config.XPDeathPenalty > 0) {
+                    //sheet
+                    PSheet psheet = Shortcuts.LOCAL_PLAYER.PSheet;
+
+                    //character
+                    uint penalty = (uint)Math.Max(1, Math.Floor(psheet.Character.XP_Level_Total * config.XPDeathPenalty));
+                    psheet.Character.LocalSubtractXP(penalty);
+
+                    //classes
+                    if (psheet.Classes.Can_Gain_XP) {
+                        if (psheet.Classes.Primary.Can_Gain_XP) {
+                            if (psheet.Classes.Secondary.Can_Gain_XP) {
+                                //both
+
+                                penalty = (uint)Math.Max(1, Math.Floor(psheet.Classes.Primary.XP_Level_Total * config.XPDeathPenalty * SUBCLASS_PENALTY_XP_MULTIPLIER_PRIMARY));
+                                psheet.Classes.Primary.SubtractXP(penalty);
+
+                                penalty = (uint)Math.Max(1, Math.Floor(psheet.Classes.Secondary.XP_Level_Total * config.XPDeathPenalty * SUBCLASS_PENALTY_XP_MULTIPLIER_SECONDARY));
+                                psheet.Classes.Secondary.SubtractXP(penalty);
+
+                            }
+                            else {
+                                //primary only
+                                penalty = (uint)Math.Max(1, Math.Floor(psheet.Classes.Primary.XP_Level_Total * config.XPDeathPenalty));
+                                psheet.Classes.Primary.SubtractXP(penalty);
+                            }
+                        }
+                        else {
+                            //secondary only
+                            penalty = (uint)Math.Max(1, Math.Floor(psheet.Classes.Secondary.XP_Level_Total * config.XPDeathPenalty));
+                            psheet.Classes.Secondary.SubtractXP(penalty);
+                        }
+                    }
+
+                    //message
+                    Main.NewText(Language.GetTextValue("Mods.ExperienceAndClasses.Common.Death_Penalty_XP"), UI.Constants.COLOUR_MESSAGE_ERROR);
+                }
             }
         }
 

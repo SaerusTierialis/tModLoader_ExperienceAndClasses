@@ -15,7 +15,10 @@ namespace ExperienceAndClasses.Systems.PlayerSheet {
 
         public float Healing_Mult; //TODO - unused
 
-        public float Dodge; //TODO - unused
+        /// <summary>
+        /// 0 (0%) to 1 (100%)
+        /// </summary>
+        public float Dodge;
 
         public float Ability_Delay_Reduction; //TODO - unused
 
@@ -31,6 +34,11 @@ namespace ExperienceAndClasses.Systems.PlayerSheet {
         public DamageModifier Holy = new DamageModifier(); //TODO - unused (may stack with other types)
         public DamageModifier Musical = new DamageModifier(); //TODO - unused (may stack with other types)
         */
+
+        public class DamageModifier {
+            public float Increase, FinalMultAdd;
+        }
+
         public DamageModifier AllNearby = new DamageModifier(); //TODO - unused
         public DamageModifier NonMinionProjectile = new DamageModifier(); //TODO - unused
         public DamageModifier NonMinionAll = new DamageModifier(); //TODO - unused
@@ -51,8 +59,8 @@ namespace ExperienceAndClasses.Systems.PlayerSheet {
             AllNearby.FinalMultAdd = NonMinionProjectile.FinalMultAdd = NonMinionAll.FinalMultAdd = 0f;
         }
 
-        public class DamageModifier {
-            public float Increase, FinalMultAdd;
+        public void Limit() {
+            Dodge = (float)Utilities.Commons.Clamp(Dodge, 0, 1);
         }
     }
 }

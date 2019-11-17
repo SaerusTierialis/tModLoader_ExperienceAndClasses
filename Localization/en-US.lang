@@ -192,3 +192,6 @@ Common.Attribute_Agility_Description=TODO
 Common.Attribute_Dexterity_Name=Dexterity
 Common.Attribute_Dexterity_Shortform=DEX
 Common.Attribute_Dexterity_Description=TODO
+
+//Misc
+Common.Death_Penalty_XP=You have lost experience from death.

@@ -84,20 +84,24 @@ namespace ExperienceAndClasses {
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Update ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-        public override void PreUpdate() {
-            base.PreUpdate();
+        public override void PreUpdateBuffs() {
+            base.PreUpdateBuffs();
 
             PSheet.PreUpdate();
         }
 
-        public override void PostUpdate() {
-            base.PostUpdate();
+        public override void PostUpdateBuffs() {
+            base.PostUpdateBuffs();
 
             PSheet.PostUpdate();
 
             //Main.NewText("test=" + PSheet.Classes.Primary.Class.Name + " " + PSheet.Classes.Primary.Unlocked);
 
-            Main.NewText("IN_COMBAT = " + PSheet.Character.In_Combat);
+            //Main.NewText("IN_COMBAT = " + PSheet.Character.In_Combat);
+        }
+
+        public override void PostUpdate() {
+            base.PostUpdate();
 
             if (Fields.Is_Local) {
                 ConfigServer config = Shortcuts.GetConfigServer;
@@ -129,7 +133,25 @@ namespace ExperienceAndClasses {
         public override void Hurt(bool pvp, bool quiet, double damage, int hitDirection, bool crit) {
             base.Hurt(pvp, quiet, damage, hitDirection, crit);
 
+            if (Shortcuts.IS_PLAYER)
+                Main.NewText(player.name + " " + damage);
+            else
+                Console.WriteLine(player.name + " " + damage);
+
             TriggerInCombat();
+        }
+
+        public override bool PreHurt(bool pvp, bool quiet, ref int damage, ref int hitDirection, ref bool crit, ref bool customDamage, ref bool playSound, ref bool genGore, ref PlayerDeathReason damageSource) {
+            //check if hit
+            bool hit = base.PreHurt(pvp, quiet, ref damage, ref hitDirection, ref crit, ref customDamage, ref playSound, ref genGore, ref damageSource);
+
+            //dodge (local check)
+            if (hit && Fields.Is_Local && (Main.rand.NextFloat(0, 1) < PSheet.Stats.Dodge)) {
+                player.ShadowDodge();
+                return false;
+            }
+
+            return hit;
         }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Damage Dealt ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
@@ -168,7 +190,8 @@ namespace ExperienceAndClasses {
             PSheet.Character.SetInCombat(false);
 
             //death penalty
-            //TODO
+            if (Fields.Is_Local)
+                Systems.XP.Adjustments.LocalDeathPenalty();
         }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Save/Load ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/

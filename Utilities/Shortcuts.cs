@@ -69,7 +69,8 @@ namespace ExperienceAndClasses {
             LocalPlayerClear();
 
             //textures
-            Utilities.Textures.LoadTextures();
+            if (!IS_SERVER)
+                Utilities.Textures.LoadTextures();
 
             //set global item instances
             Systems.Attribute.RESET_COST_ITEM = GetInstance<Items.Orb_Monster>();

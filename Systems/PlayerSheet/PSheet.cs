@@ -52,6 +52,7 @@ namespace ExperienceAndClasses.Systems {
 
         public void PostUpdate() {
             Attributes.Apply();
+            Stats.Limit();
         }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Save/Load ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/

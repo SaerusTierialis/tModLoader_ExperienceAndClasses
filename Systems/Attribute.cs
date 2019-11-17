@@ -279,7 +279,7 @@ namespace ExperienceAndClasses.Systems {
                 if (eacplayer.Fields.Is_Local) Effect_Text += BonusValueString(bonus, "maximum life", PER_POINT_LIFE);
 
                 //life regen
-                bonus = RoundIntBonus(PER_POINT_LIFE_REGEN * points);
+                bonus = (int)Math.Max(0, PER_POINT_LIFE_REGEN * points);
                 if (do_effects) eacplayer.player.lifeRegen += bonus;
                 if (eacplayer.Fields.Is_Local) Effect_Text += BonusValueString(bonus, "life regeneration", PER_POINT_LIFE_REGEN);
 
@@ -305,7 +305,7 @@ namespace ExperienceAndClasses.Systems {
                 if (eacplayer.Fields.Is_Local) Effect_Text += BonusValueString(bonus, "maximum mana", PER_POINT_MANA);
 
                 //mana regen
-                bonus = RoundIntBonus(PER_POINT_MANA_REGEN * points);
+                bonus = (int)Math.Max(0, PER_POINT_MANA_REGEN * points);
                 if (do_effects) eacplayer.player.manaRegenBonus += bonus;
                 if (eacplayer.Fields.Is_Local) Effect_Text += BonusValueString(bonus, "mana regeneration", PER_POINT_MANA_REGEN);
 
