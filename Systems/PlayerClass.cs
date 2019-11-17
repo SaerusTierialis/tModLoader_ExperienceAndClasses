@@ -75,8 +75,8 @@ namespace ExperienceAndClasses.Systems {
         private static readonly Color COLOUR_TRICKERY_3 = new Color(107, 107, 107);
         private static readonly Color COLOUR_HYBRID_2 = new Color(204, 87, 138);
         private static readonly Color COLOUR_HYBRID_3 = new Color(193, 36, 104);
-        private static readonly Color COLOUR_MUSIC_2 = new Color(102, 225, 139);
-        private static readonly Color COLOUR_MUSIC_3 = new Color(34, 177, 76);
+        private static readonly Color COLOUR_MUSIC_2 = new Color(34, 177, 76);
+        private static readonly Color COLOUR_MUSIC_3 = new Color(0, 128, 0);
 
         public readonly static PlayerClass[] LOOKUP;
 
