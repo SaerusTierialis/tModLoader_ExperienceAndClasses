@@ -1,0 +1,193 @@
+//Generic
+
+
+
+//Mod Name
+Common.Mod_Name=ExperienceAndClasses
+
+
+
+//Levelup+Unlock
+Common.Levelup_Character={0} evoluiu para o nivel {1}!
+Common.Levelup_Class={0} agora é nivel {1} {2}!
+Common.Unlock=Você desbloqueou {0}!
+Common.Unlock_T3=Agora você pode desbloquear as classes Tier 3!
+Common.Unlock_Multiclass_NoItem=Você precisa de um {0} para desbloquear a multiclasse!
+Common.Unlock_Multiclass=Agora você pode usar as multiclasses! /nClique com o botão direito do mouse em uma classe para defini-la como sua subclasse.
+Common.Unlock_Class_Prereq_Met=Tier {0} Requisito Exigido: {1} Nivel {2}
+Common.Unlock_WOF=Tier III Requisito Exigido: Derrotar o Parede de Carne
+Common.Unlock_Class_Fail_WOF=Você deve derrotar o Parede de Carne para desbloquear as classes de nivel 3!
+Common.Unlock_Class_Fail_Prereq=Você deve atingir o nível {0} {1} para desbloquear {2}
+Common.Unlock_Class_Fail_Item=Você precisa de um {0} para desbloquear {1} 
+
+//Set Class
+Common.SetClass_Fail_Combination=Falha ao definir a classe porque a combinação é inválida!
+Common.SetClass_Fail_Locked=Falha ao definir a classe porque está bloqueada!
+Common.SetClass_Fail_Combat=Falha ao definir a classe porque você está em combate!
+
+//Buffs
+BuffName.XP_Buff=Bônus de EXP
+BuffDescription.XP_Buff=Ganho de EXP aumentado em 50%!
+
+//Items
+ItemName.Orb_Monster=Orbe da Ascensão
+ItemTooltip.Orb_Monster=Uma esfera cristalina que brilha emitindo uma grande promessa de poder...\n\nUsado para desbloquear as Classes, Resetar atributos, ou TODO
+ItemName.Orb_Boss=Orbe da Transcendência
+ItemTooltip.Orb_Boss=Uma esfera cristalina que trás uma promessa de um poder extraordinário...\n\nUsado para desbloquear as classes, desbloquear sub-classes, ou TODO
+ItemName.Unlock_Tier2=Passe de Classe Tier II
+ItemTooltip.Unlock_Tier2=Este Passe pode ser usado para desbloquear classes de Tier II!\nClique em um ícone de classe para desbloquear o diálogo.
+ItemName.Unlock_Tier3=Passe de Classe Tier III
+ItemTooltip.Unlock_Tier3=Este Passe pode ser usado para desbloquear classes de Tier III!\nClique em um ícone de classe para desbloquear o diálogo.
+ItemName.Unlock_Subclass=Passe para Sub-classe
+ItemTooltip.Unlock_Subclass=Este passe pode ser usado para desbloquear o sistema de Sub-classe.\nBotão direito em qualquer ícone de classe para desbloquear o diálogo.\nEste desbloqueio é realizado apenas uma vez por classe.\nUma vez desbloqueado, Clique com o botão direito em uma classe para defini-la como sub-classe.
+ItemName.Unlock_Explorer=Passe de Explorador
+ItemTooltip.Unlock_Explorer=Este passe pode ser usado para desbloquear uma classe não-combatente. \nClique em um ícone de classe para desbloquear o diálogo.
+ItemName.Potion_XP_Instant=Poção da Clarividência
+ItemTooltip.Potion_XP_Instant=Instantaneamente ganha 100 de XP por nível do personagem!
+ItemName.Potion_XP_Buff=Poção do Conhecimento
+ItemTooltip.Potion_XP_Buff=Ganho de EXP aumentado em 50%!
+
+//System - Password
+Common.Password_Display=A Senha do Mundo ({$Mods.ExperienceAndClasses.Common.Mod_Name}) é:{0}
+Common.Password_CommandShow_Description=Exibir a senha do Mundo ({$Mods.ExperienceAndClasses.Common.Mod_Name})
+Common.Password_CommandSet_Description=Defina a senha do Mundo ({$Mods.ExperienceAndClasses.Common.Mod_Name})
+
+//System - Misc
+Common.AFK_Start=Você está AFK. Você não ganhará nem perderá XP.
+Common.AFK_End=Você não está mais AFK. Você pode ganhar e perder XP novamente.
+
+
+//Config Common
+Common.Config_Enabled=Habilitado
+
+
+//ConfigServer
+Common.Config_Header_XP=Expêriencia e Orbes
+Common.Config_Header_Attrbutes=Atributos
+Common.Config_Header_AFK=Longe do teclado
+Common.Config_Header_Debug=Debug
+
+Common.Config_XP_Rate_Label=Multiplicador de XP
+
+Common.Config_XP_DeathPenalty_Label=Penalidade de XP por morte
+
+Common.Config_Reward_ModPerPlayer_Label=Multiplicador de recompensa bônus por Jogador
+Common.Config_Reward_ModPerPlayer_Tooltip=Bônus para ser aplicado antes de dividir as recompensas por Jogador após o primeiro
+
+Common.Config_Reward_Distance_Label=Distância de recompensa multiplayer
+Common.Config_Reward_Distance_Tooltip=Distância para receber recompensas no multiplayer\nJogadores que deram dano no alvo são elegíveis independente da distância\nJogadores sempre serão elegíveis para receber recompensas dos chefes 
+
+Common.Config_Attribute_Effect_Label=Efeito Multiplicador
+Common.Config_Attribute_Effect_Tooltip=Ajuste de multiplicador para todos os bônus por ponto
+
+Common.Config_AFK_Enabled_Tooltip=O modo AFK é ativo quando não houve movimentação recente\ne desativa a pena de morte e todas as recompensas
+
+Common.Config_AFK_Seconds_Label=Segundos para disparar
+Common.Config_AFK_Seconds_Tooltip=Habilitar o modo AFK após alguns segundos sem movimentação
+
+Common.Config_Trace_Label=Rastreamento de pacotes
+Common.Config_Trace_Tooltip=Log packet trace messages for multiplayer debugging.
+
+
+
+//ConfigClient
+Common.Config_Header_UIMain=Interface Principal
+Common.Config_Header_UIHUD=HUD
+Common.Config_Header_Permissions=Autenticação para Multiplayer
+Common.Config_Header_UIMessages=UI de Diversos
+Common.Config_UIDrag_Label=Botão direito e arraste para mover
+Common.Config_UIAutoMode_Label=Modo de Exibição
+Common.Config_UIPosition_Label=Posição
+
+Common.Config_Password_Label=Senha
+Common.Config_Password_Tooltip=As configurações do servidor podem ser alteradas no Multiplayer\nse a senha do cliente corresponder à senha do mundo.\nJogando em um mundo no Singleplayer defina sua senha como\na senha do cliente. O comando do console eac_password\npode ser usado para definir a senha durante o Multiplayer.
+
+Common.Config_UIMessages_XPOverhead_Label=Exibir grande ganho de XP
+
+
+//Class - Names
+Common.Class_None_Name=Sem Classe
+Common.Class_Novice_Name=Novato
+Common.Class_Explorer_Name=Explorador
+
+Common.Class_Warrior_Name=Guerreiro
+Common.Class_Ranger_Name=Arqueiro
+Common.Class_Traveler_Name=Viajante
+Common.Class_Rogue_Name=Ladrão
+Common.Class_Summoner_Name=Invocador
+Common.Class_Cleric_Name=Clérigo
+Common.Class_Bard_Name=Bardo
+Common.Class_Hybrid_Name=Híbrido
+
+Common.Class_BloodKnight_Name=Cavaleiro de Sangue
+Common.Class_Berserker_Name=Berserker
+Common.Class_Guardian_Name=Guardião
+Common.Class_Artillery_Name=Artilheiro
+Common.Class_Chrono_Name=Chrono
+Common.Class_Controller_Name=Controlador
+Common.Class_Shadow_Name=Sombra
+Common.Class_Assassin_Name=Assassino
+Common.Class_SoulBinder_Name=Controlador de Almas
+Common.Class_Tactician_Name=Tático
+Common.Class_Saint_Name=Santo
+Common.Class_Oracle_Name=Oráculo
+Common.Class_Minstrel_Name=Menestrel
+Common.Class_HybridPrime_Name=Híbrido Prime
+
+//Class - Descriptions
+Common.Class_None_Description=
+Common.Class_Novice_Description=TODO
+Common.Class_Explorer_Description=TODO
+
+Common.Class_Warrior_Description=TODO
+Common.Class_Ranger_Description=TODO
+Common.Class_Traveler_Description=TODO
+Common.Class_Rogue_Description=TODO
+Common.Class_Summoner_Description=TODO
+Common.Class_Cleric_Description=TODO
+Common.Class_Bard_Description=TODO
+Common.Class_Hybrid_Description=TODO
+
+Common.Class_BloodKnight_Description=TODO
+Common.Class_Berserker_Description=TODO
+Common.Class_Guardian_Description=TODO
+Common.Class_Artillery_Description=TODO
+Common.Class_Chrono_Description=TODO
+Common.Class_Controller_Description=TODO
+Common.Class_Shadow_Description=TODO
+Common.Class_Assassin_Description=TODO
+Common.Class_SoulBinder_Description=TODO
+Common.Class_Tactician_Description=TODO
+Common.Class_Saint_Description=TODO
+Common.Class_Oracle_Description=TODO
+Common.Class_Minstrel_Description=TODO
+Common.Class_HybridPrime_Description=TODO
+
+//Attributes
+Common.Attribute_Reset_Success=Os atributos foram redefinidos!
+Common.Attribute_Reset_Fail=Você não tem requisitos para redefinir seus atributos.
+Common.Attribute_Reset_NoPoints=Você não pode redefinir os atributos por que nenhum ponto foi alocado.
+
+Common.Attribute_Power_Name=Power
+Common.Attribute_Power_Shortform=PWR
+Common.Attribute_Power_Description=TODO
+
+Common.Attribute_Vitality_Name=Vitality
+Common.Attribute_Vitality_Shortform=VIT
+Common.Attribute_Vitality_Description=TODO
+
+Common.Attribute_Mind_Name=Mind
+Common.Attribute_Mind_Shortform=MND
+Common.Attribute_Mind_Description=TODO
+
+Common.Attribute_Spirit_Name=Spirit
+Common.Attribute_Spirit_Shortform=SPR
+Common.Attribute_Spirit_Description=TODO
+
+Common.Attribute_Agility_Name=Agility
+Common.Attribute_Agility_Shortform=AGI
+Common.Attribute_Agility_Description=TODO
+
+Common.Attribute_Dexterity_Name=Dexterity
+Common.Attribute_Dexterity_Shortform=DEX
+Common.Attribute_Dexterity_Description=TODO
