@@ -257,6 +257,7 @@ namespace ExperienceAndClasses.Utilities {
                 CharLevel.WritePacketBody(packet, eacplayer.PSheet.Character.Level, false);
                 Attributes.WritePacketBody(packet, eacplayer.PSheet.Attributes.Allocated_Effective);
                 Class.WritePacketBody(packet, eacplayer.PSheet.Classes.Primary.ID, eacplayer.PSheet.Classes.Primary.Level, eacplayer.PSheet.Classes.Secondary.ID, eacplayer.PSheet.Classes.Secondary.Level);
+                AFK.WritePacketBody(packet, eacplayer.PSheet.Character.AFK);
                 //TODO - other sync data
 
                 //send
@@ -268,6 +269,7 @@ namespace ExperienceAndClasses.Utilities {
                 LOOKUP[(byte)PACKET_TYPE.CharLevel].Recieve(reader, origin);
                 LOOKUP[(byte)PACKET_TYPE.Attributes].Recieve(reader, origin);
                 LOOKUP[(byte)PACKET_TYPE.Class].Recieve(reader, origin);
+                LOOKUP[(byte)PACKET_TYPE.AFK].Recieve(reader, origin);
                 //TODO - other sync data
 
                 //is init
@@ -372,7 +374,7 @@ namespace ExperienceAndClasses.Utilities {
                     ModPacket packet = LOOKUP[(byte)PACKET_TYPE.AFK].GetPacket(origin);
 
                     //specific content
-                    packet.Write(status);
+                    WritePacketBody(packet, status);
 
                     //send
                     packet.Send(target, origin);
@@ -383,9 +385,11 @@ namespace ExperienceAndClasses.Utilities {
                 //read and set
                 origin_eacplayer.PSheet.Character.SetAFK(reader.ReadBoolean());
             }
+
+            public static void WritePacketBody(ModPacket packet, bool status) {
+                packet.Write(status);
+            }
         }
-
-
 
     }
 }

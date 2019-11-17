@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using Terraria;
+using Terraria.DataStructures;
 using Terraria.GameInput;
 using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
@@ -31,7 +32,8 @@ namespace ExperienceAndClasses {
 
             public bool Is_Local = false;
 
-            public DateTime AFK_Time = DateTime.MaxValue; 
+            public DateTime AFK_Time = DateTime.MaxValue;
+            public DateTime IN_COMBAT_time = DateTime.MinValue;
         }
 
         /// <summary>
@@ -51,7 +53,6 @@ namespace ExperienceAndClasses {
             Entity = new Utilities.Containers.Entity(this);
         }
 
-        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Overrides ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         public override void OnEnterWorld(Player player) {
             //Update netmode
             Shortcuts.UpdateNetmode();
@@ -78,7 +79,7 @@ namespace ExperienceAndClasses {
 
         private void FullSync() {
             Utilities.PacketHandler.FullSync.Send(this);
-            //TODO - send statuses
+            //TODO - send other?
         }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Update ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
@@ -95,6 +96,8 @@ namespace ExperienceAndClasses {
             PSheet.PostUpdate();
 
             //Main.NewText("test=" + PSheet.Classes.Primary.Class.Name + " " + PSheet.Classes.Primary.Unlocked);
+
+            Main.NewText("IN_COMBAT = " + PSheet.Character.In_Combat);
 
             if (Fields.Is_Local) {
                 ConfigServer config = Shortcuts.GetConfigServer;
@@ -114,6 +117,58 @@ namespace ExperienceAndClasses {
                 }
 
             }
+
+            //in combat
+            if (PSheet.Character.In_Combat && (Shortcuts.Now.CompareTo(Fields.IN_COMBAT_time) > 0)) {
+                PSheet.Character.SetInCombat(false);
+            }
+        }
+
+        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Damage Taken ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+        public override void Hurt(bool pvp, bool quiet, double damage, int hitDirection, bool crit) {
+            base.Hurt(pvp, quiet, damage, hitDirection, crit);
+
+            TriggerInCombat();
+        }
+
+        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Damage Dealt ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+        public override void ModifyHitNPC(Item item, NPC target, ref int damage, ref float knockback, ref bool crit) {
+            ModifyDamageDealt(new Systems.Battle.DamageSource(item), ref damage);
+            base.ModifyHitNPC(item, target, ref damage, ref knockback, ref crit);
+        }
+
+        public override void ModifyHitPvp(Item item, Player target, ref int damage, ref bool crit) {
+            ModifyDamageDealt(new Systems.Battle.DamageSource(item), ref damage);
+            base.ModifyHitPvp(item, target, ref damage, ref crit);
+        }
+
+        public override void ModifyHitNPCWithProj(Projectile proj, NPC target, ref int damage, ref float knockback, ref bool crit, ref int hitDirection) {
+            ModifyDamageDealt(new Systems.Battle.DamageSource(proj), ref damage, true, player.Distance(target.position));
+            base.ModifyHitNPCWithProj(proj, target, ref damage, ref knockback, ref crit, ref hitDirection);
+        }
+
+        public override void ModifyHitPvpWithProj(Projectile proj, Player target, ref int damage, ref bool crit) {
+            ModifyDamageDealt(new Systems.Battle.DamageSource(proj), ref damage, true, player.Distance(target.position));
+            base.ModifyHitPvpWithProj(proj, target, ref damage, ref crit);
+        }
+
+        private void ModifyDamageDealt(Systems.Battle.DamageSource dsource, ref int damage, bool is_projectile = false, float distance = 0f) {
+            TriggerInCombat();
+            //TODO - modify damage
+        }
+
+        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Death ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+        public override void Kill(double damage, int hitDirection, bool pvp, PlayerDeathReason damageSource) {
+            base.Kill(damage, hitDirection, pvp, damageSource);
+
+            //ends in-combat
+            PSheet.Character.SetInCombat(false);
+
+            //death penalty
+            //TODO
         }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Save/Load ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
@@ -191,6 +246,13 @@ namespace ExperienceAndClasses {
                 PSheet.Character.SetAFK(false);
             }
             Fields.AFK_Time = Shortcuts.Now.AddSeconds(Shortcuts.GetConfigServer.AFKSeconds);
+        }
+
+        private void TriggerInCombat() {
+            if (!PSheet.Character.In_Combat) {
+                PSheet.Character.SetInCombat(true);
+            }
+            Fields.IN_COMBAT_time = Shortcuts.Now.AddSeconds(Systems.Battle.SECONDS_IN_COMBAT);
         }
 
     }
