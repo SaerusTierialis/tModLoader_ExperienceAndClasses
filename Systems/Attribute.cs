@@ -228,7 +228,7 @@ namespace ExperienceAndClasses.Systems {
         private static string BonusValueString(float value, string type, float per_point, bool percent = false) {
             string str = "\n";
 
-            if (value > 0) {
+            if (value >= 0) {
                 str += "+";
             }
 
