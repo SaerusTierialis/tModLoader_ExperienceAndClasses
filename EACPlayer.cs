@@ -147,7 +147,7 @@ namespace ExperienceAndClasses {
             bool hit = base.PreHurt(pvp, quiet, ref damage, ref hitDirection, ref crit, ref customDamage, ref playSound, ref genGore, ref damageSource);
 
             //dodge (local check)
-            if (hit && Fields.Is_Local && (Main.rand.NextFloat(0, 100) < PSheet.Stats.Dodge)) {
+            if (hit && Fields.Is_Local && (Main.rand.NextFloat(0f, 1f) < PSheet.Stats.Dodge)) {
                 player.ShadowDodge();
                 return false;
             }

@@ -71,32 +71,39 @@ namespace ExperienceAndClasses.Systems {
         }
 
         public static void LocalModifyDamageDealt(EACPlayer eacplayer, DamageSource dsource, ref int damage, ref bool crit, bool is_projectile = false, float distance = 0f) {
-            //apply all crit chance
-            if (eacplayer.Fields.Is_Local && !crit && (eacplayer.PSheet.Stats.Crit_All > 0)) {
-                //adjust chance to prevent diminishing returns
-                int adjust = 0;
+            if (eacplayer.Fields.Is_Local) {
+                //is a crit?
+                if (!crit && (eacplayer.PSheet.Stats.Crit_All > 0)) {
+                    //adjust chance to prevent diminishing returns
+                    float adjust = 0;
 
-                if (dsource.Melee)
-                    adjust += eacplayer.player.meleeCrit;
+                    if (dsource.Melee)
+                        adjust += eacplayer.player.meleeCrit / 100f;
 
-                if (dsource.Ranged)
-                    adjust += eacplayer.player.rangedCrit;
+                    if (dsource.Ranged)
+                        adjust += eacplayer.player.rangedCrit / 100f;
 
-                if (dsource.Throwing)
-                    adjust += eacplayer.player.thrownCrit;
+                    if (dsource.Throwing)
+                        adjust += eacplayer.player.thrownCrit / 100f;
 
-                if (dsource.Magic)
-                    adjust += eacplayer.player.magicCrit;
+                    if (dsource.Magic)
+                        adjust += eacplayer.player.magicCrit / 100f;
 
-                //roll crit
-                if (RollCrit(eacplayer, adjust)) {
-                    crit = true;
+                    //roll crit
+                    if (RollCrit(eacplayer, adjust)) {
+                        crit = true;
+                    }
+                }
+
+                //modifify crit damage
+                if (crit) {
+                    damage = (int)Math.Ceiling(damage * eacplayer.PSheet.Stats.Crit_Damage_Mult);
                 }
             }
         }
 
         public static bool RollCrit(EACPlayer eacplayer, float adjust = 0) {
-            return Main.rand.NextFloat(0, 100 - adjust) < eacplayer.PSheet.Stats.Crit_All;
+            return Main.rand.NextFloat(0f, 1f - adjust) < eacplayer.PSheet.Stats.Crit_All;
         }
 
     }

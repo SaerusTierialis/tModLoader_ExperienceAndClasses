@@ -225,20 +225,34 @@ namespace ExperienceAndClasses.Systems {
             }
         }
 
-        private static string BonusValueString(float value, string type, float per_point, bool percent = false) {
+        public static string BonusValueString(float value, string type, bool percent = false, float per_point = 0, string type_suffix = "", bool show_plus = true) {
             string str = "\n";
 
-            if (value >= 0) {
+            if (value >= 0 && show_plus) {
                 str += "+";
             }
 
-            str += value;
-
             if (percent) {
-                str += "%";
+                str += Math.Round(value * 100, 3) + "%";
+            }
+            else {
+                str += Math.Round(value, 3);
             }
 
-            str += " " + type + " (" + per_point + " per point)";
+            str += " " + Language.GetTextValue("Mods.ExperienceAndClasses.Common." + type) + type_suffix;
+
+            if (per_point > 0) {
+                str += " (";
+
+                if (percent) {
+                    str += Math.Round(per_point * 100, 3) + "%";
+                }
+                else {
+                    str += per_point;
+                }
+
+                str += " per point)";
+            }
 
             return str;
         }
@@ -277,24 +291,24 @@ namespace ExperienceAndClasses.Systems {
                 //life
                 bonus = RoundIntBonus(PER_POINT_LIFE * points);
                 if (do_effects) eacplayer.player.statLifeMax2 += bonus;
-                if (eacplayer.Fields.Is_Local) Effect_Text += BonusValueString(bonus, "maximum life", PER_POINT_LIFE);
+                if (eacplayer.Fields.Is_Local) Effect_Text += BonusValueString(bonus, "Stat_Defensive_Vanilla_Life", false, PER_POINT_LIFE);
 
                 //life regen
                 bonus = (int)Math.Max(0, PER_POINT_LIFE_REGEN * points);
                 if (do_effects) eacplayer.player.lifeRegen += bonus;
-                if (eacplayer.Fields.Is_Local) Effect_Text += BonusValueString(bonus, "life regeneration", PER_POINT_LIFE_REGEN);
+                if (eacplayer.Fields.Is_Local) Effect_Text += BonusValueString(bonus, "Stat_Defensive_Vanilla_LifeRegen", false, PER_POINT_LIFE_REGEN);
 
                 //defense
                 bonus = RoundIntBonus(PER_POINT_DEFENSE * points);
                 if (do_effects) eacplayer.player.statDefense += bonus;
-                if (eacplayer.Fields.Is_Local) Effect_Text += BonusValueString(bonus, "defense", PER_POINT_DEFENSE);
+                if (eacplayer.Fields.Is_Local) Effect_Text += BonusValueString(bonus, "Stat_Defensive_Vanilla_Defense", false, PER_POINT_DEFENSE);
             }
         }
 
         public class Mind : Attribute {
             private static float PER_POINT_MANA { get { return 0.5f * ATTRIBUTE_BONUS_MULTIPLIER; } }
             private static float PER_POINT_MANA_REGEN { get { return 0.5f * ATTRIBUTE_BONUS_MULTIPLIER; } }
-            private static float PER_POINT_MANA_DELAY { get { return 0.5f * ATTRIBUTE_BONUS_MULTIPLIER; } }
+            private static float PER_POINT_MANA_DELAY { get { return 0.005f * ATTRIBUTE_BONUS_MULTIPLIER; } }
 
             public Mind() : base(IDs.Mind) {}
             protected override void Effect(EACPlayer eacplayer, int points, bool do_effects = true) {
@@ -303,25 +317,22 @@ namespace ExperienceAndClasses.Systems {
                 //mana
                 bonus = RoundIntBonus(PER_POINT_MANA * points);
                 if (do_effects) eacplayer.player.statManaMax2 += bonus;
-                if (eacplayer.Fields.Is_Local) Effect_Text += BonusValueString(bonus, "maximum mana", PER_POINT_MANA);
+                if (eacplayer.Fields.Is_Local) Effect_Text += BonusValueString(bonus, "Stat_Mana_Vanilla_Mana", false, PER_POINT_MANA);
 
                 //mana regen
                 bonus = (int)Math.Max(0, PER_POINT_MANA_REGEN * points);
                 if (do_effects) eacplayer.player.manaRegenBonus += bonus;
-                if (eacplayer.Fields.Is_Local) Effect_Text += BonusValueString(bonus, "mana regeneration", PER_POINT_MANA_REGEN);
+                if (eacplayer.Fields.Is_Local) Effect_Text += BonusValueString(bonus, "Stat_Mana_Vanilla_ManaRegen", false, PER_POINT_MANA_REGEN);
 
                 //mana delay
-                bonus = RoundIntBonus(PER_POINT_MANA_DELAY * points);
-                if (eacplayer.player.manaRegenDelay > 50) {
-                    int new_delay = (int)Math.Max(Math.Round(eacplayer.player.manaRegenDelay * (100f / (100f + bonus))), 50);
-                    if (do_effects) eacplayer.player.manaRegenDelayBonus += eacplayer.player.manaRegenDelay - new_delay;
-                }
-                if (eacplayer.Fields.Is_Local) Effect_Text += BonusValueString(bonus, "reduced mana delay", PER_POINT_MANA_DELAY, true);
+                float bonus_float = PER_POINT_MANA_DELAY * points;
+                if (do_effects) eacplayer.PSheet.Stats.Mana_Regen_Delay_Reduction += bonus_float;
+                if (eacplayer.Fields.Is_Local) Effect_Text += BonusValueString(bonus_float, "Stat_Mana_ManaRegenDelay", true, PER_POINT_MANA_DELAY);
             }
         }
 
         public class Spirit : Attribute {
-            private static float PER_POINT_CRIT { get { return 0.15f * ATTRIBUTE_BONUS_MULTIPLIER; } }
+            private static float PER_POINT_CRIT { get { return 0.0015f * ATTRIBUTE_BONUS_MULTIPLIER; } }
             private static float PER_POINT_MINION_CAP { get { return 0.04f * ATTRIBUTE_BONUS_MULTIPLIER; } }
             private static float PER_POINT_HOLY_HEAL { get { return 0.01f * ATTRIBUTE_BONUS_MULTIPLIER; } }
             
@@ -333,24 +344,24 @@ namespace ExperienceAndClasses.Systems {
                 //crit
                 bonus_float = PER_POINT_CRIT * points;
                 if (do_effects) eacplayer.PSheet.Stats.Crit_All += bonus_float;
-                if (eacplayer.Fields.Is_Local) Effect_Text += BonusValueString((float)Math.Round(bonus_float, 3), "all critical chance", (float)Math.Round(PER_POINT_CRIT, 3), true);
+                if (eacplayer.Fields.Is_Local) Effect_Text += BonusValueString(bonus_float, "Stat_Crit_All", true, PER_POINT_CRIT);
 
                 //minion cap
                 bonus = RoundIntBonus(PER_POINT_MINION_CAP * points);
                 if (do_effects) eacplayer.player.maxMinions += bonus;
-                if (eacplayer.Fields.Is_Local) Effect_Text += BonusValueString(bonus, "maximum minions", PER_POINT_MINION_CAP);
+                if (eacplayer.Fields.Is_Local) Effect_Text += BonusValueString(bonus, "Stat_Misc_Vanilla_MinionCap", false, PER_POINT_MINION_CAP);
 
                 //healing
                 bonus_float = PER_POINT_HOLY_HEAL * points;
                 if (do_effects) eacplayer.PSheet.Stats.Healing_Mult += bonus_float;
-                if (eacplayer.Fields.Is_Local) Effect_Text += BonusValueString((float)Math.Round(bonus_float * 100, 3), "ability healing", (float)Math.Round(PER_POINT_HOLY_HEAL * 100, 3), true);
+                if (eacplayer.Fields.Is_Local) Effect_Text += BonusValueString(bonus_float, "Stat_Abilities_Healing", true, PER_POINT_HOLY_HEAL);
             }
         }
 
         public class Agility : Attribute {
             private static float PER_POINT_MOVEMENT { get { return 0.005f * ATTRIBUTE_BONUS_MULTIPLIER; } }
             private static float PER_POINT_JUMP { get { return 0.01f * ATTRIBUTE_BONUS_MULTIPLIER; } }
-            private static float PER_POINT_DODGE { get { return 0.25f * ATTRIBUTE_BONUS_MULTIPLIER; } }
+            private static float PER_POINT_DODGE { get { return 0.0025f * ATTRIBUTE_BONUS_MULTIPLIER; } }
             private static float PER_POINT_FLY { get { return 0.5f * ATTRIBUTE_BONUS_MULTIPLIER; } }
 
             public Agility() : base(IDs.Agility) {}
@@ -362,23 +373,22 @@ namespace ExperienceAndClasses.Systems {
                 bonus_float = PER_POINT_MOVEMENT * points;
                 if (do_effects) eacplayer.player.maxRunSpeed *= (1f + bonus_float);
                 if (do_effects) eacplayer.player.runAcceleration *= (1f + bonus_float);
-                if (do_effects) eacplayer.player.runSlowdown *= (1f / (1f + bonus_float));
-                if (eacplayer.Fields.Is_Local) Effect_Text += BonusValueString((float)Math.Round(bonus_float * 100, 3), "movement speed", (float)Math.Round(PER_POINT_MOVEMENT * 100, 3), true);
+                if (eacplayer.Fields.Is_Local) Effect_Text += BonusValueString(bonus_float, "Stat_Mobility_Movement", true, PER_POINT_MOVEMENT);
 
                 //jump
                 bonus_float = PER_POINT_JUMP * points;
                 if (do_effects) eacplayer.player.jumpSpeedBoost += (bonus_float * 5);
-                if (eacplayer.Fields.Is_Local) Effect_Text += BonusValueString((float)Math.Round(bonus_float * 100, 3), "increased jump", (float)Math.Round(PER_POINT_JUMP * 100, 3), true);
+                if (eacplayer.Fields.Is_Local) Effect_Text += BonusValueString(bonus_float, "Stat_Mobility_Vanilla_Jump", true, PER_POINT_JUMP);
                 
                 //dodge
                 bonus_float = PER_POINT_DODGE * points;
                 if (do_effects) eacplayer.PSheet.Stats.Dodge += bonus_float;
-                if (eacplayer.Fields.Is_Local) Effect_Text += BonusValueString((float)Math.Round(bonus_float * 100, 3), "dodge chance", (float)Math.Round(PER_POINT_DODGE * 100, 3), true);
+                if (eacplayer.Fields.Is_Local) Effect_Text += BonusValueString(bonus_float, "Stat_Defensive_Dodge", true, PER_POINT_DODGE);
                 
                 //max fly time
                 bonus_int = RoundIntBonus(PER_POINT_FLY * points);
                 if (do_effects) eacplayer.player.wingTimeMax += bonus_int;
-                if (eacplayer.Fields.Is_Local) Effect_Text += BonusValueString(bonus_int, "wing time", PER_POINT_FLY);
+                if (eacplayer.Fields.Is_Local) Effect_Text += BonusValueString(bonus_int, "Stat_Mobility_Vanilla_WingTime", false, PER_POINT_FLY);
             }
         }
 
@@ -393,19 +403,19 @@ namespace ExperienceAndClasses.Systems {
                 //ability after use delay
                 bonus = PER_POINT_ABILITY_DELAY * points;
                 if (do_effects) eacplayer.PSheet.Stats.Ability_Delay_Reduction += bonus;
-                if (eacplayer.Fields.Is_Local) Effect_Text += BonusValueString((float)Math.Round(bonus * 100, 3), "reduced ability delay", (float)Math.Round(PER_POINT_ABILITY_DELAY * 100, 3), true);
+                if (eacplayer.Fields.Is_Local) Effect_Text += BonusValueString(bonus, "Stat_Abilities_Cooldown", true, PER_POINT_ABILITY_DELAY);
 
                 //weapon use time
                 bonus = PER_POINT_USE_SPEED * points;
                 if (do_effects) eacplayer.PSheet.Stats.Item_Speed_Weapon += bonus;
-                if (eacplayer.Fields.Is_Local) Effect_Text += BonusValueString((float)Math.Round(bonus * 100, 3), "weapon use speed", (float)Math.Round(PER_POINT_USE_SPEED * 100, 3), true);
+                if (eacplayer.Fields.Is_Local) Effect_Text += BonusValueString(bonus, "Stat_ItemSpeed_Weapon", true, PER_POINT_USE_SPEED);
 
                 //tool use time (if non-combat)
                 float fish_per = Math.Max(eacplayer.PSheet.Classes.Primary.Class.Fish_Power_Scaling, eacplayer.PSheet.Classes.Secondary.Class.Fish_Power_Scaling / 2);
                 float bonus_per_point = fish_per * PER_POINT_USE_SPEED;
                 bonus = bonus_per_point * points;
                 if (do_effects) eacplayer.PSheet.Stats.Item_Speed_Tool += bonus;
-                if (eacplayer.Fields.Is_Local) Effect_Text += BonusValueString((float)Math.Round(bonus * 100, 3), "tool use speed (Explorer)", (float)Math.Round(bonus_per_point * 100, 3), true);
+                if (eacplayer.Fields.Is_Local) Effect_Text += BonusValueString(bonus, "Stat_ItemSpeed_Tool", true, bonus_per_point, " (" + PlayerClass.LOOKUP[(byte)PlayerClass.IDs.Explorer].Name + ")" );
             }
         }
     }

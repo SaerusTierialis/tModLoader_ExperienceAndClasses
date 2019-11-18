@@ -206,7 +206,7 @@ Common.Stat_Damage_Vanilla_Magic=Magic Damage
 Common.Stat_Damage_Vanilla_Minion=Minion Damage
 Common.Stat_Damage_Light=Light Damage
 Common.Stat_Damage_Harmonic=Harmonic Damage
-Common.Stat_Damage_Other=Other Damage
+Common.Stat_Damage_Other=Any Other Damage
 
 Common.Stat_Crit_Header=Critical Hits
 Common.Stat_Crit_All=All Critical Chance
@@ -214,8 +214,9 @@ Common.Stat_Crit_Vanilla_Melee=Melee Critical Chance
 Common.Stat_Crit_Vanilla_Ranged=Ranged Critical Chance
 Common.Stat_Crit_Vanilla_Throwing=Throwing Critical Chance
 Common.Stat_Crit_Vanilla_Magic=Magic Critical Chance
+Common.Stat_Crit_Mult=Critical Damage Multiplier
 
-Common.Stat_Defensive_Header=Defensive
+Common.Stat_Defensive_Header=Survival
 Common.Stat_Defensive_Vanilla_Life=Maximum Life
 Common.Stat_Defensive_Vanilla_LifeRegen=Life Regeneration
 Common.Stat_Defensive_Vanilla_Defense=Defense
@@ -224,20 +225,22 @@ Common.Stat_Defensive_Dodge=Dodge Chance
 Common.Stat_Mana_Header=Mana
 Common.Stat_Mana_Vanilla_Mana=Maximum Mana
 Common.Stat_Mana_Vanilla_ManaRegen=Mana Regeneration
-Common.Stat_Mana_ManaRegenDelay=Mana Regeneration Delay Reduction
+Common.Stat_Mana_ManaRegenDelay=Mana Delay Reduction
 
 Common.Stat_Mobility_Header=Mobility
-Common.Stat_Mobility_Vanilla_Movement=Run Speed
-Common.Stat_Mobility_Vanilla_Jump=Jump Power
-Common.Stat_Mobility_Vanilla_FlyTime=Flight Time
+Common.Stat_Mobility_Movement=Run Speed
+Common.Stat_Mobility_Vanilla_MaxRun=Max Run Speed
+Common.Stat_Mobility_Vanilla_RunAccel=Run Acceleration
+Common.Stat_Mobility_Vanilla_Jump=Jump Speed Boost
+Common.Stat_Mobility_Vanilla_WingTime=Wing Time
 
 Common.Stat_ItemSpeed_Header=Item Speed
-Common.Stat_ItemSpeed_All=All Attack Speed
+Common.Stat_ItemSpeed_Weapon=All Weapon Attack Speed
 Common.Stat_ItemSpeed_Vanilla_Melee=Melee Attack Speed
-Common.Stat_ItemSpeed_Tool=Tool Speed
+Common.Stat_ItemSpeed_Tool=All Tool Speed
 
 Common.Stat_Abilities_Header=Abilities
-Common.Stat_Abilities_Healing=Ability Cooldown Reduction
+Common.Stat_Abilities_Cooldown=Ability Cooldown Reduction
 Common.Stat_Abilities_Healing=Ability Healing
 
 Common.Stat_Misc_Header=Miscellaneous

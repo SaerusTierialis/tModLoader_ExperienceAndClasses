@@ -1,4 +1,6 @@
-﻿namespace ExperienceAndClasses.Systems.PlayerSheet {
+﻿using System;
+
+namespace ExperienceAndClasses.Systems.PlayerSheet {
     public class StatsSheet : ContainerTemplate {
         public StatsSheet(PSheet psheet) : base(psheet) {
             Reset();
@@ -8,6 +10,8 @@
         public bool Channelling; //TODO - unused
 
         public float Healing_Mult; //TODO - unused
+
+        public float Mana_Regen_Delay_Reduction;
 
         /// <summary>
         /// 0 to 100
@@ -19,14 +23,20 @@
         public float Item_Speed_Weapon; //TODO - unused
         public float Item_Speed_Tool; //TODO - unused
 
+        //1 = 100%
         public float Damage_Light; //TODO - unused
         public float Damage_Harmonic; //TODO - unused
-        public float Damage_Other; //TODO - unused
+        public float Damage_Other_Add; //TODO - unused
 
         /// <summary>
-        /// 0 to 100
+        /// 0 to 1
         /// </summary>
         public float Crit_All;
+
+        /// <summary>
+        /// 1 = 100%
+        /// </summary>
+        public float Crit_Damage_Mult;
 
         public class DamageModifier {
             public float Increase, FinalMultAdd;
@@ -36,19 +46,31 @@
             Can_Use_Abilities = true;
             Channelling = false;
 
+            Mana_Regen_Delay_Reduction = 0f;
+
             Healing_Mult = 1f;
             Dodge = 0f;
-            Ability_Delay_Reduction = 1f;
+            Ability_Delay_Reduction = 0f;
 
-            Damage_Light = Damage_Harmonic = Damage_Other = 0f;
+            Damage_Light = Damage_Harmonic = 1f;
+            Damage_Other_Add = 0f;
 
             Crit_All = 0f;
+            Crit_Damage_Mult = 1f;
 
             Item_Speed_Weapon = Item_Speed_Tool = 0f;
         }
 
         public void Limit() {
-            Dodge = (float)Utilities.Commons.Clamp(Dodge, 0, 1);
+            Dodge = (float)Utilities.Commons.Clamp(Dodge, 0f, 1f);
+            Crit_All = (float)Utilities.Commons.Clamp(Crit_All, 0f, 1f);
+        }
+
+        public void Apply() {
+            if (PSHEET.eacplayer.player.manaRegenDelay > 50) {
+                int new_delay = (int)Math.Max(Math.Round(PSHEET.eacplayer.player.manaRegenDelay * (1f / (1f + Mana_Regen_Delay_Reduction))), 50);
+                PSHEET.eacplayer.player.manaRegenDelayBonus += PSHEET.eacplayer.player.manaRegenDelay - new_delay;
+            }
         }
     }
 }
