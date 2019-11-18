@@ -31,9 +31,9 @@ BuffDescription.XP_Buff=Increase experience gain by 50%
 
 //Items
 ItemName.Orb_Monster=Ascension Orb
-ItemTooltip.Orb_Monster=A crystalline sphere that glows with the promise of power.\n\nUsed to unlock classes, reset attributes, or TODO
+ItemTooltip.Orb_Monster=A crystalline sphere that glows with the promise of power.\n\nUsed to unlock classes, reset attributes, or craft experience potions.
 ItemName.Orb_Boss=Transcendence Orb
-ItemTooltip.Orb_Boss=A crystalline sphere that shines with the promise of power.\n\nUsed to unlock clases, unlock subclass, or TODO
+ItemTooltip.Orb_Boss=A crystalline sphere that shines with the promise of power.\n\nUsed to unlock clases, unlock subclass, or craft experience potions.\nCan also be converted into {$Mods.ExperienceAndClasses.ItemName.Orb_Monster}.
 ItemName.Unlock_Tier2=Tier II Class Token
 ItemTooltip.Unlock_Tier2=A token that is used to unlock any standard Tier II class.\nClick on a class icon to open the unlock dialogue.
 ItemName.Unlock_Tier3=Tier III Class Token
@@ -196,28 +196,44 @@ Common.Attribute_Dexterity_Description=TODO
 //Misc
 Common.Death_Penalty_XP=You have lost experience from death.
 
+//Stat Terms
+Common.Term_Damage=Damage;
+Common.Term_CritChance=Critical Chance;
+
+//Damage Types
+Common.Damage_Type_Melee=Melee
+Common.Damage_Type_Ranged=Ranged
+Common.Damage_Type_Throwing=Throwing
+Common.Damage_Type_Magic=Magic
+Common.Damage_Type_Minion=Minion
+Common.Damage_Type_All=All
+Common.Damage_Type_Light=Light
+Common.Damage_Type_Harmonic=Harmonic
+Common.Damage_Type_Other=Other
+Common.Damage_Type_RangedThrowing={$Mods.ExperienceAndClasses.Common.Damage_Type_Ranged}/{$Mods.ExperienceAndClasses.Common.Damage_Type_Throwing}
+
 //Stats
 Common.Stat_Damage_Header=Damage
-Common.Stat_Damage_Vanilla_All=All Damage
-Common.Stat_Damage_Vanilla_Melee=Melee Damage
-Common.Stat_Damage_Vanilla_Ranged=Ranged Damage
-Common.Stat_Damage_Vanilla_Throwing=Throwing Damage
-Common.Stat_Damage_Vanilla_Magic=Magic Damage
-Common.Stat_Damage_Vanilla_Minion=Minion Damage
-Common.Stat_Damage_Light=Light Damage
-Common.Stat_Damage_Harmonic=Harmonic Damage
-Common.Stat_Damage_Other=Other Damage
+Common.Stat_Damage_Vanilla_All={$Mods.ExperienceAndClasses.Common.Damage_Type_All} {$Mods.ExperienceAndClasses.Common.Term_Damage}
+Common.Stat_Damage_Vanilla_Melee={$Mods.ExperienceAndClasses.Common.Damage_Type_Melee} {$Mods.ExperienceAndClasses.Common.Term_Damage}
+Common.Stat_Damage_Vanilla_Ranged={$Mods.ExperienceAndClasses.Common.Damage_Type_Ranged} {$Mods.ExperienceAndClasses.Common.Term_Damage}
+Common.Stat_Damage_Vanilla_Throwing={$Mods.ExperienceAndClasses.Common.Damage_Type_Throwing} {$Mods.ExperienceAndClasses.Common.Term_Damage}
+Common.Stat_Damage_Vanilla_Magic={$Mods.ExperienceAndClasses.Common.Damage_Type_Magic} {$Mods.ExperienceAndClasses.Common.Term_Damage}
+Common.Stat_Damage_Vanilla_Minion={$Mods.ExperienceAndClasses.Common.Damage_Type_Minion} {$Mods.ExperienceAndClasses.Common.Term_Damage}
+Common.Stat_Damage_Light={$Mods.ExperienceAndClasses.Common.Damage_Type_Light} {$Mods.ExperienceAndClasses.Common.Term_Damage}
+Common.Stat_Damage_Harmonic={$Mods.ExperienceAndClasses.Common.Damage_Type_Harmonic} {$Mods.ExperienceAndClasses.Common.Term_Damage}
+Common.Stat_Damage_Other={$Mods.ExperienceAndClasses.Common.Damage_Type_Other} {$Mods.ExperienceAndClasses.Common.Term_Damage}
 
 Common.Stat_Crit_Header=Critical Hits
-Common.Stat_Crit_All=All Critical Chance
-Common.Stat_Crit_Vanilla_Melee=Melee Critical Chance
-Common.Stat_Crit_Vanilla_Ranged=Ranged Critical Chance
-Common.Stat_Crit_Vanilla_Throwing=Throwing Critical Chance
-Common.Stat_Crit_Vanilla_Magic=Magic Critical Chance
-Common.Stat_Crit_Minion=Minion Critical Chance
-Common.Stat_Crit_Light=Light Critical Chance
-Common.Stat_Crit_Harmonic=Harmonic Critical Chance
-Common.Stat_Crit_Other=Other Critical Chance
+Common.Stat_Crit_All={$Mods.ExperienceAndClasses.Common.Damage_Type_All} {$Mods.ExperienceAndClasses.Common.Term_CritChance}
+Common.Stat_Crit_Vanilla_Melee={$Mods.ExperienceAndClasses.Common.Damage_Type_Melee} {$Mods.ExperienceAndClasses.Common.Term_CritChance}
+Common.Stat_Crit_Vanilla_Ranged={$Mods.ExperienceAndClasses.Common.Damage_Type_Ranged} {$Mods.ExperienceAndClasses.Common.Term_CritChance}
+Common.Stat_Crit_Vanilla_Throwing={$Mods.ExperienceAndClasses.Common.Damage_Type_Throwing} {$Mods.ExperienceAndClasses.Common.Term_CritChance}
+Common.Stat_Crit_Vanilla_Magic={$Mods.ExperienceAndClasses.Common.Damage_Type_Magic} {$Mods.ExperienceAndClasses.Common.Term_CritChance}
+Common.Stat_Crit_Minion={$Mods.ExperienceAndClasses.Common.Damage_Type_Minion} {$Mods.ExperienceAndClasses.Common.Term_CritChance}
+Common.Stat_Crit_Light={$Mods.ExperienceAndClasses.Common.Damage_Type_Light} {$Mods.ExperienceAndClasses.Common.Term_CritChance}
+Common.Stat_Crit_Harmonic={$Mods.ExperienceAndClasses.Common.Damage_Type_Harmonic} {$Mods.ExperienceAndClasses.Common.Term_CritChance}
+Common.Stat_Crit_Other={$Mods.ExperienceAndClasses.Common.Damage_Type_Other} {$Mods.ExperienceAndClasses.Common.Term_CritChance}
 Common.Stat_Crit_Mult=Critical Damage Multiplier
 
 Common.Stat_Defensive_Header=Survival
@@ -251,4 +267,4 @@ Common.Stat_Misc_Header=Miscellaneous
 Common.Stat_Misc_Vanilla_FishingPower=Fishing Power
 Common.Stat_Misc_Vanilla_MinionCap=Maximum Minions
 
-Common.Stat_Sheet_Disclaimer=Global bonuses have been added to displayed values\n"Other" refers to custom damage types added by other mods
+Common.Stat_Sheet_Disclaimer=Global bonuses have been added to displayed values\n"{$Mods.ExperienceAndClasses.Common.Damage_Type_Other}" refers to custom damage types added by other mods
