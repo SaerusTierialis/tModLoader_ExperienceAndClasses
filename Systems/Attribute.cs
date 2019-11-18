@@ -34,8 +34,8 @@ namespace ExperienceAndClasses.Systems {
 
         //attribute bonus from active class
         public const float LEVELS_PER_ATTRIBUTE_POINT_PER_STAR = 10f;
-        public const float SUBCLASS_PENALTY_ATTRIBUTE_MULTIPLIER_PRIMARY = 0.7f;
-        public const float SUBCLASS_PENALTY_ATTRIBUTE_MULTIPLIER_SECONDARY = 0.3f;
+        public const float SUBCLASS_PENALTY_ATTRIBUTE_MULTIPLIER_PRIMARY = 0.8f;
+        public const float SUBCLASS_PENALTY_ATTRIBUTE_MULTIPLIER_SECONDARY = 0.6f;
 
         //allocation points
         public const double ALLOCATION_POINTS_PER_INCREASED_COST = 5d;
