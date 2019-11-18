@@ -35,7 +35,7 @@ namespace ExperienceAndClasses {
 
         //UI
         public static bool UI_Initialized { get; private set; } = false;
-        private static UI.UIStateCombo[] UIs = new UI.UIStateCombo[] { UI.UIHUD.Instance, UI.UIMain.Instance, UI.UIPopup.Instance, UI.UIOverlay.Instance, UI.UIHelp.Instance };
+        private static UI.UIStateCombo[] UIs = new UI.UIStateCombo[] { UI.UIOverlay.Instance, UI.UIHUD.Instance, UI.UIMain.Instance, UI.UIPopup.Instance, UI.UIHelp.Instance };
         public static bool Inventory_Open { get; private set; } = false;
 
         //Recipe
