@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace ExperienceAndClasses.Systems.PlayerSheet {
+﻿namespace ExperienceAndClasses.Systems.PlayerSheet {
     public class StatsSheet : ContainerTemplate {
         public StatsSheet(PSheet psheet) : base(psheet) {
             Reset();
@@ -16,32 +10,27 @@ namespace ExperienceAndClasses.Systems.PlayerSheet {
         public float Healing_Mult; //TODO - unused
 
         /// <summary>
-        /// 0 (0%) to 1 (100%)
+        /// 0 to 100
         /// </summary>
         public float Dodge;
 
         public float Ability_Delay_Reduction; //TODO - unused
 
-        public float SpeedAdjust_Melee; //TODO - unused
-        public float SpeedAdjust_Ranged; //TODO - unused
-        public float SpeedAdjust_Magic; //TODO - unused
-        public float SpeedAdjust_Throwing; //TODO - unused
-        public float SpeedAdjust_Minion; //TODO - unused
-        public float SpeedAdjust_Weapon; //TODO - unused
-        public float SpeedAdjust_Tool; //TODO - unused
+        public float Item_Speed_Weapon; //TODO - unused
+        public float Item_Speed_Tool; //TODO - unused
 
-        /*
-        public DamageModifier Holy = new DamageModifier(); //TODO - unused (may stack with other types)
-        public DamageModifier Musical = new DamageModifier(); //TODO - unused (may stack with other types)
-        */
+        public float Damage_Light; //TODO - unused
+        public float Damage_Harmonic; //TODO - unused
+        public float Damage_Other; //TODO - unused
+
+        /// <summary>
+        /// 0 to 100
+        /// </summary>
+        public float Crit_All;
 
         public class DamageModifier {
             public float Increase, FinalMultAdd;
         }
-
-        public DamageModifier AllNearby = new DamageModifier(); //TODO - unused
-        public DamageModifier NonMinionProjectile = new DamageModifier(); //TODO - unused
-        public DamageModifier NonMinionAll = new DamageModifier(); //TODO - unused
 
         public void Reset() {
             Can_Use_Abilities = true;
@@ -51,12 +40,11 @@ namespace ExperienceAndClasses.Systems.PlayerSheet {
             Dodge = 0f;
             Ability_Delay_Reduction = 1f;
 
-            SpeedAdjust_Melee = SpeedAdjust_Ranged = SpeedAdjust_Magic = SpeedAdjust_Throwing = SpeedAdjust_Minion = SpeedAdjust_Weapon = SpeedAdjust_Tool = 0f;
+            Damage_Light = Damage_Harmonic = Damage_Other = 0f;
 
-            //Holy.Increase = Musical.Increase = 
-            AllNearby.Increase = NonMinionProjectile.Increase = NonMinionAll.Increase = 0f;
-            //Holy.FinalMultAdd = Musical.FinalMultAdd = 
-            AllNearby.FinalMultAdd = NonMinionProjectile.FinalMultAdd = NonMinionAll.FinalMultAdd = 0f;
+            Crit_All = 0f;
+
+            Item_Speed_Weapon = Item_Speed_Tool = 0f;
         }
 
         public void Limit() {

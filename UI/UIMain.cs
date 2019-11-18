@@ -46,7 +46,7 @@ namespace ExperienceAndClasses.UI {
         private const byte INDICATOR_ALPHA = 50;
 
         private const float FONT_SCALE_TITLE = 1.5f;
-        private const float FONT_SCALE_HELP = 1.2f;
+        private const float FONT_SCALE_HELP = 1f;
         private const float FONT_SCALE_ATTRIBUTE = 1f;
         private const float FONT_SCALE_ABILITY = 0.9f;
         private const float FONT_SCALE_LEVEL = 0.9f;
@@ -322,16 +322,23 @@ namespace ExperienceAndClasses.UI {
             panel_help.BorderColor = Color.Transparent;
             panel.Append(panel_help);
 
-            //help button
+            //top right buttons
+            TextButton stats = new TextButton("Stats", FONT_SCALE_HELP, FONT_SCALE_HELP + 0.1f);
+            stats.OnMouseOver += new UIElement.MouseEvent(MouseOverStats);
+            stats.OnMouseOut += new UIElement.MouseEvent(MouseOutStats);
+            stats.HAlign = 0.1f;
+            stats.Top.Set(Constants.UI_PADDING, 0f);
+            panel_help.Append(stats);
+
             TextButton help = new TextButton("Help", FONT_SCALE_HELP, FONT_SCALE_HELP + 0.1f);
             help.OnClick += new UIElement.MouseEvent(ClickHelp);
-            help.HAlign = 0.2f;
+            help.HAlign = 0.5f;
             help.Top.Set(Constants.UI_PADDING, 0f);
             panel_help.Append(help);
 
             TextButton close = new TextButton("Close", FONT_SCALE_HELP, FONT_SCALE_HELP + 0.1f);
             close.OnClick += new UIElement.MouseEvent(ClickClose);
-            close.HAlign = 0.8f;
+            close.HAlign = 0.9f;
             close.Top.Set(Constants.UI_PADDING, 0f);
             panel_help.Append(close);
 
@@ -525,6 +532,14 @@ namespace ExperienceAndClasses.UI {
 
         private void ClickClose(UIMouseEvent evt, UIElement listeningElement) {
             Visibility = false;
+        }
+
+        private void MouseOverStats(UIMouseEvent evt, UIElement listeningElement) {
+            UIPopup.Instance.ShowStats(listeningElement);
+        }
+
+        private void MouseOutStats(UIMouseEvent evt, UIElement listeningElement) {
+            UIPopup.Instance.EndText(listeningElement);
         }
 
         private void ClickPreRevampXP(UIMouseEvent evt, UIElement listeningElement) {

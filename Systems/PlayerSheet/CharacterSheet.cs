@@ -71,6 +71,14 @@ namespace ExperienceAndClasses.Systems.PlayerSheet {
         }
 
         public void SetInCombat(bool combat_state) {
+            if (PSHEET.eacplayer.Fields.Is_Local) {
+                //sync change
+                if (Shortcuts.IS_CLIENT && (combat_state != In_Combat)) {
+                    Utilities.PacketHandler.InCombat.Send(-1, Shortcuts.WHO_AM_I, combat_state);
+                }
+            }
+
+            //set
             In_Combat = combat_state;
         }
 

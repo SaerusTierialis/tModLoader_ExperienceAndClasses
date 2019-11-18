@@ -23,6 +23,7 @@ namespace ExperienceAndClasses.Utilities {
             Attributes,
             Class,
             AFK,
+            InCombat,
 
 
             NUMBER_OF_TYPES, //must be last
@@ -258,6 +259,7 @@ namespace ExperienceAndClasses.Utilities {
                 Attributes.WritePacketBody(packet, eacplayer.PSheet.Attributes.Allocated_Effective);
                 Class.WritePacketBody(packet, eacplayer.PSheet.Classes.Primary.ID, eacplayer.PSheet.Classes.Primary.Level, eacplayer.PSheet.Classes.Secondary.ID, eacplayer.PSheet.Classes.Secondary.Level);
                 AFK.WritePacketBody(packet, eacplayer.PSheet.Character.AFK);
+                InCombat.WritePacketBody(packet, eacplayer.PSheet.Character.AFK);
                 //TODO - other sync data
 
                 //send
@@ -270,6 +272,7 @@ namespace ExperienceAndClasses.Utilities {
                 LOOKUP[(byte)PACKET_TYPE.Attributes].Recieve(reader, origin);
                 LOOKUP[(byte)PACKET_TYPE.Class].Recieve(reader, origin);
                 LOOKUP[(byte)PACKET_TYPE.AFK].Recieve(reader, origin);
+                LOOKUP[(byte)PACKET_TYPE.InCombat].Recieve(reader, origin);
                 //TODO - other sync data
 
                 //is init
@@ -363,7 +366,7 @@ namespace ExperienceAndClasses.Utilities {
         }
 
         /// <summary>
-        /// Client tells server its local password
+        /// Client tells server if they are afk
         /// </summary>
         public sealed class AFK : Handler {
             public AFK() : base(PACKET_TYPE.AFK) { }
@@ -384,6 +387,35 @@ namespace ExperienceAndClasses.Utilities {
             protected override void RecieveBody(BinaryReader reader, int origin, EACPlayer origin_eacplayer) {
                 //read and set
                 origin_eacplayer.PSheet.Character.SetAFK(reader.ReadBoolean());
+            }
+
+            public static void WritePacketBody(ModPacket packet, bool status) {
+                packet.Write(status);
+            }
+        }
+
+        /// <summary>
+        /// Client tells server if they are in combat
+        /// </summary>
+        public sealed class InCombat : Handler {
+            public InCombat() : base(PACKET_TYPE.InCombat) { }
+
+            public static void Send(int target, int origin, bool status) {
+                if (Shortcuts.IS_CLIENT) {
+                    //get packet containing header
+                    ModPacket packet = LOOKUP[(byte)PACKET_TYPE.InCombat].GetPacket(origin);
+
+                    //specific content
+                    WritePacketBody(packet, status);
+
+                    //send
+                    packet.Send(target, origin);
+                }
+            }
+
+            protected override void RecieveBody(BinaryReader reader, int origin, EACPlayer origin_eacplayer) {
+                //read and set
+                origin_eacplayer.PSheet.Character.SetInCombat(reader.ReadBoolean());
             }
 
             public static void WritePacketBody(ModPacket packet, bool status) {

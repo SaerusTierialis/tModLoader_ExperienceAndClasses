@@ -26,6 +26,7 @@ namespace ExperienceAndClasses {
         public static bool IS_CLIENT { get; private set; }
         public static bool IS_SINGLEPLAYER { get; private set; }
         public static bool IS_PLAYER { get; private set; }
+        public static bool IS_EFFECTIVELY_SERVER { get; private set; }
         public static int WHO_AM_I { get; private set; }
 
         //ModPlayer
@@ -104,6 +105,7 @@ namespace ExperienceAndClasses {
             IS_SINGLEPLAYER = (Main.netMode == NetmodeID.SinglePlayer);
 
             IS_PLAYER = IS_CLIENT || IS_SINGLEPLAYER;
+            IS_EFFECTIVELY_SERVER = IS_SERVER || IS_SINGLEPLAYER;
         }
 
         public static void LocalPlayerClear() {

@@ -120,12 +120,13 @@ namespace ExperienceAndClasses {
                     }
                 }
 
-            }
+                //in combat
+                if (PSheet.Character.In_Combat && (Shortcuts.Now.CompareTo(Fields.IN_COMBAT_time) > 0)) {
+                    PSheet.Character.SetInCombat(false);
+                }
 
-            //in combat
-            if (PSheet.Character.In_Combat && (Shortcuts.Now.CompareTo(Fields.IN_COMBAT_time) > 0)) {
-                PSheet.Character.SetInCombat(false);
             }
+            
         }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Damage Taken ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
@@ -146,7 +147,7 @@ namespace ExperienceAndClasses {
             bool hit = base.PreHurt(pvp, quiet, ref damage, ref hitDirection, ref crit, ref customDamage, ref playSound, ref genGore, ref damageSource);
 
             //dodge (local check)
-            if (hit && Fields.Is_Local && (Main.rand.NextFloat(0, 1) < PSheet.Stats.Dodge)) {
+            if (hit && Fields.Is_Local && (Main.rand.NextFloat(0, 100) < PSheet.Stats.Dodge)) {
                 player.ShadowDodge();
                 return false;
             }
@@ -154,31 +155,31 @@ namespace ExperienceAndClasses {
             return hit;
         }
 
-        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Damage Dealt ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Damage Dealt (local) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         public override void ModifyHitNPC(Item item, NPC target, ref int damage, ref float knockback, ref bool crit) {
-            ModifyDamageDealt(new Systems.Battle.DamageSource(item), ref damage);
+            Systems.Combat.LocalModifyDamageDealt(this, new Systems.Combat.DamageSource(item), ref damage, ref crit);
             base.ModifyHitNPC(item, target, ref damage, ref knockback, ref crit);
         }
 
         public override void ModifyHitPvp(Item item, Player target, ref int damage, ref bool crit) {
-            ModifyDamageDealt(new Systems.Battle.DamageSource(item), ref damage);
+            Systems.Combat.LocalModifyDamageDealt(this, new Systems.Combat.DamageSource(item), ref damage, ref crit);
             base.ModifyHitPvp(item, target, ref damage, ref crit);
         }
 
         public override void ModifyHitNPCWithProj(Projectile proj, NPC target, ref int damage, ref float knockback, ref bool crit, ref int hitDirection) {
-            ModifyDamageDealt(new Systems.Battle.DamageSource(proj), ref damage, true, player.Distance(target.position));
+            Systems.Combat.LocalModifyDamageDealt(this, new Systems.Combat.DamageSource(proj), ref damage, ref crit, true, player.Distance(target.position));
             base.ModifyHitNPCWithProj(proj, target, ref damage, ref knockback, ref crit, ref hitDirection);
         }
 
         public override void ModifyHitPvpWithProj(Projectile proj, Player target, ref int damage, ref bool crit) {
-            ModifyDamageDealt(new Systems.Battle.DamageSource(proj), ref damage, true, player.Distance(target.position));
+            Systems.Combat.LocalModifyDamageDealt(this, new Systems.Combat.DamageSource(proj), ref damage, ref crit, true, player.Distance(target.position));
             base.ModifyHitPvpWithProj(proj, target, ref damage, ref crit);
         }
 
-        private void ModifyDamageDealt(Systems.Battle.DamageSource dsource, ref int damage, bool is_projectile = false, float distance = 0f) {
+        public override void OnHitAnything(float x, float y, Entity victim) {
             TriggerInCombat();
-            //TODO - modify damage
+            base.OnHitAnything(x, y, victim);
         }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Death ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
@@ -275,7 +276,7 @@ namespace ExperienceAndClasses {
             if (!PSheet.Character.In_Combat) {
                 PSheet.Character.SetInCombat(true);
             }
-            Fields.IN_COMBAT_time = Shortcuts.Now.AddSeconds(Systems.Battle.SECONDS_IN_COMBAT);
+            Fields.IN_COMBAT_time = Shortcuts.Now.AddSeconds(Systems.Combat.SECONDS_IN_COMBAT);
         }
 
     }

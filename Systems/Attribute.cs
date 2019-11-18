@@ -260,7 +260,8 @@ namespace ExperienceAndClasses.Systems {
 
             public Power() : base(IDs.Power) {}
             protected override void Effect(EACPlayer eacplayer, int points, bool do_effects = true) {
-                Effect_Text += PowerScaling.ApplyPower(eacplayer, points, do_effects);
+                //TODO
+                //TODO fishing power too
             }
         }
 
@@ -327,17 +328,12 @@ namespace ExperienceAndClasses.Systems {
             public Spirit() : base(IDs.Spirit) {}
             protected override void Effect(EACPlayer eacplayer, int points, bool do_effects = true) {
                 int bonus;
+                float bonus_float;
 
                 //crit
-                bonus = RoundIntBonus(PER_POINT_CRIT * points);
-                if (do_effects) eacplayer.player.meleeCrit += bonus;
-                if (eacplayer.Fields.Is_Local) Effect_Text += BonusValueString(bonus, "melee critical chance", PER_POINT_CRIT, true);
-                if (do_effects) eacplayer.player.rangedCrit += bonus;
-                if (eacplayer.Fields.Is_Local) Effect_Text += BonusValueString(bonus, "ranged critical chance", PER_POINT_CRIT, true);
-                if (do_effects) eacplayer.player.magicCrit += bonus;
-                if (eacplayer.Fields.Is_Local) Effect_Text += BonusValueString(bonus, "magic critical chance", PER_POINT_CRIT, true);
-                if (do_effects) eacplayer.player.thrownCrit += bonus;
-                if (eacplayer.Fields.Is_Local) Effect_Text += BonusValueString(bonus, "throwing critical chance", PER_POINT_CRIT, true);
+                bonus_float = PER_POINT_CRIT * points;
+                if (do_effects) eacplayer.PSheet.Stats.Crit_All += bonus_float;
+                if (eacplayer.Fields.Is_Local) Effect_Text += BonusValueString((float)Math.Round(bonus_float, 3), "all critical chance", (float)Math.Round(PER_POINT_CRIT, 3), true);
 
                 //minion cap
                 bonus = RoundIntBonus(PER_POINT_MINION_CAP * points);
@@ -345,18 +341,16 @@ namespace ExperienceAndClasses.Systems {
                 if (eacplayer.Fields.Is_Local) Effect_Text += BonusValueString(bonus, "maximum minions", PER_POINT_MINION_CAP);
 
                 //healing
-                float healing_per = Math.Max(eacplayer.PSheet.Classes.Primary.Class.Power_Scaling.Healing, eacplayer.PSheet.Classes.Secondary.Class.Power_Scaling.Healing / 2);
-                float bonus_per_point = healing_per * PER_POINT_HOLY_HEAL;
-                float bonus_float = bonus_per_point * points;
+                bonus_float = PER_POINT_HOLY_HEAL * points;
                 if (do_effects) eacplayer.PSheet.Stats.Healing_Mult += bonus_float;
-                if (eacplayer.Fields.Is_Local) Effect_Text += BonusValueString((float)Math.Round(bonus_float * 100, 3), "ability healing", (float)Math.Round(bonus_per_point * 100, 3), true);
+                if (eacplayer.Fields.Is_Local) Effect_Text += BonusValueString((float)Math.Round(bonus_float * 100, 3), "ability healing", (float)Math.Round(PER_POINT_HOLY_HEAL * 100, 3), true);
             }
         }
 
         public class Agility : Attribute {
             private static float PER_POINT_MOVEMENT { get { return 0.005f * ATTRIBUTE_BONUS_MULTIPLIER; } }
             private static float PER_POINT_JUMP { get { return 0.01f * ATTRIBUTE_BONUS_MULTIPLIER; } }
-            private static float PER_POINT_DODGE { get { return 0.0025f * ATTRIBUTE_BONUS_MULTIPLIER; } }
+            private static float PER_POINT_DODGE { get { return 0.25f * ATTRIBUTE_BONUS_MULTIPLIER; } }
             private static float PER_POINT_FLY { get { return 0.5f * ATTRIBUTE_BONUS_MULTIPLIER; } }
 
             public Agility() : base(IDs.Agility) {}
@@ -403,309 +397,16 @@ namespace ExperienceAndClasses.Systems {
 
                 //weapon use time
                 bonus = PER_POINT_USE_SPEED * points;
-                if (do_effects) eacplayer.PSheet.Stats.SpeedAdjust_Weapon += bonus;
+                if (do_effects) eacplayer.PSheet.Stats.Item_Speed_Weapon += bonus;
                 if (eacplayer.Fields.Is_Local) Effect_Text += BonusValueString((float)Math.Round(bonus * 100, 3), "weapon use speed", (float)Math.Round(PER_POINT_USE_SPEED * 100, 3), true);
 
                 //tool use time (if non-combat)
-                float fish_per = Math.Max(eacplayer.PSheet.Classes.Primary.Class.Power_Scaling.Fish_Power, eacplayer.PSheet.Classes.Secondary.Class.Power_Scaling.Fish_Power / 2);
+                float fish_per = Math.Max(eacplayer.PSheet.Classes.Primary.Class.Fish_Power_Scaling, eacplayer.PSheet.Classes.Secondary.Class.Fish_Power_Scaling / 2);
                 float bonus_per_point = fish_per * PER_POINT_USE_SPEED;
                 bonus = bonus_per_point * points;
-                if (do_effects) eacplayer.PSheet.Stats.SpeedAdjust_Tool += bonus;
+                if (do_effects) eacplayer.PSheet.Stats.Item_Speed_Tool += bonus;
                 if (eacplayer.Fields.Is_Local) Effect_Text += BonusValueString((float)Math.Round(bonus * 100, 3), "tool use speed (Explorer)", (float)Math.Round(bonus_per_point * 100, 3), true);
             }
-        }
-
-        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Power Scaling ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-
-        public abstract class PowerScaling {
-            /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Constants (and readonly) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-            public enum IDs : byte {
-                None,
-                CloseRange,
-                Projectile,
-                ProjectileAndMinion,
-                AllCore,
-                Holy_AllCore,
-                MinionOnly,
-                NonCombat,
-                Rogue,
-                Musical,
-
-                //insert here
-
-                NUMBER_OF_IDs, //leave this last
-            }
-
-            protected const float SCALE_PRIMARY = 1f;
-            protected const float SCALE_SECONDARY = 0.7f;
-
-            /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Auto-Populated Lookup ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-
-            /// <summary>
-            /// singleton instanstances for packet-recieving (do NOT attach these to targets)
-            /// </summary>
-            public static PowerScaling[] LOOKUP { get; private set; }
-
-            static PowerScaling() {
-                LOOKUP = new PowerScaling[(ushort)IDs.NUMBER_OF_IDs];
-                for (ushort i = 0; i < LOOKUP.Length; i++) {
-                    LOOKUP[i] = Utilities.Commons.CreateObjectFromName<PowerScaling>(Enum.GetName(typeof(IDs), i));
-                }
-            }
-
-            /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Instance Vars (specific) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-
-            //labels
-            public string Primary_Types { get; private set; } = "";
-            public string Secondary_Types { get; private set; } = "";
-
-            //core types
-            protected float Minion { get; private set; } = 0f;
-
-            //custom types
-            protected float Damage_All_Non_Minion { get; private set; } = 0f;
-            protected float Damage_Close_Range { get; private set; } = 0f;
-            protected float Damage_Non_Minion_Projectile { get; private set; } = 0f;
-            public float Damage_Holy { get; private set; } = 0f;
-            public float Damage_Musical { get; private set; } = 0f;
-
-            //healing
-            public float Healing { get; private set; } = 0f;
-
-            //non-combat
-            public float Fish_Power { get; private set; } = 0f;
-
-            /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Instance Vars (generic) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-
-            public IDs ID { get; private set; } = IDs.None;
-            public byte ID_num { get; private set; } = (byte)IDs.None;
-
-            /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Constructor ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-
-            public PowerScaling(IDs id) {
-                ID = id;
-                ID_num = (byte)ID;
-            }
-
-            /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Public Methods ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-
-            public static string ApplyPower(EACPlayer eacplayer, int points, bool do_effects = true) {
-                string bonus = "";
-                bool tooltip_damage_not_shown = false;
-
-                //calculate scaling values to use...
-
-                //core
-                float non_minion_per = Math.Max(eacplayer.PSheet.Classes.Primary.Class.Power_Scaling.Damage_All_Non_Minion, eacplayer.PSheet.Classes.Secondary.Class.Power_Scaling.Damage_All_Non_Minion / 2);
-                float minion_per = Math.Max(eacplayer.PSheet.Classes.Primary.Class.Power_Scaling.Minion, eacplayer.PSheet.Classes.Secondary.Class.Power_Scaling.Minion / 2);
-
-                //custom types
-                float close_range_damage_per = Math.Max(eacplayer.PSheet.Classes.Primary.Class.Power_Scaling.Damage_Close_Range, eacplayer.PSheet.Classes.Secondary.Class.Power_Scaling.Damage_Close_Range / 2);
-                float non_minion_projectile_damage_per = Math.Max(eacplayer.PSheet.Classes.Primary.Class.Power_Scaling.Damage_Non_Minion_Projectile, eacplayer.PSheet.Classes.Secondary.Class.Power_Scaling.Damage_Non_Minion_Projectile / 2);
-                float holy_damage_per = Math.Max(eacplayer.PSheet.Classes.Primary.Class.Power_Scaling.Damage_Holy, eacplayer.PSheet.Classes.Secondary.Class.Power_Scaling.Damage_Holy / 2);
-                float music_damage_per = Math.Max(eacplayer.PSheet.Classes.Primary.Class.Power_Scaling.Damage_Musical, eacplayer.PSheet.Classes.Secondary.Class.Power_Scaling.Damage_Musical / 2);
-
-                //non-combat
-                float fish_per = Math.Max(eacplayer.PSheet.Classes.Primary.Class.Power_Scaling.Fish_Power, eacplayer.PSheet.Classes.Secondary.Class.Power_Scaling.Fish_Power / 2);
-
-                //non_minion_per does not stack with projectile_damage_per and close_range_damage_per
-                if ((non_minion_per > 0f) && (non_minion_projectile_damage_per > 0)) {
-                    if (non_minion_per > non_minion_projectile_damage_per) {
-                        non_minion_projectile_damage_per = 0f;
-                    }
-                    else {
-                        non_minion_projectile_damage_per -= non_minion_per;
-                    }
-                }
-                if ((non_minion_per > 0f) && (close_range_damage_per > 0)) {
-                    if (non_minion_per > close_range_damage_per) {
-                        close_range_damage_per = 0f;
-                    }
-                    else {
-                        close_range_damage_per -= non_minion_per;
-                    }
-                }
-                if ((close_range_damage_per > 0f) && (non_minion_projectile_damage_per > 0f)) {
-                    float global = Math.Min(close_range_damage_per, non_minion_projectile_damage_per);
-                    close_range_damage_per -= global;
-                    non_minion_projectile_damage_per -= global;
-                    non_minion_per += global;
-                    minion_per += global;
-                }
-
-                //apply bonuses...
-                float bonus_per_point;
-                float bonus_total;
-
-                //all non-minion
-                if (non_minion_per > 0f) {
-                    bonus_per_point = non_minion_per * Attribute.Power.PER_POINT_DAMAGE;
-                    bonus_total = bonus_per_point * points;
-                    if (do_effects) eacplayer.PSheet.Stats.NonMinionAll.Increase += bonus_total;
-                    if (eacplayer.Fields.Is_Local) {
-                        bonus += BonusValueString((float)Math.Round(bonus_total * 100, 3), "all non-minion damage*", (float)Math.Round(bonus_per_point * 100, 3), true);
-                        tooltip_damage_not_shown = true;
-                    }
-                }
-
-                //all minion
-                if (minion_per > 0f) {
-                    bonus_per_point = minion_per * Attribute.Power.PER_POINT_DAMAGE;
-                    bonus_total = bonus_per_point * points;
-                    if (do_effects) eacplayer.player.minionDamage += bonus_total;
-                    if (eacplayer.Fields.Is_Local) {
-                        bonus += BonusValueString((float)Math.Round(bonus_total * 100, 3), "all minion damage", (float)Math.Round(bonus_per_point * 100, 3), true);
-                    }
-                }
-
-                //close range
-                if (close_range_damage_per > 0f) {
-                    bonus_per_point = close_range_damage_per * Attribute.Power.PER_POINT_DAMAGE;
-                    bonus_total = bonus_per_point * points;
-                    if (do_effects) eacplayer.PSheet.Stats.AllNearby.Increase += bonus_total;
-                    if (eacplayer.Fields.Is_Local) {
-                        bonus += BonusValueString((float)Math.Round(bonus_total * 100, 3), "all damage on nearby targets*", (float)Math.Round(bonus_per_point * 100, 3), true);
-                        tooltip_damage_not_shown = true;
-                    }
-                }
-
-                //non-minon projectile
-                if (non_minion_projectile_damage_per > 0f) {
-                    bonus_per_point = non_minion_projectile_damage_per * Attribute.Power.PER_POINT_DAMAGE;
-                    bonus_total = bonus_per_point * points;
-                    if (do_effects) eacplayer.PSheet.Stats.NonMinionProjectile.Increase += bonus_total;
-                    if (eacplayer.Fields.Is_Local) {
-                        bonus += BonusValueString((float)Math.Round(bonus_total * 100, 3), "all non-minion projectile damage*", (float)Math.Round(bonus_per_point * 100, 3), true);
-                        tooltip_damage_not_shown = true;
-                    }
-                }
-
-                /*
-                //holy
-                if (holy_damage_per > 0f) {
-                    bonus_per_point = holy_damage_per * Attribute.Power.PER_POINT_DAMAGE;
-                    bonus_total = bonus_per_point * points;
-                    if (do_effects) eacplayer.PSheet.Stats.Holy.Increase += bonus_total;
-                    if (eacplayer.Fields.Is_Local) {
-                        bonus += BonusValueString((float)Math.Round(bonus_total * 100, 3), "holy damage", (float)Math.Round(bonus_per_point * 100, 3), true);
-                    }
-                }
-
-                //music
-                if (music_damage_per > 0f) {
-                    bonus_per_point = music_damage_per * Attribute.Power.PER_POINT_DAMAGE;
-                    bonus_total = bonus_per_point * points;
-                    if (do_effects) eacplayer.PSheet.Stats.Musical.Increase += bonus_total;
-                    if (eacplayer.Fields.Is_Local) {
-                        bonus += BonusValueString((float)Math.Round(bonus_total * 100, 3), "musical damage", (float)Math.Round(bonus_per_point * 100, 3), true);
-                    }
-                }
-                */
-
-                //fish
-                if (fish_per > 0f) {
-                    bonus_per_point = fish_per * Attribute.Power.PER_POINT_FISH;
-                    int bonus_total_int = RoundIntBonus(bonus_per_point * points);
-                    if (do_effects) eacplayer.player.fishingSkill += bonus_total_int;
-                    if (eacplayer.Fields.Is_Local) {
-                        bonus += BonusValueString(bonus_total_int, "fishing power (Explorer)", (float)Math.Round(bonus_per_point * 100, 3));
-                    }
-                }
-
-                if (tooltip_damage_not_shown) {
-                    bonus += "\n\n* bonus is not reflected in item tooltip damage";
-                }
-
-                return bonus;
-            }
-
-            /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Power Scaling ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-
-            public class None : PowerScaling {
-                public None() : base(IDs.None) {
-                    //leave defaults
-                }
-            }
-
-            public class CloseRange : PowerScaling {
-                public CloseRange() : base(IDs.CloseRange) {
-                    Primary_Types = "Hits Against Nearby Targets";
-                    Damage_Close_Range = SCALE_PRIMARY + 0.2f;
-                }
-            }
-
-            public class Rogue : PowerScaling {
-                public Rogue() : base(IDs.Rogue) {
-                    Primary_Types = "Hits Against Nearby Targets";
-                    Damage_Close_Range = SCALE_PRIMARY + 0.1f;
-                    Secondary_Types = "All Damage";
-                    Damage_All_Non_Minion = SCALE_PRIMARY / 2f;
-                    Minion = SCALE_PRIMARY / 2f;
-                }
-            }
-
-            public class Projectile : PowerScaling {
-                public Projectile() : base(IDs.Projectile) {
-                    Primary_Types = "Any Non-Minion Projectiles";
-                    Damage_Non_Minion_Projectile = SCALE_PRIMARY;
-                }
-            }
-
-            public class ProjectileAndMinion : PowerScaling {
-                public ProjectileAndMinion() : base(IDs.ProjectileAndMinion) {
-                    Primary_Types = "Any Non-Minion Projectiles";
-                    Damage_Non_Minion_Projectile = SCALE_PRIMARY;
-                    Secondary_Types = "Minion";
-                    Minion = SCALE_SECONDARY;
-                }
-            }
-
-            public class AllCore : PowerScaling {
-                public AllCore() : base(IDs.AllCore) {
-                    Primary_Types = "All Damage";
-                    Damage_All_Non_Minion = SCALE_PRIMARY;
-                    Minion = SCALE_PRIMARY;
-                }
-            }
-
-            public class Musical : PowerScaling {
-                public Musical() : base(IDs.Musical) {
-                    Primary_Types = "All Damage";
-                    Damage_All_Non_Minion = SCALE_PRIMARY;
-                    Minion = SCALE_PRIMARY;
-                    Damage_Musical = SCALE_PRIMARY;
-
-                    Healing = SCALE_SECONDARY;
-                }
-            }
-
-            public class Holy_AllCore : PowerScaling {
-                public Holy_AllCore() : base(IDs.Holy_AllCore) {
-                    Primary_Types = "Holy";
-                    Damage_Holy = SCALE_PRIMARY;
-
-                    Secondary_Types = "All Damage";
-                    Damage_All_Non_Minion = SCALE_SECONDARY;
-                    Minion = SCALE_SECONDARY;
-
-                    Healing = SCALE_PRIMARY;
-                }
-            }
-
-            public class MinionOnly : PowerScaling {
-                public MinionOnly() : base(IDs.MinionOnly) {
-                    Primary_Types = "Minion";
-                    Minion = SCALE_PRIMARY;
-                }
-            }
-
-            public class NonCombat : PowerScaling {
-                public NonCombat() : base(IDs.NonCombat) {
-                    Primary_Types = "Fishing Power";
-                    Fish_Power = SCALE_PRIMARY;
-                }
-            }
-
         }
     }
 }

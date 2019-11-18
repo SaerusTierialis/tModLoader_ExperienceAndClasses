@@ -33,6 +33,7 @@ namespace ExperienceAndClasses.UI {
         private const float WIDTH_RESET = 400f;
         private const float WIDTH_ABILITY = 400f;
         private const float WIDTH_PASSIVE = 400f;
+        private const float WIDTH_STATS = 400f;
 
         private const float BUTTON_SEPARATION = 100f;
 
@@ -340,6 +341,17 @@ namespace ExperienceAndClasses.UI {
 
         public void ShowPassive(UIElement source, Systems.Passive passive) {
             ShowText(source, passive.Name, passive.Description, WIDTH_PASSIVE);
+        }
+
+        public void ShowStats(UIElement source) {
+            //generate stat text
+            string str = "";
+
+
+
+
+            //display
+            ShowText(source, "Stats", "TODO", WIDTH_STATS);
         }
 
     }

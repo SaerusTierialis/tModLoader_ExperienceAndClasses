@@ -112,7 +112,6 @@ namespace ExperienceAndClasses.Systems {
 
         public bool Gives_Allocation_Attributes { get; protected set; } = false;
         public float[] Attribute_Growth { get; protected set; } = Enumerable.Repeat(1f, (byte)Attribute.IDs.NUMBER_OF_IDs).ToArray();
-        public Attribute.PowerScaling Power_Scaling { get; protected set; } = Attribute.PowerScaling.LOOKUP[(byte)Attribute.PowerScaling.IDs.None];
 
         public bool Enabled { get; protected set; } = false;
 
@@ -124,6 +123,7 @@ namespace ExperienceAndClasses.Systems {
 
         public float XP_Multiplier_Combat { get; protected set; } = 1.0f;
         public float XP_Multiplier_NonCombat { get; protected set; } = 1.0f;
+        public float Fish_Power_Scaling { get; protected set; } = 0f;
 
         public Ability[] Abilities = new Ability[Ability.NUMBER_ABILITY_SLOTS_PER_CLASS];
         public Ability[] Abilities_Alt = new Ability[Ability.NUMBER_ABILITY_SLOTS_PER_CLASS];
@@ -217,7 +217,7 @@ namespace ExperienceAndClasses.Systems {
                 }
 
                 //set tooltip
-                string tooltip_main = implementation_status_text + "\n\n" + Description + "\n\n" + "POWER SCALING:\nPrimary:   " + Power_Scaling.Primary_Types + "\nSecondary: " + Power_Scaling.Secondary_Types + "\n\nATTRIBUTES:";
+                string tooltip_main = implementation_status_text + "\n\n" + Description + "\n\nATTRIBUTES:";
                 bool first = true;
                 string attribute_names = "";
                 foreach (byte id in Systems.Attribute.ATTRIBUTES_UI_ORDER) {
@@ -485,23 +485,22 @@ namespace ExperienceAndClasses.Systems {
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Subtypes ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         public abstract class RealClass : PlayerClass {
-            public RealClass(IDs id, Attribute.PowerScaling.IDs power_scaling) : base(id) {
+            public RealClass(IDs id) : base(id) {
                 Gives_Allocation_Attributes = true;
-                Power_Scaling = Attribute.PowerScaling.LOOKUP[(byte)power_scaling];
                 Has_Texture = true;
                 Enabled = true;
             }
         }
 
         public abstract class Tier1 : RealClass {
-            public Tier1(IDs id, Attribute.PowerScaling.IDs power_scaling) : base(id, power_scaling) {
+            public Tier1(IDs id) : base(id) {
                 Tier = 1;
                 Max_Level = MAX_TIER_LEVEL[Tier];
             }
         }
 
         public abstract class Tier2 : RealClass {
-            public Tier2(IDs id, Attribute.PowerScaling.IDs power_scaling) : base(id, power_scaling) {
+            public Tier2(IDs id) : base(id) {
                 Tier = 2;
                 Max_Level = MAX_TIER_LEVEL[Tier];
                 Prereq = LOOKUP[(byte)IDs.Novice];
@@ -513,7 +512,7 @@ namespace ExperienceAndClasses.Systems {
         }
 
         public abstract class Tier3 : RealClass {
-            public Tier3(IDs id, Attribute.PowerScaling.IDs power_scaling, IDs prereq) : base(id, power_scaling) {
+            public Tier3(IDs id, IDs prereq) : base(id) {
                 Tier = 3;
                 Max_Level = MAX_TIER_LEVEL[Tier];
                 Prereq = LOOKUP[(byte)prereq];
@@ -539,7 +538,7 @@ namespace ExperienceAndClasses.Systems {
         }
 
         public class Explorer : Tier2 {
-            public Explorer() : base(IDs.Explorer, Attribute.PowerScaling.IDs.NonCombat) {
+            public Explorer() : base(IDs.Explorer) {
                 Max_Level = MAX_TIER_LEVEL[3]; //tier 2 class with tier 3 level cap
                 Class_Locations[0, 4] = ID_num;
                 Attribute_Growth[(byte)Attribute.IDs.Power] = 2f;
@@ -552,6 +551,7 @@ namespace ExperienceAndClasses.Systems {
                 implementation_status = IMPLEMENTATION_STATUS.ATTRIBUTE_ONLY;
                 XP_Multiplier_Combat = 0.1f;
                 XP_Multiplier_NonCombat = 10.0f;
+                Fish_Power_Scaling = 1f;
             }
 
             protected override Items.Unlock GetUnlockItem() {
@@ -561,7 +561,7 @@ namespace ExperienceAndClasses.Systems {
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Tier 1 Classes ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         public class Novice : Tier1 {
-            public Novice() : base(IDs.Novice, Attribute.PowerScaling.IDs.AllCore) {
+            public Novice() : base(IDs.Novice) {
                 Class_Locations[0, 3] = ID_num;
                 Colour = COLOUR_NOVICE;
                 implementation_status = IMPLEMENTATION_STATUS.COMPLETE;
@@ -571,7 +571,7 @@ namespace ExperienceAndClasses.Systems {
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Tier 2 Classes ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         public class Warrior : Tier2 {
-            public Warrior() : base(IDs.Warrior, Attribute.PowerScaling.IDs.CloseRange) {
+            public Warrior() : base(IDs.Warrior) {
                 Class_Locations[1, 0] = ID_num;
                 Attribute_Growth[(byte)Attribute.IDs.Power] = 2;
                 Attribute_Growth[(byte)Attribute.IDs.Vitality] = 3;
@@ -582,7 +582,7 @@ namespace ExperienceAndClasses.Systems {
         }
 
         public class Ranger : Tier2 {
-            public Ranger() : base(IDs.Ranger, Attribute.PowerScaling.IDs.Projectile) {
+            public Ranger() : base(IDs.Ranger) {
                 Class_Locations[1, 1] = ID_num;
                 Attribute_Growth[(byte)Attribute.IDs.Power] = 3;
                 Attribute_Growth[(byte)Attribute.IDs.Spirit] = 2;
@@ -593,7 +593,7 @@ namespace ExperienceAndClasses.Systems {
         }
 
         public class Traveler : Tier2 {
-            public Traveler() : base(IDs.Traveler, Attribute.PowerScaling.IDs.AllCore) {
+            public Traveler() : base(IDs.Traveler) {
                 Class_Locations[1, 2] = ID_num;
                 Attribute_Growth[(byte)Attribute.IDs.Dexterity] = 2;
                 Attribute_Growth[(byte)Attribute.IDs.Vitality] = 2;
@@ -605,7 +605,7 @@ namespace ExperienceAndClasses.Systems {
         }
 
         public class Rogue : Tier2 {
-            public Rogue() : base(IDs.Rogue, Attribute.PowerScaling.IDs.Rogue) {
+            public Rogue() : base(IDs.Rogue) {
                 Class_Locations[1, 3] = ID_num;
                 Attribute_Growth[(byte)Attribute.IDs.Spirit] = 3;
                 Attribute_Growth[(byte)Attribute.IDs.Agility] = 3;
@@ -615,7 +615,7 @@ namespace ExperienceAndClasses.Systems {
         }
 
         public class Summoner : Tier2 {
-            public Summoner() : base(IDs.Summoner, Attribute.PowerScaling.IDs.MinionOnly) {
+            public Summoner() : base(IDs.Summoner) {
                 Class_Locations[1, 4] = ID_num;
                 Attribute_Growth[(byte)Attribute.IDs.Power] = 3;
                 Attribute_Growth[(byte)Attribute.IDs.Spirit] = 3;
@@ -625,7 +625,7 @@ namespace ExperienceAndClasses.Systems {
         }
 
         public class Cleric : Tier2 {
-            public Cleric() : base(IDs.Cleric, Attribute.PowerScaling.IDs.Holy_AllCore) {
+            public Cleric() : base(IDs.Cleric) {
                 Class_Locations[1, 5] = ID_num;
                 Attribute_Growth[(byte)Attribute.IDs.Mind] = 3;
                 Attribute_Growth[(byte)Attribute.IDs.Spirit] = 3;
@@ -635,7 +635,7 @@ namespace ExperienceAndClasses.Systems {
         }
 
         public class Hybrid : Tier2 {
-            public Hybrid() : base(IDs.Hybrid, Attribute.PowerScaling.IDs.AllCore) {
+            public Hybrid() : base(IDs.Hybrid) {
                 Class_Locations[1, 7] = ID_num;
                 Attribute_Growth[(byte)Attribute.IDs.Power] = 2;
                 Attribute_Growth[(byte)Attribute.IDs.Vitality] = 2;
@@ -649,7 +649,7 @@ namespace ExperienceAndClasses.Systems {
         }
 
         public class Bard : Tier2 {
-            public Bard() : base(IDs.Bard, Attribute.PowerScaling.IDs.Musical) {
+            public Bard() : base(IDs.Bard) {
                 Class_Locations[1, 6] = ID_num;
                 Attribute_Growth[(byte)Attribute.IDs.Power] = 2;
                 Attribute_Growth[(byte)Attribute.IDs.Vitality] = 2;
@@ -665,7 +665,7 @@ namespace ExperienceAndClasses.Systems {
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Tier 3 Classes ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         public class BloodKnight : Tier3 {
-            public BloodKnight() : base(IDs.BloodKnight, Attribute.PowerScaling.IDs.CloseRange, IDs.Warrior) {
+            public BloodKnight() : base(IDs.BloodKnight, IDs.Warrior) {
                 Class_Locations[3, 0] = ID_num;
                 Attribute_Growth[(byte)Attribute.IDs.Power] = 4;
                 Attribute_Growth[(byte)Attribute.IDs.Vitality] = 4;
@@ -675,7 +675,7 @@ namespace ExperienceAndClasses.Systems {
         }
 
         public class Berserker : Tier3 {
-            public Berserker() : base(IDs.Berserker, Attribute.PowerScaling.IDs.CloseRange, IDs.Warrior) {
+            public Berserker() : base(IDs.Berserker, IDs.Warrior) {
                 Class_Locations[2, 0] = ID_num;
                 Attribute_Growth[(byte)Attribute.IDs.Power] = 2;
                 Attribute_Growth[(byte)Attribute.IDs.Vitality] = 2;
@@ -687,7 +687,7 @@ namespace ExperienceAndClasses.Systems {
         }
 
         public class Guardian : Tier3 {
-            public Guardian() : base(IDs.Guardian, Attribute.PowerScaling.IDs.CloseRange, IDs.Warrior) {
+            public Guardian() : base(IDs.Guardian, IDs.Warrior) {
 
                 //DISABLED
                 //Class_Locations[4, 0] = ID_num;
@@ -701,7 +701,7 @@ namespace ExperienceAndClasses.Systems {
         }
 
         public class Artillery : Tier3 {
-            public Artillery() : base(IDs.Artillery, Attribute.PowerScaling.IDs.Projectile, IDs.Ranger) {
+            public Artillery() : base(IDs.Artillery, IDs.Ranger) {
                 Class_Locations[2, 1] = ID_num;
                 Attribute_Growth[(byte)Attribute.IDs.Power] = 4;
                 Attribute_Growth[(byte)Attribute.IDs.Spirit] = 4;
@@ -711,7 +711,7 @@ namespace ExperienceAndClasses.Systems {
         }
 
         public class Tinkerer : Tier3 {
-            public Tinkerer() : base(IDs.Tinkerer, Attribute.PowerScaling.IDs.ProjectileAndMinion, IDs.Ranger) {
+            public Tinkerer() : base(IDs.Tinkerer, IDs.Ranger) {
 
                 //DISABLED
                 //Class_Locations[3, 1] = ID_num;
@@ -727,7 +727,7 @@ namespace ExperienceAndClasses.Systems {
         }
 
         public class Controller : Tier3 {
-            public Controller() : base(IDs.Controller, Attribute.PowerScaling.IDs.AllCore, IDs.Traveler) {
+            public Controller() : base(IDs.Controller, IDs.Traveler) {
                 Class_Locations[2, 2] = ID_num;
                 Attribute_Growth[(byte)Attribute.IDs.Dexterity] = 3;
                 Attribute_Growth[(byte)Attribute.IDs.Vitality] = 2;
@@ -739,7 +739,7 @@ namespace ExperienceAndClasses.Systems {
         }
 
         public class Shadow : Tier3 {
-            public Shadow() : base(IDs.Shadow, Attribute.PowerScaling.IDs.Rogue, IDs.Traveler) {
+            public Shadow() : base(IDs.Shadow, IDs.Traveler) {
                 Class_Locations[3, 3] = ID_num;
                 Attribute_Growth[(byte)Attribute.IDs.Power] = 3;
                 Attribute_Growth[(byte)Attribute.IDs.Dexterity] = 2;
@@ -750,7 +750,7 @@ namespace ExperienceAndClasses.Systems {
         }
 
         public class Assassin : Tier3 {
-            public Assassin() : base(IDs.Assassin, Attribute.PowerScaling.IDs.Rogue, IDs.Rogue) {
+            public Assassin() : base(IDs.Assassin, IDs.Rogue) {
                 Class_Locations[2, 3] = ID_num;
                 Attribute_Growth[(byte)Attribute.IDs.Power] = 2;
                 Attribute_Growth[(byte)Attribute.IDs.Spirit] = 4;
@@ -761,7 +761,7 @@ namespace ExperienceAndClasses.Systems {
         }
 
         public class Chrono : Tier3 {
-            public Chrono() : base(IDs.Chrono, Attribute.PowerScaling.IDs.Projectile, IDs.Ranger) {
+            public Chrono() : base(IDs.Chrono, IDs.Ranger) {
                 Class_Locations[3, 1] = ID_num;
                 Attribute_Growth[(byte)Attribute.IDs.Power] = 2;
                 Attribute_Growth[(byte)Attribute.IDs.Spirit] = 2;
@@ -772,7 +772,7 @@ namespace ExperienceAndClasses.Systems {
         }
 
         public class SoulBinder : Tier3 {
-            public SoulBinder() : base(IDs.SoulBinder, Attribute.PowerScaling.IDs.MinionOnly, IDs.Summoner) {
+            public SoulBinder() : base(IDs.SoulBinder, IDs.Summoner) {
                 Class_Locations[2, 4] = ID_num;
                 Attribute_Growth[(byte)Attribute.IDs.Power] = 5;
                 Attribute_Growth[(byte)Attribute.IDs.Mind] = 2;
@@ -783,7 +783,7 @@ namespace ExperienceAndClasses.Systems {
         }
 
         public class Tactician : Tier3 {
-            public Tactician() : base(IDs.Tactician, Attribute.PowerScaling.IDs.MinionOnly, IDs.Summoner) {
+            public Tactician() : base(IDs.Tactician, IDs.Summoner) {
                 Class_Locations[3, 4] = ID_num;
                 Attribute_Growth[(byte)Attribute.IDs.Power] = 4;
                 Attribute_Growth[(byte)Attribute.IDs.Spirit] = 4;
@@ -793,7 +793,7 @@ namespace ExperienceAndClasses.Systems {
         }
 
         public class Saint : Tier3 {
-            public Saint() : base(IDs.Saint, Attribute.PowerScaling.IDs.Holy_AllCore, IDs.Cleric) {
+            public Saint() : base(IDs.Saint, IDs.Cleric) {
                 Class_Locations[2, 5] = ID_num;
                 Attribute_Growth[(byte)Attribute.IDs.Power] = 2;
                 Attribute_Growth[(byte)Attribute.IDs.Mind] = 3;
@@ -804,7 +804,7 @@ namespace ExperienceAndClasses.Systems {
         }
 
         public class Oracle : Tier3 {
-            public Oracle() : base(IDs.Oracle, Attribute.PowerScaling.IDs.Holy_AllCore, IDs.Cleric) {
+            public Oracle() : base(IDs.Oracle, IDs.Cleric) {
                 Class_Locations[3, 5] = ID_num;
                 Attribute_Growth[(byte)Attribute.IDs.Mind] = 3;
                 Attribute_Growth[(byte)Attribute.IDs.Spirit] = 5;
@@ -814,7 +814,7 @@ namespace ExperienceAndClasses.Systems {
         }
 
         public class HybridPrime : Tier3 {
-            public HybridPrime() : base(IDs.HybridPrime, Attribute.PowerScaling.IDs.AllCore, IDs.Hybrid) {
+            public HybridPrime() : base(IDs.HybridPrime, IDs.Hybrid) {
                 Class_Locations[2, 7] = ID_num;
                 Attribute_Growth[(byte)Attribute.IDs.Power] = 2.5f;
                 Attribute_Growth[(byte)Attribute.IDs.Vitality] = 2.5f;
@@ -828,7 +828,7 @@ namespace ExperienceAndClasses.Systems {
         }
 
         public class Minstrel : Tier3 {
-            public Minstrel() : base(IDs.Minstrel, Attribute.PowerScaling.IDs.Musical, IDs.Bard) {
+            public Minstrel() : base(IDs.Minstrel, IDs.Bard) {
                 Class_Locations[2, 6] = ID_num;
                 Attribute_Growth[(byte)Attribute.IDs.Power] = 2.5f;
                 Attribute_Growth[(byte)Attribute.IDs.Vitality] = 2.5f;
