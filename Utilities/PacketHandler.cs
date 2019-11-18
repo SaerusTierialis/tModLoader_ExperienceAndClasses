@@ -24,6 +24,7 @@ namespace ExperienceAndClasses.Utilities {
             Class,
             AFK,
             InCombat,
+            PowerScaling,
 
 
             NUMBER_OF_TYPES, //must be last
@@ -260,6 +261,7 @@ namespace ExperienceAndClasses.Utilities {
                 Class.WritePacketBody(packet, eacplayer.PSheet.Classes.Primary.ID, eacplayer.PSheet.Classes.Primary.Level, eacplayer.PSheet.Classes.Secondary.ID, eacplayer.PSheet.Classes.Secondary.Level);
                 AFK.WritePacketBody(packet, eacplayer.PSheet.Character.AFK);
                 InCombat.WritePacketBody(packet, eacplayer.PSheet.Character.AFK);
+                PowerScaling.WritePacketBody(packet, eacplayer.PSheet.Attributes.Power_Scaling.ID_num);
                 //TODO - other sync data
 
                 //send
@@ -273,6 +275,7 @@ namespace ExperienceAndClasses.Utilities {
                 LOOKUP[(byte)PACKET_TYPE.Class].Recieve(reader, origin);
                 LOOKUP[(byte)PACKET_TYPE.AFK].Recieve(reader, origin);
                 LOOKUP[(byte)PACKET_TYPE.InCombat].Recieve(reader, origin);
+                LOOKUP[(byte)PACKET_TYPE.PowerScaling].Recieve(reader, origin);
                 //TODO - other sync data
 
                 //is init
@@ -426,6 +429,41 @@ namespace ExperienceAndClasses.Utilities {
 
             public static void WritePacketBody(ModPacket packet, bool status) {
                 packet.Write(status);
+            }
+        }
+
+        /// <summary>
+        /// Client tells server their power scaling type
+        /// </summary>
+        public sealed class PowerScaling : Handler {
+            public PowerScaling() : base(PACKET_TYPE.PowerScaling) { }
+
+            public static void Send(int target, int origin, byte power_scaling) {
+                if (Shortcuts.IS_CLIENT) {
+                    //get packet containing header
+                    ModPacket packet = LOOKUP[(byte)PACKET_TYPE.PowerScaling].GetPacket(origin);
+
+                    //specific content
+                    WritePacketBody(packet, power_scaling);
+
+                    //send
+                    packet.Send(target, origin);
+                }
+            }
+
+            protected override void RecieveBody(BinaryReader reader, int origin, EACPlayer origin_eacplayer) {
+                //read and set
+                byte power_scaling = reader.ReadByte();
+                origin_eacplayer.PSheet.Attributes.ForcePowerScaling(power_scaling);
+
+                //relay
+                if (Shortcuts.IS_SERVER) {
+                    Send(-1, origin, power_scaling);
+                }
+            }
+
+            public static void WritePacketBody(ModPacket packet, byte power_scaling) {
+                packet.Write(power_scaling);
             }
         }
 

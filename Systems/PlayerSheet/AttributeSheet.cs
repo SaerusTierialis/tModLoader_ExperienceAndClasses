@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Terraria;
+using Terraria.Localization;
 using Terraria.ModLoader.IO;
 
 namespace ExperienceAndClasses.Systems.PlayerSheet {
@@ -50,6 +52,8 @@ namespace ExperienceAndClasses.Systems.PlayerSheet {
         public int Points_Available { get; protected set; } = 0;
         public int Points_Spent { get; protected set; } = 0;
         public int Points_Total { get; protected set; } = 0;
+
+        public PowerScaling Power_Scaling { get; protected set; } = PowerScaling.LOOKUP[PowerScaling.ID_NUM_DEFAULT];
 
         /// <summary>
         /// Reset bonus attributes (to be called before each update)
@@ -154,6 +158,41 @@ namespace ExperienceAndClasses.Systems.PlayerSheet {
             }
         }
 
+        public void LocalPowerScalingNext() {
+            if (PSHEET.eacplayer.Fields.Is_Local) {
+                if (PSHEET.Character.In_Combat) {
+                    Main.NewText(Language.GetTextValue("Mods.ExperienceAndClasses.Common.PowerScaling_SetFail_InCombat"), UI.Constants.COLOUR_MESSAGE_ERROR);
+                }
+                else {
+                    Power_Scaling = Power_Scaling.GetNext();
+                    OnLocalPowerScalingChange();
+                }
+            }
+            else {
+                Utilities.Logger.Error("LocalPowerScalingNext called by non local");
+            }
+        }
+
+        public void LocalPowerScalingPrior() {
+            if (PSHEET.eacplayer.Fields.Is_Local) {
+                if (PSHEET.Character.In_Combat) {
+                    Main.NewText(Language.GetTextValue("Mods.ExperienceAndClasses.Common.PowerScaling_SetFail_InCombat"), UI.Constants.COLOUR_MESSAGE_ERROR);
+                }
+                else {
+                    Power_Scaling = Power_Scaling.GetPrior();
+                    OnLocalPowerScalingChange();
+                }
+            }
+            else {
+                Utilities.Logger.Error("LocalPowerScalingPrior called by non local");
+            }
+        }
+
+        private void OnLocalPowerScalingChange() {
+            if (Shortcuts.IS_CLIENT) Utilities.PacketHandler.PowerScaling.Send(-1, Shortcuts.WHO_AM_I, Power_Scaling.ID_num);
+            Shortcuts.UpdateUIPSheet(PSHEET);
+        }
+
         public void Reset(bool allow_sync = true) {
             //clear allocated
             Allocated = new int[Attribute.Count];
@@ -179,11 +218,23 @@ namespace ExperienceAndClasses.Systems.PlayerSheet {
             }
         }
 
+        public void ForcePowerScaling(byte id_num) {
+            if (PSHEET.eacplayer.Fields.Is_Local) {
+                Utilities.Logger.Error("ForcePowerScaling called by local");
+            }
+            else {
+                Power_Scaling = PowerScaling.LOOKUP[id_num];
+            }
+        }
+
         public TagCompound Save(TagCompound tag) {
+            tag.Add(TAG_NAMES.Attributes_PowerScaling, Power_Scaling.ID_num);
             tag = Utilities.Commons.TagAddArrayAsList(tag, TAG_NAMES.Attributes_Allocated, Allocated);
             return tag;
         }
         public void Load(TagCompound tag) {
+            Power_Scaling = PowerScaling.LOOKUP[Utilities.Commons.TagTryGet(tag, TAG_NAMES.Attributes_PowerScaling, PowerScaling.ID_NUM_DEFAULT)];
+
             Allocated = Utilities.Commons.TagLoadListAsArray<int>(tag, TAG_NAMES.Attributes_Allocated, Attribute.Count);
 
             //unallocate any attribute that is no longer active

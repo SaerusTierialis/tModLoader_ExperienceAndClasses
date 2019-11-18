@@ -210,26 +210,25 @@ Common.Damage_Type_All=All
 Common.Damage_Type_Light=Light
 Common.Damage_Type_Harmonic=Harmonic
 Common.Damage_Type_Other=Other
-Common.Damage_Type_RangedThrowing={$Mods.ExperienceAndClasses.Common.Damage_Type_Ranged}/{$Mods.ExperienceAndClasses.Common.Damage_Type_Throwing}
 
 //Stats
 Common.Stat_Damage_Header=Damage
-Common.Stat_Damage_Vanilla_All={$Mods.ExperienceAndClasses.Common.Damage_Type_All} {$Mods.ExperienceAndClasses.Common.Term_Damage}
-Common.Stat_Damage_Vanilla_Melee={$Mods.ExperienceAndClasses.Common.Damage_Type_Melee} {$Mods.ExperienceAndClasses.Common.Term_Damage}
-Common.Stat_Damage_Vanilla_Ranged={$Mods.ExperienceAndClasses.Common.Damage_Type_Ranged} {$Mods.ExperienceAndClasses.Common.Term_Damage}
-Common.Stat_Damage_Vanilla_Throwing={$Mods.ExperienceAndClasses.Common.Damage_Type_Throwing} {$Mods.ExperienceAndClasses.Common.Term_Damage}
-Common.Stat_Damage_Vanilla_Magic={$Mods.ExperienceAndClasses.Common.Damage_Type_Magic} {$Mods.ExperienceAndClasses.Common.Term_Damage}
-Common.Stat_Damage_Vanilla_Minion={$Mods.ExperienceAndClasses.Common.Damage_Type_Minion} {$Mods.ExperienceAndClasses.Common.Term_Damage}
+Common.Stat_Damage_All={$Mods.ExperienceAndClasses.Common.Damage_Type_All} {$Mods.ExperienceAndClasses.Common.Term_Damage}
+Common.Stat_Damage_Melee={$Mods.ExperienceAndClasses.Common.Damage_Type_Melee} {$Mods.ExperienceAndClasses.Common.Term_Damage}
+Common.Stat_Damage_Ranged={$Mods.ExperienceAndClasses.Common.Damage_Type_Ranged} {$Mods.ExperienceAndClasses.Common.Term_Damage}
+Common.Stat_Damage_Throwing={$Mods.ExperienceAndClasses.Common.Damage_Type_Throwing} {$Mods.ExperienceAndClasses.Common.Term_Damage}
+Common.Stat_Damage_Magic={$Mods.ExperienceAndClasses.Common.Damage_Type_Magic} {$Mods.ExperienceAndClasses.Common.Term_Damage}
+Common.Stat_Damage_Minion={$Mods.ExperienceAndClasses.Common.Damage_Type_Minion} {$Mods.ExperienceAndClasses.Common.Term_Damage}
 Common.Stat_Damage_Light={$Mods.ExperienceAndClasses.Common.Damage_Type_Light} {$Mods.ExperienceAndClasses.Common.Term_Damage}
 Common.Stat_Damage_Harmonic={$Mods.ExperienceAndClasses.Common.Damage_Type_Harmonic} {$Mods.ExperienceAndClasses.Common.Term_Damage}
 Common.Stat_Damage_Other={$Mods.ExperienceAndClasses.Common.Damage_Type_Other} {$Mods.ExperienceAndClasses.Common.Term_Damage}
 
 Common.Stat_Crit_Header=Critical Hits
 Common.Stat_Crit_All={$Mods.ExperienceAndClasses.Common.Damage_Type_All} {$Mods.ExperienceAndClasses.Common.Term_CritChance}
-Common.Stat_Crit_Vanilla_Melee={$Mods.ExperienceAndClasses.Common.Damage_Type_Melee} {$Mods.ExperienceAndClasses.Common.Term_CritChance}
-Common.Stat_Crit_Vanilla_Ranged={$Mods.ExperienceAndClasses.Common.Damage_Type_Ranged} {$Mods.ExperienceAndClasses.Common.Term_CritChance}
-Common.Stat_Crit_Vanilla_Throwing={$Mods.ExperienceAndClasses.Common.Damage_Type_Throwing} {$Mods.ExperienceAndClasses.Common.Term_CritChance}
-Common.Stat_Crit_Vanilla_Magic={$Mods.ExperienceAndClasses.Common.Damage_Type_Magic} {$Mods.ExperienceAndClasses.Common.Term_CritChance}
+Common.Stat_Crit_Melee={$Mods.ExperienceAndClasses.Common.Damage_Type_Melee} {$Mods.ExperienceAndClasses.Common.Term_CritChance}
+Common.Stat_Crit_Ranged={$Mods.ExperienceAndClasses.Common.Damage_Type_Ranged} {$Mods.ExperienceAndClasses.Common.Term_CritChance}
+Common.Stat_Crit_Throwing={$Mods.ExperienceAndClasses.Common.Damage_Type_Throwing} {$Mods.ExperienceAndClasses.Common.Term_CritChance}
+Common.Stat_Crit_Magic={$Mods.ExperienceAndClasses.Common.Damage_Type_Magic} {$Mods.ExperienceAndClasses.Common.Term_CritChance}
 Common.Stat_Crit_Minion={$Mods.ExperienceAndClasses.Common.Damage_Type_Minion} {$Mods.ExperienceAndClasses.Common.Term_CritChance}
 Common.Stat_Crit_Light={$Mods.ExperienceAndClasses.Common.Damage_Type_Light} {$Mods.ExperienceAndClasses.Common.Term_CritChance}
 Common.Stat_Crit_Harmonic={$Mods.ExperienceAndClasses.Common.Damage_Type_Harmonic} {$Mods.ExperienceAndClasses.Common.Term_CritChance}
@@ -237,26 +236,26 @@ Common.Stat_Crit_Other={$Mods.ExperienceAndClasses.Common.Damage_Type_Other} {$M
 Common.Stat_Crit_Mult=Critical Damage Multiplier
 
 Common.Stat_Defensive_Header=Survival
-Common.Stat_Defensive_Vanilla_Life=Maximum Life
-Common.Stat_Defensive_Vanilla_LifeRegen=Life Regeneration
-Common.Stat_Defensive_Vanilla_Defense=Defense
+Common.Stat_Defensive_Life=Maximum Life
+Common.Stat_Defensive_LifeRegen=Life Regeneration
+Common.Stat_Defensive_Defense=Defense
 Common.Stat_Defensive_Dodge=Dodge Chance
 
 Common.Stat_Mana_Header=Mana
-Common.Stat_Mana_Vanilla_Mana=Maximum Mana
-Common.Stat_Mana_Vanilla_ManaRegen=Mana Regeneration
+Common.Stat_Mana_Mana=Maximum Mana
+Common.Stat_Mana_ManaRegen=Mana Regeneration
 Common.Stat_Mana_ManaRegenDelay=Mana Delay Reduction
 
 Common.Stat_Mobility_Header=Mobility
 Common.Stat_Mobility_Movement=Run Speed
-Common.Stat_Mobility_Vanilla_MaxRun=Max Run Speed
-Common.Stat_Mobility_Vanilla_RunAccel=Run Acceleration
-Common.Stat_Mobility_Vanilla_Jump=Jump Speed Boost
-Common.Stat_Mobility_Vanilla_WingTime=Wing Time
+Common.Stat_Mobility_MaxRun=Max Run Speed
+Common.Stat_Mobility_RunAccel=Run Acceleration
+Common.Stat_Mobility_Jump=Jump Speed Boost
+Common.Stat_Mobility_WingTime=Wing Time
 
 Common.Stat_ItemSpeed_Header=Item Speed
 Common.Stat_ItemSpeed_Weapon=All Weapon Attack Speed
-Common.Stat_ItemSpeed_Vanilla_Melee=Melee Attack Speed
+Common.Stat_ItemSpeed_Melee=Melee Attack Speed
 Common.Stat_ItemSpeed_Tool=All Tool Speed
 
 Common.Stat_Abilities_Header=Abilities
@@ -264,7 +263,10 @@ Common.Stat_Abilities_Cooldown=Ability Cooldown Reduction
 Common.Stat_Abilities_Healing=Ability Healing
 
 Common.Stat_Misc_Header=Miscellaneous
-Common.Stat_Misc_Vanilla_FishingPower=Fishing Power
-Common.Stat_Misc_Vanilla_MinionCap=Maximum Minions
+Common.Stat_Misc_FishingPower=Fishing Power
+Common.Stat_Misc_MinionCap=Maximum Minions
 
 Common.Stat_Sheet_Disclaimer=Global bonuses have been added to displayed values\n"{$Mods.ExperienceAndClasses.Common.Damage_Type_Other}" refers to custom damage types added by other mods
+
+//Power Scaling
+Common.PowerScaling_SetFail_InCombat={$Mods.ExperienceAndClasses.Common.Attribute_Power_Name} Scaling Type cannot be changed while in combat.

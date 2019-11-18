@@ -143,8 +143,9 @@ namespace ExperienceAndClasses.Systems.PlayerSheet {
         public static string Class_Active_Primary = PREFIX + "class_current_primary";
         public static string Class_Active_Secondary = PREFIX + "class_current_secondary";
 
-        //Attribute Allocations
+        //Attribute
         public static string Attributes_Allocated = PREFIX + "attribute_allocation";
+        public static string Attributes_PowerScaling = PREFIX + "attribute_power_scaling";
 
         //Character
         public static string Character_Level = PREFIX + "character_level";

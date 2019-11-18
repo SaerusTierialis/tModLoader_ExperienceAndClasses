@@ -31,9 +31,10 @@ namespace ExperienceAndClasses.UI {
         private const float HEIGHT_ABILITY = 80f;
 
         private const float WIDTH_HELP_AND_PASSIVES = 180f;
-        private static readonly float HEIGHT_PASSIVES = HEIGHT - HEIGHT_HELP + 1 - (Constants.UI_PADDING * 2) + 1;
+        private static readonly float HEIGHT_PASSIVES = HEIGHT - HEIGHT_HELP - HEIGHT_POWER_SCALING + 1 - (Constants.UI_PADDING * 2) + 1;
 
         private const float HEIGHT_HELP = 35f;
+        private const float HEIGHT_POWER_SCALING = 50f;
 
         private static readonly float WIDTH = CLASS_WIDTH + WIDTH_ATTRIBUTES + WIDTH_HELP_AND_PASSIVES + (Constants.UI_PADDING * 2) - 4;
         private const float HEIGHT = 430f;
@@ -50,6 +51,8 @@ namespace ExperienceAndClasses.UI {
         private const float FONT_SCALE_ATTRIBUTE = 1f;
         private const float FONT_SCALE_ABILITY = 0.9f;
         private const float FONT_SCALE_LEVEL = 0.9f;
+        private const float FONT_SCALE_POWER_SCALING_TITLE = 1.1f;
+        private const float FONT_SCALE_POWER_SCALING = 1f;
 
         public const float SPACING_ABILITY_ICON = 2f;
 
@@ -74,6 +77,8 @@ namespace ExperienceAndClasses.UI {
         private ScrollPanel passives;
 
         private TextButton old_xp_button;
+
+        private DragableUIPanel panel_power_scaling;
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Initialize ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         protected override void InitializeState() {
@@ -342,6 +347,34 @@ namespace ExperienceAndClasses.UI {
             close.Top.Set(Constants.UI_PADDING, 0f);
             panel_help.Append(close);
 
+            //power scaling
+            DragableUIPanel panel_power_scaling_outer = new DragableUIPanel(WIDTH_HELP_AND_PASSIVES, HEIGHT_POWER_SCALING, Constants.COLOUR_SUBPANEL, this, false, false, false);
+            panel_power_scaling_outer.Left.Set(panel_passive.Left.Pixels, 0f);
+            panel_power_scaling_outer.Top.Set(panel_help.Top.Pixels + panel_help.Height.Pixels, 0f);
+            panel_power_scaling_outer.SetTitle("Power Scaling", FONT_SCALE_POWER_SCALING_TITLE, true, "TODO");
+            panel.Append(panel_power_scaling_outer);
+
+            panel_power_scaling = new DragableUIPanel(WIDTH_HELP_AND_PASSIVES, HEIGHT_POWER_SCALING - panel_power_scaling_outer.top_space, Color.Transparent, this, false, false, false);
+            panel_power_scaling.Top.Set(panel_power_scaling_outer.top_space  - 3f, 0f);
+            panel_power_scaling.BackgroundColor = Color.Transparent;
+            panel_power_scaling.BorderColor = Color.Transparent;
+            panel_power_scaling.SetTitle("???", FONT_SCALE_POWER_SCALING, true);
+            panel_power_scaling_outer.Append(panel_power_scaling);
+
+            UIImageButton button_left = new UIImageButton(Utilities.Textures.TEXTURE_BUTTON_LEFT);
+            button_left.Top.Set(Constants.UI_PADDING, 0f);
+            button_left.Left.Set(Constants.UI_PADDING, 0f);
+            button_left.SetVisibility(0.8f, 0.5f);
+            button_left.OnMouseDown += new UIElement.MouseEvent(ClickPowerScalingLeft);
+            panel_power_scaling.Append(button_left);
+
+            UIImageButton button_right = new UIImageButton(Utilities.Textures.TEXTURE_BUTTON_RIGHT);
+            button_right.Top.Set(Constants.UI_PADDING, 0f);
+            button_right.Left.Set(panel_power_scaling_outer.Width.Pixels - Utilities.Textures.TEXTURE_BUTTON_LEFTRIGHT_SIZE - Constants.UI_PADDING, 0f);
+            button_right.SetVisibility(0.8f, 0.5f);
+            button_right.OnMouseDown += new UIElement.MouseEvent(ClickPowerScalingRight);
+            panel_power_scaling.Append(button_right);
+
             //done adding to main panel
             state.Append(panel);
 
@@ -465,6 +498,9 @@ namespace ExperienceAndClasses.UI {
 
             //apply prerevamp xp
             UpdatePreRevampXPButtonVisible();
+
+            //power scaling
+            panel_power_scaling.SetTitle(psheet.Attributes.Power_Scaling.Name, FONT_SCALE_POWER_SCALING);
         }
 
         public void UpdatePreRevampXPButtonVisible() {
@@ -540,6 +576,13 @@ namespace ExperienceAndClasses.UI {
 
         private void MouseOutStats(UIMouseEvent evt, UIElement listeningElement) {
             UIPopup.Instance.EndText(listeningElement);
+        }
+
+        private void ClickPowerScalingLeft(UIMouseEvent evt, UIElement listeningElement) {
+            Shortcuts.LOCAL_PLAYER.PSheet.Attributes.LocalPowerScalingPrior();
+        }
+        private void ClickPowerScalingRight(UIMouseEvent evt, UIElement listeningElement) {
+            Shortcuts.LOCAL_PLAYER.PSheet.Attributes.LocalPowerScalingNext();
         }
 
         private void ClickPreRevampXP(UIMouseEvent evt, UIElement listeningElement) {

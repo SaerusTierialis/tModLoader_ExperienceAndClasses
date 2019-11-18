@@ -123,7 +123,8 @@ namespace ExperienceAndClasses.Systems {
 
         public float XP_Multiplier_Combat { get; protected set; } = 1.0f;
         public float XP_Multiplier_NonCombat { get; protected set; } = 1.0f;
-        public float Fish_Power_Scaling { get; protected set; } = 0f;
+        public float Power_Scaling_Fish { get; protected set; } = 0f;
+        public float Power_Scaling_Damage { get; protected set; } = 0f;
 
         public Ability[] Abilities = new Ability[Ability.NUMBER_ABILITY_SLOTS_PER_CLASS];
         public Ability[] Abilities_Alt = new Ability[Ability.NUMBER_ABILITY_SLOTS_PER_CLASS];
@@ -489,6 +490,7 @@ namespace ExperienceAndClasses.Systems {
                 Gives_Allocation_Attributes = true;
                 Has_Texture = true;
                 Enabled = true;
+                Power_Scaling_Damage = 1f;
             }
         }
 
@@ -551,7 +553,8 @@ namespace ExperienceAndClasses.Systems {
                 implementation_status = IMPLEMENTATION_STATUS.ATTRIBUTE_ONLY;
                 XP_Multiplier_Combat = 0.1f;
                 XP_Multiplier_NonCombat = 10.0f;
-                Fish_Power_Scaling = 1f;
+                Power_Scaling_Fish = 1f;
+                Power_Scaling_Damage = 0f;
             }
 
             protected override Items.Unlock GetUnlockItem() {

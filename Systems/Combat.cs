@@ -8,6 +8,9 @@ using Terraria;
 namespace ExperienceAndClasses.Systems {
     class Combat {
         public const double SECONDS_IN_COMBAT = 10;
+        public const float BASE_CRIT_MINION = 0.07f;
+        public const float BASE_CRIT_LIGHT = 0.07f;
+        public const float BASE_CRIT_HARMONIC = 0.07f;
 
         public class DamageSource {
             public readonly bool Is_Item;
@@ -90,7 +93,7 @@ namespace ExperienceAndClasses.Systems {
                         adjust += eacplayer.player.magicCrit / 100f;
 
                     //roll crit
-                    if (RollCrit(eacplayer, adjust)) {
+                    if (RollCrit(eacplayer, adjust, dsource.Minion, dsource.Light, dsource.Harmonic)) {
                         crit = true;
                     }
                 }
@@ -102,8 +105,14 @@ namespace ExperienceAndClasses.Systems {
             }
         }
 
-        public static bool RollCrit(EACPlayer eacplayer, float adjust = 0) {
-            return Main.rand.NextFloat(0f, 1f - adjust) < eacplayer.PSheet.Stats.Crit_All;
+        public static bool RollCrit(EACPlayer eacplayer, float adjust = 0, bool is_minion = false, bool is_light = false, bool is_harmonic = false) {
+            float crit_chance = eacplayer.PSheet.Stats.Crit_All;
+
+            if (is_minion) crit_chance += BASE_CRIT_MINION;
+            if (is_light) crit_chance += BASE_CRIT_LIGHT;
+            if (is_harmonic) crit_chance += BASE_CRIT_HARMONIC;
+
+            return Main.rand.NextFloat(0f, 1f - adjust) < crit_chance;
         }
 
     }

@@ -15,6 +15,10 @@ namespace ExperienceAndClasses.Utilities {
         public static Texture2D TEXTURE_BUTTON_MINUS { get; private set; }
         public static float TEXTURE_BUTTON_SIZE { get; private set; }
 
+        public static Texture2D TEXTURE_BUTTON_LEFT { get; private set; }
+        public static Texture2D TEXTURE_BUTTON_RIGHT { get; private set; }
+        public static float TEXTURE_BUTTON_LEFTRIGHT_SIZE { get; private set; }
+
         public static Texture2D TEXTURE_CHARACTER { get; private set; }
 
         public static Texture2D TEXTURE_CORNER_BUTTON_CLOSE { get; private set; }
@@ -57,6 +61,10 @@ namespace ExperienceAndClasses.Utilities {
             TEXTURE_BUTTON_PLUS = GetTexture("ExperienceAndClasses/Textures/UI/ButtonPlus");
             TEXTURE_BUTTON_MINUS = GetTexture("ExperienceAndClasses/Textures/UI/ButtonMinus");
             TEXTURE_BUTTON_SIZE = TEXTURE_BUTTON_PLUS.Width;
+
+            TEXTURE_BUTTON_LEFT = GetTexture("ExperienceAndClasses/Textures/UI/ButtonLeft");
+            TEXTURE_BUTTON_RIGHT = GetTexture("ExperienceAndClasses/Textures/UI/ButtonRight");
+            TEXTURE_BUTTON_LEFTRIGHT_SIZE = TEXTURE_BUTTON_LEFT.Width;
 
             TEXTURE_CHARACTER = GetTexture("ExperienceAndClasses/Textures/UI/Character");
 

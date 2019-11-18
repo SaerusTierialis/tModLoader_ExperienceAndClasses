@@ -274,8 +274,20 @@ namespace ExperienceAndClasses.Systems {
 
             public Power() : base(IDs.Power) {}
             protected override void Effect(EACPlayer eacplayer, int points, bool do_effects = true) {
-                //TODO
-                //TODO fishing power too
+                //damage
+                float damage_scaling = Math.Max(eacplayer.PSheet.Classes.Primary.Class.Power_Scaling_Damage, eacplayer.PSheet.Classes.Secondary.Class.Power_Scaling_Damage / 2) * PER_POINT_DAMAGE;
+                if (damage_scaling > 0) {
+                    string str = eacplayer.PSheet.Attributes.Power_Scaling.ApplyPoints(eacplayer, points * damage_scaling, damage_scaling, do_effects);
+                    if (eacplayer.Fields.Is_Local) Effect_Text += str;
+                }
+
+                //fish
+                float fish_scaling = Math.Max(eacplayer.PSheet.Classes.Primary.Class.Power_Scaling_Fish, eacplayer.PSheet.Classes.Secondary.Class.Power_Scaling_Fish / 2) * PER_POINT_FISH;
+                if (fish_scaling > 0) {
+                    int bonus = RoundIntBonus(points * fish_scaling);
+                    if (do_effects) eacplayer.player.fishingSkill += bonus;
+                    if (eacplayer.Fields.Is_Local) Effect_Text += BonusValueString(bonus, "Stat_Misc_FishingPower", false, fish_scaling);
+                }
             }
         }
 
@@ -291,17 +303,17 @@ namespace ExperienceAndClasses.Systems {
                 //life
                 bonus = RoundIntBonus(PER_POINT_LIFE * points);
                 if (do_effects) eacplayer.player.statLifeMax2 += bonus;
-                if (eacplayer.Fields.Is_Local) Effect_Text += BonusValueString(bonus, "Stat_Defensive_Vanilla_Life", false, PER_POINT_LIFE);
+                if (eacplayer.Fields.Is_Local) Effect_Text += BonusValueString(bonus, "Stat_Defensive_Life", false, PER_POINT_LIFE);
 
                 //life regen
                 bonus = (int)Math.Max(0, PER_POINT_LIFE_REGEN * points);
                 if (do_effects) eacplayer.player.lifeRegen += bonus;
-                if (eacplayer.Fields.Is_Local) Effect_Text += BonusValueString(bonus, "Stat_Defensive_Vanilla_LifeRegen", false, PER_POINT_LIFE_REGEN);
+                if (eacplayer.Fields.Is_Local) Effect_Text += BonusValueString(bonus, "Stat_Defensive_LifeRegen", false, PER_POINT_LIFE_REGEN);
 
                 //defense
                 bonus = RoundIntBonus(PER_POINT_DEFENSE * points);
                 if (do_effects) eacplayer.player.statDefense += bonus;
-                if (eacplayer.Fields.Is_Local) Effect_Text += BonusValueString(bonus, "Stat_Defensive_Vanilla_Defense", false, PER_POINT_DEFENSE);
+                if (eacplayer.Fields.Is_Local) Effect_Text += BonusValueString(bonus, "Stat_Defensive_Defense", false, PER_POINT_DEFENSE);
             }
         }
 
@@ -317,12 +329,12 @@ namespace ExperienceAndClasses.Systems {
                 //mana
                 bonus = RoundIntBonus(PER_POINT_MANA * points);
                 if (do_effects) eacplayer.player.statManaMax2 += bonus;
-                if (eacplayer.Fields.Is_Local) Effect_Text += BonusValueString(bonus, "Stat_Mana_Vanilla_Mana", false, PER_POINT_MANA);
+                if (eacplayer.Fields.Is_Local) Effect_Text += BonusValueString(bonus, "Stat_Mana_Mana", false, PER_POINT_MANA);
 
                 //mana regen
                 bonus = (int)Math.Max(0, PER_POINT_MANA_REGEN * points);
                 if (do_effects) eacplayer.player.manaRegenBonus += bonus;
-                if (eacplayer.Fields.Is_Local) Effect_Text += BonusValueString(bonus, "Stat_Mana_Vanilla_ManaRegen", false, PER_POINT_MANA_REGEN);
+                if (eacplayer.Fields.Is_Local) Effect_Text += BonusValueString(bonus, "Stat_Mana_ManaRegen", false, PER_POINT_MANA_REGEN);
 
                 //mana delay
                 float bonus_float = PER_POINT_MANA_DELAY * points;
@@ -349,7 +361,7 @@ namespace ExperienceAndClasses.Systems {
                 //minion cap
                 bonus = RoundIntBonus(PER_POINT_MINION_CAP * points);
                 if (do_effects) eacplayer.player.maxMinions += bonus;
-                if (eacplayer.Fields.Is_Local) Effect_Text += BonusValueString(bonus, "Stat_Misc_Vanilla_MinionCap", false, PER_POINT_MINION_CAP);
+                if (eacplayer.Fields.Is_Local) Effect_Text += BonusValueString(bonus, "Stat_Misc_MinionCap", false, PER_POINT_MINION_CAP);
 
                 //healing
                 bonus_float = PER_POINT_HOLY_HEAL * points;
@@ -378,7 +390,7 @@ namespace ExperienceAndClasses.Systems {
                 //jump
                 bonus_float = PER_POINT_JUMP * points;
                 if (do_effects) eacplayer.player.jumpSpeedBoost += (bonus_float * 5);
-                if (eacplayer.Fields.Is_Local) Effect_Text += BonusValueString(bonus_float, "Stat_Mobility_Vanilla_Jump", true, PER_POINT_JUMP);
+                if (eacplayer.Fields.Is_Local) Effect_Text += BonusValueString(bonus_float, "Stat_Mobility_Jump", true, PER_POINT_JUMP);
                 
                 //dodge
                 bonus_float = PER_POINT_DODGE * points;
@@ -388,7 +400,7 @@ namespace ExperienceAndClasses.Systems {
                 //max fly time
                 bonus_int = RoundIntBonus(PER_POINT_FLY * points);
                 if (do_effects) eacplayer.player.wingTimeMax += bonus_int;
-                if (eacplayer.Fields.Is_Local) Effect_Text += BonusValueString(bonus_int, "Stat_Mobility_Vanilla_WingTime", false, PER_POINT_FLY);
+                if (eacplayer.Fields.Is_Local) Effect_Text += BonusValueString(bonus_int, "Stat_Mobility_WingTime", false, PER_POINT_FLY);
             }
         }
 
@@ -411,7 +423,7 @@ namespace ExperienceAndClasses.Systems {
                 if (eacplayer.Fields.Is_Local) Effect_Text += BonusValueString(bonus, "Stat_ItemSpeed_Weapon", true, PER_POINT_USE_SPEED);
 
                 //tool use time (if non-combat)
-                float fish_per = Math.Max(eacplayer.PSheet.Classes.Primary.Class.Fish_Power_Scaling, eacplayer.PSheet.Classes.Secondary.Class.Fish_Power_Scaling / 2);
+                float fish_per = Math.Max(eacplayer.PSheet.Classes.Primary.Class.Power_Scaling_Fish, eacplayer.PSheet.Classes.Secondary.Class.Power_Scaling_Fish / 2);
                 float bonus_per_point = fish_per * PER_POINT_USE_SPEED;
                 bonus = bonus_per_point * points;
                 if (do_effects) eacplayer.PSheet.Stats.Item_Speed_Tool += bonus;
