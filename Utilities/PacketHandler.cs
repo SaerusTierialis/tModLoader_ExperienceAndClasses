@@ -415,7 +415,13 @@ namespace ExperienceAndClasses.Utilities {
 
             protected override void RecieveBody(BinaryReader reader, int origin, EACPlayer origin_eacplayer) {
                 //read and set
-                origin_eacplayer.PSheet.Character.SetInCombat(reader.ReadBoolean());
+                bool in_combat = reader.ReadBoolean();
+                origin_eacplayer.PSheet.Character.SetInCombat(in_combat);
+
+                //relay
+                if (Shortcuts.IS_SERVER) {
+                    Send(-1, origin, in_combat);
+                }
             }
 
             public static void WritePacketBody(ModPacket packet, bool status) {
