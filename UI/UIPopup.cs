@@ -353,35 +353,43 @@ namespace ExperienceAndClasses.UI {
             EACPlayer eacplayer = Shortcuts.LOCAL_PLAYER;
 
             //damage
+            float global_damage_add = eacplayer.player.allDamage - 1f;
             str += Language.GetTextValue("Mods.ExperienceAndClasses.Common.Stat_Damage_Header");
-            str += Systems.Attribute.BonusValueString(eacplayer.player.allDamage - 1f, "Stat_Damage_Vanilla_All", true, default, default, true);
-            str += Systems.Attribute.BonusValueString(eacplayer.player.meleeDamage, "Stat_Damage_Vanilla_Melee", true, default, default, false);
-            str += Systems.Attribute.BonusValueString(eacplayer.player.rangedDamage, "Stat_Damage_Vanilla_Ranged", true, default, default, false);
-            str += Systems.Attribute.BonusValueString(eacplayer.player.thrownDamage, "Stat_Damage_Vanilla_Throwing", true, default, default, false);
-            str += Systems.Attribute.BonusValueString(eacplayer.player.magicDamage, "Stat_Damage_Vanilla_Magic", true, default, default, false);
-            str += Systems.Attribute.BonusValueString(eacplayer.player.minionDamage, "Stat_Damage_Vanilla_Minion", true, default, default, false);
-            str += Systems.Attribute.BonusValueString(eacplayer.PSheet.Stats.Damage_Light, "Stat_Damage_Light", true, default, default, false);
-            str += Systems.Attribute.BonusValueString(eacplayer.PSheet.Stats.Damage_Harmonic, "Stat_Damage_Harmonic", true, default, default, false);
-            str += Systems.Attribute.BonusValueString(eacplayer.PSheet.Stats.Damage_Other_Add, "Stat_Damage_Other", true, default, default, true);
+            str += Systems.Attribute.BonusValueString(eacplayer.player.meleeDamage + global_damage_add, "Stat_Damage_Vanilla_Melee", true, default, default, false);
+            str += Systems.Attribute.BonusValueString(eacplayer.player.rangedDamage + global_damage_add, "Stat_Damage_Vanilla_Ranged", true, default, default, false);
+            str += Systems.Attribute.BonusValueString(eacplayer.player.thrownDamage + global_damage_add, "Stat_Damage_Vanilla_Throwing", true, default, default, false);
+            str += Systems.Attribute.BonusValueString(eacplayer.player.magicDamage + global_damage_add, "Stat_Damage_Vanilla_Magic", true, default, default, false);
+            str += Systems.Attribute.BonusValueString(eacplayer.player.minionDamage + global_damage_add, "Stat_Damage_Vanilla_Minion", true, default, default, false);
+            str += Systems.Attribute.BonusValueString(eacplayer.PSheet.Stats.Damage_Light + global_damage_add, "Stat_Damage_Light", true, default, default, false);
+            str += Systems.Attribute.BonusValueString(eacplayer.PSheet.Stats.Damage_Harmonic + global_damage_add, "Stat_Damage_Harmonic", true, default, default, false);
+            str += Systems.Attribute.BonusValueString(eacplayer.PSheet.Stats.Damage_Other_Add + global_damage_add, "Stat_Damage_Other", true, default, default, true);
 
+            float global_crit_chance = eacplayer.PSheet.Stats.Crit_All;
             str += "\n\n" + Language.GetTextValue("Mods.ExperienceAndClasses.Common.Stat_Crit_Header");
-            str += Systems.Attribute.BonusValueString(eacplayer.PSheet.Stats.Crit_All, "Stat_Crit_All", true, default, default, true);
-            str += Systems.Attribute.BonusValueString(eacplayer.player.meleeCrit / 100f, "Stat_Crit_Vanilla_Melee", true, default, default, false);
-            str += Systems.Attribute.BonusValueString(eacplayer.player.rangedCrit / 100f, "Stat_Crit_Vanilla_Ranged", true, default, default, false);
-            str += Systems.Attribute.BonusValueString(eacplayer.player.thrownCrit / 100f, "Stat_Crit_Vanilla_Throwing", true, default, default, false);
-            str += Systems.Attribute.BonusValueString(eacplayer.player.magicCrit / 100f, "Stat_Crit_Vanilla_Magic", true, default, default, false);
             str += Systems.Attribute.BonusValueString(eacplayer.PSheet.Stats.Crit_Damage_Mult, "Stat_Crit_Mult", true, default, default, false);
+            str += Systems.Attribute.BonusValueString(eacplayer.player.meleeCrit / 100f + global_crit_chance, "Stat_Crit_Vanilla_Melee", true, default, default, false);
+            str += Systems.Attribute.BonusValueString(eacplayer.player.rangedCrit / 100f + global_crit_chance, "Stat_Crit_Vanilla_Ranged", true, default, default, false);
+            str += Systems.Attribute.BonusValueString(eacplayer.player.thrownCrit / 100f + global_crit_chance, "Stat_Crit_Vanilla_Throwing", true, default, default, false);
+            str += Systems.Attribute.BonusValueString(eacplayer.player.magicCrit / 100f + global_crit_chance, "Stat_Crit_Vanilla_Magic", true, default, default, false);
+            str += Systems.Attribute.BonusValueString(global_crit_chance, "Stat_Crit_Minion", true, default, default, false);
+            str += Systems.Attribute.BonusValueString(global_crit_chance, "Stat_Crit_Light", true, default, default, false);
+            str += Systems.Attribute.BonusValueString(global_crit_chance, "Stat_Crit_Harmonic", true, default, default, false);
+            str += Systems.Attribute.BonusValueString(global_crit_chance, "Stat_Crit_Other", true, default, default, true);
 
-            str += "\n\n" + Language.GetTextValue("Mods.ExperienceAndClasses.Common.Stat_Defensive_Header");
-            str += Systems.Attribute.BonusValueString(eacplayer.player.statLifeMax2, "Stat_Defensive_Vanilla_Life", false, default, default, false);
-            str += Systems.Attribute.BonusValueString(eacplayer.player.lifeRegen, "Stat_Defensive_Vanilla_LifeRegen", false, default, default, false);
-            str += Systems.Attribute.BonusValueString(eacplayer.player.statDefense, "Stat_Defensive_Vanilla_Defense", false, default, default, false);
-            str += Systems.Attribute.BonusValueString(eacplayer.PSheet.Stats.Dodge, "Stat_Defensive_Dodge", true, default, default, false);
+            str += "\n\n" + Language.GetTextValue("Mods.ExperienceAndClasses.Common.Stat_Abilities_Header");
+            str += Systems.Attribute.BonusValueString(eacplayer.PSheet.Stats.Ability_Delay_Reduction, "Stat_Abilities_Cooldown", true, default, default, false);
+            str += Systems.Attribute.BonusValueString(eacplayer.PSheet.Stats.Healing_Mult, "Stat_Abilities_Healing", true, default, default, false);
 
-            str += "\n\n" + Language.GetTextValue("Mods.ExperienceAndClasses.Common.Stat_Sheet_Disclaimer");
+            str += "\n\n\n" + Language.GetTextValue("Mods.ExperienceAndClasses.Common.Stat_Sheet_Disclaimer");
 
 
-            str2 += Language.GetTextValue("Mods.ExperienceAndClasses.Common.Stat_Mana_Header");
+            str2 += "\n\n" + Language.GetTextValue("Mods.ExperienceAndClasses.Common.Stat_Defensive_Header");
+            str2 += Systems.Attribute.BonusValueString(eacplayer.player.statLifeMax2, "Stat_Defensive_Vanilla_Life", false, default, default, false);
+            str2 += Systems.Attribute.BonusValueString(eacplayer.player.lifeRegen, "Stat_Defensive_Vanilla_LifeRegen", false, default, default, false);
+            str2 += Systems.Attribute.BonusValueString(eacplayer.player.statDefense, "Stat_Defensive_Vanilla_Defense", false, default, default, false);
+            str2 += Systems.Attribute.BonusValueString(eacplayer.PSheet.Stats.Dodge, "Stat_Defensive_Dodge", true, default, default, false);
+
+            str2 += "\n\n" + Language.GetTextValue("Mods.ExperienceAndClasses.Common.Stat_Mana_Header");
             str2 += Systems.Attribute.BonusValueString(eacplayer.player.statManaMax2, "Stat_Mana_Vanilla_Mana", false, default, default, false);
             str2 += Systems.Attribute.BonusValueString(eacplayer.player.manaRegenBonus, "Stat_Mana_Vanilla_ManaRegen", false, default, default, false);
             str2 += Systems.Attribute.BonusValueString(eacplayer.PSheet.Stats.Mana_Regen_Delay_Reduction, "Stat_Mana_ManaRegenDelay", true, default, default, false);
@@ -396,10 +404,6 @@ namespace ExperienceAndClasses.UI {
             str2 += Systems.Attribute.BonusValueString(eacplayer.PSheet.Stats.Item_Speed_Weapon, "Stat_ItemSpeed_Weapon", true, default, default, true);
             str2 += Systems.Attribute.BonusValueString(eacplayer.PSheet.Stats.Item_Speed_Tool, "Stat_ItemSpeed_Tool", true, default, default, true);
             str2 += Systems.Attribute.BonusValueString(1f + (1f - eacplayer.player.meleeSpeed), "Stat_ItemSpeed_Vanilla_Melee", true, default, default, false);
-
-            str2 += "\n\n" + Language.GetTextValue("Mods.ExperienceAndClasses.Common.Stat_Abilities_Header");
-            str2 += Systems.Attribute.BonusValueString(eacplayer.PSheet.Stats.Ability_Delay_Reduction, "Stat_Abilities_Cooldown", true, default, default, false);
-            str2 += Systems.Attribute.BonusValueString(eacplayer.PSheet.Stats.Healing_Mult, "Stat_Abilities_Healing", true, default, default, false);
 
             str2 += "\n\n" + Language.GetTextValue("Mods.ExperienceAndClasses.Common.Stat_Misc_Header");
             str2 += Systems.Attribute.BonusValueString(eacplayer.player.maxMinions, "Stat_Misc_Vanilla_MinionCap", false, default, default, false);
