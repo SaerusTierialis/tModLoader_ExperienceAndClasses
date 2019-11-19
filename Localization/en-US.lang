@@ -111,7 +111,7 @@ Common.Class_None_Name=None
 Common.Class_Novice_Name=Novice
 Common.Class_Explorer_Name=Explorer
 
-Common.Class_Warrior_Name=Warrior
+Common.Class_Vanguard_Name=Vanguard
 Common.Class_Ranger_Name=Ranger
 Common.Class_Traveler_Name=Traveler
 Common.Class_Rogue_Name=Rogue
@@ -140,7 +140,7 @@ Common.Class_None_Description=
 Common.Class_Novice_Description=TODO
 Common.Class_Explorer_Description=TODO
 
-Common.Class_Warrior_Description=TODO
+Common.Class_Vanguard_Description=TODO
 Common.Class_Ranger_Description=TODO
 Common.Class_Traveler_Description=TODO
 Common.Class_Rogue_Description=TODO

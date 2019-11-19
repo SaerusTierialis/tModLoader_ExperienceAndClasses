@@ -1,10 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Terraria;
 using Terraria.Localization;
 using Terraria.ModLoader;
@@ -18,7 +15,7 @@ namespace ExperienceAndClasses.Systems {
             New, //no longer used
             None, //no class selected (intentionally)
             Novice,
-            Warrior,
+            Vanguard,
             Ranger,
             Traveler,
             Rogue,
@@ -573,8 +570,8 @@ namespace ExperienceAndClasses.Systems {
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Tier 2 Classes ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-        public class Warrior : Tier2 {
-            public Warrior() : base(IDs.Warrior) {
+        public class Vanguard : Tier2 {
+            public Vanguard() : base(IDs.Vanguard) {
                 Class_Locations[1, 0] = ID_num;
                 Attribute_Growth[(byte)Attribute.IDs.Power] = 2;
                 Attribute_Growth[(byte)Attribute.IDs.Vitality] = 3;
@@ -668,7 +665,7 @@ namespace ExperienceAndClasses.Systems {
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Tier 3 Classes ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         public class BloodKnight : Tier3 {
-            public BloodKnight() : base(IDs.BloodKnight, IDs.Warrior) {
+            public BloodKnight() : base(IDs.BloodKnight, IDs.Vanguard) {
                 Class_Locations[3, 0] = ID_num;
                 Attribute_Growth[(byte)Attribute.IDs.Power] = 4;
                 Attribute_Growth[(byte)Attribute.IDs.Vitality] = 4;
@@ -678,7 +675,7 @@ namespace ExperienceAndClasses.Systems {
         }
 
         public class Berserker : Tier3 {
-            public Berserker() : base(IDs.Berserker, IDs.Warrior) {
+            public Berserker() : base(IDs.Berserker, IDs.Vanguard) {
                 Class_Locations[2, 0] = ID_num;
                 Attribute_Growth[(byte)Attribute.IDs.Power] = 2;
                 Attribute_Growth[(byte)Attribute.IDs.Vitality] = 2;
@@ -690,7 +687,7 @@ namespace ExperienceAndClasses.Systems {
         }
 
         public class Guardian : Tier3 {
-            public Guardian() : base(IDs.Guardian, IDs.Warrior) {
+            public Guardian() : base(IDs.Guardian, IDs.Vanguard) {
 
                 //DISABLED
                 //Class_Locations[4, 0] = ID_num;

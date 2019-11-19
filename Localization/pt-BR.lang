@@ -110,7 +110,7 @@ Common.Class_None_Name=Sem Classe
 Common.Class_Novice_Name=Novato
 Common.Class_Explorer_Name=Explorador
 
-Common.Class_Warrior_Name=Guerreiro
+Common.Class_Vanguard_Name=Guerreiro
 Common.Class_Ranger_Name=Arqueiro
 Common.Class_Traveler_Name=Viajante
 Common.Class_Rogue_Name=Ladrão
@@ -139,7 +139,7 @@ Common.Class_None_Description=
 Common.Class_Novice_Description=TODO
 Common.Class_Explorer_Description=TODO
 
-Common.Class_Warrior_Description=TODO
+Common.Class_Vanguard_Description=TODO
 Common.Class_Ranger_Description=TODO
 Common.Class_Traveler_Description=TODO
 Common.Class_Rogue_Description=TODO
