@@ -16,7 +16,7 @@ namespace ExperienceAndClasses.Systems {
             None, //no class selected (intentionally)
             Novice,
             Vanguard,
-            Ranger,
+            EagleEye,
             Traveler,
             Rogue,
             Summoner,
@@ -26,13 +26,13 @@ namespace ExperienceAndClasses.Systems {
             Berserker,
             Guardian,
             Tinkerer,
-            Artillery,
+            Sharpshooter,
             Chrono,
             Controller,
             Shadow,
             Assassin,
             SoulBinder,
-            Tactician,
+            Mastermind,
             Saint,
             HybridPrime,
             Explorer,
@@ -151,6 +151,9 @@ namespace ExperienceAndClasses.Systems {
         }
 
         public void LoadTextureAndItem() {
+            if (!Enabled)
+                return;
+
             //load texture
             if (Has_Texture) {
                 Texture = ModContent.GetTexture("ExperienceAndClasses/Textures/Class/" + INTERNAL_NAME);
@@ -581,8 +584,8 @@ namespace ExperienceAndClasses.Systems {
             }
         }
 
-        public class Ranger : Tier2 {
-            public Ranger() : base(IDs.Ranger) {
+        public class EagleEye : Tier2 {
+            public EagleEye() : base(IDs.EagleEye) {
                 Class_Locations[1, 1] = ID_num;
                 Attribute_Growth[(byte)Attribute.IDs.Power] = 3;
                 Attribute_Growth[(byte)Attribute.IDs.Spirit] = 2;
@@ -666,7 +669,11 @@ namespace ExperienceAndClasses.Systems {
 
         public class BloodKnight : Tier3 {
             public BloodKnight() : base(IDs.BloodKnight, IDs.Vanguard) {
-                Class_Locations[3, 0] = ID_num;
+                
+                //DISABLED
+                //Class_Locations[3, 0] = ID_num;
+                Enabled = false;
+
                 Attribute_Growth[(byte)Attribute.IDs.Power] = 4;
                 Attribute_Growth[(byte)Attribute.IDs.Vitality] = 4;
                 Colour = COLOUR_CLOSE_RANGE_3;
@@ -676,9 +683,8 @@ namespace ExperienceAndClasses.Systems {
 
         public class Berserker : Tier3 {
             public Berserker() : base(IDs.Berserker, IDs.Vanguard) {
-                Class_Locations[2, 0] = ID_num;
-                Attribute_Growth[(byte)Attribute.IDs.Power] = 2;
-                Attribute_Growth[(byte)Attribute.IDs.Vitality] = 2;
+                Class_Locations[3, 0] = ID_num;
+                Attribute_Growth[(byte)Attribute.IDs.Power] = 3;
                 Attribute_Growth[(byte)Attribute.IDs.Agility] = 2;
                 Attribute_Growth[(byte)Attribute.IDs.Dexterity] = 4;
                 Colour = COLOUR_CLOSE_RANGE_3;
@@ -688,11 +694,7 @@ namespace ExperienceAndClasses.Systems {
 
         public class Guardian : Tier3 {
             public Guardian() : base(IDs.Guardian, IDs.Vanguard) {
-
-                //DISABLED
-                //Class_Locations[4, 0] = ID_num;
-                Enabled = false;
-
+                Class_Locations[2, 0] = ID_num;
                 Attribute_Growth[(byte)Attribute.IDs.Power] = 3;
                 Attribute_Growth[(byte)Attribute.IDs.Vitality] = 5;
                 Colour = COLOUR_CLOSE_RANGE_3;
@@ -700,8 +702,8 @@ namespace ExperienceAndClasses.Systems {
             }
         }
 
-        public class Artillery : Tier3 {
-            public Artillery() : base(IDs.Artillery, IDs.Ranger) {
+        public class Sharpshooter : Tier3 {
+            public Sharpshooter() : base(IDs.Sharpshooter, IDs.EagleEye) {
                 Class_Locations[2, 1] = ID_num;
                 Attribute_Growth[(byte)Attribute.IDs.Power] = 4;
                 Attribute_Growth[(byte)Attribute.IDs.Spirit] = 4;
@@ -711,7 +713,7 @@ namespace ExperienceAndClasses.Systems {
         }
 
         public class Tinkerer : Tier3 {
-            public Tinkerer() : base(IDs.Tinkerer, IDs.Ranger) {
+            public Tinkerer() : base(IDs.Tinkerer, IDs.EagleEye) {
 
                 //DISABLED
                 //Class_Locations[3, 1] = ID_num;
@@ -761,7 +763,7 @@ namespace ExperienceAndClasses.Systems {
         }
 
         public class Chrono : Tier3 {
-            public Chrono() : base(IDs.Chrono, IDs.Ranger) {
+            public Chrono() : base(IDs.Chrono, IDs.EagleEye) {
                 Class_Locations[3, 1] = ID_num;
                 Attribute_Growth[(byte)Attribute.IDs.Power] = 2;
                 Attribute_Growth[(byte)Attribute.IDs.Spirit] = 2;
@@ -782,8 +784,8 @@ namespace ExperienceAndClasses.Systems {
             }
         }
 
-        public class Tactician : Tier3 {
-            public Tactician() : base(IDs.Tactician, IDs.Summoner) {
+        public class Mastermind : Tier3 {
+            public Mastermind() : base(IDs.Mastermind, IDs.Summoner) {
                 Class_Locations[3, 4] = ID_num;
                 Attribute_Growth[(byte)Attribute.IDs.Power] = 4;
                 Attribute_Growth[(byte)Attribute.IDs.Spirit] = 4;
