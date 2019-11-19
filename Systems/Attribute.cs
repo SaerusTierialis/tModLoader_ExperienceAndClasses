@@ -283,11 +283,9 @@ namespace ExperienceAndClasses.Systems {
 
                 //fish
                 float fish_scaling = Math.Max(eacplayer.PSheet.Classes.Primary.Class.Power_Scaling_Fish, eacplayer.PSheet.Classes.Secondary.Class.Power_Scaling_Fish / 2) * PER_POINT_FISH;
-                if (fish_scaling > 0) {
-                    int bonus = RoundIntBonus(points * fish_scaling);
-                    if (do_effects) eacplayer.player.fishingSkill += bonus;
-                    if (eacplayer.Fields.Is_Local) Effect_Text += BonusValueString(bonus, "Stat_Misc_FishingPower", false, fish_scaling);
-                }
+                int bonus = RoundIntBonus(points * fish_scaling);
+                if (do_effects) eacplayer.player.fishingSkill += bonus;
+                if (eacplayer.Fields.Is_Local) Effect_Text += BonusValueString(bonus, "Stat_Misc_FishingPower", false, fish_scaling, " (" + PlayerClass.LOOKUP[(byte)PlayerClass.IDs.Explorer].Name + ")");
             }
         }
 
@@ -418,13 +416,13 @@ namespace ExperienceAndClasses.Systems {
                 if (eacplayer.Fields.Is_Local) Effect_Text += BonusValueString(bonus, "Stat_Abilities_Cooldown", true, PER_POINT_ABILITY_DELAY);
 
                 //weapon use time
-                bonus = PER_POINT_USE_SPEED * points;
+                float bonus_per_point = Math.Max(eacplayer.PSheet.Classes.Primary.Class.Power_Scaling_Damage, eacplayer.PSheet.Classes.Secondary.Class.Power_Scaling_Damage / 2) * PER_POINT_USE_SPEED;
+                bonus = bonus_per_point * points;
                 if (do_effects) eacplayer.PSheet.Stats.Item_Speed_Weapon += bonus;
-                if (eacplayer.Fields.Is_Local) Effect_Text += BonusValueString(bonus, "Stat_ItemSpeed_Weapon", true, PER_POINT_USE_SPEED);
+                if (eacplayer.Fields.Is_Local) Effect_Text += BonusValueString(bonus, "Stat_ItemSpeed_Weapon", true, bonus_per_point);
 
                 //tool use time (if non-combat)
-                float fish_per = Math.Max(eacplayer.PSheet.Classes.Primary.Class.Power_Scaling_Fish, eacplayer.PSheet.Classes.Secondary.Class.Power_Scaling_Fish / 2);
-                float bonus_per_point = fish_per * PER_POINT_USE_SPEED;
+                bonus_per_point = Math.Max(eacplayer.PSheet.Classes.Primary.Class.Power_Scaling_Fish, eacplayer.PSheet.Classes.Secondary.Class.Power_Scaling_Fish / 2) * PER_POINT_USE_SPEED;
                 bonus = bonus_per_point * points;
                 if (do_effects) eacplayer.PSheet.Stats.Item_Speed_Tool += bonus;
                 if (eacplayer.Fields.Is_Local) Effect_Text += BonusValueString(bonus, "Stat_ItemSpeed_Tool", true, bonus_per_point, " (" + PlayerClass.LOOKUP[(byte)PlayerClass.IDs.Explorer].Name + ")" );
