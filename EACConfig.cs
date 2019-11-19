@@ -34,7 +34,7 @@ namespace ExperienceAndClasses {
         [Range(0f, 1f)]
         [Increment(.01f)]
         [DefaultValue(0.05f)]
-        public float XPDeathPenalty { get; set; } //TODO - unused
+        public float XPDeathPenalty { get; set; }
 
         [Label("$Mods.ExperienceAndClasses.Common.Config_Reward_ModPerPlayer_Label")]
         [Tooltip("$Mods.ExperienceAndClasses.Common.Config_Reward_ModPerPlayer_Tooltip")]
@@ -84,7 +84,7 @@ namespace ExperienceAndClasses {
 
         [Label("$Mods.ExperienceAndClasses.Common.Config_Trace_Label")]
         [Tooltip("$Mods.ExperienceAndClasses.Common.Config_Trace_Tooltip")]
-        [DefaultValue(true)]
+        [DefaultValue(false)]
         public bool PacketTrace { get; set; }
 
 

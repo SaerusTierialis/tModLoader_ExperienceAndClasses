@@ -254,7 +254,7 @@ Common.Stat_Mobility_Jump=Jump Speed Boost
 Common.Stat_Mobility_WingTime=Wing Time
 
 Common.Stat_ItemSpeed_Header=Item Speed
-Common.Stat_ItemSpeed_Weapon=All Weapon Attack Speed
+Common.Stat_ItemSpeed_Weapon=All Weapon Speed
 Common.Stat_ItemSpeed_Melee=Melee Attack Speed
 Common.Stat_ItemSpeed_Tool=All Tool Speed
 
@@ -266,7 +266,7 @@ Common.Stat_Misc_Header=Miscellaneous
 Common.Stat_Misc_FishingPower=Fishing Power
 Common.Stat_Misc_MinionCap=Maximum Minions
 
-Common.Stat_Sheet_Disclaimer=Global bonuses have been added to displayed values\n"{$Mods.ExperienceAndClasses.Common.Damage_Type_Other}" refers to custom damage types added by other mods
+Common.Stat_Sheet_Disclaimer=Global bonuses have been added to displayed values\n"{$Mods.ExperienceAndClasses.Common.Damage_Type_Other}" refers to custom damage types added by other mods\nSome values will not update if the game is paused
 
 //Power Scaling
 Common.PowerScaling_SetFail_InCombat={$Mods.ExperienceAndClasses.Common.Attribute_Power_Name} Scaling Type cannot be changed while in combat.

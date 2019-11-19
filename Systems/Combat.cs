@@ -23,6 +23,9 @@ namespace ExperienceAndClasses.Systems {
                 Is_Projectile = false;
                 Item = item;
 
+                Tool = ItemIsTool(item);
+                Weapon = ItemIsWeapon(item);
+
                 Melee = item.melee;
                 Ranged = item.ranged;
                 Throwing = item.thrown;
@@ -30,31 +33,33 @@ namespace ExperienceAndClasses.Systems {
                 Minion = ItemIsMinionWeapon(item);
                 Light = is_light;
                 Harmonic = is_harmonic;
-                Tool = ItemIsTool(item);
-                Other = !(Melee || Ranged || Throwing || Magic || Minion || Light || Harmonic || Tool);
+                Other = Weapon && !(Melee || Ranged || Throwing || Magic || Minion || Light || Harmonic);
             }
             public DamageSource(Projectile proj, bool is_light = false, bool is_harmonic = false) {
                 Is_Item = false;
                 Is_Projectile = true;
                 Projectile = proj;
 
-                Melee = proj.melee;
+                Tool = false;
+                Weapon = true;
+
+                Melee = Weapon && proj.melee;
                 Ranged = proj.ranged;
                 Throwing = proj.thrown;
                 Magic = proj.magic;
                 Minion = proj.minion || proj.sentry;
                 Light = is_light;
                 Harmonic = is_harmonic;
-                Tool = false;
-                Other = !(Melee || Ranged || Throwing || Magic || Minion || Light || Harmonic || Tool);
+                Other = Weapon && !(Melee || Ranged || Throwing || Magic || Minion || Light || Harmonic || Tool);
             }
 
+            public readonly bool Tool;
+            public readonly bool Weapon;
             public readonly bool Melee;
             public readonly bool Ranged;
             public readonly bool Throwing;
             public readonly bool Magic;
             public readonly bool Minion;
-            public readonly bool Tool;
             public readonly bool Light;
             public readonly bool Harmonic;
             public readonly bool Other;
@@ -66,11 +71,37 @@ namespace ExperienceAndClasses.Systems {
         }
 
         public static bool ItemIsWeapon(Item item) {
-            return (item.damage > 0) && !ItemIsTool(item);
+            return ((item.damage > 0) || (item.mana > 0)) && !ItemIsTool(item);
         }
 
         public static bool ItemIsMinionWeapon(Item item) {
             return item.summon || item.DD2Summon || item.sentry;
+        }
+
+        public static void ModifyItemDamge(EACPlayer eacplayer, Item item, ref float add, ref float mult, ref float flat) {
+            DamageSource dsource = new DamageSource(item);
+
+            //added workaround for radiant damage
+            if (dsource.Other || (dsource.Magic && (add != (eacplayer.player.allDamage + eacplayer.player.magicDamage - 1f)))) {
+                add += eacplayer.PSheet.Stats.Damage_Other_Add;
+            }
+
+            if (dsource.Light) add += (eacplayer.PSheet.Stats.Damage_Light - 1f);
+            if (dsource.Harmonic) add += (eacplayer.PSheet.Stats.Damage_Harmonic - 1f);
+        }
+
+        public static float ModifyItemUseTime(EACPlayer eacplayer, Item item, float use_time) {
+            DamageSource dsource = new DamageSource(item);
+
+            if (dsource.Tool) {
+                use_time *= eacplayer.PSheet.Stats.Item_Speed_Tool;
+            }
+            
+            if (dsource.Weapon) {
+                use_time *= eacplayer.PSheet.Stats.Item_Speed_Weapon;
+            }
+
+            return use_time;
         }
 
         public static void LocalModifyDamageDealt(EACPlayer eacplayer, DamageSource dsource, ref int damage, ref bool crit, bool is_projectile = false, float distance = 0f) {
@@ -93,7 +124,7 @@ namespace ExperienceAndClasses.Systems {
                         adjust += eacplayer.player.magicCrit / 100f;
 
                     //roll crit
-                    if (RollCrit(eacplayer, adjust, dsource.Minion, dsource.Light, dsource.Harmonic)) {
+                    if (RollCrit(eacplayer, dsource, adjust)) {
                         crit = true;
                     }
                 }
@@ -105,12 +136,12 @@ namespace ExperienceAndClasses.Systems {
             }
         }
 
-        public static bool RollCrit(EACPlayer eacplayer, float adjust = 0, bool is_minion = false, bool is_light = false, bool is_harmonic = false) {
+        public static bool RollCrit(EACPlayer eacplayer, DamageSource dsource, float adjust = 0) {
             float crit_chance = eacplayer.PSheet.Stats.Crit_All;
 
-            if (is_minion) crit_chance += BASE_CRIT_MINION;
-            if (is_light) crit_chance += BASE_CRIT_LIGHT;
-            if (is_harmonic) crit_chance += BASE_CRIT_HARMONIC;
+            if (dsource.Minion) crit_chance += BASE_CRIT_MINION;
+            if (dsource.Light) crit_chance += BASE_CRIT_LIGHT;
+            if (dsource.Harmonic) crit_chance += BASE_CRIT_HARMONIC;
 
             return Main.rand.NextFloat(0f, 1f - adjust) < crit_chance;
         }

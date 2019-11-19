@@ -401,15 +401,15 @@ namespace ExperienceAndClasses.UI {
             str2 += Systems.Attribute.BonusValueString(eacplayer.player.wingTimeMax, "Stat_Mobility_WingTime", false, default, default, false);
 
             str2 += "\n\n" + Language.GetTextValue("Mods.ExperienceAndClasses.Common.Stat_ItemSpeed_Header");
-            str2 += Systems.Attribute.BonusValueString(eacplayer.PSheet.Stats.Item_Speed_Weapon, "Stat_ItemSpeed_Weapon", true, default, default, true);
-            str2 += Systems.Attribute.BonusValueString(eacplayer.PSheet.Stats.Item_Speed_Tool, "Stat_ItemSpeed_Tool", true, default, default, true);
+            str2 += Systems.Attribute.BonusValueString(eacplayer.PSheet.Stats.Item_Speed_Weapon, "Stat_ItemSpeed_Weapon", true, default, default, false);
+            str2 += Systems.Attribute.BonusValueString(eacplayer.PSheet.Stats.Item_Speed_Tool, "Stat_ItemSpeed_Tool", true, default, default, false);
             str2 += Systems.Attribute.BonusValueString(1f + (1f - eacplayer.player.meleeSpeed), "Stat_ItemSpeed_Melee", true, default, default, false);
 
             str2 += "\n\n" + Language.GetTextValue("Mods.ExperienceAndClasses.Common.Stat_Misc_Header");
             str2 += Systems.Attribute.BonusValueString(eacplayer.player.maxMinions, "Stat_Misc_MinionCap", false, default, default, false);
             str2 += Systems.Attribute.BonusValueString(eacplayer.player.fishingSkill, "Stat_Misc_FishingPower", false, default, default, false);
 
-            str2 += "\n\n\n";
+            str2 += "\n\n\n\n";
 
 
             //display

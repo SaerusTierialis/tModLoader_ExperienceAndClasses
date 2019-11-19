@@ -129,6 +129,17 @@ namespace ExperienceAndClasses {
             
         }
 
+        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Items ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+        public override void ModifyWeaponDamage(Item item, ref float add, ref float mult, ref float flat) {
+            base.ModifyWeaponDamage(item, ref add, ref mult, ref flat);
+            Systems.Combat.ModifyItemDamge(this, item, ref add, ref mult, ref flat);
+        }
+
+        public override float UseTimeMultiplier(Item item) {
+            return Systems.Combat.ModifyItemUseTime(this, item, base.UseTimeMultiplier(item));
+        }
+
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Damage Taken ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         public override void Hurt(bool pvp, bool quiet, double damage, int hitDirection, bool crit) {

@@ -20,13 +20,13 @@ namespace ExperienceAndClasses.Systems.PlayerSheet {
 
         public float Ability_Delay_Reduction; //TODO - unused
 
-        public float Item_Speed_Weapon; //TODO - unused
-        public float Item_Speed_Tool; //TODO - unused
+        public float Item_Speed_Weapon;
+        public float Item_Speed_Tool;
 
         //1 = 100%
-        public float Damage_Light; //TODO - unused
-        public float Damage_Harmonic; //TODO - unused
-        public float Damage_Other_Add; //TODO - unused
+        public float Damage_Light;
+        public float Damage_Harmonic;
+        public float Damage_Other_Add;
 
         /// <summary>
         /// 0 to 1
@@ -58,7 +58,7 @@ namespace ExperienceAndClasses.Systems.PlayerSheet {
             Crit_All = 0f;
             Crit_Damage_Mult = 1f;
 
-            Item_Speed_Weapon = Item_Speed_Tool = 0f;
+            Item_Speed_Weapon = Item_Speed_Tool = 1f;
         }
 
         public void Limit() {
