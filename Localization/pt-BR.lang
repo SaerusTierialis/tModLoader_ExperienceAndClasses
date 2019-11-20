@@ -31,9 +31,9 @@ BuffDescription.XP_Buff=Ganho de EXP aumentado em 50%!
 
 //Items
 ItemName.Orb_Monster=Orbe da Ascensão
-ItemTooltip.Orb_Monster=Uma esfera cristalina que brilha emitindo uma grande promessa de poder...\n\nUsado para desbloquear as Classes, Resetar atributos, ou TODO
+ItemTooltip.Orb_Monster=Uma esfera cristalina que brilha emitindo uma grande promessa de poder...\n\nUsado para desbloquear as Classes, Resetar atributos, ou ???
 ItemName.Orb_Boss=Orbe da Transcendência
-ItemTooltip.Orb_Boss=Uma esfera cristalina que trás uma promessa de um poder extraordinário...\n\nUsado para desbloquear as classes, desbloquear sub-classes, ou TODO
+ItemTooltip.Orb_Boss=Uma esfera cristalina que trás uma promessa de um poder extraordinário...\n\nUsado para desbloquear as classes, desbloquear sub-classes, ou ???
 ItemName.Unlock_Tier2=Passe de Classe Tier II
 ItemTooltip.Unlock_Tier2=Este Passe pode ser usado para desbloquear classes de Tier II!\nClique em um ícone de classe para desbloquear o diálogo.
 ItemName.Unlock_Tier3=Passe de Classe Tier III
