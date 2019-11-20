@@ -12,6 +12,9 @@ using static Terraria.ModLoader.ModContent;
 
 namespace ExperienceAndClasses {
     public class EACPlayer : ModPlayer {
+        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Constants ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+        private const double MINUTES_BETWEEN_FULL_SUNC = 120;
+
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Fields ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         public FieldsContainer Fields { get; private set; }
@@ -32,8 +35,11 @@ namespace ExperienceAndClasses {
 
             public bool Is_Local = false;
 
-            public DateTime AFK_Time = DateTime.MaxValue;
-            public DateTime IN_COMBAT_time = DateTime.MinValue;
+            public DateTime Time_BecomeAFK = DateTime.MaxValue;
+            public DateTime Time_EndInCombat = DateTime.MinValue;
+            public DateTime Time_FullSync = DateTime.MaxValue;
+
+            public int Prior_Item_Animation = 0;
         }
 
         /// <summary>
@@ -54,6 +60,9 @@ namespace ExperienceAndClasses {
         }
 
         public override void OnEnterWorld(Player player) {
+            //Update time
+            Shortcuts.UpdateTime();
+
             //Update netmode
             Shortcuts.UpdateNetmode();
 
@@ -80,6 +89,8 @@ namespace ExperienceAndClasses {
         private void FullSync() {
             Utilities.PacketHandler.FullSync.Send(this);
             //TODO - send other?
+
+            Fields.Time_FullSync = DateTime.Now.AddMinutes(MINUTES_BETWEEN_FULL_SUNC);
         }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Update ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
@@ -87,17 +98,15 @@ namespace ExperienceAndClasses {
         public override void PreUpdateBuffs() {
             base.PreUpdateBuffs();
 
+            //reinit stats, attributes, etc.
             PSheet.PreUpdate();
         }
 
-        public override void PostUpdateBuffs() {
-            base.PostUpdateBuffs();
+        public override void PostUpdateEquips() {
+            base.PostUpdateEquips();
 
+            //apply attributes etc.
             PSheet.PostUpdate();
-
-            //Main.NewText("test=" + PSheet.Classes.Primary.Class.Name + " " + PSheet.Classes.Primary.Unlocked);
-
-            //Main.NewText("IN_COMBAT = " + PSheet.Character.In_Combat);
         }
 
         public override void PostUpdate() {
@@ -109,7 +118,7 @@ namespace ExperienceAndClasses {
                 //afk (must be in post, not pre)
                 if (config.AFKEnabled) {
                     //become afk?
-                    if (!PSheet.Character.AFK && (Shortcuts.Now.CompareTo(Fields.AFK_Time) > 0)) {
+                    if (!PSheet.Character.AFK && (Shortcuts.Now.CompareTo(Fields.Time_BecomeAFK) > 0)) {
                         PSheet.Character.SetAFK(true);
                     }
                 }
@@ -121,11 +130,34 @@ namespace ExperienceAndClasses {
                 }
 
                 //in combat
-                if (PSheet.Character.In_Combat && (Shortcuts.Now.CompareTo(Fields.IN_COMBAT_time) > 0)) {
+                if (PSheet.Character.In_Combat && (Shortcuts.Now.CompareTo(Fields.Time_EndInCombat) > 0)) {
                     PSheet.Character.SetInCombat(false);
                 }
 
+                //full sync
+                if (Shortcuts.Now.CompareTo(Fields.Time_FullSync) > 0) {
+                    FullSync();
+                }
+
             }
+
+            //detect any item use
+            bool used_item = (player.itemAnimation > Fields.Prior_Item_Animation) && (!player.HeldItem.channel || player.channel);
+            Fields.Prior_Item_Animation = player.itemAnimation;
+            if (used_item) {
+                UsedItem(player.HeldItem);
+            }
+            
+        }
+
+        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Use Items/Weapons ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+        /// <summary>
+        /// Called by server + all clients
+        /// Called only at start of channelling
+        /// </summary>
+        /// <param name="item"></param>
+        private void UsedItem(Item item) {
             
         }
 
@@ -280,14 +312,14 @@ namespace ExperienceAndClasses {
             if (PSheet.Character.AFK) {
                 PSheet.Character.SetAFK(false);
             }
-            Fields.AFK_Time = Shortcuts.Now.AddSeconds(Shortcuts.GetConfigServer.AFKSeconds);
+            Fields.Time_BecomeAFK = Shortcuts.Now.AddSeconds(Shortcuts.GetConfigServer.AFKSeconds);
         }
 
         private void TriggerInCombat() {
             if (!PSheet.Character.In_Combat) {
                 PSheet.Character.SetInCombat(true);
             }
-            Fields.IN_COMBAT_time = Shortcuts.Now.AddSeconds(Systems.Combat.SECONDS_IN_COMBAT);
+            Fields.Time_EndInCombat = Shortcuts.Now.AddSeconds(Systems.Combat.SECONDS_IN_COMBAT);
         }
 
     }

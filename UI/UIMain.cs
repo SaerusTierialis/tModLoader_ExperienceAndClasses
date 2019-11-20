@@ -614,7 +614,7 @@ namespace ExperienceAndClasses.UI {
                     old_modplayer.SpendXP(xp_to_apply);
                     Systems.XP.Adjustments.LocalAddXP(xp_to_apply, false, false);
 
-                    Main.NewText(xp_to_apply + " legacy experience has been redistribution! " + old_modplayer.GetXPAvailable() + " remains.");
+                    Main.NewText(xp_to_apply + " legacy experience has been allocated! " + old_modplayer.GetXPAvailable() + " remains.");
                     MouseOverPreRevampXP(evt, listeningElement);
 
                     UpdatePreRevampXPButtonVisible();
