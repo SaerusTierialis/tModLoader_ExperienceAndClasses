@@ -203,8 +203,15 @@ namespace ExperienceAndClasses.UI {
                 //extra
                 if (extra != null) {
                     ui_text_extra.SetText(extra);
+
+                    if (extra_left < 0) {
+                        extra_left *= -1;
+                        ui_text_extra.Top.Set(ui_text_body.Top.Pixels, 0f);
+                    }
+                    else {
+                        ui_text_extra.Top.Set(panel.Height.Pixels - (Main.fontMouseText.MeasureString(extra).Y * TEXT_SCALE_BODY), 0f);
+                    }
                     ui_text_extra.Left.Set(extra_left, 0f);
-                    ui_text_extra.Top.Set(panel.Height.Pixels - (Main.fontMouseText.MeasureString(extra).Y * TEXT_SCALE_BODY), 0f);
                 }
                 else {
                     ui_text_extra.SetText("");
@@ -263,14 +270,30 @@ namespace ExperienceAndClasses.UI {
             string title = attribute.Name;
 
             Systems.PlayerSheet.AttributeSheet sheet = Shortcuts.LOCAL_PLAYER.PSheet.Attributes;
-            string points = "Zero Point: -" + sheet.Zero_Point + " (based on allocation points spent)\n" +
-                            "From Allocated: " + sheet.Allocated[attribute.ID_num] + "\n" +
-                            "From Class(es): " + sheet.From_Class[attribute.ID_num] + "\n" +
-                            "From Other: " + sheet.Bonuses[attribute.ID_num] + "\n" +
-                            "Total: " + sheet.Final[attribute.ID_num];
+            
+            string points = "";
+            string points_values = "";
 
-            string text = attribute.Description + "\n\n" + points + "\n" + attribute.Effect_Text;
-            ShowText(source, title, text, WIDTH_ATTRIBUTE);
+            points += Language.GetTextValue("Mods.ExperienceAndClasses.Common.UI_Attribute_Calc_ZeroPoint") + ":\n";
+            points_values += "-" + sheet.Zero_Point + "\n";
+
+            points += Language.GetTextValue("Mods.ExperienceAndClasses.Common.UI_Attribute_Calc_FromAllocate") + ":\n";
+            points_values += "  " + sheet.Allocated[attribute.ID_num] + "\n";
+
+            points += Language.GetTextValue("Mods.ExperienceAndClasses.Common.UI_Attribute_Calc_FromClass") + ":\n";
+            points_values += "  " + sheet.From_Class[attribute.ID_num] + "\n";
+
+            points += Language.GetTextValue("Mods.ExperienceAndClasses.Common.UI_Attribute_Calc_FromOther") + ":\n";
+            points_values += "  " + sheet.Bonuses[attribute.ID_num] + "\n";
+
+            points += Language.GetTextValue("Mods.ExperienceAndClasses.Common.UI_Attribute_Calc_Total") + ":\n";
+            if (sheet.Final[attribute.ID_num] >= 0)
+                points_values += "  " + sheet.Final[attribute.ID_num] + "\n";
+            else
+                points_values += "-" + (sheet.Final[attribute.ID_num] * -1) + "\n";
+
+            string text = points + attribute.Effect_Text;
+            ShowText(source, title, text, WIDTH_ATTRIBUTE, points_values, -150f);
         }
 
         public void ShowHelpText(UIElement source, string help_text, string title=null) {
@@ -383,7 +406,7 @@ namespace ExperienceAndClasses.UI {
             str += "\n\n\n" + Language.GetTextValue("Mods.ExperienceAndClasses.Common.Stat_Sheet_Disclaimer");
 
 
-            str2 += "\n\n" + Language.GetTextValue("Mods.ExperienceAndClasses.Common.Stat_Defensive_Header");
+            str2 += Language.GetTextValue("Mods.ExperienceAndClasses.Common.Stat_Defensive_Header");
             str2 += Systems.Attribute.BonusValueString(eacplayer.player.statLifeMax2, "Stat_Defensive_Life", false, default, default, false);
             str2 += Systems.Attribute.BonusValueString(eacplayer.player.lifeRegen, "Stat_Defensive_LifeRegen", false, default, default, false);
             str2 += Systems.Attribute.BonusValueString(eacplayer.player.statDefense, "Stat_Defensive_Defense", false, default, default, false);
@@ -409,11 +432,9 @@ namespace ExperienceAndClasses.UI {
             str2 += Systems.Attribute.BonusValueString(eacplayer.player.maxMinions, "Stat_Misc_MinionCap", false, default, default, false);
             str2 += Systems.Attribute.BonusValueString(eacplayer.player.fishingSkill, "Stat_Misc_FishingPower", false, default, default, false);
 
-            str2 += "\n\n\n\n";
-
 
             //display
-            ShowText(source, "Stats", str, WIDTH_STATS, str2, 265f);
+            ShowText(source, "Stats", str, WIDTH_STATS, str2, -265f);
         }
 
     }

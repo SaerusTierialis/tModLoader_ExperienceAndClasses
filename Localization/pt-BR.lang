@@ -170,24 +170,18 @@ Common.Attribute_Reset_NoPoints=Você não pode redefinir os atributos por que n
 
 Common.Attribute_Power_Name=Power
 Common.Attribute_Power_Shortform=PWR
-Common.Attribute_Power_Description=TODO
 
 Common.Attribute_Vitality_Name=Vitality
 Common.Attribute_Vitality_Shortform=VIT
-Common.Attribute_Vitality_Description=TODO
 
 Common.Attribute_Mind_Name=Mind
 Common.Attribute_Mind_Shortform=MND
-Common.Attribute_Mind_Description=TODO
 
 Common.Attribute_Spirit_Name=Spirit
 Common.Attribute_Spirit_Shortform=SPR
-Common.Attribute_Spirit_Description=TODO
 
 Common.Attribute_Agility_Name=Agility
 Common.Attribute_Agility_Shortform=AGI
-Common.Attribute_Agility_Description=TODO
 
 Common.Attribute_Dexterity_Name=Dexterity
 Common.Attribute_Dexterity_Shortform=DEX
-Common.Attribute_Dexterity_Description=TODO

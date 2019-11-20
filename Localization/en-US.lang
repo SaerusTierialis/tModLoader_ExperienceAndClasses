@@ -171,27 +171,21 @@ Common.Attribute_Reset_NoPoints=Cannot reset attributes because no points have b
 
 Common.Attribute_Power_Name=Power
 Common.Attribute_Power_Shortform=PWR
-Common.Attribute_Power_Description=TODO
 
 Common.Attribute_Vitality_Name=Vitality
 Common.Attribute_Vitality_Shortform=VIT
-Common.Attribute_Vitality_Description=TODO
 
 Common.Attribute_Mind_Name=Mind
 Common.Attribute_Mind_Shortform=MND
-Common.Attribute_Mind_Description=TODO
 
 Common.Attribute_Spirit_Name=Spirit
 Common.Attribute_Spirit_Shortform=SPR
-Common.Attribute_Spirit_Description=TODO
 
 Common.Attribute_Agility_Name=Agility
 Common.Attribute_Agility_Shortform=AGI
-Common.Attribute_Agility_Description=TODO
 
 Common.Attribute_Dexterity_Name=Dexterity
 Common.Attribute_Dexterity_Shortform=DEX
-Common.Attribute_Dexterity_Description=TODO
 
 //Misc
 Common.Death_Penalty_XP=You have lost experience from death.
@@ -270,3 +264,10 @@ Common.Stat_Sheet_Disclaimer=Global bonuses have been added to displayed values\
 
 //Power Scaling
 Common.PowerScaling_SetFail_InCombat={$Mods.ExperienceAndClasses.Common.Attribute_Power_Name} Scaling Type cannot be changed while in combat.
+
+//Attribute Point Calculation
+Common.UI_Attribute_Calc_ZeroPoint=Zero Point
+Common.UI_Attribute_Calc_FromAllocate=From Allocated
+Common.UI_Attribute_Calc_FromClass=From Class(es)
+Common.UI_Attribute_Calc_FromOther=From Other
+Common.UI_Attribute_Calc_Total=Total

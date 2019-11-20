@@ -79,7 +79,6 @@ namespace ExperienceAndClasses.Systems {
 
         public string Name { get { return Language.GetTextValue("Mods.ExperienceAndClasses.Common.Attribute_" + INTERNAL_NAME + "_Name"); } }
         public string Shortform { get { return Language.GetTextValue("Mods.ExperienceAndClasses.Common.Attribute_" + INTERNAL_NAME + "_Shortform"); } }
-        public string Description { get { return Language.GetTextValue("Mods.ExperienceAndClasses.Common.Attribute_" + INTERNAL_NAME + "_Description"); } }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Constructor ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
