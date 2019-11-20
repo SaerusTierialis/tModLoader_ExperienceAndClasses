@@ -197,7 +197,7 @@ namespace ExperienceAndClasses.Systems {
         public string Tooltip_Main {
             get {
                 //implementation status
-                string implementation_status_text = "Implementation State: ";
+                string implementation_status_text = "Implementation Status: ";
                 switch (implementation_status) {
                     case IMPLEMENTATION_STATUS.ATTRIBUTE_ONLY:
                         implementation_status_text += "attributes only";
@@ -218,7 +218,7 @@ namespace ExperienceAndClasses.Systems {
                 }
 
                 //set tooltip
-                string tooltip_main = implementation_status_text + "\n\n" + Description + "\n\nATTRIBUTES:";
+                string tooltip_main = Description + "\n\n" + implementation_status_text + "\n\nATTRIBUTES:";
                 bool first = true;
                 string attribute_names = "";
                 foreach (byte id in Systems.Attribute.ATTRIBUTES_UI_ORDER) {
