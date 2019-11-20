@@ -33,13 +33,40 @@ namespace ExperienceAndClasses {
             /// </summary>
             public string password = "";
 
+            /// <summary>
+            /// Set during init
+            /// </summary>
             public bool Is_Local = false;
 
-            public DateTime Time_BecomeAFK = DateTime.MaxValue;
-            public DateTime Time_EndInCombat = DateTime.MinValue;
-            public DateTime Time_FullSync = DateTime.MaxValue;
+            /// <summary>
+            /// Time until local player becomes afk (local only)
+            /// </summary>
+            public DateTime time_become_AFK = DateTime.MaxValue;
 
-            public int Prior_Item_Animation = 0;
+            /// <summary>
+            /// Time until local player is no longer in combat (local only)
+            /// </summary>
+            public DateTime time_end_in_combat = DateTime.MinValue;
+
+            /// <summary>
+            /// Time until local player should send a full sync (local only)
+            /// </summary>
+            public DateTime time_full_sync = DateTime.MaxValue;
+
+            /// <summary>
+            /// Item animation number on prior cycle (for tracking item use)
+            /// </summary>
+            public int prior_item_animation_number = 0;
+
+            /// <summary>
+            /// List of minions including sentries. Includes each part of multi-part minions. Updates on CheckMinions().
+            /// </summary>
+            public List<Projectile> minions = new List<Projectile>();
+
+            /// <summary>
+            /// List of minions including only those that take minion slots. Updates on CheckMinions().
+            /// </summary>
+            public List<Projectile> slot_minions = new List<Projectile>();
         }
 
         /// <summary>
@@ -90,7 +117,7 @@ namespace ExperienceAndClasses {
             Utilities.PacketHandler.FullSync.Send(this);
             //TODO - send other?
 
-            Fields.Time_FullSync = DateTime.Now.AddMinutes(MINUTES_BETWEEN_FULL_SUNC);
+            Fields.time_full_sync = DateTime.Now.AddMinutes(MINUTES_BETWEEN_FULL_SUNC);
         }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Update ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
@@ -118,7 +145,7 @@ namespace ExperienceAndClasses {
                 //afk (must be in post, not pre)
                 if (config.AFKEnabled) {
                     //become afk?
-                    if (!PSheet.Character.AFK && (Shortcuts.Now.CompareTo(Fields.Time_BecomeAFK) > 0)) {
+                    if (!PSheet.Character.AFK && (Shortcuts.Now.CompareTo(Fields.time_become_AFK) > 0)) {
                         PSheet.Character.SetAFK(true);
                     }
                 }
@@ -130,24 +157,23 @@ namespace ExperienceAndClasses {
                 }
 
                 //in combat
-                if (PSheet.Character.In_Combat && (Shortcuts.Now.CompareTo(Fields.Time_EndInCombat) > 0)) {
+                if (PSheet.Character.In_Combat && (Shortcuts.Now.CompareTo(Fields.time_end_in_combat) > 0)) {
                     PSheet.Character.SetInCombat(false);
                 }
 
                 //full sync
-                if (Shortcuts.Now.CompareTo(Fields.Time_FullSync) > 0) {
+                if (Shortcuts.Now.CompareTo(Fields.time_full_sync) > 0) {
                     FullSync();
                 }
 
             }
 
             //detect any item use
-            bool used_item = (player.itemAnimation > Fields.Prior_Item_Animation) && (!player.HeldItem.channel || player.channel);
-            Fields.Prior_Item_Animation = player.itemAnimation;
+            bool used_item = (player.itemAnimation > Fields.prior_item_animation_number) && (!player.HeldItem.channel || player.channel);
+            Fields.prior_item_animation_number = player.itemAnimation;
             if (used_item) {
                 UsedItem(player.HeldItem);
             }
-            
         }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Use Items/Weapons ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
@@ -174,17 +200,32 @@ namespace ExperienceAndClasses {
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Damage Taken ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
+        /// <summary>
+        /// called locally and by server
+        /// </summary>
+        /// <param name="pvp"></param>
+        /// <param name="quiet"></param>
+        /// <param name="damage"></param>
+        /// <param name="hitDirection"></param>
+        /// <param name="crit"></param>
         public override void Hurt(bool pvp, bool quiet, double damage, int hitDirection, bool crit) {
             base.Hurt(pvp, quiet, damage, hitDirection, crit);
-
-            if (Shortcuts.IS_PLAYER)
-                Main.NewText(player.name + " " + damage);
-            else
-                Console.WriteLine(player.name + " " + damage);
-
             TriggerInCombat();
         }
 
+        /// <summary>
+        /// called by all if damage could possible occur (clients call repeatedly when another player is dead on a monster, etc.)
+        /// </summary>
+        /// <param name="pvp"></param>
+        /// <param name="quiet"></param>
+        /// <param name="damage"></param>
+        /// <param name="hitDirection"></param>
+        /// <param name="crit"></param>
+        /// <param name="customDamage"></param>
+        /// <param name="playSound"></param>
+        /// <param name="genGore"></param>
+        /// <param name="damageSource"></param>
+        /// <returns></returns>
         public override bool PreHurt(bool pvp, bool quiet, ref int damage, ref int hitDirection, ref bool crit, ref bool customDamage, ref bool playSound, ref bool genGore, ref PlayerDeathReason damageSource) {
             //check if hit
             bool hit = base.PreHurt(pvp, quiet, ref damage, ref hitDirection, ref crit, ref customDamage, ref playSound, ref genGore, ref damageSource);
@@ -220,6 +261,12 @@ namespace ExperienceAndClasses {
             base.ModifyHitPvpWithProj(proj, target, ref damage, ref crit);
         }
 
+        /// <summary>
+        /// called locally only
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <param name="victim"></param>
         public override void OnHitAnything(float x, float y, Entity victim) {
             TriggerInCombat();
             base.OnHitAnything(x, y, victim);
@@ -287,6 +334,34 @@ namespace ExperienceAndClasses {
             }
         }
 
+        public void CheckMinions() {
+            Fields.minions = new List<Projectile>();
+            Fields.slot_minions = new List<Projectile>();
+            foreach (Projectile p in Main.projectile) {
+                if (p.active && (p.minion || p.sentry) && (p.owner == player.whoAmI)) {
+                    Fields.minions.Add(p);
+                    if (p.minionSlots > 0) {
+                        Fields.slot_minions.Add(p);
+                    }
+                }
+            }
+        }
+
+        public void LocalDestroyMinions() {
+            if (Fields.Is_Local) {
+                CheckMinions();
+                if (Fields.minions.Count > 0) {
+                    Main.NewText("Your minions have been despawned.", UI.Constants.COLOUR_MESSAGE_ERROR);
+                    foreach (Projectile p in Fields.minions) {
+                        p.Kill();
+                    }
+                }
+            }
+            else {
+                Utilities.Logger.Error("LocalDestroyMinions called by non-local");
+            }
+        }
+
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Hotkeys ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         public override void ProcessTriggers(TriggersSet triggersSet) {
@@ -312,14 +387,14 @@ namespace ExperienceAndClasses {
             if (PSheet.Character.AFK) {
                 PSheet.Character.SetAFK(false);
             }
-            Fields.Time_BecomeAFK = Shortcuts.Now.AddSeconds(Shortcuts.GetConfigServer.AFKSeconds);
+            Fields.time_become_AFK = Shortcuts.Now.AddSeconds(Shortcuts.GetConfigServer.AFKSeconds);
         }
 
         private void TriggerInCombat() {
             if (!PSheet.Character.In_Combat) {
                 PSheet.Character.SetInCombat(true);
             }
-            Fields.Time_EndInCombat = Shortcuts.Now.AddSeconds(Systems.Combat.SECONDS_IN_COMBAT);
+            Fields.time_end_in_combat = Shortcuts.Now.AddSeconds(Systems.Combat.SECONDS_IN_COMBAT);
         }
 
     }

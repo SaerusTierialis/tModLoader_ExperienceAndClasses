@@ -8,9 +8,9 @@ using Terraria;
 namespace ExperienceAndClasses.Systems {
     class Combat {
         public const double SECONDS_IN_COMBAT = 10;
-        public const float BASE_CRIT_MINION = 0.07f;
-        public const float BASE_CRIT_LIGHT = 0.07f;
-        public const float BASE_CRIT_HARMONIC = 0.07f;
+        public const float BASE_CRIT_MINION = 0.04f;
+        public const float BASE_CRIT_LIGHT = 0.04f;
+        public const float BASE_CRIT_HARMONIC = 0.04f;
 
         public class DamageSource {
             public readonly bool Is_Item;
@@ -133,6 +133,9 @@ namespace ExperienceAndClasses.Systems {
                 if (crit) {
                     damage = (int)Math.Ceiling(damage * eacplayer.PSheet.Stats.Crit_Damage_Mult);
                 }
+            }
+            else {
+                Utilities.Logger.Error("LocalModifyDamageDealt called by non-local");
             }
         }
 

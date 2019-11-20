@@ -108,7 +108,7 @@ namespace ExperienceAndClasses.Systems.PlayerSheet {
                 points--;
 
                 //recalc points
-                UpdatePointsAndEffective();
+                LocalUpdatePointsAndEffective();
 
                 //mark success
                 any_allocated = true;
@@ -121,6 +121,9 @@ namespace ExperienceAndClasses.Systems.PlayerSheet {
 
                 //sync
                 SyncAttributesEffective();
+
+                //destroy minions
+                PSHEET.eacplayer.LocalDestroyMinions();
             }
 
             return any_allocated;
@@ -135,26 +138,31 @@ namespace ExperienceAndClasses.Systems.PlayerSheet {
             }
         }
 
-        public void UpdatePointsAndEffective() {
-            //calculate spent + update costs for next point
-            Points_Spent = 0;
-            for (byte i = 0; i < Attribute.Count; i++) {
-                Point_Costs[i] = Attribute.AllocationPointCost(Allocated[i]);
-                Points_Spent += Attribute.AllocationPointCostTotal(Allocated[i]);
+        public void LocalUpdatePointsAndEffective() {
+            if (PSHEET.eacplayer.Fields.Is_Local) {
+                //calculate spent + update costs for next point
+                Points_Spent = 0;
+                for (byte i = 0; i < Attribute.Count; i++) {
+                    Point_Costs[i] = Attribute.AllocationPointCost(Allocated[i]);
+                    Points_Spent += Attribute.AllocationPointCostTotal(Allocated[i]);
+                }
+
+                //calculate total points available
+                Points_Total = Attribute.LocalAllocationPointTotal(PSHEET);
+
+                //calculte remaining points
+                Points_Available = Points_Total - Points_Spent;
+
+                //recalc zero point
+                Zero_Point = Attribute.CalculateZeroPoint(PSHEET);
+
+                //apply zero point
+                for (byte i = 0; i < Attribute.Count; i++) {
+                    Allocated_Effective[i] = Allocated[i] - Zero_Point;
+                }
             }
-
-            //calculate total points available
-            Points_Total = Attribute.LocalAllocationPointTotal(PSHEET);
-
-            //calculte remaining points
-            Points_Available = Points_Total - Points_Spent;
-
-            //recalc zero point
-            Zero_Point = Attribute.CalculateZeroPoint(PSHEET);
-
-            //apply zero point
-            for (byte i = 0; i < Attribute.Count; i++) {
-                Allocated_Effective[i] = Allocated[i] - Zero_Point;
+            else {
+                Utilities.Logger.Error("LocalUpdatePointsAndEffective called by non-local");
             }
         }
 
@@ -190,6 +198,11 @@ namespace ExperienceAndClasses.Systems.PlayerSheet {
 
         private void OnLocalPowerScalingChange() {
             if (Shortcuts.IS_CLIENT) Utilities.PacketHandler.PowerScaling.Send(-1, Shortcuts.WHO_AM_I, Power_Scaling.ID_num);
+
+            //destroy minions
+            PSHEET.eacplayer.LocalDestroyMinions();
+
+            //update ui
             Shortcuts.UpdateUIPSheet(PSHEET);
         }
 
@@ -198,7 +211,7 @@ namespace ExperienceAndClasses.Systems.PlayerSheet {
             Allocated = new int[Attribute.Count];
 
             //update
-            UpdatePointsAndEffective();
+            LocalUpdatePointsAndEffective();
 
             //ui
             CalculateFinal();
@@ -207,6 +220,9 @@ namespace ExperienceAndClasses.Systems.PlayerSheet {
             //sync?
             if (allow_sync)
                 SyncAttributesEffective();
+
+            //destroy minions
+            PSHEET.eacplayer.LocalDestroyMinions();
         }
 
         public void ForceAllocatedEffective(int[] attribute) {
@@ -245,7 +261,7 @@ namespace ExperienceAndClasses.Systems.PlayerSheet {
             }
 
             //calculate points
-            UpdatePointsAndEffective();
+            LocalUpdatePointsAndEffective();
 
             //calculate final
             CalculateFinal();

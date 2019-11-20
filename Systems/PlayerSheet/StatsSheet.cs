@@ -63,7 +63,7 @@ namespace ExperienceAndClasses.Systems.PlayerSheet {
 
         public void Limit() {
             Dodge = (float)Utilities.Commons.Clamp(Dodge, 0f, 1f);
-            Crit_All = (float)Utilities.Commons.Clamp(Crit_All, 0f, 1f);
+            Crit_All = (float)Utilities.Commons.Clamp(Crit_All, -0.04f, 1f);
 
             //prevent minion cap from dropping below 1
             PSHEET.eacplayer.player.maxMinions = Math.Max(1, PSHEET.eacplayer.player.maxMinions);

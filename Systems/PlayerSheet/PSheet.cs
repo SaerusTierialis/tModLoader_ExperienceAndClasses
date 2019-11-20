@@ -99,10 +99,12 @@ namespace ExperienceAndClasses.Systems {
 
             public TagCompound Save(TagCompound tag) {
                 //UI
-                tag.Add(TAG_NAMES.UI_UIMAIN_LEFT, (double)UI.UIMain.Instance.panel.GetLeft());
-                tag.Add(TAG_NAMES.UI_UIMAIN_TOP, (double)UI.UIMain.Instance.panel.GetTop());
-                tag.Add(TAG_NAMES.UI_UIHUD_LEFT, (double)UI.UIHUD.Instance.panel.GetLeft());
-                tag.Add(TAG_NAMES.UI_UIHUD_TOP, (double)UI.UIHUD.Instance.panel.GetTop());
+                if (Shortcuts.UI_Initialized) {
+                    tag.Add(TAG_NAMES.UI_UIMAIN_LEFT, (double)UI.UIMain.Instance.panel.GetLeft());
+                    tag.Add(TAG_NAMES.UI_UIMAIN_TOP, (double)UI.UIMain.Instance.panel.GetTop());
+                    tag.Add(TAG_NAMES.UI_UIHUD_LEFT, (double)UI.UIHUD.Instance.panel.GetLeft());
+                    tag.Add(TAG_NAMES.UI_UIHUD_TOP, (double)UI.UIHUD.Instance.panel.GetTop());
+                }
 
                 //version
                 tag = Utilities.Commons.TagAddArrayAsList(tag, TAG_NAMES.VERSION, Shortcuts.Version);

@@ -258,9 +258,9 @@ namespace ExperienceAndClasses.Systems.PlayerSheet {
         private void OnClassOrLevelChange(bool destroy_minions = false) {
             PSHEET.Attributes.UpdateFromClass();
 
-            //TODO destroy_minions
+            //destroy_minions
             if (destroy_minions) {
-
+                PSHEET.eacplayer.LocalDestroyMinions();
             }
 
             //TODO - ability, passive, etc.

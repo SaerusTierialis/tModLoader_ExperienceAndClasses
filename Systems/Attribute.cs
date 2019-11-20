@@ -187,7 +187,7 @@ namespace ExperienceAndClasses.Systems {
         public static int LocalCalculateResetCost() {
             int points = Shortcuts.LOCAL_PLAYER.PSheet.Attributes.Points_Spent - RESET_POINTS_FREE;
             if (points > 0)
-                return (int)Math.Floor(Math.Pow(points, 0.5));
+                return (int)Math.Floor(Math.Pow(points, 0.35));
             else
                 return 0;
         }
@@ -379,13 +379,13 @@ namespace ExperienceAndClasses.Systems {
                 int bonus_int;
 
                 //run
-                bonus_float = PER_POINT_MOVEMENT * points;
+                bonus_float = (float)Utilities.Commons.Clamp(PER_POINT_MOVEMENT * points, -0.4f, 0.75f);
                 if (do_effects) eacplayer.player.maxRunSpeed *= (1f + bonus_float);
                 if (do_effects) eacplayer.player.runAcceleration *= (1f + bonus_float);
                 if (eacplayer.Fields.Is_Local) Effect_Text += BonusValueString(bonus_float, "Stat_Mobility_Movement", true, PER_POINT_MOVEMENT);
 
                 //jump
-                bonus_float = PER_POINT_JUMP * points;
+                bonus_float = (float)Utilities.Commons.Clamp(PER_POINT_JUMP * points, -0.8f, 1.5f);
                 if (do_effects) eacplayer.player.jumpSpeedBoost += (bonus_float * 5);
                 if (eacplayer.Fields.Is_Local) Effect_Text += BonusValueString(bonus_float, "Stat_Mobility_Jump", true, PER_POINT_JUMP);
                 
