@@ -20,6 +20,8 @@ namespace ExperienceAndClasses {
         //Hotkeys
         public static ModHotKey HOTKEY_UI { get; private set;}
         public static ModHotKey HOTKEY_ALTERNATE_EFFECT { get; private set; }
+        public static ModHotKey[] HOTKEY_ABILITY_PRIMARY { get; private set; } = new ModHotKey[Systems.Ability.NUMBER_ABILITY_SLOTS_PER_CLASS];
+        public static ModHotKey[] HOTKEY_ABILITY_SECONDARY { get; private set; } = new ModHotKey[Systems.Ability.NUMBER_ABILITY_SLOTS_PER_CLASS];
 
         //Netmode
         public static bool IS_SERVER { get; private set; }
@@ -59,10 +61,18 @@ namespace ExperienceAndClasses {
             //mod
             MOD = mod;
 
-            //hotkeys (can't use localization, caused issues)
+            //hotkeys (don't use localization text, causes issues)
             HOTKEY_UI = MOD.RegisterHotKey("Toggle UI", "P");
             HOTKEY_ALTERNATE_EFFECT = MOD.RegisterHotKey("Ability Alternate Effect", "LeftShift");
-
+            HOTKEY_ABILITY_PRIMARY[0] = MOD.RegisterHotKey("Primary Class Ability 1", "Q");
+            HOTKEY_ABILITY_PRIMARY[1] = MOD.RegisterHotKey("Primary Class Ability 2", "E");
+            HOTKEY_ABILITY_PRIMARY[2] = MOD.RegisterHotKey("Primary Class Ability 3", "R");
+            HOTKEY_ABILITY_PRIMARY[3] = MOD.RegisterHotKey("Primary Class Ability 4", "F");
+            HOTKEY_ABILITY_SECONDARY[0] = MOD.RegisterHotKey("Secondary Class Ability 1", "Z");
+            HOTKEY_ABILITY_SECONDARY[1] = MOD.RegisterHotKey("Secondary Class Ability 2", "X");
+            HOTKEY_ABILITY_SECONDARY[2] = MOD.RegisterHotKey("Secondary Class Ability 3", "C");
+            HOTKEY_ABILITY_SECONDARY[3] = MOD.RegisterHotKey("Secondary Class Ability 4", "V");
+            
             //netmode
             UpdateNetmode();
 
@@ -86,6 +96,8 @@ namespace ExperienceAndClasses {
             //hotkeys
             HOTKEY_UI = null;
             HOTKEY_ALTERNATE_EFFECT = null;
+            HOTKEY_ABILITY_PRIMARY = new ModHotKey[Systems.Ability.NUMBER_ABILITY_SLOTS_PER_CLASS];
+            HOTKEY_ABILITY_SECONDARY = new ModHotKey[Systems.Ability.NUMBER_ABILITY_SLOTS_PER_CLASS];
 
             //clear local player;
             LocalPlayerClear();
