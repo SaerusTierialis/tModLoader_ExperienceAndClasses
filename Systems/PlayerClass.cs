@@ -52,6 +52,15 @@ namespace ExperienceAndClasses.Systems {
             COMPLETE,
         }
 
+        public enum RECOMMENDED_WEAPON : byte {
+            UNKNOWN,
+            ANY,
+            NONE,
+            MINION,
+            NON_MINION,
+            PROJECTILE,
+        }
+
         public const byte MAX_TIER = 3;
         public static readonly byte[] MAX_TIER_LEVEL = new byte[] { 0, 10, 50, 100 };
 
@@ -117,6 +126,7 @@ namespace ExperienceAndClasses.Systems {
         public Color Colour { get; protected set; } = COLOUR_DEFAULT;
 
         protected IMPLEMENTATION_STATUS implementation_status = IMPLEMENTATION_STATUS.UNKNOWN;
+        protected RECOMMENDED_WEAPON recommended_weapon = RECOMMENDED_WEAPON.UNKNOWN;
 
         public float XP_Multiplier_Combat { get; protected set; } = 1.0f;
         public float XP_Multiplier_NonCombat { get; protected set; } = 1.0f;
@@ -217,8 +227,37 @@ namespace ExperienceAndClasses.Systems {
                         break;
                 }
 
+                //recommended weapon
+                string recommended_weapon_text = "Recommended Weapon: ";
+                switch (recommended_weapon) {
+                    case RECOMMENDED_WEAPON.ANY:
+                        recommended_weapon_text += "any";
+                        break;
+
+                    case RECOMMENDED_WEAPON.NONE:
+                        recommended_weapon_text += "none";
+                        break;
+
+                    case RECOMMENDED_WEAPON.MINION:
+                        recommended_weapon_text += "minion";
+                        break;
+
+                    case RECOMMENDED_WEAPON.NON_MINION:
+                        recommended_weapon_text += "non-minion";
+                        break;
+
+                    case RECOMMENDED_WEAPON.PROJECTILE:
+                        recommended_weapon_text += "any that shoot projectiles\n(swinging weapons will gain projectiles from passives)";
+                        break;
+
+                    case RECOMMENDED_WEAPON.UNKNOWN:
+                    default:
+                        recommended_weapon_text += "unknown";
+                        break;
+                }
+
                 //set tooltip
-                string tooltip_main = Description + "\n\n" + implementation_status_text + "\n\nATTRIBUTES:";
+                string tooltip_main = implementation_status_text + "\n\n" + Description + "\n\n" + recommended_weapon_text + "\n\nATTRIBUTES:";
                 bool first = true;
                 string attribute_names = "";
                 foreach (byte id in Systems.Attribute.ATTRIBUTES_UI_ORDER) {
@@ -518,6 +557,7 @@ namespace ExperienceAndClasses.Systems {
                 Tier = 3;
                 Max_Level = MAX_TIER_LEVEL[Tier];
                 Prereq = LOOKUP[(byte)prereq];
+                recommended_weapon = Prereq.recommended_weapon;
             }
 
             protected override Items.Unlock GetUnlockItem() {
@@ -555,6 +595,7 @@ namespace ExperienceAndClasses.Systems {
                 XP_Multiplier_NonCombat = 10.0f;
                 Power_Scaling_Fish = 1f;
                 Power_Scaling_Damage = 0f;
+                recommended_weapon = RECOMMENDED_WEAPON.NONE;
             }
 
             protected override Items.Unlock GetUnlockItem() {
@@ -568,6 +609,7 @@ namespace ExperienceAndClasses.Systems {
                 Class_Locations[0, 3] = ID_num;
                 Colour = COLOUR_NOVICE;
                 implementation_status = IMPLEMENTATION_STATUS.COMPLETE;
+                recommended_weapon = RECOMMENDED_WEAPON.ANY;
             }
         }
 
@@ -581,6 +623,7 @@ namespace ExperienceAndClasses.Systems {
                 Attribute_Growth[(byte)Attribute.IDs.Dexterity] = 2;
                 Colour = COLOUR_CLOSE_RANGE_2;
                 implementation_status = IMPLEMENTATION_STATUS.ATTRIBUTE_ONLY;
+                recommended_weapon = RECOMMENDED_WEAPON.ANY;
             }
         }
 
@@ -592,6 +635,7 @@ namespace ExperienceAndClasses.Systems {
                 Attribute_Growth[(byte)Attribute.IDs.Dexterity] = 2;
                 Colour = COLOUR_PROJECTILE_2;
                 implementation_status = IMPLEMENTATION_STATUS.ATTRIBUTE_ONLY;
+                recommended_weapon = RECOMMENDED_WEAPON.PROJECTILE;
             }
         }
 
@@ -604,6 +648,7 @@ namespace ExperienceAndClasses.Systems {
                 Attribute_Growth[(byte)Attribute.IDs.Agility] = 2;
                 Colour = COLOUR_UTILITY_2;
                 implementation_status = IMPLEMENTATION_STATUS.ATTRIBUTE_ONLY;
+                recommended_weapon = RECOMMENDED_WEAPON.ANY;
             }
         }
 
@@ -614,6 +659,7 @@ namespace ExperienceAndClasses.Systems {
                 Attribute_Growth[(byte)Attribute.IDs.Agility] = 3;
                 Colour = COLOUR_TRICKERY_2;
                 implementation_status = IMPLEMENTATION_STATUS.ATTRIBUTE_ONLY;
+                recommended_weapon = RECOMMENDED_WEAPON.NON_MINION;
             }
         }
 
@@ -624,6 +670,7 @@ namespace ExperienceAndClasses.Systems {
                 Attribute_Growth[(byte)Attribute.IDs.Spirit] = 3;
                 Colour = COLOUR_MINION_2;
                 implementation_status = IMPLEMENTATION_STATUS.ATTRIBUTE_ONLY;
+                recommended_weapon = RECOMMENDED_WEAPON.MINION;
             }
         }
 
@@ -634,6 +681,7 @@ namespace ExperienceAndClasses.Systems {
                 Attribute_Growth[(byte)Attribute.IDs.Spirit] = 3;
                 Colour = COLOUR_SUPPORT_2;
                 implementation_status = IMPLEMENTATION_STATUS.ATTRIBUTE_ONLY;
+                recommended_weapon = RECOMMENDED_WEAPON.ANY;
             }
         }
 
@@ -648,6 +696,7 @@ namespace ExperienceAndClasses.Systems {
                 Attribute_Growth[(byte)Attribute.IDs.Dexterity] = 2;
                 Colour = COLOUR_HYBRID_2;
                 implementation_status = IMPLEMENTATION_STATUS.ATTRIBUTE_ONLY;
+                recommended_weapon = RECOMMENDED_WEAPON.ANY;
             }
         }
 
@@ -662,6 +711,7 @@ namespace ExperienceAndClasses.Systems {
                 Attribute_Growth[(byte)Attribute.IDs.Dexterity] = 2;
                 Colour = COLOUR_MUSIC_2;
                 implementation_status = IMPLEMENTATION_STATUS.ATTRIBUTE_ONLY;
+                recommended_weapon = RECOMMENDED_WEAPON.ANY;
             }
         }
 
@@ -741,7 +791,7 @@ namespace ExperienceAndClasses.Systems {
         }
 
         public class Shadow : Tier3 {
-            public Shadow() : base(IDs.Shadow, IDs.Traveler) {
+            public Shadow() : base(IDs.Shadow, IDs.Rogue) {
                 Class_Locations[3, 3] = ID_num;
                 Attribute_Growth[(byte)Attribute.IDs.Power] = 3;
                 Attribute_Growth[(byte)Attribute.IDs.Dexterity] = 2;
