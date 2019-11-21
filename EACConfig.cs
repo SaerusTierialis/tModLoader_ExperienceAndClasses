@@ -121,7 +121,7 @@ namespace ExperienceAndClasses {
         public bool UIMain_Drag { get; set; }
 
         [Label("$Mods.ExperienceAndClasses.Common.Config_UIAutoMode_Label")]
-        [DefaultValue(UIAutoMode.InventoryOpen)]
+        [DefaultValue(UIAutoMode.Never)]
         [DrawTicks]
         public UIAutoMode UIMain_AutoMode { get; set; }
 
