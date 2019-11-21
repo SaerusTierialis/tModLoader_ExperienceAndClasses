@@ -269,6 +269,7 @@ namespace ExperienceAndClasses.Systems {
 
         public class Power : Attribute {
             public static float PER_POINT_DAMAGE { get { return 0.0025f * ATTRIBUTE_BONUS_MULTIPLIER; } }
+            public static float PER_POINT_MINING { get { return 0.005f * ATTRIBUTE_BONUS_MULTIPLIER; } }
             public static float PER_POINT_FISH { get { return 0.1f * ATTRIBUTE_BONUS_MULTIPLIER; } }
 
             public Power() : base(IDs.Power) {}
@@ -280,11 +281,17 @@ namespace ExperienceAndClasses.Systems {
                     if (eacplayer.Fields.Is_Local) Effect_Text += str;
                 }
 
+                //mining
+                float mining_scaling = Math.Max(eacplayer.PSheet.Classes.Primary.Class.Power_Scaling_Fish, eacplayer.PSheet.Classes.Secondary.Class.Power_Scaling_Fish / 2) * PER_POINT_MINING;
+                float bonus = points * mining_scaling;
+                if (do_effects) eacplayer.player.pickSpeed -= bonus;
+                if (eacplayer.Fields.Is_Local) Effect_Text += BonusValueString(bonus, "Stat_Misc_MiningSpeed", true, mining_scaling, " (" + PlayerClass.LOOKUP[(byte)PlayerClass.IDs.Explorer].Name + ")");
+
                 //fish
                 float fish_scaling = Math.Max(eacplayer.PSheet.Classes.Primary.Class.Power_Scaling_Fish, eacplayer.PSheet.Classes.Secondary.Class.Power_Scaling_Fish / 2) * PER_POINT_FISH;
-                int bonus = RoundIntBonus(points * fish_scaling);
-                if (do_effects) eacplayer.player.fishingSkill += bonus;
-                if (eacplayer.Fields.Is_Local) Effect_Text += BonusValueString(bonus, "Stat_Misc_FishingPower", false, fish_scaling, " (" + PlayerClass.LOOKUP[(byte)PlayerClass.IDs.Explorer].Name + ")");
+                int bonus_int = RoundIntBonus(points * fish_scaling);
+                if (do_effects) eacplayer.player.fishingSkill += bonus_int;
+                if (eacplayer.Fields.Is_Local) Effect_Text += BonusValueString(bonus_int, "Stat_Misc_FishingPower", false, fish_scaling, " (" + PlayerClass.LOOKUP[(byte)PlayerClass.IDs.Explorer].Name + ")");
             }
         }
 

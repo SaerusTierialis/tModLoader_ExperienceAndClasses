@@ -399,11 +399,12 @@ namespace ExperienceAndClasses.UI {
             str += Systems.Attribute.BonusValueString(global_crit_chance + Systems.Combat.BASE_CRIT_HARMONIC, "Stat_Crit_Harmonic", true, default, default, false);
             str += Systems.Attribute.BonusValueString(global_crit_chance, "Stat_Crit_Other", true, default, default, true);
 
-            str += "\n\n" + Language.GetTextValue("Mods.ExperienceAndClasses.Common.Stat_Abilities_Header");
-            str += Systems.Attribute.BonusValueString(eacplayer.PSheet.Stats.Ability_Delay_Reduction, "Stat_Abilities_Cooldown", true, default, default, false);
-            str += Systems.Attribute.BonusValueString(eacplayer.PSheet.Stats.Healing_Mult, "Stat_Abilities_Healing", true, default, default, false);
+            str += "\n\n" + Language.GetTextValue("Mods.ExperienceAndClasses.Common.Stat_Mana_Header");
+            str += Systems.Attribute.BonusValueString(eacplayer.player.statManaMax2, "Stat_Mana_Mana", false, default, default, false);
+            str += Systems.Attribute.BonusValueString(eacplayer.player.manaRegenBonus, "Stat_Mana_ManaRegen", false, default, default, false);
+            str += Systems.Attribute.BonusValueString(eacplayer.PSheet.Stats.Mana_Regen_Delay_Reduction, "Stat_Mana_ManaRegenDelay", true, default, default, false);
 
-            str += "\n\n\n" + Language.GetTextValue("Mods.ExperienceAndClasses.Common.Stat_Sheet_Disclaimer");
+            str += "\n\n" + Language.GetTextValue("Mods.ExperienceAndClasses.Common.Stat_Sheet_Disclaimer");
 
 
             str2 += Language.GetTextValue("Mods.ExperienceAndClasses.Common.Stat_Defensive_Header");
@@ -412,10 +413,9 @@ namespace ExperienceAndClasses.UI {
             str2 += Systems.Attribute.BonusValueString(eacplayer.player.statDefense, "Stat_Defensive_Defense", false, default, default, false);
             str2 += Systems.Attribute.BonusValueString(eacplayer.PSheet.Stats.Dodge, "Stat_Defensive_Dodge", true, default, default, false);
 
-            str2 += "\n\n" + Language.GetTextValue("Mods.ExperienceAndClasses.Common.Stat_Mana_Header");
-            str2 += Systems.Attribute.BonusValueString(eacplayer.player.statManaMax2, "Stat_Mana_Mana", false, default, default, false);
-            str2 += Systems.Attribute.BonusValueString(eacplayer.player.manaRegenBonus, "Stat_Mana_ManaRegen", false, default, default, false);
-            str2 += Systems.Attribute.BonusValueString(eacplayer.PSheet.Stats.Mana_Regen_Delay_Reduction, "Stat_Mana_ManaRegenDelay", true, default, default, false);
+            str2 += "\n\n" + Language.GetTextValue("Mods.ExperienceAndClasses.Common.Stat_Abilities_Header");
+            str2 += Systems.Attribute.BonusValueString(eacplayer.PSheet.Stats.Ability_Delay_Reduction, "Stat_Abilities_Cooldown", true, default, default, false);
+            str2 += Systems.Attribute.BonusValueString(eacplayer.PSheet.Stats.Healing_Mult, "Stat_Abilities_Healing", true, default, default, false);
 
             str2 += "\n\n" + Language.GetTextValue("Mods.ExperienceAndClasses.Common.Stat_Mobility_Header");
             str2 += Systems.Attribute.BonusValueString(eacplayer.player.maxRunSpeed, "Stat_Mobility_MaxRun", false, default, default, false);
@@ -430,6 +430,7 @@ namespace ExperienceAndClasses.UI {
 
             str2 += "\n\n" + Language.GetTextValue("Mods.ExperienceAndClasses.Common.Stat_Misc_Header");
             str2 += Systems.Attribute.BonusValueString(eacplayer.player.maxMinions, "Stat_Misc_MinionCap", false, default, default, false);
+            str2 += Systems.Attribute.BonusValueString(1f - eacplayer.player.pickSpeed, "Stat_Misc_MiningSpeed", true, default, default, true);
             str2 += Systems.Attribute.BonusValueString(eacplayer.player.fishingSkill, "Stat_Misc_FishingPower", false, default, default, false);
 
 

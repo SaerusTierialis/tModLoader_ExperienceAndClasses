@@ -257,6 +257,7 @@ Common.Stat_Abilities_Cooldown=Ability Cooldown Reduction
 Common.Stat_Abilities_Healing=Ability Healing
 
 Common.Stat_Misc_Header=Miscellaneous
+Common.Stat_Misc_MiningSpeed=Mining Speed
 Common.Stat_Misc_FishingPower=Fishing Power
 Common.Stat_Misc_MinionCap=Maximum Minions
 
