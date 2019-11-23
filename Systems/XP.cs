@@ -91,7 +91,7 @@ namespace ExperienceAndClasses.Systems {
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ XP Adjustments ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         
         public static class Adjustments {
-            public static void LocalAddXP(uint xp, bool is_combat = true, bool allow_multipliers = true) {
+            public static void LocalAddXP(uint xp, bool allow_multipliers = true) {
                 //convert to double temporarily
                 double xpd = xp;
 
@@ -123,21 +123,21 @@ namespace ExperienceAndClasses.Systems {
                     if (psheet.Classes.Has_Subclass) {
                         if (!psheet.Classes.Primary.Can_Gain_XP) {
                             //secondary only (maxed primary)
-                            psheet.Classes.Secondary.AddXP(xp, is_combat, allow_multipliers);
+                            psheet.Classes.Secondary.AddXP(xp, allow_multipliers);
                         }
                         else if (!psheet.Classes.Secondary.Can_Gain_XP) {
                             //primary only (maxed secondary)
-                            psheet.Classes.Primary.AddXP(xp, is_combat, allow_multipliers);
+                            psheet.Classes.Primary.AddXP(xp, allow_multipliers);
                         }
                         else {
                             //both
-                            psheet.Classes.Primary.AddXP((uint)Math.Ceiling(xp * SUBCLASS_PENALTY_XP_MULTIPLIER_PRIMARY), is_combat, allow_multipliers);
-                            psheet.Classes.Secondary.AddXP((uint)Math.Ceiling(xp * SUBCLASS_PENALTY_XP_MULTIPLIER_SECONDARY), is_combat, allow_multipliers);
+                            psheet.Classes.Primary.AddXP((uint)Math.Ceiling(xp * SUBCLASS_PENALTY_XP_MULTIPLIER_PRIMARY), allow_multipliers);
+                            psheet.Classes.Secondary.AddXP((uint)Math.Ceiling(xp * SUBCLASS_PENALTY_XP_MULTIPLIER_SECONDARY), allow_multipliers);
                         }
                     }
                     else {
                         //primary only (no secondary)
-                        psheet.Classes.Primary.AddXP(xp, is_combat, allow_multipliers);
+                        psheet.Classes.Primary.AddXP(xp, allow_multipliers);
                     }
                 }
             }
@@ -182,6 +182,41 @@ namespace ExperienceAndClasses.Systems {
 
                     //message
                     Main.NewText(Language.GetTextValue("Mods.ExperienceAndClasses.Common.Death_Penalty_XP"), UI.Constants.COLOUR_MESSAGE_ERROR);
+                }
+            }
+
+            public static void LocalAddFishXP(Item item) {
+                double xp = 0;
+
+                //xp from rarity
+                switch (item.rare) {
+                    case (-11):
+                        xp += 7;
+                        break;
+
+                    case (-12):
+                        xp += 10;
+                        break;
+
+                    default:
+                        xp += (item.rare + 1);
+                        break;
+                }
+
+                //xp from value
+                if (item.value > 0) {
+                    xp += Math.Log(Math.Max(1, item.value / 1000));
+                }
+
+                //scale with character level
+                xp *= Shortcuts.LOCAL_PLAYER.PSheet.Character.Level / 10.0;
+
+                //overall adjustment
+                xp *= 1.5;
+
+                //apply
+                if (xp > 0) {
+                    LocalAddXP((uint)Math.Ceiling(xp), true);
                 }
             }
         }

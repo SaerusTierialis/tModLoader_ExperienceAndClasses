@@ -49,7 +49,7 @@ namespace ExperienceAndClasses.Items {
             EACPlayer eacplayer = player.GetModPlayer<EACPlayer>();
 
             if (eacplayer.Fields.Is_Local) {
-                Systems.XP.Adjustments.LocalAddXP(eacplayer.PSheet.Character.Level * XP_PER_CHARACTER_LEVEL, false, true);
+                Systems.XP.Adjustments.LocalAddXP(eacplayer.PSheet.Character.Level * XP_PER_CHARACTER_LEVEL, true);
                 return true;
             }
             else {

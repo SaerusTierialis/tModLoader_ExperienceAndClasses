@@ -128,8 +128,6 @@ namespace ExperienceAndClasses.Systems {
         protected IMPLEMENTATION_STATUS implementation_status = IMPLEMENTATION_STATUS.UNKNOWN;
         protected RECOMMENDED_WEAPON recommended_weapon = RECOMMENDED_WEAPON.UNKNOWN;
 
-        public float XP_Multiplier_Combat { get; protected set; } = 1.0f;
-        public float XP_Multiplier_NonCombat { get; protected set; } = 1.0f;
         public float Power_Scaling_Fish { get; protected set; } = 0f;
         public float Power_Scaling_Damage { get; protected set; } = 0f;
 
@@ -591,8 +589,6 @@ namespace ExperienceAndClasses.Systems {
                 Attribute_Growth[(byte)Attribute.IDs.Dexterity] = 2f;
                 Colour = COLOUR_NONCOMBAT;
                 implementation_status = IMPLEMENTATION_STATUS.ATTRIBUTE_ONLY;
-                XP_Multiplier_Combat = 0.1f;
-                XP_Multiplier_NonCombat = 10.0f;
                 Power_Scaling_Fish = 1f;
                 Power_Scaling_Damage = 0f;
                 recommended_weapon = RECOMMENDED_WEAPON.NONE;

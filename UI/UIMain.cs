@@ -612,7 +612,7 @@ namespace ExperienceAndClasses.UI {
 
                     uint xp_to_apply = (uint)Math.Min(max_xp_to_add, old_modplayer.GetXPAvailable());
                     old_modplayer.SpendXP(xp_to_apply);
-                    Systems.XP.Adjustments.LocalAddXP(xp_to_apply, false, false);
+                    Systems.XP.Adjustments.LocalAddXP(xp_to_apply, false);
 
                     Main.NewText(xp_to_apply + " legacy experience has been allocated! " + old_modplayer.GetXPAvailable() + " remains.");
                     MouseOverPreRevampXP(evt, listeningElement);

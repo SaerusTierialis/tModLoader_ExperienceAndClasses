@@ -121,15 +121,8 @@ namespace ExperienceAndClasses.Systems.PlayerSheet {
                 Shortcuts.UpdateUIPSheet(CONTAINER.PSHEET);
             }
 
-            public void AddXP(uint xp, bool from_combat = true, bool allow_multipliers = true) {
+            public void AddXP(uint xp, bool allow_multipliers = true) {
                 if (Valid_Class) {
-                    if (allow_multipliers) {
-                        if (from_combat)
-                            xp = (uint)Math.Ceiling(xp * Class.XP_Multiplier_Combat);
-                        else
-                            xp = (uint)Math.Ceiling(xp * Class.XP_Multiplier_NonCombat);
-                    }
-
                     XP = Utilities.Commons.SafeAdd(XP, xp);
                     LocalHandleXPChange();
                 }
