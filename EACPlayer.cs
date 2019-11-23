@@ -308,6 +308,8 @@ namespace ExperienceAndClasses {
         /// <param name="regen_delay"></param>
         /// <returns></returns>
         public bool UseMana(int cost, bool regen_delay = true) {
+            //TODO switch to using OnMissingMana
+
             //mana flower: use potion if it makes the difference
             if ((Main.LocalPlayer.statMana < cost) && Main.LocalPlayer.manaFlower) {
                 Item mana_item = Main.LocalPlayer.QuickMana_GetItemToUse();
