@@ -9,6 +9,7 @@ namespace ExperienceAndClasses.Systems {
     public abstract class PowerScaling {
 
         public enum IDs : byte {
+            All,
             Melee,
             RangedThrowing,
             Magic,
@@ -22,7 +23,7 @@ namespace ExperienceAndClasses.Systems {
             NUMBER_OF_IDs, //leave this last
         }
 
-        public const byte ID_NUM_DEFAULT = (byte)IDs.Melee;
+        public const byte ID_NUM_DEFAULT = (byte)IDs.All;
 
         public static readonly PowerScaling[] LOOKUP;
         public static readonly int LOOKUP_LENGTH;
@@ -37,10 +38,10 @@ namespace ExperienceAndClasses.Systems {
         public readonly IDs ID;
         public readonly byte ID_num;
         public readonly string[] Types;
-        public float Scale { get; protected set; } = 1f;
+        public readonly float Scale;
         public bool Enabled { get; protected set; } = true;
 
-        public string Name {
+        public virtual string Name {
             get {
                 string name = "";
                 foreach (string type in Types) {
@@ -54,10 +55,11 @@ namespace ExperienceAndClasses.Systems {
             }
         }
 
-        public PowerScaling(IDs id, string[] types) {
+        public PowerScaling(IDs id, string[] types, float scale = 1f) {
             ID = id;
             ID_num = (byte)id;
             Types = types;
+            Scale = scale;
         }
 
         public string ApplyPoints(EACPlayer eacplayer, float increase, float per_point, bool do_effects = true) {
@@ -112,15 +114,23 @@ namespace ExperienceAndClasses.Systems {
                 return LOOKUP[ind].GetPrior();
         }
 
+        public class All : PowerScaling {
+            public All() : base(IDs.All, new string[] { "All" }, 0.5f) { }
+            protected override void Apply(EACPlayer eacplayer, float damage_increase) {
+                eacplayer.player.allDamage += damage_increase;
+            }
+            public override string Name => Language.GetTextValue("Mods.ExperienceAndClasses.Common.Damage_Type_Balanced");
+        }
+
         public class Melee : PowerScaling {
-            public Melee() : base (IDs.Melee, new string[] { "Melee" }) {}
+            public Melee() : base (IDs.Melee, new string[] { "Melee" }, 1.281426534f) { }
             protected override void Apply(EACPlayer eacplayer, float damage_increase) {
                 eacplayer.player.meleeDamage += damage_increase;
             }
         }
 
         public class RangedThrowing : PowerScaling {
-            public RangedThrowing() : base(IDs.RangedThrowing, new string[] { "Ranged" , "Throwing" }) { }
+            public RangedThrowing() : base(IDs.RangedThrowing, new string[] { "Ranged" , "Throwing" }, 0.953819928f) { }
             protected override void Apply(EACPlayer eacplayer, float damage_increase) {
                 eacplayer.player.rangedDamage += damage_increase;
                 eacplayer.player.thrownDamage += damage_increase;
@@ -128,14 +138,14 @@ namespace ExperienceAndClasses.Systems {
         }
 
         public class Magic : PowerScaling {
-            public Magic() : base(IDs.Magic, new string[] { "Magic" }) { }
+            public Magic() : base(IDs.Magic, new string[] { "Magic" }, 0.786591565f) { }
             protected override void Apply(EACPlayer eacplayer, float damage_increase) {
                 eacplayer.player.magicDamage += damage_increase;
             }
         }
 
         public class Minion : PowerScaling {
-            public Minion() : base(IDs.Minion, new string[] { "Minion" }) { }
+            public Minion() : base(IDs.Minion, new string[] { "Minion" }, 0.978161974f) { }
             protected override void Apply(EACPlayer eacplayer, float damage_increase) {
                 eacplayer.player.minionDamage += damage_increase;
             }

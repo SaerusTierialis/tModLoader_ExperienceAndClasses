@@ -195,6 +195,7 @@ Common.Term_Damage=Damage;
 Common.Term_CritChance=Critical Chance;
 
 //Damage Types
+Common.Damage_Type_Balanced=Balanced
 Common.Damage_Type_Melee=Melee
 Common.Damage_Type_Ranged=Ranged
 Common.Damage_Type_Throwing=Throwing
