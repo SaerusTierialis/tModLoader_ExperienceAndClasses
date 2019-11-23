@@ -123,14 +123,14 @@ namespace ExperienceAndClasses.Systems {
         }
 
         public class Melee : PowerScaling {
-            public Melee() : base (IDs.Melee, new string[] { "Melee" }, 1.281426534f) { }
+            public Melee() : base (IDs.Melee, new string[] { "Melee" }, 0.812339332f) { }
             protected override void Apply(EACPlayer eacplayer, float damage_increase) {
                 eacplayer.player.meleeDamage += damage_increase;
             }
         }
 
         public class RangedThrowing : PowerScaling {
-            public RangedThrowing() : base(IDs.RangedThrowing, new string[] { "Ranged" , "Throwing" }, 0.953819928f) { }
+            public RangedThrowing() : base(IDs.RangedThrowing, new string[] { "Ranged" , "Throwing" }, 0.956298201f) { }
             protected override void Apply(EACPlayer eacplayer, float damage_increase) {
                 eacplayer.player.rangedDamage += damage_increase;
                 eacplayer.player.thrownDamage += damage_increase;
@@ -138,14 +138,14 @@ namespace ExperienceAndClasses.Systems {
         }
 
         public class Magic : PowerScaling {
-            public Magic() : base(IDs.Magic, new string[] { "Magic" }, 0.786591565f) { }
+            public Magic() : base(IDs.Magic, new string[] { "Magic" }, 0.884318766f) { }
             protected override void Apply(EACPlayer eacplayer, float damage_increase) {
                 eacplayer.player.magicDamage += damage_increase;
             }
         }
 
         public class Minion : PowerScaling {
-            public Minion() : base(IDs.Minion, new string[] { "Minion" }, 0.978161974f) { }
+            public Minion() : base(IDs.Minion, new string[] { "Minion" }, 1.347043702f) { }
             protected override void Apply(EACPlayer eacplayer, float damage_increase) {
                 eacplayer.player.minionDamage += damage_increase;
             }
