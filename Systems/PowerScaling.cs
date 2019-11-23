@@ -9,7 +9,6 @@ namespace ExperienceAndClasses.Systems {
     public abstract class PowerScaling {
 
         public enum IDs : byte {
-            All,
             Melee,
             RangedThrowing,
             Magic,
@@ -17,6 +16,7 @@ namespace ExperienceAndClasses.Systems {
             Light,
             Harmonic,
             Other,
+            All,
 
             //insert here
 
