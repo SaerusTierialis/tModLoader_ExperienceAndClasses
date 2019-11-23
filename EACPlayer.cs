@@ -198,6 +198,25 @@ namespace ExperienceAndClasses {
             return Systems.Combat.ModifyItemUseTime(this, item, base.UseTimeMultiplier(item));
         }
 
+        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Life Skills ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+        public override void CatchFish(Item fishingRod, Item bait, int power, int liquidType, int poolSize, int worldLayer, int questFish, ref int caughtType, ref bool junk) {
+            base.CatchFish(fishingRod, bait, power, liquidType, poolSize, worldLayer, questFish, ref caughtType, ref junk);
+
+            if (!junk) {
+                float chance = (float)Utilities.Commons.Clamp((float)power / PSheet.Character.Level, 0.5, 2);
+                if (Main.rand.NextFloat(0f, 100f) < chance) {
+                    if (Main.rand.NextFloat(0f, 6f) < 1f) {
+                        caughtType = ItemType<Items.Orb_Boss>();
+                    }
+                    else {
+                        caughtType = ItemType<Items.Orb_Monster>();
+                    }
+                    junk = false;
+                }
+            }
+        }
+
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Damage Taken ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         /// <summary>
