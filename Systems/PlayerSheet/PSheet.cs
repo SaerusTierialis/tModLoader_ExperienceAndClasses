@@ -59,6 +59,9 @@ namespace ExperienceAndClasses.Systems {
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Save/Load ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         public void Load(TagCompound tag) {
+            //must be local
+            eacplayer.Fields.Is_Local = true;
+
             //Class
             Classes.Load(tag);
 
