@@ -32,28 +32,52 @@ namespace ExperienceAndClasses.Systems {
 
         public override void PlaceInWorld(int i, int j, Item item) {
             base.PlaceInWorld(i, j, item);
-            if (Shortcuts.IS_EFFECTIVELY_SERVER) PlaceTile(i, j);
+            
+            if (Shortcuts.IS_EFFECTIVELY_SERVER) {
+                int type = Main.tile[i, j].type;
+                if (IsTreeTile(type) || IsOreTile(type)) {
+                    PlaceTile(i, j);
+                }
+            }
         }
 
         public override bool Drop(int i, int j, int type) {
             bool drop = base.Drop(i, j, type);
 
             if (Shortcuts.IS_EFFECTIVELY_SERVER) {
-                //life skill xp
-                if (drop && !TileIsPlaced(i, j)) {
-                    if (Main.tileAxe[type]) {
-                        XP.Adjustments.AddTreeXP(i, j);
+                //checks
+                bool is_tree = IsTreeTile(type);
+                bool is_ore = IsOreTile(type);
+
+                //relevant tile
+                if (is_tree || is_ore) {
+                    if (!TileIsPlaced(i, j)) {
+                        //xp
+                        if (drop) {
+                            if (is_tree) {
+                                XP.Adjustments.AddTreeXP(i, j);
+                            }
+                            else if (is_ore) {
+                                XP.Adjustments.AddOreXP(i, j, type);
+                            }
+                        }
                     }
-                    else if (Main.tileSpelunker[type]) {
-                        XP.Adjustments.AddOreXP(i, j, type);
+                    else {
+                        //was a placed tile, remove from list
+                        UnplaceTile(i, j);
                     }
                 }
-
-                //keep list as short as possible
-                UnplaceTile(i, j);
             }
 
             return drop;
+        }
+
+        private static bool IsTreeTile(int type) {
+            return Main.tileAxe[type];
+        }
+
+        private static bool IsOreTile(int type) {
+            return Main.tileSpelunker[type];
         }
 
     }
