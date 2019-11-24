@@ -92,7 +92,7 @@ namespace ExperienceAndClasses.Systems {
             Player player;
             EACPlayer eacplayer;
             if (Shortcuts.IS_SERVER) {
-                for (int player_index = 0; player_index < 255; player_index++) {
+                for (int player_index = 0; player_index < Main.maxPlayers; player_index++) {
                     player = Main.player[player_index];
 
                     //must exist
@@ -206,7 +206,7 @@ namespace ExperienceAndClasses.Systems {
         private static bool xp_buffer_empty = true;
 
         /// <summary>
-        /// Award players with xp
+        /// Award player with xp (place in xp_buffer)
         /// </summary>
         /// <param name="xp"></param>
         /// <param name="eligible_players"></param>
@@ -214,6 +214,16 @@ namespace ExperienceAndClasses.Systems {
             foreach (byte player_index in eligible_players) {
                 xp_buffer[player_index] += xp;
             }
+            xp_buffer_empty = false;
+        }
+
+        /// <summary>
+        /// Award player with xp (place in xp_buffer)
+        /// </summary>
+        /// <param name="xp"></param>
+        /// <param name="player_index"></param>
+        public static void AwardXP(uint xp, byte player_index) {
+            xp_buffer[player_index] += xp;
             xp_buffer_empty = false;
         }
 

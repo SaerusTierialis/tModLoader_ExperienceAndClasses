@@ -155,5 +155,50 @@ namespace ExperienceAndClasses.Utilities {
             return subtract > value ? (byte)0 : (byte)(value - subtract);
         }
 
+        public static List<EACPlayer> GetEACPlayersInRange(Vector2 position, float range,  bool require_alive = false, bool require_active = false) {
+            List<EACPlayer> players = new List<EACPlayer>();
+
+            Player player;
+            EACPlayer eacplayer;
+            for (int player_index = 0; player_index < Main.maxPlayers; player_index++) {
+                player = Main.player[player_index];
+
+                //must exist
+                if (!player.active) continue;
+
+                //must be alive?
+                if (require_alive && player.dead) continue;
+
+                //distance check
+                if (player.Distance(position) > range) continue;
+
+                //get eacplayer...
+                eacplayer = player.GetModPlayer<EACPlayer>();
+
+                //must be active (not afk)?
+                if (require_active && eacplayer.PSheet.Character.AFK) continue;
+
+                //all good
+                players.Add(eacplayer);
+            }
+
+            return players;
+        }
+
+        public static List<byte> GetPlayersInRange(Vector2 position, float range, bool require_alive = false, bool require_active = false) {
+            List<EACPlayer> eacplayers = GetEACPlayersInRange(position, range, require_active, require_active);
+            return GetPlayerIndexList(eacplayers);
+        }
+
+        public static List<byte> GetPlayerIndexList(List<EACPlayer> eacplayers) {
+            List<byte> players = new List<byte>();
+
+            foreach (EACPlayer player in eacplayers) {
+                players.Add((byte)player.player.whoAmI);
+            }
+
+            return players;
+        }
+
     }
 }

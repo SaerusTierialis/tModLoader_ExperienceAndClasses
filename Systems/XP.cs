@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Xna.Framework;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -217,6 +218,39 @@ namespace ExperienceAndClasses.Systems {
                 //apply
                 if (xp > 0) {
                     LocalAddXP((uint)Math.Ceiling(xp), true);
+                }
+            }
+
+            public static void AddTreeXP(int x, int y) {
+                Do_AddXP_TreeOre(x, y, 0.5);
+            }
+
+            public static void AddOreXP(int x, int y, int type) {
+                Do_AddXP_TreeOre(x, y, Main.tileValue[type] / 100.0);
+            }
+
+            private static void Do_AddXP_TreeOre(int x, int y, double xp_base) {
+                //get config
+                ConfigServer config = Shortcuts.GetConfigServer;
+
+                //get list of valid players
+                List<byte> players;
+                if (Shortcuts.IS_SINGLEPLAYER) {
+                    players = new List<byte>();
+                    players.Add((byte)Shortcuts.WHO_AM_I);
+                }
+                else {
+                    players = Utilities.Commons.GetPlayersInRange(new Vector2(x, y).ToWorldCoordinates(), config.RewardDistance, true, true);
+                }
+
+                //adjust per-player xp based on number of players
+                double xp_divided = xp_base * (1.0 + ((players.Count - 1.0) * config.RewardModPerPlayer)) / players.Count;
+
+                //award xp (with individual scaling by level)
+                uint xp;
+                foreach (byte player_index in players) {
+                    xp = (uint)Math.Ceiling(xp_divided * Main.player[player_index].GetModPlayer<EACPlayer>().PSheet.Character.Level / 10.0);
+                    NPCRewards.AwardXP(xp, player_index);
                 }
             }
         }
