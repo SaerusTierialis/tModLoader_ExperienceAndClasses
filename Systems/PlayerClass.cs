@@ -32,7 +32,7 @@ namespace ExperienceAndClasses.Systems {
             Shadow,
             Assassin,
             SoulBinder,
-            Mastermind,
+            Tactician,
             Saint,
             HybridPrime,
             Explorer,
@@ -823,18 +823,19 @@ namespace ExperienceAndClasses.Systems {
             public SoulBinder() : base(IDs.SoulBinder, IDs.Summoner) {
                 Class_Locations[2, 4] = ID_num;
                 Attribute_Growth[(byte)Attribute.IDs.Power] = 5;
-                Attribute_Growth[(byte)Attribute.IDs.Mind] = 2;
-                Attribute_Growth[(byte)Attribute.IDs.Spirit] = 2;
+                Attribute_Growth[(byte)Attribute.IDs.Spirit] = 3;
                 Colour = COLOUR_MINION_3;
                 implementation_status = IMPLEMENTATION_STATUS.ATTRIBUTE_ONLY;
             }
         }
 
-        public class Mastermind : Tier3 {
-            public Mastermind() : base(IDs.Mastermind, IDs.Summoner) {
+        public class Tactician : Tier3 {
+            public Tactician() : base(IDs.Tactician, IDs.Summoner) {
                 Class_Locations[3, 4] = ID_num;
-                Attribute_Growth[(byte)Attribute.IDs.Power] = 4;
-                Attribute_Growth[(byte)Attribute.IDs.Spirit] = 4;
+                Attribute_Growth[(byte)Attribute.IDs.Power] = 3;
+                Attribute_Growth[(byte)Attribute.IDs.Mind] = 2;
+                Attribute_Growth[(byte)Attribute.IDs.Vitality] = 2;
+                Attribute_Growth[(byte)Attribute.IDs.Spirit] =3;
                 Colour = COLOUR_MINION_3;
                 implementation_status = IMPLEMENTATION_STATUS.ATTRIBUTE_ONLY;
             }
