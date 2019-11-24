@@ -236,6 +236,10 @@ namespace ExperienceAndClasses.Systems {
                 //get list of valid players
                 List<byte> players;
                 if (Shortcuts.IS_SINGLEPLAYER) {
+                    if (Shortcuts.WHO_AM_I < 0) {
+                        //world creation
+                        return;
+                    }
                     players = new List<byte>();
                     players.Add((byte)Shortcuts.WHO_AM_I);
                 }
