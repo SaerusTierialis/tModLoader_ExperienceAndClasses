@@ -43,7 +43,7 @@ namespace ExperienceAndClasses.Systems {
         public static readonly float[] ALLOCATION_POINTS_PER_LEVEL_TIERS = new float[] { 0f, 0.2f, 0.3f, 0.5f };
 
         //zero point calculation
-        public const float PENALTY_RATIO = 0.05f;
+        public const float PENALTY_RATIO = 0.7f;
 
         //reset
         public static ModItem RESET_COST_ITEM;
@@ -110,7 +110,18 @@ namespace ExperienceAndClasses.Systems {
         /// <param name="psheet"></param>
         /// <returns></returns>
         public static int CalculateZeroPoint(PSheet psheet) {
-            return (int)Math.Floor(psheet.Attributes.Points_Spent * PENALTY_RATIO);
+            if ((psheet.Classes.Primary.Class.Tier < 1) && (psheet.Attributes.Points_Spent == 0))
+                return 0;
+            else {
+                int zero_point = 0;
+                float amount = psheet.Attributes.Points_Total / 6.0f;
+                while (AllocationPointCostTotal(zero_point+1) <= amount) {
+                    zero_point++;
+                }
+                zero_point = (int)Math.Floor(zero_point * PENALTY_RATIO);
+
+                return zero_point;
+            }
         }
 
         /// <summary>
