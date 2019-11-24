@@ -590,7 +590,7 @@ namespace ExperienceAndClasses.Systems {
                 Colour = COLOUR_NONCOMBAT;
                 implementation_status = IMPLEMENTATION_STATUS.ATTRIBUTE_ONLY;
                 Power_Scaling_Fish = 1f;
-                Power_Scaling_Damage = 0f;
+                Power_Scaling_Damage = 0.5f;
                 recommended_weapon = RECOMMENDED_WEAPON.NONE;
             }
 
