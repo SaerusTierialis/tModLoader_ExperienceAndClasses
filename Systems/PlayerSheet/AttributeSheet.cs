@@ -100,6 +100,12 @@ namespace ExperienceAndClasses.Systems.PlayerSheet {
             //default
             bool any_allocated = false;
 
+            //allow allocate
+            if (PSHEET.Character.In_Combat) {
+                Main.NewText(Language.GetTextValue("Mods.ExperienceAndClasses.Common.Attribute_Allocate_InCombat"), UI.Constants.COLOUR_MESSAGE_ERROR);
+                return false;
+            }
+
             while ((points > 0) && (Point_Costs[id] <= Points_Available)) {
                 //add point
                 Allocated[id]++;

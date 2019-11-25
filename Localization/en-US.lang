@@ -168,6 +168,8 @@ Common.Class_HybridPrime_Description=TODO
 Common.Attribute_Reset_Success=Attributes have been reset!
 Common.Attribute_Reset_Fail=Attribute reset requirement was not met.
 Common.Attribute_Reset_NoPoints=Cannot reset attributes because no points have been allocated.
+Common.Attribute_Reset_InCombat=Cannot reset attributes while in combat.
+Common.Attribute_Allocate_InCombat=Cannot allocate attributes while in combat.
 
 Common.Attribute_Power_Name=Power
 Common.Attribute_Power_Shortform=PWR

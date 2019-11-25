@@ -173,16 +173,20 @@ namespace ExperienceAndClasses.Systems {
             int type = RESET_COST_ITEM.item.type;
             int held = Shortcuts.LOCAL_PLAYER.player.CountItem(type);
 
+            EACPlayer eacplayer = Shortcuts.LOCAL_PLAYER;
+
             //do reset
-            if (Shortcuts.LOCAL_PLAYER.PSheet.Attributes.Points_Spent <= 0)
+            if (eacplayer.PSheet.Attributes.Points_Spent <= 0)
                 Main.NewText(Language.GetTextValue("Mods.ExperienceAndClasses.Common.Attribute_Reset_NoPoints"), UI.Constants.COLOUR_MESSAGE_ERROR);
+            if (eacplayer.PSheet.Character.In_Combat)
+                Main.NewText(Language.GetTextValue("Mods.ExperienceAndClasses.Common.Attribute_Reset_InCombat"), UI.Constants.COLOUR_MESSAGE_ERROR);
             else if (held >= cost) {
                 //consume
                 for (int i = 0; i < cost; i++)
-                    Shortcuts.LOCAL_PLAYER.player.ConsumeItem(type);
+                    eacplayer.player.ConsumeItem(type);
 
                 //reset
-                Shortcuts.LOCAL_PLAYER.PSheet.Attributes.Reset();
+                eacplayer.PSheet.Attributes.Reset();
 
                 //message
                 Main.NewText(Language.GetTextValue("Mods.ExperienceAndClasses.Common.Attribute_Reset_Success"), UI.Constants.COLOUR_MESSAGE_SUCCESS);
