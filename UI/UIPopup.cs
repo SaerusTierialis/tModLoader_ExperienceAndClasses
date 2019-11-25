@@ -318,13 +318,7 @@ namespace ExperienceAndClasses.UI {
                 str += "Defeat the Wall of Flesh\n";
             }
 
-            //str += c.Prereq.Name + " Level " + c.Prereq.Max_Level + "\n" + item.item.Name + "\n\nToken Recipe:\n" + item.GetRecipeString(true) + "\n(Work Bench)";
-
-            str += c.Prereq.Name;
-            str += " Level " + c.Prereq.Max_Level + "\n";
-            //str += item.item.Name;
-            //str += "\n\nToken Recipe:\n" + item.GetRecipeString(true);
-            str += "\n(Work Bench)";
+            str += c.Prereq.Name + " Level " + c.Prereq.Max_Level + "\n" + item.item.Name + "\n\nToken Recipe:\n" + item.GetRecipeString(true) + "\n(Work Bench)";
 
             mode = MODE.INPUT;
             unlock_mode = INPUT_MODE.CLASS;
