@@ -109,7 +109,6 @@ Common.Config_UIMessages_XPOverhead_Label=Display XP gain overhead
 //Class - Names
 Common.Class_None_Name=None
 Common.Class_Novice_Name=Novice
-Common.Class_Explorer_Name=Explorer
 
 Common.Class_Vanguard_Name=Vanguard
 Common.Class_EagleEye_Name=Eagle Eye
@@ -119,6 +118,7 @@ Common.Class_Summoner_Name=Summoner
 Common.Class_Cleric_Name=Cleric
 Common.Class_Bard_Name=Bard
 Common.Class_Hybrid_Name=Hybrid
+Common.Class_Tinkerer_Name=Tinkerer
 
 Common.Class_Guardian_Name=Guardian
 Common.Class_Berserker_Name=Berserker
@@ -134,11 +134,11 @@ Common.Class_Saint_Name=Saint
 Common.Class_Oracle_Name=Oracle
 Common.Class_Minstrel_Name=Minstrel
 Common.Class_HybridPrime_Name=Hybrid Prime
+Common.Class_Engineer_Name=Engineer
 
 //Class - Descriptions
 Common.Class_None_Description=
 Common.Class_Novice_Description=TODO
-Common.Class_Explorer_Description=TODO
 
 Common.Class_Vanguard_Description=TODO
 Common.Class_EagleEye_Description=TODO
@@ -148,6 +148,7 @@ Common.Class_Summoner_Description=TODO
 Common.Class_Cleric_Description=TODO
 Common.Class_Bard_Description=TODO
 Common.Class_Hybrid_Description=TODO
+Common.Class_Tinkerer_Description=TODO
 
 Common.Class_Guardian_Description=TODO
 Common.Class_Berserker_Description=TODO
@@ -163,6 +164,7 @@ Common.Class_Saint_Description=TODO
 Common.Class_Oracle_Description=TODO
 Common.Class_Minstrel_Description=TODO
 Common.Class_HybridPrime_Description=TODO
+Common.Class_Engineer_Description=TODO
 
 //Attributes
 Common.Attribute_Reset_Success=Attributes have been reset!

@@ -52,19 +52,4 @@ namespace ExperienceAndClasses.Items {
             QuckRecipe(mod, new int[,] { { ItemID.SoulofLight, 100 }, { ItemID.SoulofNight, 100 } , { ModContent.ItemType<Orb_Boss>(), 20 } }, this, 1, recipe);
         }
     }
-
-    public class Unlock_Explorer : Unlock {
-        private const string TEXTURE = "ExperienceAndClasses/Textures/Item/Unlock_Explorer";
-        private const int RARITY = -11;
-
-        public Unlock_Explorer() : base(TEXTURE, RARITY) { }
-
-        public override void AddRecipes() {
-            ModRecipe recipe = new ModRecipe(Shortcuts.MOD);
-            recipe.AddRecipeGroup("Wood", 50); //any wood
-            recipe.AddRecipeGroup("IronBar", 1); //iron or tin
-            recipe.AddIngredient(ItemID.FallenStar, 1);
-            QuckRecipe(mod, new int[,] { { }, { } }, this, 1, recipe);
-        }
-    }
 }
