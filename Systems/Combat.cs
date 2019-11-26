@@ -106,9 +106,6 @@ namespace ExperienceAndClasses.Systems {
 
         public static void LocalModifyDamageDealt(EACPlayer eacplayer, DamageSource dsource, ref int damage, ref bool crit, bool is_projectile = false, float distance = 0f) {
             if (eacplayer.Fields.Is_Local) {
-                //damage dealt multiplier
-                damage = (int)Math.Ceiling(damage * eacplayer.PSheet.Stats.Damage_Dealt_Multiplier);
-
                 //is a crit?
                 if (!crit && (eacplayer.PSheet.Stats.Crit_All > 0)) {
                     //adjust chance to prevent diminishing returns

@@ -213,7 +213,6 @@ Common.Damage_Type_Mechanical=Mechanical
 
 //Stats
 Common.Stat_Damage_Header=Damage
-Common.Stat_Damage_Dealt_Multiplier=Damage Dealt Multiplier
 Common.Stat_Damage_All={$Mods.ExperienceAndClasses.Common.Damage_Type_All} {$Mods.ExperienceAndClasses.Common.Term_Damage}
 Common.Stat_Damage_Melee={$Mods.ExperienceAndClasses.Common.Damage_Type_Melee} {$Mods.ExperienceAndClasses.Common.Term_Damage}
 Common.Stat_Damage_Ranged={$Mods.ExperienceAndClasses.Common.Damage_Type_Ranged} {$Mods.ExperienceAndClasses.Common.Term_Damage}

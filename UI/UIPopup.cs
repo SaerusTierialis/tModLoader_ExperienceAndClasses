@@ -394,7 +394,7 @@ namespace ExperienceAndClasses.UI {
             //damage
             float global_damage_add = eacplayer.player.allDamage - 1f;
             str += Language.GetTextValue("Mods.ExperienceAndClasses.Common.Stat_Damage_Header");
-            str += Systems.Attribute.BonusValueString(eacplayer.PSheet.Stats.Damage_Dealt_Multiplier, "Stat_Damage_Dealt_Multiplier", true, default, default, false);
+            str += Systems.Attribute.BonusValueString(eacplayer.player.allDamageMult, "Stat_Damage_Dealt_Multiplier", true, default, default, false);
             str += Systems.Attribute.BonusValueString(eacplayer.player.meleeDamage + global_damage_add, "Stat_Damage_Melee", true, default, default, false);
             str += Systems.Attribute.BonusValueString(eacplayer.player.rangedDamage + global_damage_add, "Stat_Damage_Ranged", true, default, default, false);
             str += Systems.Attribute.BonusValueString(eacplayer.player.thrownDamage + global_damage_add, "Stat_Damage_Throwing", true, default, default, false);

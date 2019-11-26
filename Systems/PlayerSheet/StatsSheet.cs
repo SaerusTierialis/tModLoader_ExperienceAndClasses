@@ -29,7 +29,6 @@ namespace ExperienceAndClasses.Systems.PlayerSheet {
         public float Damage_Other_Add;
 
         //multipliers
-        public float Damage_Dealt_Multiplier;
         public float Damage_Taken_Multiplier;
 
         /// <summary>
@@ -64,7 +63,7 @@ namespace ExperienceAndClasses.Systems.PlayerSheet {
 
             Item_Speed_Weapon = 1f;
 
-            Damage_Dealt_Multiplier = Damage_Taken_Multiplier = 1f;
+            Damage_Taken_Multiplier = 1f;
         }
 
         public void Limit() {
