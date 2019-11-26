@@ -55,7 +55,6 @@ namespace ExperienceAndClasses.Systems {
         public enum RECOMMENDED_WEAPON : byte {
             UNKNOWN,
             ANY,
-            NONE,
             MINION,
             NON_MINION,
             PROJECTILE,
@@ -127,9 +126,6 @@ namespace ExperienceAndClasses.Systems {
 
         protected IMPLEMENTATION_STATUS implementation_status = IMPLEMENTATION_STATUS.UNKNOWN;
         protected RECOMMENDED_WEAPON recommended_weapon = RECOMMENDED_WEAPON.UNKNOWN;
-
-        public float Power_Scaling_Fish { get; protected set; } = 0f;
-        public float Power_Scaling_Damage { get; protected set; } = 0f;
 
         public Ability[] Abilities = new Ability[Ability.NUMBER_ABILITY_SLOTS_PER_CLASS];
         public Ability[] Abilities_Alt = new Ability[Ability.NUMBER_ABILITY_SLOTS_PER_CLASS];
@@ -230,10 +226,6 @@ namespace ExperienceAndClasses.Systems {
                 switch (recommended_weapon) {
                     case RECOMMENDED_WEAPON.ANY:
                         recommended_weapon_text += "any";
-                        break;
-
-                    case RECOMMENDED_WEAPON.NONE:
-                        recommended_weapon_text += "none";
                         break;
 
                     case RECOMMENDED_WEAPON.MINION:
@@ -527,7 +519,6 @@ namespace ExperienceAndClasses.Systems {
                 Gives_Allocation_Attributes = true;
                 Has_Texture = true;
                 Enabled = true;
-                Power_Scaling_Damage = 1f;
             }
         }
 
@@ -589,9 +580,7 @@ namespace ExperienceAndClasses.Systems {
                 Attribute_Growth[(byte)Attribute.IDs.Dexterity] = 2f;
                 Colour = COLOUR_NONCOMBAT;
                 implementation_status = IMPLEMENTATION_STATUS.ATTRIBUTE_ONLY;
-                Power_Scaling_Fish = 1f;
-                Power_Scaling_Damage = 0.5f;
-                recommended_weapon = RECOMMENDED_WEAPON.NONE;
+                recommended_weapon = RECOMMENDED_WEAPON.ANY;
             }
 
             protected override Items.Unlock GetUnlockItem() {

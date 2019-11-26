@@ -290,23 +290,8 @@ namespace ExperienceAndClasses.Systems {
             public Power() : base(IDs.Power) {}
             protected override void Effect(EACPlayer eacplayer, int points, bool do_effects = true) {
                 //damage
-                float damage_scaling = Math.Max(eacplayer.PSheet.Classes.Primary.Class.Power_Scaling_Damage, eacplayer.PSheet.Classes.Secondary.Class.Power_Scaling_Damage / 2) * PER_POINT_DAMAGE;
-                if (damage_scaling > 0) {
-                    string str = eacplayer.PSheet.Attributes.Power_Scaling.ApplyPoints(eacplayer, points * damage_scaling, damage_scaling, do_effects);
-                    if (eacplayer.Fields.Is_Local) Effect_Text += str;
-                }
-
-                //mining
-                float mining_scaling = Math.Max(eacplayer.PSheet.Classes.Primary.Class.Power_Scaling_Fish, eacplayer.PSheet.Classes.Secondary.Class.Power_Scaling_Fish / 2) * PER_POINT_MINING;
-                float bonus = points * mining_scaling;
-                if (do_effects) eacplayer.player.pickSpeed -= bonus;
-                if (eacplayer.Fields.Is_Local) Effect_Text += BonusValueString(bonus, "Stat_Misc_MiningSpeed", true, mining_scaling, " (" + PlayerClass.LOOKUP[(byte)PlayerClass.IDs.Explorer].Name + ")");
-
-                //fish
-                float fish_scaling = Math.Max(eacplayer.PSheet.Classes.Primary.Class.Power_Scaling_Fish, eacplayer.PSheet.Classes.Secondary.Class.Power_Scaling_Fish / 2) * PER_POINT_FISH;
-                int bonus_int = RoundIntBonus(points * fish_scaling);
-                if (do_effects) eacplayer.player.fishingSkill += bonus_int;
-                if (eacplayer.Fields.Is_Local) Effect_Text += BonusValueString(bonus_int, "Stat_Misc_FishingPower", false, fish_scaling, " (" + PlayerClass.LOOKUP[(byte)PlayerClass.IDs.Explorer].Name + ")");
+                string str = eacplayer.PSheet.Attributes.Power_Scaling.ApplyPoints(eacplayer, points * PER_POINT_DAMAGE, PER_POINT_DAMAGE, do_effects);
+                if (eacplayer.Fields.Is_Local) Effect_Text += str;
             }
         }
 
@@ -437,16 +422,9 @@ namespace ExperienceAndClasses.Systems {
                 if (eacplayer.Fields.Is_Local) Effect_Text += BonusValueString(bonus, "Stat_Abilities_Cooldown", true, PER_POINT_ABILITY_DELAY);
 
                 //weapon use time
-                float bonus_per_point = Math.Max(eacplayer.PSheet.Classes.Primary.Class.Power_Scaling_Damage, eacplayer.PSheet.Classes.Secondary.Class.Power_Scaling_Damage / 2) * PER_POINT_USE_SPEED;
-                bonus = bonus_per_point * points;
+                bonus = PER_POINT_USE_SPEED * points;
                 if (do_effects) eacplayer.PSheet.Stats.Item_Speed_Weapon += bonus;
-                if (eacplayer.Fields.Is_Local) Effect_Text += BonusValueString(bonus, "Stat_ItemSpeed_Weapon", true, bonus_per_point);
-
-                //tool use time (if non-combat)
-                bonus_per_point = Math.Max(eacplayer.PSheet.Classes.Primary.Class.Power_Scaling_Fish, eacplayer.PSheet.Classes.Secondary.Class.Power_Scaling_Fish / 2) * PER_POINT_USE_SPEED;
-                bonus = bonus_per_point * points;
-                if (do_effects) eacplayer.PSheet.Stats.Item_Speed_Tool += bonus;
-                if (eacplayer.Fields.Is_Local) Effect_Text += BonusValueString(bonus, "Stat_ItemSpeed_Tool", true, bonus_per_point, " (" + PlayerClass.LOOKUP[(byte)PlayerClass.IDs.Explorer].Name + ")" );
+                if (eacplayer.Fields.Is_Local) Effect_Text += BonusValueString(bonus, "Stat_ItemSpeed_Weapon", true, PER_POINT_USE_SPEED);
             }
         }
     }

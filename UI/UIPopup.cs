@@ -34,7 +34,7 @@ namespace ExperienceAndClasses.UI {
         private const float WIDTH_RESET = 400f;
         private const float WIDTH_ABILITY = 400f;
         private const float WIDTH_PASSIVE = 400f;
-        private const float WIDTH_STATS = 525f;
+        private const float WIDTH_STATS = 790f;
 
         private const float BUTTON_SEPARATION = 100f;
 
@@ -51,7 +51,7 @@ namespace ExperienceAndClasses.UI {
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Variables ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         private DragableUIPanel panel;
-        private UIText ui_text_body, ui_text_extra;
+        private UIText ui_text_body, ui_text_extra, ui_text_extra2;
         private UIElement source = null;
         private UIImage image;
         private static MODE mode;
@@ -80,6 +80,11 @@ namespace ExperienceAndClasses.UI {
             ui_text_extra.Left.Set(Constants.UI_PADDING, 0f);
             ui_text_extra.Top.Set(Constants.UI_PADDING, 0f);
             panel.Append(ui_text_extra);
+
+            ui_text_extra2 = new UIText("", TEXT_SCALE_BODY, false);
+            ui_text_extra2.Left.Set(Constants.UI_PADDING, 0f);
+            ui_text_extra2.Top.Set(Constants.UI_PADDING, 0f);
+            panel.Append(ui_text_extra2);
 
             image = new UIImage(Utilities.Textures.TEXTURE_BLANK);
             image.Left.Set(Constants.UI_PADDING, 0f);
@@ -137,7 +142,7 @@ namespace ExperienceAndClasses.UI {
             EndText(source);
         }
 
-        private void ShowText(UIElement source, string title, string body, float width, string extra=null, float extra_left=0f, Texture2D texture=null, bool force=false, bool transparent = false, float body_scale = TEXT_SCALE_BODY) {
+        private void ShowText(UIElement source, string title, string body, float width, string extra=null, float extra_left=0f, Texture2D texture=null, bool force=false, bool transparent = false, float body_scale = TEXT_SCALE_BODY, string extra2=null, float extra2_left=0f) {
             if (mode == MODE.HOVER || force) {
 
                 this.source = source;
@@ -215,6 +220,23 @@ namespace ExperienceAndClasses.UI {
                 }
                 else {
                     ui_text_extra.SetText("");
+                }
+
+                //extra2
+                if (extra2 != null) {
+                    ui_text_extra2.SetText(extra2);
+
+                    if (extra2_left < 0) {
+                        extra2_left *= -1;
+                        ui_text_extra2.Top.Set(ui_text_body.Top.Pixels, 0f);
+                    }
+                    else {
+                        ui_text_extra2.Top.Set(panel.Height.Pixels - (Main.fontMouseText.MeasureString(extra2).Y * TEXT_SCALE_BODY), 0f);
+                    }
+                    ui_text_extra2.Left.Set(extra2_left, 0f);
+                }
+                else {
+                    ui_text_extra2.SetText("");
                 }
 
                 //show
@@ -364,7 +386,7 @@ namespace ExperienceAndClasses.UI {
         public void ShowStats(UIElement source) {
             //generate stat text
             string str = "";
-            string str2 = "";
+            string str1, str2, str3;
 
             //get player
             EACPlayer eacplayer = Shortcuts.LOCAL_PLAYER;
@@ -372,6 +394,7 @@ namespace ExperienceAndClasses.UI {
             //damage
             float global_damage_add = eacplayer.player.allDamage - 1f;
             str += Language.GetTextValue("Mods.ExperienceAndClasses.Common.Stat_Damage_Header");
+            str += Systems.Attribute.BonusValueString(eacplayer.PSheet.Stats.Damage_Dealt_Multiplier, "Stat_Damage_Dealt_Multiplier", true, default, default, false);
             str += Systems.Attribute.BonusValueString(eacplayer.player.meleeDamage + global_damage_add, "Stat_Damage_Melee", true, default, default, false);
             str += Systems.Attribute.BonusValueString(eacplayer.player.rangedDamage + global_damage_add, "Stat_Damage_Ranged", true, default, default, false);
             str += Systems.Attribute.BonusValueString(eacplayer.player.thrownDamage + global_damage_add, "Stat_Damage_Throwing", true, default, default, false);
@@ -379,10 +402,25 @@ namespace ExperienceAndClasses.UI {
             str += Systems.Attribute.BonusValueString(eacplayer.player.minionDamage + global_damage_add, "Stat_Damage_Minion", true, default, default, false);
             str += Systems.Attribute.BonusValueString(eacplayer.PSheet.Stats.Damage_Light + global_damage_add, "Stat_Damage_Light", true, default, default, false);
             str += Systems.Attribute.BonusValueString(eacplayer.PSheet.Stats.Damage_Harmonic + global_damage_add, "Stat_Damage_Harmonic", true, default, default, false);
+            str += Systems.Attribute.BonusValueString(eacplayer.PSheet.Stats.Damage_Mechanical + global_damage_add, "Stat_Damage_Mechanical", true, default, default, false);
             str += Systems.Attribute.BonusValueString(eacplayer.PSheet.Stats.Damage_Other_Add + global_damage_add, "Stat_Damage_Other", true, default, default, true);
 
+            if (str.Length > 0) str += "\n\n";
+            str += Language.GetTextValue("Mods.ExperienceAndClasses.Common.Stat_Defensive_Header");
+            str += Systems.Attribute.BonusValueString(eacplayer.PSheet.Stats.Damage_Taken_Multiplier, "Stat_Damage_Taken_Multiplier", true, default, default, false);
+            str += Systems.Attribute.BonusValueString(eacplayer.player.lifeRegen, "Stat_Defensive_LifeRegen", false, default, default, false);
+            str += Systems.Attribute.BonusValueString(eacplayer.player.statDefense, "Stat_Defensive_Defense", false, default, default, false);
+            str += Systems.Attribute.BonusValueString(eacplayer.PSheet.Stats.Dodge, "Stat_Defensive_Dodge", true, default, default, false);
+
+            if (str.Length > 0) str += "\n\n";
+            str += Language.GetTextValue("Mods.ExperienceAndClasses.Common.Stat_Sheet_Disclaimer");
+
+            str1 = str;
+            str = "";
+
             float global_crit_chance = eacplayer.PSheet.Stats.Crit_All;
-            str += "\n\n" + Language.GetTextValue("Mods.ExperienceAndClasses.Common.Stat_Crit_Header");
+            if (str.Length > 0) str += "\n\n";
+            str += Language.GetTextValue("Mods.ExperienceAndClasses.Common.Stat_Crit_Header");
             str += Systems.Attribute.BonusValueString(eacplayer.PSheet.Stats.Crit_Damage_Mult, "Stat_Crit_Mult", true, default, default, false);
             str += Systems.Attribute.BonusValueString(eacplayer.player.meleeCrit / 100f + global_crit_chance, "Stat_Crit_Melee", true, default, default, false);
             str += Systems.Attribute.BonusValueString(eacplayer.player.rangedCrit / 100f + global_crit_chance, "Stat_Crit_Ranged", true, default, default, false);
@@ -391,45 +429,44 @@ namespace ExperienceAndClasses.UI {
             str += Systems.Attribute.BonusValueString(global_crit_chance + Systems.Combat.BASE_CRIT_MINION, "Stat_Crit_Minion", true, default, default, false);
             str += Systems.Attribute.BonusValueString(global_crit_chance + Systems.Combat.BASE_CRIT_LIGHT, "Stat_Crit_Light", true, default, default, false);
             str += Systems.Attribute.BonusValueString(global_crit_chance + Systems.Combat.BASE_CRIT_HARMONIC, "Stat_Crit_Harmonic", true, default, default, false);
+            str += Systems.Attribute.BonusValueString(global_crit_chance + Systems.Combat.BASE_CRIT_MECHANICAL, "Stat_Crit_Mechanical", true, default, default, false);
             str += Systems.Attribute.BonusValueString(global_crit_chance, "Stat_Crit_Other", true, default, default, true);
 
-            str += "\n\n" + Language.GetTextValue("Mods.ExperienceAndClasses.Common.Stat_Mana_Header");
-            str += Systems.Attribute.BonusValueString(eacplayer.player.statManaMax2, "Stat_Mana_Mana", false, default, default, false);
+            if (str.Length > 0) str += "\n\n";
+            str += Language.GetTextValue("Mods.ExperienceAndClasses.Common.Stat_Mobility_Header");
+            str += Systems.Attribute.BonusValueString(eacplayer.player.maxRunSpeed, "Stat_Mobility_MaxRun", false, default, default, false);
+            str += Systems.Attribute.BonusValueString(eacplayer.player.runAcceleration, "Stat_Mobility_RunAccel", false, default, default, false);
+            str += Systems.Attribute.BonusValueString(eacplayer.player.jumpSpeedBoost, "Stat_Mobility_Jump", false, default, default, false);
+            str += Systems.Attribute.BonusValueString(eacplayer.player.wingTimeMax, "Stat_Mobility_WingTime", false, default, default, false);
+
+            str2 = str;
+            str = "";
+
+            if (str.Length > 0) str += "\n\n";
+            str += Language.GetTextValue("Mods.ExperienceAndClasses.Common.Stat_Mana_Header");
             str += Systems.Attribute.BonusValueString(eacplayer.player.manaRegenBonus, "Stat_Mana_ManaRegen", false, default, default, false);
             str += Systems.Attribute.BonusValueString(eacplayer.PSheet.Stats.Mana_Regen_Delay_Reduction, "Stat_Mana_ManaRegenDelay", true, default, default, false);
 
-            str += "\n\n" + Language.GetTextValue("Mods.ExperienceAndClasses.Common.Stat_Sheet_Disclaimer");
+            if (str.Length > 0) str += "\n\n";
+            str += Language.GetTextValue("Mods.ExperienceAndClasses.Common.Stat_ItemSpeed_Header");
+            str += Systems.Attribute.BonusValueString(eacplayer.PSheet.Stats.Item_Speed_Weapon, "Stat_ItemSpeed_Weapon", true, default, default, false);
+            str += Systems.Attribute.BonusValueString(1f + (1f - eacplayer.player.meleeSpeed), "Stat_ItemSpeed_Melee", true, default, default, false);
 
+            if (str.Length > 0) str += "\n\n";
+            str += Language.GetTextValue("Mods.ExperienceAndClasses.Common.Stat_Abilities_Header");
+            str += Systems.Attribute.BonusValueString(eacplayer.PSheet.Stats.Ability_Delay_Reduction, "Stat_Abilities_Cooldown", true, default, default, false);
+            str += Systems.Attribute.BonusValueString(eacplayer.PSheet.Stats.Healing_Mult, "Stat_Abilities_Healing", true, default, default, false);
 
-            str2 += Language.GetTextValue("Mods.ExperienceAndClasses.Common.Stat_Defensive_Header");
-            str2 += Systems.Attribute.BonusValueString(eacplayer.player.statLifeMax2, "Stat_Defensive_Life", false, default, default, false);
-            str2 += Systems.Attribute.BonusValueString(eacplayer.player.lifeRegen, "Stat_Defensive_LifeRegen", false, default, default, false);
-            str2 += Systems.Attribute.BonusValueString(eacplayer.player.statDefense, "Stat_Defensive_Defense", false, default, default, false);
-            str2 += Systems.Attribute.BonusValueString(eacplayer.PSheet.Stats.Dodge, "Stat_Defensive_Dodge", true, default, default, false);
+            if (str.Length > 0) str += "\n\n";
+            str += Language.GetTextValue("Mods.ExperienceAndClasses.Common.Stat_Misc_Header");
+            str += Systems.Attribute.BonusValueString(eacplayer.player.maxMinions, "Stat_Misc_MinionCap", false, default, default, false);
+            str += Systems.Attribute.BonusValueString(2f - eacplayer.player.pickSpeed, "Stat_Misc_MiningSpeed", true, default, default, false);
+            str += Systems.Attribute.BonusValueString(eacplayer.player.FishingLevel(), "Stat_Misc_FishingPower", false, default, default, false);
 
-            str2 += "\n\n" + Language.GetTextValue("Mods.ExperienceAndClasses.Common.Stat_Abilities_Header");
-            str2 += Systems.Attribute.BonusValueString(eacplayer.PSheet.Stats.Ability_Delay_Reduction, "Stat_Abilities_Cooldown", true, default, default, false);
-            str2 += Systems.Attribute.BonusValueString(eacplayer.PSheet.Stats.Healing_Mult, "Stat_Abilities_Healing", true, default, default, false);
-
-            str2 += "\n\n" + Language.GetTextValue("Mods.ExperienceAndClasses.Common.Stat_Mobility_Header");
-            str2 += Systems.Attribute.BonusValueString(eacplayer.player.maxRunSpeed, "Stat_Mobility_MaxRun", false, default, default, false);
-            str2 += Systems.Attribute.BonusValueString(eacplayer.player.runAcceleration, "Stat_Mobility_RunAccel", false, default, default, false);
-            str2 += Systems.Attribute.BonusValueString(eacplayer.player.jumpSpeedBoost, "Stat_Mobility_Jump", false, default, default, false);
-            str2 += Systems.Attribute.BonusValueString(eacplayer.player.wingTimeMax, "Stat_Mobility_WingTime", false, default, default, false);
-
-            str2 += "\n\n" + Language.GetTextValue("Mods.ExperienceAndClasses.Common.Stat_ItemSpeed_Header");
-            str2 += Systems.Attribute.BonusValueString(eacplayer.PSheet.Stats.Item_Speed_Weapon, "Stat_ItemSpeed_Weapon", true, default, default, false);
-            str2 += Systems.Attribute.BonusValueString(eacplayer.PSheet.Stats.Item_Speed_Tool, "Stat_ItemSpeed_Tool", true, default, default, false);
-            str2 += Systems.Attribute.BonusValueString(1f + (1f - eacplayer.player.meleeSpeed), "Stat_ItemSpeed_Melee", true, default, default, false);
-
-            str2 += "\n\n" + Language.GetTextValue("Mods.ExperienceAndClasses.Common.Stat_Misc_Header");
-            str2 += Systems.Attribute.BonusValueString(eacplayer.player.maxMinions, "Stat_Misc_MinionCap", false, default, default, false);
-            str2 += Systems.Attribute.BonusValueString(1f - eacplayer.player.pickSpeed, "Stat_Misc_MiningSpeed", true, default, default, true);
-            str2 += Systems.Attribute.BonusValueString(eacplayer.player.fishingSkill, "Stat_Misc_FishingPower", false, default, default, false);
-
+            str3 = str;
 
             //display
-            ShowText(source, "Stats", str, WIDTH_STATS, str2, -265f);
+            ShowText(source, "Stats", str1, WIDTH_STATS, str2, -265f, null, false, false, 0.9f, str3, -530f);
         }
 
     }

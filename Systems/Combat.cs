@@ -11,6 +11,7 @@ namespace ExperienceAndClasses.Systems {
         public const float BASE_CRIT_MINION = 0.04f;
         public const float BASE_CRIT_LIGHT = 0.04f;
         public const float BASE_CRIT_HARMONIC = 0.04f;
+        public const float BASE_CRIT_MECHANICAL = 0.04f;
 
         public class DamageSource {
             public readonly bool Is_Item;
@@ -96,10 +97,6 @@ namespace ExperienceAndClasses.Systems {
         public static float ModifyItemUseTime(EACPlayer eacplayer, Item item, float use_time) {
             DamageSource dsource = new DamageSource(item);
 
-            if (dsource.Tool) {
-                use_time *= eacplayer.PSheet.Stats.Item_Speed_Tool;
-            }
-            
             if (dsource.Weapon) {
                 use_time *= eacplayer.PSheet.Stats.Item_Speed_Weapon;
             }
@@ -109,6 +106,9 @@ namespace ExperienceAndClasses.Systems {
 
         public static void LocalModifyDamageDealt(EACPlayer eacplayer, DamageSource dsource, ref int damage, ref bool crit, bool is_projectile = false, float distance = 0f) {
             if (eacplayer.Fields.Is_Local) {
+                //damage dealt multiplier
+                damage = (int)Math.Ceiling(damage * eacplayer.PSheet.Stats.Damage_Dealt_Multiplier);
+
                 //is a crit?
                 if (!crit && (eacplayer.PSheet.Stats.Crit_All > 0)) {
                     //adjust chance to prevent diminishing returns
@@ -148,6 +148,7 @@ namespace ExperienceAndClasses.Systems {
             if (dsource.Minion) crit_chance += BASE_CRIT_MINION;
             if (dsource.Light) crit_chance += BASE_CRIT_LIGHT;
             if (dsource.Harmonic) crit_chance += BASE_CRIT_HARMONIC;
+            if (dsource.Mechanical) crit_chance += BASE_CRIT_MECHANICAL;
 
             return Main.rand.NextFloat(0f, 1f - adjust) < crit_chance;
         }

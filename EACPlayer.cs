@@ -255,6 +255,9 @@ namespace ExperienceAndClasses {
                 return false;
             }
 
+            //damage taken multiplier
+            damage = (int)Math.Ceiling(damage * PSheet.Stats.Damage_Taken_Multiplier);
+
             return hit;
         }
 

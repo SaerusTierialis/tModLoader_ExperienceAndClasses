@@ -193,8 +193,8 @@ Common.Attribute_Dexterity_Shortform=DEX
 Common.Death_Penalty_XP=You have lost experience from death.
 
 //Stat Terms
-Common.Term_Damage=Damage;
-Common.Term_CritChance=Critical Chance;
+Common.Term_Damage=Damage
+Common.Term_CritChance=Critical Chance
 
 //Damage Types
 Common.Damage_Type_Balanced=Balanced
@@ -207,9 +207,11 @@ Common.Damage_Type_All=All
 Common.Damage_Type_Light=Light
 Common.Damage_Type_Harmonic=Harmonic
 Common.Damage_Type_Other=Other
+Common.Damage_Type_Mechanical=Mechanical
 
 //Stats
 Common.Stat_Damage_Header=Damage
+Common.Stat_Damage_Dealt_Multiplier=Damage Dealt Multiplier
 Common.Stat_Damage_All={$Mods.ExperienceAndClasses.Common.Damage_Type_All} {$Mods.ExperienceAndClasses.Common.Term_Damage}
 Common.Stat_Damage_Melee={$Mods.ExperienceAndClasses.Common.Damage_Type_Melee} {$Mods.ExperienceAndClasses.Common.Term_Damage}
 Common.Stat_Damage_Ranged={$Mods.ExperienceAndClasses.Common.Damage_Type_Ranged} {$Mods.ExperienceAndClasses.Common.Term_Damage}
@@ -218,6 +220,7 @@ Common.Stat_Damage_Magic={$Mods.ExperienceAndClasses.Common.Damage_Type_Magic} {
 Common.Stat_Damage_Minion={$Mods.ExperienceAndClasses.Common.Damage_Type_Minion} {$Mods.ExperienceAndClasses.Common.Term_Damage}
 Common.Stat_Damage_Light={$Mods.ExperienceAndClasses.Common.Damage_Type_Light} {$Mods.ExperienceAndClasses.Common.Term_Damage}
 Common.Stat_Damage_Harmonic={$Mods.ExperienceAndClasses.Common.Damage_Type_Harmonic} {$Mods.ExperienceAndClasses.Common.Term_Damage}
+Common.Stat_Damage_Mechanical={$Mods.ExperienceAndClasses.Common.Damage_Type_Mechanical} {$Mods.ExperienceAndClasses.Common.Term_Damage}
 Common.Stat_Damage_Other={$Mods.ExperienceAndClasses.Common.Damage_Type_Other} {$Mods.ExperienceAndClasses.Common.Term_Damage}
 
 Common.Stat_Crit_Header=Critical Hits
@@ -229,10 +232,12 @@ Common.Stat_Crit_Magic={$Mods.ExperienceAndClasses.Common.Damage_Type_Magic} {$M
 Common.Stat_Crit_Minion={$Mods.ExperienceAndClasses.Common.Damage_Type_Minion} {$Mods.ExperienceAndClasses.Common.Term_CritChance}
 Common.Stat_Crit_Light={$Mods.ExperienceAndClasses.Common.Damage_Type_Light} {$Mods.ExperienceAndClasses.Common.Term_CritChance}
 Common.Stat_Crit_Harmonic={$Mods.ExperienceAndClasses.Common.Damage_Type_Harmonic} {$Mods.ExperienceAndClasses.Common.Term_CritChance}
+Common.Stat_Crit_Mechanical={$Mods.ExperienceAndClasses.Common.Damage_Type_Mechanical} {$Mods.ExperienceAndClasses.Common.Term_CritChance}
 Common.Stat_Crit_Other={$Mods.ExperienceAndClasses.Common.Damage_Type_Other} {$Mods.ExperienceAndClasses.Common.Term_CritChance}
 Common.Stat_Crit_Mult=Critical Damage Multiplier
 
 Common.Stat_Defensive_Header=Survival
+Common.Stat_Damage_Taken_Multiplier=Damage Taken Multiplier
 Common.Stat_Defensive_Life=Maximum Life
 Common.Stat_Defensive_LifeRegen=Life Regeneration
 Common.Stat_Defensive_Defense=Defense
@@ -253,7 +258,6 @@ Common.Stat_Mobility_WingTime=Wing Time
 Common.Stat_ItemSpeed_Header=Item Speed
 Common.Stat_ItemSpeed_Weapon=All Weapon Speed
 Common.Stat_ItemSpeed_Melee=Melee Attack Speed
-Common.Stat_ItemSpeed_Tool=All Tool Speed
 
 Common.Stat_Abilities_Header=Abilities
 Common.Stat_Abilities_Cooldown=Ability Cooldown Reduction
@@ -264,7 +268,7 @@ Common.Stat_Misc_MiningSpeed=Mining Speed
 Common.Stat_Misc_FishingPower=Fishing Power
 Common.Stat_Misc_MinionCap=Maximum Minions
 
-Common.Stat_Sheet_Disclaimer=Global bonuses have been added to displayed values\n"{$Mods.ExperienceAndClasses.Common.Damage_Type_Other}" refers to custom damage types added by other mods\nSome values will not update if the game is paused
+Common.Stat_Sheet_Disclaimer=Displayed values include global bonuses. "{$Mods.ExperienceAndClasses.Common.Damage_Type_Other}" refers to custom damage types added by other mods.\nSome values will not update if the game is paused.
 
 //Power Scaling
 Common.PowerScaling_SetFail_InCombat={$Mods.ExperienceAndClasses.Common.Attribute_Power_Name} Scaling Type cannot be changed while in combat.
