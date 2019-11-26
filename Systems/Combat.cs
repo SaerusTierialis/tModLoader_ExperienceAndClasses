@@ -18,7 +18,7 @@ namespace ExperienceAndClasses.Systems {
             public readonly Item Item;
             public readonly Projectile Projectile;
 
-            public DamageSource(Item item, bool is_light = false, bool is_harmonic = false) {
+            public DamageSource(Item item, bool is_light = false, bool is_harmonic = false, bool is_mechanical = false) {
                 Is_Item = true;
                 Is_Projectile = false;
                 Item = item;
@@ -33,9 +33,10 @@ namespace ExperienceAndClasses.Systems {
                 Minion = ItemIsMinionWeapon(item);
                 Light = is_light;
                 Harmonic = is_harmonic;
-                Other = Weapon && !(Melee || Ranged || Throwing || Magic || Minion || Light || Harmonic);
+                Mechanical = is_mechanical;
+                Other = Weapon && !(Melee || Ranged || Throwing || Magic || Minion || Light || Harmonic || Mechanical);
             }
-            public DamageSource(Projectile proj, bool is_light = false, bool is_harmonic = false) {
+            public DamageSource(Projectile proj, bool is_light = false, bool is_harmonic = false, bool is_mechanical = false) {
                 Is_Item = false;
                 Is_Projectile = true;
                 Projectile = proj;
@@ -50,7 +51,8 @@ namespace ExperienceAndClasses.Systems {
                 Minion = proj.minion || proj.sentry;
                 Light = is_light;
                 Harmonic = is_harmonic;
-                Other = Weapon && !(Melee || Ranged || Throwing || Magic || Minion || Light || Harmonic || Tool);
+                Mechanical = is_mechanical;
+                Other = Weapon && !(Melee || Ranged || Throwing || Magic || Minion || Light || Harmonic || Mechanical);
             }
 
             public readonly bool Tool;
@@ -62,6 +64,7 @@ namespace ExperienceAndClasses.Systems {
             public readonly bool Minion;
             public readonly bool Light;
             public readonly bool Harmonic;
+            public readonly bool Mechanical;
             public readonly bool Other;
 
         }

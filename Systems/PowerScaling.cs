@@ -15,6 +15,7 @@ namespace ExperienceAndClasses.Systems {
             Minion,
             Light,
             Harmonic,
+            Mechanical,
             Other,
             All,
 
@@ -162,6 +163,13 @@ namespace ExperienceAndClasses.Systems {
             public Harmonic() : base(IDs.Harmonic, new string[] { "Harmonic" }) { }
             protected override void Apply(EACPlayer eacplayer, float damage_increase) {
                 eacplayer.PSheet.Stats.Damage_Harmonic += damage_increase;
+            }
+        }
+
+        public class Mechanical : PowerScaling {
+            public Mechanical() : base(IDs.Mechanical, new string[] { "Mechanical" }) { }
+            protected override void Apply(EACPlayer eacplayer, float damage_increase) {
+                eacplayer.PSheet.Stats.Damage_Mechanical += damage_increase;
             }
         }
 

@@ -26,6 +26,7 @@ namespace ExperienceAndClasses.Systems.PlayerSheet {
         //1 = 100%
         public float Damage_Light;
         public float Damage_Harmonic;
+        public float Damage_Mechanical;
         public float Damage_Other_Add;
 
         /// <summary>
@@ -52,7 +53,7 @@ namespace ExperienceAndClasses.Systems.PlayerSheet {
             Dodge = 0f;
             Ability_Delay_Reduction = 0f;
 
-            Damage_Light = Damage_Harmonic = 1f;
+            Damage_Light = Damage_Harmonic = Damage_Mechanical = 1f;
             Damage_Other_Add = 0f;
 
             Crit_All = 0f;
