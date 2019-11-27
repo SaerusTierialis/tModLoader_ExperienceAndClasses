@@ -664,7 +664,7 @@ namespace ExperienceAndClasses.UI {
         private const float TEXT_SCALE = 0.7f;
         private const float TEXT_OFFSET = 5f;
         private const float LOW_VISIBILITY = 0.8f;
-        private static readonly Color COLOUR_GRAY_OUT = new Color(170, 170, 170, 255);
+        private static readonly Color COLOUR_GRAY_OUT = new Color(170, 170, 170, 100);
 
         private float button_size = 0f;
         public Systems.PlayerClass Class { get; private set; }
