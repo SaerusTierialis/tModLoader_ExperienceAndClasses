@@ -687,7 +687,7 @@ namespace ExperienceAndClasses.UI {
             image_lock.Width.Set(Utilities.Textures.TEXTURE_LOCK_WIDTH, 0f);
             image_lock.Height.Set(Utilities.Textures.TEXTURE_LOCK_HEIGHT, 0f);
             image_lock.Left.Set(button_size / 2 - Utilities.Textures.TEXTURE_LOCK_WIDTH / 2, 0f);
-            image_lock.Top.Set(button_size / 2 - Utilities.Textures.TEXTURE_LOCK_HEIGHT / 2, 0f);
+            image_lock.Top.Set(button_size + Constants.UI_PADDING, 0f);
             Append(image_lock);
 
             background = new UITransparantImage(Utilities.Textures.TEXTURE_CLASS_BACKGROUND, Class.Colour);
