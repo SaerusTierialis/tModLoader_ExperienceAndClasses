@@ -210,7 +210,7 @@ namespace ExperienceAndClasses.Systems {
                 }
 
                 //scale with character level
-                xp *= Shortcuts.LOCAL_PLAYER.PSheet.Character.Level / 10.0;
+                xp *= GetNonCombatXPScaling(Shortcuts.LOCAL_PLAYER.PSheet.Character.Level, Shortcuts.GetConfigServer);
 
                 //overall adjustment
                 xp *= 1.5;
@@ -253,9 +253,13 @@ namespace ExperienceAndClasses.Systems {
                 //award xp (with individual scaling by level)
                 uint xp;
                 foreach (byte player_index in players) {
-                    xp = (uint)Math.Ceiling(xp_divided * Main.player[player_index].GetModPlayer<EACPlayer>().PSheet.Character.Level / 10.0);
+                    xp = (uint)Math.Ceiling(xp_divided * GetNonCombatXPScaling(Main.player[player_index].GetModPlayer<EACPlayer>().PSheet.Character.Level, config));
                     NPCRewards.AwardXP(xp, player_index);
                 }
+            }
+
+            private static float GetNonCombatXPScaling(byte character_level, ConfigServer config) {
+                return (1f + (Math.Min(character_level - 1, 60.0f) / 10.0f)) * config.XPRate;
             }
         }
 
