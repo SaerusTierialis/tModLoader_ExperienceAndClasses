@@ -599,7 +599,7 @@ namespace ExperienceAndClasses.UI {
         }
 
         public void ClickAdd(UIMouseEvent evt, UIElement listeningElement) {
-            if (!UIPopup.AllowClicks()) return;
+            if (!UIPopup.AllowClicks) return;
 
             int point_add;
             if (Shortcuts.HOTKEY_ALTERNATE_EFFECT.Current) {
@@ -697,7 +697,7 @@ namespace ExperienceAndClasses.UI {
         }
 
         public override void Click(UIMouseEvent evt) {
-            if (!UIPopup.AllowClicks()) return;
+            if (!UIPopup.AllowClicks) return;
 
             base.Click(evt);
 
@@ -710,7 +710,7 @@ namespace ExperienceAndClasses.UI {
         }
 
         public override void RightClick(UIMouseEvent evt) {
-            if (!UIPopup.AllowClicks()) return;
+            if (!UIPopup.AllowClicks) return;
 
             base.RightClick(evt);
 
@@ -962,7 +962,7 @@ namespace ExperienceAndClasses.UI {
 
         public override void RightMouseDown(UIMouseEvent evt) {
             base.RightMouseDown(evt);
-            if (can_drag && UIPopup.AllowClicks()) {
+            if (can_drag && UIPopup.AllowClicks) {
                 DragStart(evt);
             }
         }
@@ -1137,7 +1137,7 @@ namespace ExperienceAndClasses.UI {
         }
 
         public override void Click(UIMouseEvent evt) {
-            if (!UIPopup.AllowClicks()) return;
+            if (!UIPopup.AllowClicks) return;
             base.Click(evt);
         }
 

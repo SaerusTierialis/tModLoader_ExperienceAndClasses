@@ -133,8 +133,10 @@ namespace ExperienceAndClasses.UI {
         }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Methods ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-        public static bool AllowClicks() {
-            return mode == MODE.HOVER;
+        public static bool AllowClicks {
+            get {
+                return mode == MODE.HOVER;
+            }
         }
 
         private void ResetState() {

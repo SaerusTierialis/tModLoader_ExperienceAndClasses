@@ -559,11 +559,11 @@ namespace ExperienceAndClasses.UI {
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Events ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         private void ClickReset(UIMouseEvent evt, UIElement listeningElement) {
-            UIPopup.Instance.ShowResetAttributes(listeningElement);
+            if (UIPopup.AllowClicks) UIPopup.Instance.ShowResetAttributes(listeningElement);
         }
 
         private void ClickHelp(UIMouseEvent evt, UIElement listeningElement) {
-            UIHelp.Instance.OpenHelp();
+            if (UIPopup.AllowClicks) UIHelp.Instance.OpenHelp();
         }
 
         private void ClickClose(UIMouseEvent evt, UIElement listeningElement) {
@@ -571,7 +571,7 @@ namespace ExperienceAndClasses.UI {
         }
 
         private void MouseOverStats(UIMouseEvent evt, UIElement listeningElement) {
-            UIPopup.Instance.ShowStats(listeningElement);
+            if (UIPopup.AllowClicks) UIPopup.Instance.ShowStats(listeningElement);
         }
 
         private void MouseOutStats(UIMouseEvent evt, UIElement listeningElement) {
@@ -579,14 +579,14 @@ namespace ExperienceAndClasses.UI {
         }
 
         private void ClickPowerScalingLeft(UIMouseEvent evt, UIElement listeningElement) {
-            Shortcuts.LOCAL_PLAYER.PSheet.Attributes.LocalPowerScalingPrior();
+            if (UIPopup.AllowClicks) Shortcuts.LOCAL_PLAYER.PSheet.Attributes.LocalPowerScalingPrior();
         }
         private void ClickPowerScalingRight(UIMouseEvent evt, UIElement listeningElement) {
-            Shortcuts.LOCAL_PLAYER.PSheet.Attributes.LocalPowerScalingNext();
+            if (UIPopup.AllowClicks) Shortcuts.LOCAL_PLAYER.PSheet.Attributes.LocalPowerScalingNext();
         }
 
         private void ClickPreRevampXP(UIMouseEvent evt, UIElement listeningElement) {
-            if (old_xp_button.visible) {
+            if (old_xp_button.visible && UIPopup.AllowClicks) {
                 Systems.PSheet psheet = Shortcuts.LOCAL_PLAYER.PSheet;
 
                 if (psheet.Classes.Can_Gain_XP) {
@@ -627,7 +627,7 @@ namespace ExperienceAndClasses.UI {
         }
 
         private void MouseOverPreRevampXP(UIMouseEvent evt, UIElement listeningElement) {
-            if (old_xp_button.visible) {
+            if (old_xp_button.visible && UIPopup.AllowClicks) {
                 Systems.Legacy.MyPlayer old_modplayer = Main.LocalPlayer.GetModPlayer<Systems.Legacy.MyPlayer>();
                 double xp_available = old_modplayer.GetXPAvailable();
                 if (xp_available > 0) {
