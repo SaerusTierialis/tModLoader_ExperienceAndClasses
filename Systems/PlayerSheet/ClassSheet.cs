@@ -262,6 +262,23 @@ namespace ExperienceAndClasses.Systems.PlayerSheet {
             Shortcuts.UpdateUIPSheet(PSHEET);
         }
 
+        public void LocalResetLevels() {
+            ID_Active_Primary = (byte)PlayerClass.IDs.None;
+            ID_Active_Secondary = (byte)PlayerClass.IDs.None;
+
+            for (byte i = 0; i < PlayerClass.Count; i++) {
+                if (Data_Level[i] > 1) {
+                    Data_Level[i] = 1;
+                }
+
+                if (Data_XP[i] > 0) {
+                    Data_XP[i] = 0;
+                }
+
+                Data_Class[i].AddXP(0, false);
+            }
+        }
+
         private void SyncClass(byte id_levelup = 0) {
             if (!PSHEET.eacplayer.Fields.Is_Local) {
                 Utilities.Logger.Error("SyncClass called by non-local");

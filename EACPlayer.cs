@@ -113,7 +113,7 @@ namespace ExperienceAndClasses {
             FullSync();
         }
 
-        private void FullSync() {
+        public void FullSync() {
             Utilities.PacketHandler.FullSync.Send(this);
             //TODO - send other?
 

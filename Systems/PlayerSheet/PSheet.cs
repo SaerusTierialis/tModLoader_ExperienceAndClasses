@@ -127,6 +127,28 @@ namespace ExperienceAndClasses.Systems {
             }
         }
 
+        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Public Methods ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+        public void LocalResetLevels() {
+            if (eacplayer.Fields.Is_Local) {
+                Character.LocalResetLevel();
+                Classes.LocalResetLevels();
+
+                eacplayer.LocalDestroyMinions();
+
+                Attributes.Reset();
+
+                Attributes.UpdateFromClass();
+                Attributes.LocalUpdatePointsAndEffective();
+
+                Shortcuts.UpdateUIPSheet(this);
+
+                if (Shortcuts.IS_CLIENT) {
+                    eacplayer.FullSync();
+                }
+            }
+        }
+
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Internal Methods ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         protected void Passives_Clear() {

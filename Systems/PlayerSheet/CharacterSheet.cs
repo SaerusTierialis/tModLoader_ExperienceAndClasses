@@ -14,32 +14,32 @@ namespace ExperienceAndClasses.Systems.PlayerSheet {
         public byte Level { get; private set; } = 1;
         public uint XP { get; private set; } = 0;
 
-        public uint XP_Level_Total { get; private set; } = 0; //TODO
-        public uint XP_Level_Remaining { get; private set; } = 0; //TODO
+        public uint XP_Level_Total { get; private set; } = 0;
+        public uint XP_Level_Remaining { get; private set; } = 0;
 
         /// <summary>
         /// True while player is AFK
         /// | sync server
         /// </summary>
-        public bool AFK { get; private set; } = false; //TODO
+        public bool AFK { get; private set; } = false;
 
         /// <summary>
         /// True while in combat
         /// | sync ALL
         /// </summary>
-        public bool In_Combat { get; private set; } = false; //TODO
+        public bool In_Combat { get; private set; } = false;
 
         /// <summary>
         /// Track boss kill
         /// | local only
         /// </summary>
-        public bool Defeated_WOF { get; private set; } = false; //TODO - not added
+        public bool Defeated_WOF { get; private set; } = false;
 
         /// <summary>
         /// Has unlocked subclass system
         /// | local only
         /// </summary>
-        public bool Secondary_Unlocked { get; private set; } = false; //TODO - not used
+        public bool Secondary_Unlocked { get; private set; } = false;
 
         public void ForceLevel(byte level) {
             if (PSHEET.eacplayer.Fields.Is_Local) {
@@ -151,6 +151,17 @@ namespace ExperienceAndClasses.Systems.PlayerSheet {
 
         public string GetLevelupMessage() {
             return Language.GetTextValue("Mods.ExperienceAndClasses.Common.Levelup_Character", PSHEET.eacplayer.player.name, Level);
+        }
+
+        public void LocalResetLevel() {
+            if (!PSHEET.eacplayer.Fields.Is_Local) {
+                Utilities.Logger.Error("LocalResetLevel called by non-local");
+            }
+            else {
+                Level = 1;
+                XP = 0;
+                UpdateXPForLevel();
+            }
         }
 
         public TagCompound Save(TagCompound tag) {
