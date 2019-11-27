@@ -236,7 +236,7 @@ namespace ExperienceAndClasses.Systems {
                 //get list of valid players
                 List<byte> players;
                 if (Shortcuts.IS_SINGLEPLAYER) {
-                    if (Shortcuts.WHO_AM_I < 0) {
+                    if (Shortcuts.WHO_AM_I < 0 || (Main.menuMode != 10) || (Main.LocalPlayer == null) || (!Main.LocalPlayer.active)) {
                         //world creation
                         return;
                     }
