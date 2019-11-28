@@ -960,15 +960,15 @@ namespace ExperienceAndClasses.UI {
             }
         }
 
-        public override void RightMouseDown(UIMouseEvent evt) {
-            base.RightMouseDown(evt);
+        public override void MouseDown(UIMouseEvent evt) {
+            base.MouseDown(evt);
             if (can_drag && UIPopup.AllowClicks) {
                 DragStart(evt);
             }
         }
 
-        public override void RightMouseUp(UIMouseEvent evt) {
-            base.RightMouseUp(evt);
+        public override void MouseUp(UIMouseEvent evt) {
+            base.MouseUp(evt);
             DragEnd(evt);
         }
 

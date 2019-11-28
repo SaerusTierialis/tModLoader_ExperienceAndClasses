@@ -95,7 +95,7 @@ Common.Config_Header_UIMain=Interface Principal
 Common.Config_Header_UIHUD=HUD
 Common.Config_Header_Permissions=Autenticação para Multiplayer
 Common.Config_Header_UIMessages=UI de Diversos
-Common.Config_UIDrag_Label=Botão direito e arraste para mover
+Common.Config_UIDrag_Label=???
 Common.Config_UIAutoMode_Label=Modo de Exibição
 Common.Config_UIPosition_Label=Posição
 

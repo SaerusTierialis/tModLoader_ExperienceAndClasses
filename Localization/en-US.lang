@@ -96,7 +96,7 @@ Common.Config_Header_UIHUD=HUD
 Common.Config_Header_Permissions=Multiplayer Authentication
 Common.Config_Header_UIMessages=UI Miscellaneous
 
-Common.Config_UIDrag_Label=Right Click and Drag to Move
+Common.Config_UIDrag_Label=Left Click and Drag to Move
 Common.Config_UIAutoMode_Label=Display Mode
 Common.Config_UIPosition_Label=Position
 
