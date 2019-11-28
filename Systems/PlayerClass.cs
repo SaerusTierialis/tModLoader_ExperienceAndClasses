@@ -244,7 +244,7 @@ namespace ExperienceAndClasses.Systems {
                 }
 
                 //set tooltip
-                string tooltip_main = implementation_status_text + "\n\n" + Description + "\n\n" + recommended_weapon_text + "\n\nAttribute Bonus Per " + Attribute.LEVELS_PER_ATTRIBUTE_POINT_PER_STAR + " Levels:";
+                string tooltip_main = implementation_status_text + "\n\n" + Description + "\n\n" + recommended_weapon_text + "\n\nAttribute Bonus Per " + Attribute.LEVELS_PER_ATTRIBUTE_POINT_PER_STAR + " Levels (★ = 1 point):";
                 bool first = true;
                 string attribute_names = "";
                 foreach (byte id in Systems.Attribute.ATTRIBUTES_UI_ORDER) {
