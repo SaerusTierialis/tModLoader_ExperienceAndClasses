@@ -104,8 +104,19 @@ namespace ExperienceAndClasses.Systems {
             return use_time;
         }
 
+        /// <summary>
+        /// NOTE: some mods make non-local calls to Player.ModifyHitX so this can be called non-locally, but will only do stuff when called locally (no error message when called non-locally)
+        /// </summary>
+        /// <param name="eacplayer"></param>
+        /// <param name="dsource"></param>
+        /// <param name="damage"></param>
+        /// <param name="crit"></param>
+        /// <param name="is_projectile"></param>
+        /// <param name="distance"></param>
         public static void LocalModifyDamageDealt(EACPlayer eacplayer, DamageSource dsource, ref int damage, ref bool crit, bool is_projectile = false, float distance = 0f) {
             if (eacplayer.Fields.Is_Local) {
+                //local only...
+
                 //is a crit?
                 if (!crit && (eacplayer.PSheet.Stats.Crit_All > 0)) {
                     //adjust chance to prevent diminishing returns
@@ -133,9 +144,6 @@ namespace ExperienceAndClasses.Systems {
                 if (crit) {
                     damage = (int)Math.Ceiling(damage * eacplayer.PSheet.Stats.Crit_Damage_Mult);
                 }
-            }
-            else {
-                Utilities.Logger.Error("LocalModifyDamageDealt called by non-local");
             }
         }
 

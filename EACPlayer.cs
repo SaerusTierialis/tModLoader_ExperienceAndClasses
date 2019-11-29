@@ -263,6 +263,8 @@ namespace ExperienceAndClasses {
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Damage Dealt (local) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
+        //These 4 methods are usually only called locally, but there seems to be some mods that call them non-locally so don't assume local
+
         public override void ModifyHitNPC(Item item, NPC target, ref int damage, ref float knockback, ref bool crit) {
             Systems.Combat.LocalModifyDamageDealt(this, new Systems.Combat.DamageSource(item), ref damage, ref crit);
             base.ModifyHitNPC(item, target, ref damage, ref knockback, ref crit);
