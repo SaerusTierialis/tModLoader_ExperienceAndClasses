@@ -572,6 +572,13 @@ namespace ExperienceAndClasses.Systems {
                 Colour = COLOUR_NOVICE;
                 implementation_status = IMPLEMENTATION_STATUS.COMPLETE;
                 recommended_weapon = RECOMMENDED_WEAPON.ANY;
+
+                Attribute_Growth[(byte)Attribute.IDs.Power] = 1;
+                Attribute_Growth[(byte)Attribute.IDs.Vitality] = 1;
+                Attribute_Growth[(byte)Attribute.IDs.Mind] = 1;
+                Attribute_Growth[(byte)Attribute.IDs.Spirit] = 1;
+                Attribute_Growth[(byte)Attribute.IDs.Agility] = 1;
+                Attribute_Growth[(byte)Attribute.IDs.Dexterity] = 1;
             }
         }
 
@@ -580,115 +587,144 @@ namespace ExperienceAndClasses.Systems {
         public class Vanguard : Tier2 {
             public Vanguard() : base(IDs.Vanguard) {
                 Class_Locations[1, 0] = ID_num;
-                Attribute_Growth[(byte)Attribute.IDs.Power] = 2;
-                Attribute_Growth[(byte)Attribute.IDs.Vitality] = 3;
-                Attribute_Growth[(byte)Attribute.IDs.Dexterity] = 2;
                 Colour = COLOUR_CLOSE_RANGE_2;
                 implementation_status = IMPLEMENTATION_STATUS.ATTRIBUTE_ONLY;
                 recommended_weapon = RECOMMENDED_WEAPON.ANY;
+
+                Attribute_Growth[(byte)Attribute.IDs.Power] = 4;
+                Attribute_Growth[(byte)Attribute.IDs.Vitality] = 4;
+                Attribute_Growth[(byte)Attribute.IDs.Mind] = 0;
+                Attribute_Growth[(byte)Attribute.IDs.Spirit] = 0;
+                Attribute_Growth[(byte)Attribute.IDs.Agility] = 1;
+                Attribute_Growth[(byte)Attribute.IDs.Dexterity] = 1;
             }
         }
 
         public class EagleEye : Tier2 {
             public EagleEye() : base(IDs.EagleEye) {
                 Class_Locations[1, 1] = ID_num;
-                Attribute_Growth[(byte)Attribute.IDs.Power] = 3;
-                Attribute_Growth[(byte)Attribute.IDs.Spirit] = 2;
-                Attribute_Growth[(byte)Attribute.IDs.Dexterity] = 2;
                 Colour = COLOUR_PROJECTILE_2;
                 implementation_status = IMPLEMENTATION_STATUS.ATTRIBUTE_ONLY;
                 recommended_weapon = RECOMMENDED_WEAPON.PROJECTILE;
+
+                Attribute_Growth[(byte)Attribute.IDs.Power] = 4;
+                Attribute_Growth[(byte)Attribute.IDs.Vitality] = 0;
+                Attribute_Growth[(byte)Attribute.IDs.Mind] = 0;
+                Attribute_Growth[(byte)Attribute.IDs.Spirit] = 4;
+                Attribute_Growth[(byte)Attribute.IDs.Agility] = 0;
+                Attribute_Growth[(byte)Attribute.IDs.Dexterity] = 2;
             }
         }
 
         public class Traveler : Tier2 {
             public Traveler() : base(IDs.Traveler) {
                 Class_Locations[1, 2] = ID_num;
-                Attribute_Growth[(byte)Attribute.IDs.Dexterity] = 2;
-                Attribute_Growth[(byte)Attribute.IDs.Vitality] = 2;
-                Attribute_Growth[(byte)Attribute.IDs.Mind] = 2;
-                Attribute_Growth[(byte)Attribute.IDs.Agility] = 2;
                 Colour = COLOUR_UTILITY_2;
                 implementation_status = IMPLEMENTATION_STATUS.ATTRIBUTE_ONLY;
                 recommended_weapon = RECOMMENDED_WEAPON.ANY;
+
+                Attribute_Growth[(byte)Attribute.IDs.Power] = 0;
+                Attribute_Growth[(byte)Attribute.IDs.Vitality] = 1;
+                Attribute_Growth[(byte)Attribute.IDs.Mind] = 4;
+                Attribute_Growth[(byte)Attribute.IDs.Spirit] = 0;
+                Attribute_Growth[(byte)Attribute.IDs.Agility] = 1;
+                Attribute_Growth[(byte)Attribute.IDs.Dexterity] = 4;
             }
         }
 
         public class Rogue : Tier2 {
             public Rogue() : base(IDs.Rogue) {
                 Class_Locations[1, 3] = ID_num;
-                Attribute_Growth[(byte)Attribute.IDs.Spirit] = 3;
-                Attribute_Growth[(byte)Attribute.IDs.Agility] = 3;
                 Colour = COLOUR_TRICKERY_2;
                 implementation_status = IMPLEMENTATION_STATUS.ATTRIBUTE_ONLY;
                 recommended_weapon = RECOMMENDED_WEAPON.NON_MINION;
+
+                Attribute_Growth[(byte)Attribute.IDs.Power] = 1;
+                Attribute_Growth[(byte)Attribute.IDs.Vitality] = 0;
+                Attribute_Growth[(byte)Attribute.IDs.Mind] = 0;
+                Attribute_Growth[(byte)Attribute.IDs.Spirit] = 4;
+                Attribute_Growth[(byte)Attribute.IDs.Agility] = 4;
+                Attribute_Growth[(byte)Attribute.IDs.Dexterity] = 1;
             }
         }
 
         public class Summoner : Tier2 {
             public Summoner() : base(IDs.Summoner) {
                 Class_Locations[1, 4] = ID_num;
-                Attribute_Growth[(byte)Attribute.IDs.Power] = 3;
-                Attribute_Growth[(byte)Attribute.IDs.Spirit] = 3;
                 Colour = COLOUR_MINION_2;
                 implementation_status = IMPLEMENTATION_STATUS.ATTRIBUTE_ONLY;
                 recommended_weapon = RECOMMENDED_WEAPON.MINION;
+
+                Attribute_Growth[(byte)Attribute.IDs.Power] = 4;
+                Attribute_Growth[(byte)Attribute.IDs.Vitality] = 0;
+                Attribute_Growth[(byte)Attribute.IDs.Mind] = 2;
+                Attribute_Growth[(byte)Attribute.IDs.Spirit] = 4;
+                Attribute_Growth[(byte)Attribute.IDs.Agility] = 0;
+                Attribute_Growth[(byte)Attribute.IDs.Dexterity] = 0;
             }
         }
 
         public class Cleric : Tier2 {
             public Cleric() : base(IDs.Cleric) {
                 Class_Locations[1, 5] = ID_num;
-                Attribute_Growth[(byte)Attribute.IDs.Mind] = 3;
-                Attribute_Growth[(byte)Attribute.IDs.Spirit] = 3;
                 Colour = COLOUR_SUPPORT_2;
                 implementation_status = IMPLEMENTATION_STATUS.ATTRIBUTE_ONLY;
                 recommended_weapon = RECOMMENDED_WEAPON.ANY;
+
+                Attribute_Growth[(byte)Attribute.IDs.Power] = 0;
+                Attribute_Growth[(byte)Attribute.IDs.Vitality] = 2;
+                Attribute_Growth[(byte)Attribute.IDs.Mind] = 2;
+                Attribute_Growth[(byte)Attribute.IDs.Spirit] = 4;
+                Attribute_Growth[(byte)Attribute.IDs.Agility] = 0;
+                Attribute_Growth[(byte)Attribute.IDs.Dexterity] = 2;
             }
         }
 
         public class Bard : Tier2 {
             public Bard() : base(IDs.Bard) {
                 Class_Locations[1, 6] = ID_num;
-                Attribute_Growth[(byte)Attribute.IDs.Power] = 2;
-                Attribute_Growth[(byte)Attribute.IDs.Vitality] = 2;
-                Attribute_Growth[(byte)Attribute.IDs.Mind] = 2;
-                Attribute_Growth[(byte)Attribute.IDs.Spirit] = 2;
-                Attribute_Growth[(byte)Attribute.IDs.Agility] = 2;
-                Attribute_Growth[(byte)Attribute.IDs.Dexterity] = 2;
                 Colour = COLOUR_MUSIC_2;
                 implementation_status = IMPLEMENTATION_STATUS.ATTRIBUTE_ONLY;
                 recommended_weapon = RECOMMENDED_WEAPON.ANY;
+
+                Attribute_Growth[(byte)Attribute.IDs.Power] = 2;
+                Attribute_Growth[(byte)Attribute.IDs.Vitality] = 1;
+                Attribute_Growth[(byte)Attribute.IDs.Mind] = 1;
+                Attribute_Growth[(byte)Attribute.IDs.Spirit] = 2;
+                Attribute_Growth[(byte)Attribute.IDs.Agility] = 2;
+                Attribute_Growth[(byte)Attribute.IDs.Dexterity] = 2;
             }
         }
 
         public class Tinkerer : Tier2 {
             public Tinkerer() : base(IDs.Tinkerer) {
                 Class_Locations[1, 7] = ID_num;
-                Attribute_Growth[(byte)Attribute.IDs.Power] = 2f;
-                Attribute_Growth[(byte)Attribute.IDs.Vitality] = 2f;
-                Attribute_Growth[(byte)Attribute.IDs.Mind] = 2f;
-                Attribute_Growth[(byte)Attribute.IDs.Spirit] = 2f;
-                Attribute_Growth[(byte)Attribute.IDs.Agility] = 2f;
-                Attribute_Growth[(byte)Attribute.IDs.Dexterity] = 2f;
                 Colour = COLOUR_NONCOMBAT_2;
                 implementation_status = IMPLEMENTATION_STATUS.ATTRIBUTE_ONLY;
                 recommended_weapon = RECOMMENDED_WEAPON.ANY;
+
+                Attribute_Growth[(byte)Attribute.IDs.Power] = 2;
+                Attribute_Growth[(byte)Attribute.IDs.Vitality] = 2;
+                Attribute_Growth[(byte)Attribute.IDs.Mind] = 0;
+                Attribute_Growth[(byte)Attribute.IDs.Spirit] = 2;
+                Attribute_Growth[(byte)Attribute.IDs.Agility] = 2;
+                Attribute_Growth[(byte)Attribute.IDs.Dexterity] = 2;
             }
         }
 
         public class Hybrid : Tier2 {
             public Hybrid() : base(IDs.Hybrid) {
                 Class_Locations[1, 8] = ID_num;
+                Colour = COLOUR_HYBRID_2;
+                implementation_status = IMPLEMENTATION_STATUS.ATTRIBUTE_ONLY;
+                recommended_weapon = RECOMMENDED_WEAPON.ANY;
+
                 Attribute_Growth[(byte)Attribute.IDs.Power] = 2;
                 Attribute_Growth[(byte)Attribute.IDs.Vitality] = 2;
                 Attribute_Growth[(byte)Attribute.IDs.Mind] = 2;
                 Attribute_Growth[(byte)Attribute.IDs.Spirit] = 2;
                 Attribute_Growth[(byte)Attribute.IDs.Agility] = 2;
                 Attribute_Growth[(byte)Attribute.IDs.Dexterity] = 2;
-                Colour = COLOUR_HYBRID_2;
-                implementation_status = IMPLEMENTATION_STATUS.ATTRIBUTE_ONLY;
-                recommended_weapon = RECOMMENDED_WEAPON.ANY;
             }
         }
 
@@ -701,8 +737,6 @@ namespace ExperienceAndClasses.Systems {
                 //Class_Locations[3, 0] = ID_num;
                 Enabled = false;
 
-                Attribute_Growth[(byte)Attribute.IDs.Power] = 4;
-                Attribute_Growth[(byte)Attribute.IDs.Vitality] = 4;
                 Colour = COLOUR_CLOSE_RANGE_3;
                 implementation_status = IMPLEMENTATION_STATUS.ATTRIBUTE_ONLY;
             }
@@ -711,31 +745,60 @@ namespace ExperienceAndClasses.Systems {
         public class Berserker : Tier3 {
             public Berserker() : base(IDs.Berserker, IDs.Vanguard) {
                 Class_Locations[3, 0] = ID_num;
-                Attribute_Growth[(byte)Attribute.IDs.Power] = 3;
-                Attribute_Growth[(byte)Attribute.IDs.Agility] = 2;
-                Attribute_Growth[(byte)Attribute.IDs.Dexterity] = 4;
                 Colour = COLOUR_CLOSE_RANGE_3;
                 implementation_status = IMPLEMENTATION_STATUS.ATTRIBUTE_ONLY;
+
+                Attribute_Growth[(byte)Attribute.IDs.Power] = 4;
+                Attribute_Growth[(byte)Attribute.IDs.Vitality] = 2;
+                Attribute_Growth[(byte)Attribute.IDs.Mind] = 0;
+                Attribute_Growth[(byte)Attribute.IDs.Spirit] = 0;
+                Attribute_Growth[(byte)Attribute.IDs.Agility] = 4;
+                Attribute_Growth[(byte)Attribute.IDs.Dexterity] = 5;
             }
         }
 
         public class Guardian : Tier3 {
             public Guardian() : base(IDs.Guardian, IDs.Vanguard) {
                 Class_Locations[2, 0] = ID_num;
-                Attribute_Growth[(byte)Attribute.IDs.Power] = 3;
-                Attribute_Growth[(byte)Attribute.IDs.Vitality] = 5;
                 Colour = COLOUR_CLOSE_RANGE_3;
                 implementation_status = IMPLEMENTATION_STATUS.ATTRIBUTE_ONLY;
+
+                Attribute_Growth[(byte)Attribute.IDs.Power] = 3;
+                Attribute_Growth[(byte)Attribute.IDs.Vitality] = 5;
+                Attribute_Growth[(byte)Attribute.IDs.Mind] = 1;
+                Attribute_Growth[(byte)Attribute.IDs.Spirit] = 1;
+                Attribute_Growth[(byte)Attribute.IDs.Agility] = 3;
+                Attribute_Growth[(byte)Attribute.IDs.Dexterity] = 2;
             }
         }
 
         public class Sharpshooter : Tier3 {
             public Sharpshooter() : base(IDs.Sharpshooter, IDs.EagleEye) {
                 Class_Locations[2, 1] = ID_num;
-                Attribute_Growth[(byte)Attribute.IDs.Power] = 4;
-                Attribute_Growth[(byte)Attribute.IDs.Spirit] = 4;
                 Colour = COLOUR_PROJECTILE_3;
                 implementation_status = IMPLEMENTATION_STATUS.ATTRIBUTE_ONLY;
+
+                Attribute_Growth[(byte)Attribute.IDs.Power] = 5;
+                Attribute_Growth[(byte)Attribute.IDs.Vitality] = 0;
+                Attribute_Growth[(byte)Attribute.IDs.Mind] = 0;
+                Attribute_Growth[(byte)Attribute.IDs.Spirit] = 5;
+                Attribute_Growth[(byte)Attribute.IDs.Agility] = 2;
+                Attribute_Growth[(byte)Attribute.IDs.Dexterity] = 3;
+            }
+        }
+
+        public class Chrono : Tier3 {
+            public Chrono() : base(IDs.Chrono, IDs.EagleEye) {
+                Class_Locations[3, 1] = ID_num;
+                Colour = COLOUR_PROJECTILE_3;
+                implementation_status = IMPLEMENTATION_STATUS.ATTRIBUTE_ONLY;
+
+                Attribute_Growth[(byte)Attribute.IDs.Power] = 3;
+                Attribute_Growth[(byte)Attribute.IDs.Vitality] = 1;
+                Attribute_Growth[(byte)Attribute.IDs.Mind] = 1;
+                Attribute_Growth[(byte)Attribute.IDs.Spirit] = 1;
+                Attribute_Growth[(byte)Attribute.IDs.Agility] = 4;
+                Attribute_Growth[(byte)Attribute.IDs.Dexterity] = 5;
             }
         }
 
@@ -746,10 +809,6 @@ namespace ExperienceAndClasses.Systems {
                 //Class_Locations[3, 1] = ID_num;
                 Enabled = false;
 
-                Attribute_Growth[(byte)Attribute.IDs.Power] = 3;
-                Attribute_Growth[(byte)Attribute.IDs.Vitality] = 3;
-                Attribute_Growth[(byte)Attribute.IDs.Spirit] = 2;
-                Attribute_Growth[(byte)Attribute.IDs.Dexterity] = 2;
                 Colour = COLOUR_PROJECTILE_3;
                 implementation_status = IMPLEMENTATION_STATUS.ATTRIBUTE_ONLY;
             }
@@ -758,131 +817,152 @@ namespace ExperienceAndClasses.Systems {
         public class Controller : Tier3 {
             public Controller() : base(IDs.Controller, IDs.Traveler) {
                 Class_Locations[2, 2] = ID_num;
-                Attribute_Growth[(byte)Attribute.IDs.Dexterity] = 3;
-                Attribute_Growth[(byte)Attribute.IDs.Vitality] = 2;
-                Attribute_Growth[(byte)Attribute.IDs.Mind] = 2;
-                Attribute_Growth[(byte)Attribute.IDs.Agility] = 3;
                 Colour = COLOUR_UTILITY_3;
                 implementation_status = IMPLEMENTATION_STATUS.ATTRIBUTE_ONLY;
+
+                Attribute_Growth[(byte)Attribute.IDs.Power] = 2;
+                Attribute_Growth[(byte)Attribute.IDs.Vitality] = 1;
+                Attribute_Growth[(byte)Attribute.IDs.Mind] = 5;
+                Attribute_Growth[(byte)Attribute.IDs.Spirit] = 0;
+                Attribute_Growth[(byte)Attribute.IDs.Agility] = 2;
+                Attribute_Growth[(byte)Attribute.IDs.Dexterity] = 5;
             }
         }
 
         public class Shadow : Tier3 {
             public Shadow() : base(IDs.Shadow, IDs.Rogue) {
                 Class_Locations[3, 3] = ID_num;
-                Attribute_Growth[(byte)Attribute.IDs.Power] = 3;
-                Attribute_Growth[(byte)Attribute.IDs.Dexterity] = 2;
-                Attribute_Growth[(byte)Attribute.IDs.Agility] = 4;
                 Colour = COLOUR_TRICKERY_3;
                 implementation_status = IMPLEMENTATION_STATUS.ATTRIBUTE_ONLY;
+
+                Attribute_Growth[(byte)Attribute.IDs.Power] = 3;
+                Attribute_Growth[(byte)Attribute.IDs.Vitality] = 0;
+                Attribute_Growth[(byte)Attribute.IDs.Mind] = 0;
+                Attribute_Growth[(byte)Attribute.IDs.Spirit] = 4;
+                Attribute_Growth[(byte)Attribute.IDs.Agility] = 5;
+                Attribute_Growth[(byte)Attribute.IDs.Dexterity] = 3;
             }
         }
 
         public class Assassin : Tier3 {
             public Assassin() : base(IDs.Assassin, IDs.Rogue) {
                 Class_Locations[2, 3] = ID_num;
-                Attribute_Growth[(byte)Attribute.IDs.Power] = 2;
-                Attribute_Growth[(byte)Attribute.IDs.Spirit] = 4;
-                Attribute_Growth[(byte)Attribute.IDs.Agility] = 3;
                 Colour = COLOUR_TRICKERY_3;
                 implementation_status = IMPLEMENTATION_STATUS.ATTRIBUTE_ONLY;
-            }
-        }
 
-        public class Chrono : Tier3 {
-            public Chrono() : base(IDs.Chrono, IDs.EagleEye) {
-                Class_Locations[3, 1] = ID_num;
-                Attribute_Growth[(byte)Attribute.IDs.Power] = 2;
-                Attribute_Growth[(byte)Attribute.IDs.Spirit] = 2;
-                Attribute_Growth[(byte)Attribute.IDs.Dexterity] = 5;
-                Colour = COLOUR_PROJECTILE_3;
-                implementation_status = IMPLEMENTATION_STATUS.ATTRIBUTE_ONLY;
+                Attribute_Growth[(byte)Attribute.IDs.Power] = 5;
+                Attribute_Growth[(byte)Attribute.IDs.Vitality] = 0;
+                Attribute_Growth[(byte)Attribute.IDs.Mind] = 0;
+                Attribute_Growth[(byte)Attribute.IDs.Spirit] = 5;
+                Attribute_Growth[(byte)Attribute.IDs.Agility] = 4;
+                Attribute_Growth[(byte)Attribute.IDs.Dexterity] = 1;
             }
         }
 
         public class SoulBinder : Tier3 {
             public SoulBinder() : base(IDs.SoulBinder, IDs.Summoner) {
                 Class_Locations[2, 4] = ID_num;
-                Attribute_Growth[(byte)Attribute.IDs.Power] = 5;
-                Attribute_Growth[(byte)Attribute.IDs.Spirit] = 3;
                 Colour = COLOUR_MINION_3;
                 implementation_status = IMPLEMENTATION_STATUS.ATTRIBUTE_ONLY;
+
+                Attribute_Growth[(byte)Attribute.IDs.Power] = 5;
+                Attribute_Growth[(byte)Attribute.IDs.Vitality] = 1;
+                Attribute_Growth[(byte)Attribute.IDs.Mind] = 3;
+                Attribute_Growth[(byte)Attribute.IDs.Spirit] = 5;
+                Attribute_Growth[(byte)Attribute.IDs.Agility] = 1;
+                Attribute_Growth[(byte)Attribute.IDs.Dexterity] = 0;
             }
         }
 
         public class Tactician : Tier3 {
             public Tactician() : base(IDs.Tactician, IDs.Summoner) {
                 Class_Locations[3, 4] = ID_num;
-                Attribute_Growth[(byte)Attribute.IDs.Power] = 3;
-                Attribute_Growth[(byte)Attribute.IDs.Mind] = 2;
-                Attribute_Growth[(byte)Attribute.IDs.Vitality] = 2;
-                Attribute_Growth[(byte)Attribute.IDs.Spirit] =3;
                 Colour = COLOUR_MINION_3;
                 implementation_status = IMPLEMENTATION_STATUS.ATTRIBUTE_ONLY;
+
+                Attribute_Growth[(byte)Attribute.IDs.Power] = 3;
+                Attribute_Growth[(byte)Attribute.IDs.Vitality] = 2;
+                Attribute_Growth[(byte)Attribute.IDs.Mind] = 2;
+                Attribute_Growth[(byte)Attribute.IDs.Spirit] = 5;
+                Attribute_Growth[(byte)Attribute.IDs.Agility] = 2;
+                Attribute_Growth[(byte)Attribute.IDs.Dexterity] = 1;
             }
         }
 
         public class Saint : Tier3 {
             public Saint() : base(IDs.Saint, IDs.Cleric) {
                 Class_Locations[2, 5] = ID_num;
-                Attribute_Growth[(byte)Attribute.IDs.Power] = 2;
-                Attribute_Growth[(byte)Attribute.IDs.Mind] = 3;
-                Attribute_Growth[(byte)Attribute.IDs.Spirit] = 4;
                 Colour = COLOUR_SUPPORT_3;
                 implementation_status = IMPLEMENTATION_STATUS.ATTRIBUTE_ONLY;
+
+                Attribute_Growth[(byte)Attribute.IDs.Power] = 3;
+                Attribute_Growth[(byte)Attribute.IDs.Vitality] = 2;
+                Attribute_Growth[(byte)Attribute.IDs.Mind] = 3;
+                Attribute_Growth[(byte)Attribute.IDs.Spirit] = 5;
+                Attribute_Growth[(byte)Attribute.IDs.Agility] = 0;
+                Attribute_Growth[(byte)Attribute.IDs.Dexterity] = 2;
             }
         }
 
         public class Oracle : Tier3 {
             public Oracle() : base(IDs.Oracle, IDs.Cleric) {
                 Class_Locations[3, 5] = ID_num;
-                Attribute_Growth[(byte)Attribute.IDs.Mind] = 3;
-                Attribute_Growth[(byte)Attribute.IDs.Spirit] = 5;
                 Colour = COLOUR_SUPPORT_3;
                 implementation_status = IMPLEMENTATION_STATUS.ATTRIBUTE_ONLY;
+
+                Attribute_Growth[(byte)Attribute.IDs.Power] = 0;
+                Attribute_Growth[(byte)Attribute.IDs.Vitality] = 3;
+                Attribute_Growth[(byte)Attribute.IDs.Mind] = 4;
+                Attribute_Growth[(byte)Attribute.IDs.Spirit] = 5;
+                Attribute_Growth[(byte)Attribute.IDs.Agility] = 0;
+                Attribute_Growth[(byte)Attribute.IDs.Dexterity] = 3;
             }
         }
 
         public class Minstrel : Tier3 {
             public Minstrel() : base(IDs.Minstrel, IDs.Bard) {
                 Class_Locations[2, 6] = ID_num;
-                Attribute_Growth[(byte)Attribute.IDs.Power] = 2.5f;
-                Attribute_Growth[(byte)Attribute.IDs.Vitality] = 2.5f;
-                Attribute_Growth[(byte)Attribute.IDs.Mind] = 2.5f;
-                Attribute_Growth[(byte)Attribute.IDs.Spirit] = 2.5f;
-                Attribute_Growth[(byte)Attribute.IDs.Agility] = 2.5f;
-                Attribute_Growth[(byte)Attribute.IDs.Dexterity] = 2.5f;
                 Colour = COLOUR_MUSIC_3;
                 implementation_status = IMPLEMENTATION_STATUS.ATTRIBUTE_ONLY;
+
+                Attribute_Growth[(byte)Attribute.IDs.Power] = 3;
+                Attribute_Growth[(byte)Attribute.IDs.Vitality] = 1;
+                Attribute_Growth[(byte)Attribute.IDs.Mind] = 2;
+                Attribute_Growth[(byte)Attribute.IDs.Spirit] = 3;
+                Attribute_Growth[(byte)Attribute.IDs.Agility] = 3;
+                Attribute_Growth[(byte)Attribute.IDs.Dexterity] = 3;
+
             }
         }
 
         public class Engineer : Tier2 {
             public Engineer() : base(IDs.Engineer) {
                 Class_Locations[2, 7] = ID_num;
-                Attribute_Growth[(byte)Attribute.IDs.Power] = 2.5f;
-                Attribute_Growth[(byte)Attribute.IDs.Vitality] = 2.5f;
-                Attribute_Growth[(byte)Attribute.IDs.Mind] = 2.5f;
-                Attribute_Growth[(byte)Attribute.IDs.Spirit] = 2.5f;
-                Attribute_Growth[(byte)Attribute.IDs.Agility] = 2.5f;
-                Attribute_Growth[(byte)Attribute.IDs.Dexterity] = 2.5f;
                 Colour = COLOUR_NONCOMBAT_3;
                 implementation_status = IMPLEMENTATION_STATUS.ATTRIBUTE_ONLY;
                 recommended_weapon = RECOMMENDED_WEAPON.ANY;
+
+                Attribute_Growth[(byte)Attribute.IDs.Power] = 3;
+                Attribute_Growth[(byte)Attribute.IDs.Vitality] = 4;
+                Attribute_Growth[(byte)Attribute.IDs.Mind] = 1;
+                Attribute_Growth[(byte)Attribute.IDs.Spirit] = 3;
+                Attribute_Growth[(byte)Attribute.IDs.Agility] = 2;
+                Attribute_Growth[(byte)Attribute.IDs.Dexterity] = 2;
             }
         }
 
         public class HybridPrime : Tier3 {
             public HybridPrime() : base(IDs.HybridPrime, IDs.Hybrid) {
                 Class_Locations[2, 8] = ID_num;
-                Attribute_Growth[(byte)Attribute.IDs.Power] = 2.5f;
-                Attribute_Growth[(byte)Attribute.IDs.Vitality] = 2.5f;
-                Attribute_Growth[(byte)Attribute.IDs.Mind] = 2.5f;
-                Attribute_Growth[(byte)Attribute.IDs.Spirit] = 2.5f;
-                Attribute_Growth[(byte)Attribute.IDs.Agility] = 2.5f;
-                Attribute_Growth[(byte)Attribute.IDs.Dexterity] = 2.5f;
                 Colour = COLOUR_HYBRID_3;
                 implementation_status = IMPLEMENTATION_STATUS.ATTRIBUTE_ONLY;
+
+                Attribute_Growth[(byte)Attribute.IDs.Power] = 3;
+                Attribute_Growth[(byte)Attribute.IDs.Vitality] = 3;
+                Attribute_Growth[(byte)Attribute.IDs.Mind] = 3;
+                Attribute_Growth[(byte)Attribute.IDs.Spirit] = 3;
+                Attribute_Growth[(byte)Attribute.IDs.Agility] = 3;
+                Attribute_Growth[(byte)Attribute.IDs.Dexterity] = 3;
             }
         }
 
