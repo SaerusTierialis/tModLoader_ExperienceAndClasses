@@ -38,7 +38,7 @@ namespace ExperienceAndClasses.Systems {
                     XP_REQ_CLASS[i] = xp_predef[i];
                 }
                 else {
-                    adjust = Math.Max(1.09 - ((i - 1.0 - num_predef) / 10000), 1.08);
+                    adjust = Math.Max(1.09 - ((i - 1.0 - num_predef) / 1000), 1.08);
                     XP_REQ_CLASS[i] = (uint)Math.Round(XP_REQ_CLASS[i - 1] * adjust, 0);
                 }
             }
