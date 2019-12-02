@@ -23,6 +23,10 @@ namespace ExperienceAndClasses.Systems {
         private const double DROP_CHANCE_ORB_BOSS_MAX = 0.5;
         private const double DROP_CHANCE_ORB_BOSS_MODIFIER = 1.5;
 
+        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Static Variables ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+        public static bool Rebalance = false;
+
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Instance Variables ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         private double base_xp_value = 0;
@@ -50,6 +54,18 @@ namespace ExperienceAndClasses.Systems {
 
             //calculate xp value on base stats (uses non-expert, single-player stats)
             base_xp_value = XP.CalculateBaseXPValue(npc);
+
+            //rebalance (normal mode)
+            if (!Main.expertMode) {
+                RebalanceStats(ref npc);
+            }
+        }
+
+        public override void ScaleExpertStats(NPC npc, int numPlayers, float bossLifeScale)
+        {
+            base.ScaleExpertStats(npc, numPlayers, bossLifeScale);
+            //rebalance (expert mode)
+            RebalanceStats(ref npc);
         }
 
         public override void NPCLoot(NPC npc) {
@@ -80,6 +96,15 @@ namespace ExperienceAndClasses.Systems {
         }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Methods ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+        private void RebalanceStats(ref NPC npc)
+        {
+            if (Rebalance)
+            {
+                npc.damage *= 2;
+                npc.lifeMax *= 2;
+            }
+        }
 
         /// <summary>
         /// Returns a list of player indices for all players eligible for rewards.

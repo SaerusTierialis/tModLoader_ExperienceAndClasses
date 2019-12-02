@@ -55,12 +55,18 @@ namespace ExperienceAndClasses {
         //Attributes
         [Header("$Mods.ExperienceAndClasses.Common.Config_Header_Attrbutes")]
 
+        [Label("$Mods.ExperienceAndClasses.Common.Config_Rebalance_Mode_Label")]
+        [Tooltip("$Mods.ExperienceAndClasses.Common.Config_Rebalance_Mode_Tooltip")]
+        [DefaultValue(true)]
+        public bool RebalanceMode { get; set; }
+
         [Label("$Mods.ExperienceAndClasses.Common.Config_Attribute_Effect_Label")]
         [Tooltip("$Mods.ExperienceAndClasses.Common.Config_Attribute_Effect_Tooltip")]
         [Range(0f, 10f)]
         [Increment(0.1f)]
         [DefaultValue(1f)]
         public float AttributeEffect { get; set; }
+
 
 
         //AFK
@@ -104,7 +110,15 @@ namespace ExperienceAndClasses {
         }
 
         public override void OnChanged() {
+            //attribute multiplier
             Systems.Attribute.ATTRIBUTE_BONUS_MULTIPLIER = AttributeEffect;
+            if (!RebalanceMode)
+            {
+                Systems.Attribute.ATTRIBUTE_BONUS_MULTIPLIER *= 0.1f;
+            }
+
+            //rebalance npcs
+            Systems.NPCRewards.Rebalance = RebalanceMode;
         }
 
     }
