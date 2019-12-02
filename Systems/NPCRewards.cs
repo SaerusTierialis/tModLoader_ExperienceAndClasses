@@ -101,8 +101,9 @@ namespace ExperienceAndClasses.Systems {
         {
             if (Rebalance)
             {
-                npc.damage *= 2;
-                npc.lifeMax *= 2;
+                double scale = 1.0 + Math.Min(1.0, base_xp_value / 15.0);
+                npc.damage = (int)Math.Ceiling(npc.damage * scale);
+                npc.lifeMax = (int)Math.Ceiling(npc.lifeMax * scale);
             }
         }
 
