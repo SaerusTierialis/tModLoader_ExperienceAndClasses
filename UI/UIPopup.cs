@@ -299,7 +299,7 @@ namespace ExperienceAndClasses.UI {
             string points_values = "";
 
             points += Language.GetTextValue("Mods.ExperienceAndClasses.Common.UI_Attribute_Calc_ZeroPoint") + ":\n";
-            points_values += "-" + sheet.Zero_Point + "\n";
+            points_values += "-" + sheet.Zero_Point + " (" + Language.GetTextValue("Mods.ExperienceAndClasses.Common.UI_Attribute_Calc_ZeroPoint_Desciption") + ")\n";
 
             points += Language.GetTextValue("Mods.ExperienceAndClasses.Common.UI_Attribute_Calc_FromAllocate") + ":\n";
             points_values += "  " + sheet.Allocated[attribute.ID_num] + "\n";

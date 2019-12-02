@@ -277,6 +277,7 @@ Common.PowerScaling_SetFail_InCombat={$Mods.ExperienceAndClasses.Common.Attribut
 
 //Attribute Point Calculation
 Common.UI_Attribute_Calc_ZeroPoint=Zero Point
+Common.UI_Attribute_Calc_ZeroPoint_Desciption=based on total allocation points
 Common.UI_Attribute_Calc_FromAllocate=From Allocated
 Common.UI_Attribute_Calc_FromClass=From Class(es)
 Common.UI_Attribute_Calc_FromOther=From Other
