@@ -87,6 +87,11 @@ namespace ExperienceAndClasses {
         }
 
         public override void OnEnterWorld(Player player) {
+            base.OnEnterWorld(player);
+
+            //load localized text
+            Utilities.Text.LoadLocalizedText();
+
             //Update time
             Shortcuts.UpdateTime();
 

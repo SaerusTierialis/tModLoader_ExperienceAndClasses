@@ -33,8 +33,8 @@ namespace ExperienceAndClasses.Systems {
 
         public Texture2D Texture { get; protected set; }
 
-        public string Name { get { return Language.GetTextValue("Mods.ExperienceAndClasses.Common.Ability_" + INTERNAL_NAME + "_Name"); } }
-        public string Description { get { return Language.GetTextValue("Mods.ExperienceAndClasses.Common.Ability_" + INTERNAL_NAME + "_Description"); } }
+        public string Name { get; private set; } = "?";
+        public string Description { get; private set; } = "?";
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Instance Variables ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -59,6 +59,12 @@ namespace ExperienceAndClasses.Systems {
         /// </summary>
         public void LoadTexture() {
             //TODO
+        }
+
+        public void LoadLocalizedText()
+        {
+            Name = Language.GetTextValue("Mods.ExperienceAndClasses.Common.Ability_" + INTERNAL_NAME + "_Name");
+            Description = Language.GetTextValue("Mods.ExperienceAndClasses.Common.Ability_" + INTERNAL_NAME + "_Description");
         }
 
         public float CooldownPercent() {

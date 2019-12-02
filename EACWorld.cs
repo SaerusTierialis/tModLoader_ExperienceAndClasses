@@ -47,6 +47,9 @@ namespace ExperienceAndClasses {
             for (int i = 0; i < (tiles_placed.Count / 2.0); i++) {
                 Systems.LifeSkillTile.PlaceTile(tiles_placed[count++], tiles_placed[count++]);
             }
+
+            //load localized text
+            Utilities.Text.LoadLocalizedText();
         }
 
     }

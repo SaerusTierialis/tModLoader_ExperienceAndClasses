@@ -142,13 +142,19 @@ namespace ExperienceAndClasses.Systems {
             INTERNAL_NAME = Enum.GetName(typeof(IDs), ID_num);
         }
 
-        public string Name { get { return Language.GetTextValue("Mods.ExperienceAndClasses.Common.Class_" + INTERNAL_NAME + "_Name"); } }
-        public string Description {  get { return Language.GetTextValue("Mods.ExperienceAndClasses.Common.Class_" + INTERNAL_NAME + "_Description"); } }
+        public string Name { get; private set; } = "?";
+        public string Description { get; private set; } = "?";
 
         public string Tooltip_Title {
             get {
                 return Name + " [Tier " + new string('I', Tier) + "]";
             }
+        }
+
+        public void LoadLocalizedText()
+        {
+            Name = Language.GetTextValue("Mods.ExperienceAndClasses.Common.Class_" + INTERNAL_NAME + "_Name");
+            Description = Language.GetTextValue("Mods.ExperienceAndClasses.Common.Class_" + INTERNAL_NAME + "_Description");
         }
 
         public void LoadTextureAndItem() {

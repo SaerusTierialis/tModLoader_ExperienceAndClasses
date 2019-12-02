@@ -77,7 +77,7 @@ namespace ExperienceAndClasses.Systems {
         /// </summary>
         public bool Active { get; private set; } = true;
 
-        public string Name { get { return Language.GetTextValue("Mods.ExperienceAndClasses.Common.Attribute_" + INTERNAL_NAME + "_Name"); } }
+        public string Name { get; private set; } = "?";
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Constructor ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -91,6 +91,11 @@ namespace ExperienceAndClasses.Systems {
         protected abstract void Effect(EACPlayer eacplayer, int points, bool do_effects = true);
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Instance Methods ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+        public void LoadLocalizedText()
+        {
+            Name = Language.GetTextValue("Mods.ExperienceAndClasses.Common.Attribute_" + INTERNAL_NAME + "_Name");
+        }
 
         public void ApplyEffect(EACPlayer eacplayer, int points, bool do_effects = true) {
             if (Active) {

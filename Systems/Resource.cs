@@ -28,7 +28,7 @@ namespace ExperienceAndClasses.Systems {
 
         public Texture2D Texture { get; protected set; }
 
-        public string Name { get { return Language.GetTextValue("Mods.ExperienceAndClasses.Common.Resource_" + INTERNAL_NAME + "_Name"); } }
+        public string Name { get; private set; } = "?";
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Instance Variables ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -53,6 +53,10 @@ namespace ExperienceAndClasses.Systems {
             //TODO
         }
 
+        public void LoadLocalizedText()
+        {
+            Name = Language.GetTextValue("Mods.ExperienceAndClasses.Common.Resource_" + INTERNAL_NAME + "_Name");
+        }
 
     }
 }
