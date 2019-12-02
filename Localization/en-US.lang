@@ -174,22 +174,11 @@ Common.Attribute_Reset_InCombat=Cannot reset attributes while in combat.
 Common.Attribute_Allocate_InCombat=Cannot allocate attributes while in combat.
 
 Common.Attribute_Power_Name=Power
-Common.Attribute_Power_Shortform=PWR
-
 Common.Attribute_Vitality_Name=Vitality
-Common.Attribute_Vitality_Shortform=VIT
-
 Common.Attribute_Mind_Name=Mind
-Common.Attribute_Mind_Shortform=MND
-
 Common.Attribute_Spirit_Name=Spirit
-Common.Attribute_Spirit_Shortform=SPR
-
 Common.Attribute_Agility_Name=Agility
-Common.Attribute_Agility_Shortform=AGI
-
 Common.Attribute_Dexterity_Name=Dexterity
-Common.Attribute_Dexterity_Shortform=DEX
 
 //Misc
 Common.Death_Penalty_XP=You have lost experience from death.
