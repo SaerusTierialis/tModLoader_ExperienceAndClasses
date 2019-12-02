@@ -935,8 +935,8 @@ namespace ExperienceAndClasses.Systems {
             }
         }
 
-        public class Engineer : Tier2 {
-            public Engineer() : base(IDs.Engineer) {
+        public class Engineer : Tier3 {
+            public Engineer() : base(IDs.Engineer, IDs.Tinkerer) {
                 Class_Locations[2, 7] = ID_num;
                 Colour = COLOUR_NONCOMBAT_3;
                 implementation_status = IMPLEMENTATION_STATUS.ATTRIBUTE_ONLY;
