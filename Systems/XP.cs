@@ -283,7 +283,7 @@ namespace ExperienceAndClasses.Systems {
                 xp = (npc.lifeMax / 100d) * (1d + (npc.defense / 10d)) * (1d + (npc.damage / 25d));
 
             //adjustment to keep xp approx where it was pre-revamp
-            xp *= 2.0;
+            xp *= 3.0;
 
             //special cases
             switch (npc.type) {
