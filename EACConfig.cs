@@ -105,8 +105,6 @@ namespace ExperienceAndClasses {
 
         public override void OnChanged() {
             Systems.Attribute.ATTRIBUTE_BONUS_MULTIPLIER = AttributeEffect;
-            if (Shortcuts.IS_PLAYER && Shortcuts.LOCAL_PLAYER_VALID)
-                Shortcuts.LOCAL_PLAYER.PSheet.Attributes.Apply(false);
         }
 
     }

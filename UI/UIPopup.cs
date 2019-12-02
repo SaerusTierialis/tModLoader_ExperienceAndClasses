@@ -294,7 +294,8 @@ namespace ExperienceAndClasses.UI {
             string title = attribute.Name;
 
             Systems.PlayerSheet.AttributeSheet sheet = Shortcuts.LOCAL_PLAYER.PSheet.Attributes;
-            
+
+            /*
             string points = "";
             string points_values = "";
 
@@ -318,6 +319,9 @@ namespace ExperienceAndClasses.UI {
 
             string text = points + attribute.Effect_Text;
             ShowText(source, title, text, WIDTH_ATTRIBUTE, points_values, -150f);
+            */
+
+            ShowText(source, title, attribute.LocalEffectText(), WIDTH_ATTRIBUTE);
         }
 
         public void ShowHelpText(UIElement source, string help_text, string title=null) {

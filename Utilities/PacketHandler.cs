@@ -255,7 +255,7 @@ namespace ExperienceAndClasses.Utilities {
 
                 //specific content
                 CharLevel.WritePacketBody(packet, eacplayer.PSheet.Character.Level, false);
-                Attributes.WritePacketBody(packet, eacplayer.PSheet.Attributes.Allocated_Effective);
+                Attributes.WritePacketBody(packet, eacplayer.PSheet.Attributes.Allocated);
                 Class.WritePacketBody(packet, eacplayer.PSheet.Classes.Primary.ID, eacplayer.PSheet.Classes.Primary.Level, eacplayer.PSheet.Classes.Secondary.ID, eacplayer.PSheet.Classes.Secondary.Level);
                 AFK.WritePacketBody(packet, eacplayer.PSheet.Character.AFK);
                 InCombat.WritePacketBody(packet, eacplayer.PSheet.Character.AFK);
@@ -310,7 +310,7 @@ namespace ExperienceAndClasses.Utilities {
                 }
 
                 //set
-                origin_eacplayer.PSheet.Attributes.ForceAllocatedEffective(attributes);
+                origin_eacplayer.PSheet.Attributes.ForceAllocatedAttributes(attributes);
 
                 //relay
                 if (Shortcuts.IS_SERVER) {

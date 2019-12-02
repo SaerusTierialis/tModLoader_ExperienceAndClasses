@@ -18,18 +18,6 @@ namespace ExperienceAndClasses.Systems.PlayerSheet {
         public int[] Allocated { get; protected set; } = new int[Attribute.Count];
 
         /// <summary>
-        /// Dynamic zero point
-        /// | not synced
-        /// </summary>
-        public int Zero_Point { get; protected set; } = 0;
-
-        /// <summary>
-        /// From allocated points after applying zero point
-        /// | synced
-        /// </summary>
-        public int[] Allocated_Effective { get; protected set; } = new int[Attribute.Count];
-
-        /// <summary>
         /// From active class bonuses
         /// | not synced (deterministic)
         /// </summary>
@@ -75,7 +63,7 @@ namespace ExperienceAndClasses.Systems.PlayerSheet {
 
         private void CalculateFinal() {
             for (byte i = 0; i < Attribute.Count; i++) {
-                Final[i] = Allocated_Effective[i] + From_Class[i] + Bonuses[i];
+                Final[i] = Allocated[i] + From_Class[i] + Bonuses[i];
             }
         }
 
@@ -114,7 +102,7 @@ namespace ExperienceAndClasses.Systems.PlayerSheet {
                 points--;
 
                 //recalc points
-                LocalUpdatePointsAndEffective();
+                LocalUpdateAttributePoints();
 
                 //mark success
                 any_allocated = true;
@@ -126,7 +114,7 @@ namespace ExperienceAndClasses.Systems.PlayerSheet {
                 Shortcuts.UpdateUIPSheet(PSHEET);
 
                 //sync
-                SyncAttributesEffective();
+                SyncAllocatedAttributes();
 
                 //destroy minions
                 PSHEET.eacplayer.LocalDestroyMinions();
@@ -135,16 +123,16 @@ namespace ExperienceAndClasses.Systems.PlayerSheet {
             return any_allocated;
         }
 
-        private void SyncAttributesEffective() {
+        private void SyncAllocatedAttributes() {
             if (Shortcuts.IS_CLIENT) {
                 if (PSHEET.eacplayer.Fields.Is_Local)
-                    Utilities.PacketHandler.Attributes.Send(-1, Shortcuts.WHO_AM_I, Allocated_Effective);
+                    Utilities.PacketHandler.Attributes.Send(-1, Shortcuts.WHO_AM_I, Allocated);
                 else
-                    Utilities.Logger.Error("SendPacketAttributesEffective called by non-local");
+                    Utilities.Logger.Error("SyncAllocatedAttributes called by non-local");
             }
         }
 
-        public void LocalUpdatePointsAndEffective() {
+        public void LocalUpdateAttributePoints() {
             if (PSHEET.eacplayer.Fields.Is_Local) {
                 //calculate spent + update costs for next point
                 Points_Spent = 0;
@@ -158,17 +146,9 @@ namespace ExperienceAndClasses.Systems.PlayerSheet {
 
                 //calculte remaining points
                 Points_Available = Points_Total - Points_Spent;
-
-                //recalc zero point
-                Zero_Point = Attribute.CalculateZeroPoint(PSHEET);
-
-                //apply zero point
-                for (byte i = 0; i < Attribute.Count; i++) {
-                    Allocated_Effective[i] = Allocated[i] - Zero_Point;
-                }
             }
             else {
-                Utilities.Logger.Error("LocalUpdatePointsAndEffective called by non-local");
+                Utilities.Logger.Error("LocalUpdateAttributePoints called by non-local");
             }
         }
 
@@ -217,7 +197,7 @@ namespace ExperienceAndClasses.Systems.PlayerSheet {
             Allocated = new int[Attribute.Count];
 
             //update
-            LocalUpdatePointsAndEffective();
+            LocalUpdateAttributePoints();
 
             //ui
             CalculateFinal();
@@ -225,18 +205,18 @@ namespace ExperienceAndClasses.Systems.PlayerSheet {
 
             //sync?
             if (allow_sync)
-                SyncAttributesEffective();
+                SyncAllocatedAttributes();
 
             //destroy minions
             PSHEET.eacplayer.LocalDestroyMinions();
         }
 
-        public void ForceAllocatedEffective(int[] attribute) {
+        public void ForceAllocatedAttributes(int[] attribute) {
             if (PSHEET.eacplayer.Fields.Is_Local) {
-                Utilities.Logger.Error("ForceAllocatedEffective called by local");
+                Utilities.Logger.Error("ForceAllocatedAttributes called by local");
             }
             else {
-                Allocated_Effective = attribute;
+                Allocated = attribute;
             }
         }
 
@@ -267,7 +247,7 @@ namespace ExperienceAndClasses.Systems.PlayerSheet {
             }
 
             //calculate points
-            LocalUpdatePointsAndEffective();
+            LocalUpdateAttributePoints();
 
             //calculate final
             CalculateFinal();

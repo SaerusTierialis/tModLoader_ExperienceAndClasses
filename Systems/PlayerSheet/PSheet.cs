@@ -139,7 +139,7 @@ namespace ExperienceAndClasses.Systems {
                 Attributes.Reset();
 
                 Attributes.UpdateFromClass();
-                Attributes.LocalUpdatePointsAndEffective();
+                Attributes.LocalUpdateAttributePoints();
 
                 Shortcuts.UpdateUIPSheet(this);
 

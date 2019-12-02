@@ -69,14 +69,15 @@ namespace ExperienceAndClasses.Systems {
                 increase *= Scale;
                 per_point *= Scale;
 
-                if (eacplayer.Fields.Is_Local) {
-                    foreach (string type in Types) {
-                        str += Attribute.BonusValueString(increase, "Stat_Damage_" + type, true, per_point);
-                    }
-                }
-
                 if (do_effects) {
                     Apply(eacplayer, increase);
+                }
+                else
+                {
+                    foreach (string type in Types)
+                    {
+                        str += Attribute.BonusValueString(increase, "Stat_Damage_" + type, true, per_point);
+                    }
                 }
             }
             return str;
