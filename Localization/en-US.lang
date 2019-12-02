@@ -223,6 +223,7 @@ Common.Stat_Damage_Light={$Mods.ExperienceAndClasses.Common.Damage_Type_Light} {
 Common.Stat_Damage_Harmonic={$Mods.ExperienceAndClasses.Common.Damage_Type_Harmonic} {$Mods.ExperienceAndClasses.Common.Term_Damage}
 Common.Stat_Damage_Mechanical={$Mods.ExperienceAndClasses.Common.Damage_Type_Mechanical} {$Mods.ExperienceAndClasses.Common.Term_Damage}
 Common.Stat_Damage_Other={$Mods.ExperienceAndClasses.Common.Damage_Type_Other} {$Mods.ExperienceAndClasses.Common.Term_Damage}
+Common.Stat_Damage_Dealt_Multiplier=All Damage Multiplier
 
 Common.Stat_Crit_Header=Critical Hits
 Common.Stat_Crit_All={$Mods.ExperienceAndClasses.Common.Damage_Type_All} {$Mods.ExperienceAndClasses.Common.Term_CritChance}
