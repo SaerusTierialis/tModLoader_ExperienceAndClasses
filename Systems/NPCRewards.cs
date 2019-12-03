@@ -31,6 +31,7 @@ namespace ExperienceAndClasses.Systems {
 
         private double base_xp_value = 0;
         private bool treat_as_boss = false;
+        private bool is_eow = false;
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Overrides ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -49,6 +50,7 @@ namespace ExperienceAndClasses.Systems {
                 case NPCID.EaterofWorldsBody:
                 case NPCID.EaterofWorldsTail:
                     treat_as_boss = true;
+                    is_eow = true;
                     break;
             }
 
@@ -101,11 +103,33 @@ namespace ExperienceAndClasses.Systems {
         {
             if (Rebalance)
             {
-                double scale = 2.0;
-                if (!Main.hardMode)
+                double scale = 1.0;
+
+                if (Main.hardMode)
                 {
-                    scale = 1.0 + Math.Min(1.0, base_xp_value / 15.0);
+                    //max in hardmode
+                    scale = 1.5;
                 }
+                else if (treat_as_boss)
+                {
+                    if (is_eow)
+                    {
+                        //special case for eater of worlds
+                        scale += (160.0 / 1500.0) * 0.5;
+                    }
+                    else
+                    {
+                        //scale up to WoF
+                        scale += (base_xp_value / 1500.0) * 0.5;
+                    }
+                }
+                else
+                {
+                    //non-boss in non-hardmode
+                    scale = 1.0 + (Math.Min(1.0, base_xp_value / 15.0) * 0.5);
+                }
+
+                //apply
                 npc.damage = (int)Math.Ceiling(npc.damage * scale);
                 npc.lifeMax = (int)Math.Ceiling(npc.lifeMax * scale);
             }
