@@ -274,3 +274,23 @@ Common.UI_Attribute_Calc_FromAllocate=From Allocated
 Common.UI_Attribute_Calc_FromClass=From Class(es)
 Common.UI_Attribute_Calc_FromOther=From Other
 Common.UI_Attribute_Calc_Total=Total
+
+//Class Recommended Weapon
+Common.RecommendedWeapon=Recommended Weapon:
+Common.RecommendedWeapon_Any_Name={$Mods.ExperienceAndClasses.Common.RecommendedWeapon} Any
+Common.RecommendedWeapon_Minion_Name={$Mods.ExperienceAndClasses.Common.RecommendedWeapon} Minions
+Common.RecommendedWeapon_NonMinion_Name={$Mods.ExperienceAndClasses.Common.RecommendedWeapon} Any Non-Minion
+Common.RecommendedWeapon_Projectile_Name={$Mods.ExperienceAndClasses.Common.RecommendedWeapon} Anything With Projectiles\n(swinging weapons will gain projectiles from passives)
+Common.RecommendedWeapon_Multiple_Name={$Mods.ExperienceAndClasses.Common.RecommendedWeapon} Multiple Weapons With Different Damage Types (any)
+
+//Class Category Names
+Common.ClassCategory_Novice_Name=Novice
+Common.ClassCategory_CloseCombat_Name=Close Combat
+Common.ClassCategory_Projectile_Name=Projectiles
+Common.ClassCategory_Control_Name=Mobility & Control
+Common.ClassCategory_Stealth_Name=Stealth & Trickery
+Common.ClassCategory_Minion_Name=Minion
+Common.ClassCategory_Light_Name=Light
+Common.ClassCategory_Musical_Name=Musical
+Common.ClassCategory_Mechanical_Name=Mechanical
+Common.ClassCategory_Hybrid_Name=Hybrid

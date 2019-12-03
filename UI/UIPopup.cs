@@ -269,25 +269,7 @@ namespace ExperienceAndClasses.UI {
         }
 
         public void ShowTextClass(UIElement source, Systems.PlayerClass c) {
-            string title = c.Tooltip_Title;
-
-            string text = "";
-            if (!Shortcuts.LOCAL_PLAYER.PSheet.Classes.GetClassInfo(c.ID_num).Unlocked) {
-                title += " [locked]";
-                text += "Left click for class unlock requirements.\n";
-            }
-
-            if (!Shortcuts.LOCAL_PLAYER.PSheet.Character.Secondary_Unlocked) {
-                text += "Right click for multiclass unlock requirements.\n";
-            }
-
-            if (text.Length > 0) {
-                text += "\n";
-            }
-
-            text += c.Tooltip_Main;
-
-            ShowText(source, title, text, WIDTH_CLASS, c.Tooltip_Attribute_Growth, 100f);
+            ShowText(source, c.Tooltip_Title, c.Tooltip_Main, WIDTH_CLASS, c.Tooltip_Attribute_Growth, 100f);
         }
 
         public void ShowTextAttribute(UIElement source, Systems.Attribute attribute) {

@@ -447,7 +447,7 @@ namespace ExperienceAndClasses.UI {
             
             SetPadding(0f);
 
-            icon_background = new UITransparantImage(Utilities.Textures.TEXTURE_CLASS_BACKGROUND, Systems.PlayerClass.COLOUR_DEFAULT);
+            icon_background = new UITransparantImage(Utilities.Textures.TEXTURE_CLASS_BACKGROUND, Systems.PlayerClassCategory.COLOUR_DEFAULT);
             icon_background.ImageScale = ICON_SCALE;
             icon_background.Top.Set(ICON_TOP, 0f);
             Append(icon_background);
@@ -1166,7 +1166,7 @@ namespace ExperienceAndClasses.UI {
             Width.Set(SIZE, 0f);
             Height.Set(SIZE, 0f);
 
-            icon_background = new UITransparantImage(Utilities.Textures.TEXTURE_ABILITY_BACKGROUND, Systems.PlayerClass.COLOUR_DEFAULT);
+            icon_background = new UITransparantImage(Utilities.Textures.TEXTURE_ABILITY_BACKGROUND, Systems.PlayerClassCategory.COLOUR_DEFAULT);
             Append(icon_background);
 
             icon = new UITransparantImage(Utilities.Textures.TEXTURE_BLANK, COLOUR_TRANSPARENT);
@@ -1406,7 +1406,7 @@ namespace ExperienceAndClasses.UI {
             Width.Set(SIZE, 0f);
             Height.Set(SIZE, 0f);
 
-            icon_background = new UITransparantImage(Utilities.Textures.TEXTURE_ABILITY_BACKGROUND, Systems.PlayerClass.COLOUR_DEFAULT);
+            icon_background = new UITransparantImage(Utilities.Textures.TEXTURE_ABILITY_BACKGROUND, Systems.PlayerClassCategory.COLOUR_DEFAULT);
             icon_background.ImageScale = ICON_SCALE;
             Append(icon_background);
 

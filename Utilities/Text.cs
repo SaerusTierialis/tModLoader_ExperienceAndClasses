@@ -22,6 +22,12 @@ namespace ExperienceAndClasses.Utilities
                 playerclass.LoadLocalizedText();
             }
 
+            //class categories
+            foreach (Systems.PlayerClassCategory category in Systems.PlayerClassCategory.LOOKUP)
+            {
+                category.LoadLocalizedText();
+            }
+
             //TODO - passive
             //TODO - resource
             //TODO - ability

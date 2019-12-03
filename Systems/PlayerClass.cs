@@ -7,7 +7,7 @@ using Terraria.Localization;
 using Terraria.ModLoader;
 
 namespace ExperienceAndClasses.Systems {
-    public class PlayerClass {
+    public abstract class PlayerClass {
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Constants (and readonly) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         //DO NOT CHANGE THE ORDER OF IDs
@@ -64,27 +64,6 @@ namespace ExperienceAndClasses.Systems {
         public const byte MAX_TIER = 3;
         public static readonly byte[] MAX_TIER_LEVEL = new byte[] { 0, 10, 50, 100 };
 
-        public static readonly Color COLOUR_DEFAULT = new Color(255, 255, 255);
-        private static readonly Color COLOUR_NOVICE = new Color(168, 185, 127);
-        private static readonly Color COLOUR_NONCOMBAT_2 = new Color(188, 136, 120);
-        private static readonly Color COLOUR_NONCOMBAT_3 = new Color(165, 98, 77);
-        private static readonly Color COLOUR_CLOSE_RANGE_2 = new Color(204, 89, 89);
-        private static readonly Color COLOUR_CLOSE_RANGE_3 = new Color(198, 43, 43);
-        private static readonly Color COLOUR_PROJECTILE_2 = new Color(127, 146, 255);
-        private static readonly Color COLOUR_PROJECTILE_3 = new Color(81, 107, 255);
-        private static readonly Color COLOUR_UTILITY_2 = new Color(158, 255, 255);
-        private static readonly Color COLOUR_UTILITY_3 = new Color(49, 160, 160);
-        private static readonly Color COLOUR_MINION_2 = new Color(142, 79, 142);
-        private static readonly Color COLOUR_MINION_3 = new Color(145, 37, 145);
-        private static readonly Color COLOUR_SUPPORT_2 = new Color(255, 204, 153);
-        private static readonly Color COLOUR_SUPPORT_3 = new Color(255, 174, 94);
-        private static readonly Color COLOUR_TRICKERY_2 = new Color(158, 158, 158);
-        private static readonly Color COLOUR_TRICKERY_3 = new Color(107, 107, 107);
-        private static readonly Color COLOUR_HYBRID_2 = new Color(204, 87, 138);
-        private static readonly Color COLOUR_HYBRID_3 = new Color(193, 36, 104);
-        private static readonly Color COLOUR_MUSIC_2 = new Color(34, 177, 76);
-        private static readonly Color COLOUR_MUSIC_3 = new Color(0, 128, 0);
-
         public readonly static PlayerClass[] LOOKUP;
 
         //which classes to show in ui and where
@@ -124,20 +103,21 @@ namespace ExperienceAndClasses.Systems {
 
         public bool Has_Texture { get; protected set; } = false;
         public Texture2D Texture { get; protected set; }
-        public Color Colour { get; protected set; } = COLOUR_DEFAULT;
+
+        public readonly PlayerClassCategory Category;
 
         protected IMPLEMENTATION_STATUS implementation_status = IMPLEMENTATION_STATUS.UNKNOWN;
-        protected RECOMMENDED_WEAPON recommended_weapon = RECOMMENDED_WEAPON.UNKNOWN;
 
         public Ability[] Abilities = new Ability[Ability.NUMBER_ABILITY_SLOTS_PER_CLASS];
         public Ability[] Abilities_Alt = new Ability[Ability.NUMBER_ABILITY_SLOTS_PER_CLASS];
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Instance ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-        public PlayerClass(IDs id) {
+        public PlayerClass(IDs id, PlayerClassCategory.TYPES category = PlayerClassCategory.TYPES.Novice) {
             //defaults
             ID = id;
             ID_num = (byte)id;
+            Category = PlayerClassCategory.LOOKUP[(byte)category];
 
             INTERNAL_NAME = Enum.GetName(typeof(IDs), ID_num);
         }
@@ -145,9 +125,15 @@ namespace ExperienceAndClasses.Systems {
         public string Name { get; private set; } = "?";
         public string Description { get; private set; } = "?";
 
+        public Color Colour { get
+            {
+                return Category.Colours[Tier - 1];
+            }
+        }
+
         public string Tooltip_Title {
             get {
-                return Name + " [Tier " + new string('I', Tier) + "]";
+                return Name + " [" + Category.Name + "] [Tier " + new string('I', Tier) + "]";
             }
         }
 
@@ -204,53 +190,30 @@ namespace ExperienceAndClasses.Systems {
         public string Tooltip_Main {
             get {
                 //implementation status
-                string implementation_status_text = "Implementation Status: ";
-                switch (implementation_status) {
-                    case IMPLEMENTATION_STATUS.ATTRIBUTE_ONLY:
-                        implementation_status_text += "attributes only";
-                        break;
+                string implementation_status_text = "";
+                if (implementation_status != IMPLEMENTATION_STATUS.COMPLETE)
+                {
+                    implementation_status_text = "WARNING: The implementation status for this class is ";
+                    switch (implementation_status)
+                    {
+                        case IMPLEMENTATION_STATUS.ATTRIBUTE_ONLY:
+                            implementation_status_text += "attributes only";
+                            break;
 
-                    case IMPLEMENTATION_STATUS.ATTRIBUTE_PLUS_PARTIAL_ABILITY:
-                        implementation_status_text += "some abilities/passives";
-                        break;
+                        case IMPLEMENTATION_STATUS.ATTRIBUTE_PLUS_PARTIAL_ABILITY:
+                            implementation_status_text += "some abilities/passives";
+                            break;
 
-                    case IMPLEMENTATION_STATUS.COMPLETE:
-                        implementation_status_text += "complete";
-                        break;
-
-                    case IMPLEMENTATION_STATUS.UNKNOWN:
-                    default:
-                        implementation_status_text += "unknown";
-                        break;
-                }
-
-                //recommended weapon
-                string recommended_weapon_text = "Recommended Weapon: ";
-                switch (recommended_weapon) {
-                    case RECOMMENDED_WEAPON.ANY:
-                        recommended_weapon_text += "any";
-                        break;
-
-                    case RECOMMENDED_WEAPON.MINION:
-                        recommended_weapon_text += "minion";
-                        break;
-
-                    case RECOMMENDED_WEAPON.NON_MINION:
-                        recommended_weapon_text += "non-minion";
-                        break;
-
-                    case RECOMMENDED_WEAPON.PROJECTILE:
-                        recommended_weapon_text += "any that shoot projectiles\n(swinging weapons will gain projectiles from passives)";
-                        break;
-
-                    case RECOMMENDED_WEAPON.UNKNOWN:
-                    default:
-                        recommended_weapon_text += "unknown";
-                        break;
+                        case IMPLEMENTATION_STATUS.UNKNOWN:
+                        default:
+                            implementation_status_text += "unknown";
+                            break;
+                    }
+                    implementation_status_text += "\n\n";
                 }
 
                 //set tooltip
-                string tooltip_main = implementation_status_text + "\n\n" + Description + "\n\n" + recommended_weapon_text + "\n\nAttribute Bonus Per " + Attribute.LEVELS_PER_ATTRIBUTE_POINT_PER_STAR + " Levels (★ = 1 point):";
+                string tooltip_main = implementation_status_text + Description + "\n\n" + Category.Recommended_Weapon + "\n\nAttribute Bonus Per " + Attribute.LEVELS_PER_ATTRIBUTE_POINT_PER_STAR + " Levels (★ = 1 point):";
                 bool first = true;
                 string attribute_names = "";
                 foreach (byte id in Systems.Attribute.ATTRIBUTES_UI_ORDER) {
@@ -518,7 +481,7 @@ namespace ExperienceAndClasses.Systems {
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Subtypes ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         public abstract class RealClass : PlayerClass {
-            public RealClass(IDs id) : base(id) {
+            public RealClass(IDs id, PlayerClassCategory.TYPES category) : base(id, category) {
                 Gives_Allocation_Attributes = true;
                 Has_Texture = true;
                 Enabled = true;
@@ -526,14 +489,14 @@ namespace ExperienceAndClasses.Systems {
         }
 
         public abstract class Tier1 : RealClass {
-            public Tier1(IDs id) : base(id) {
+            public Tier1(IDs id, PlayerClassCategory.TYPES category) : base(id, category) {
                 Tier = 1;
                 Max_Level = MAX_TIER_LEVEL[Tier];
             }
         }
 
         public abstract class Tier2 : RealClass {
-            public Tier2(IDs id) : base(id) {
+            public Tier2(IDs id, PlayerClassCategory.TYPES category) : base(id, category) {
                 Tier = 2;
                 Max_Level = MAX_TIER_LEVEL[Tier];
                 Prereq = LOOKUP[(byte)IDs.Novice];
@@ -545,11 +508,10 @@ namespace ExperienceAndClasses.Systems {
         }
 
         public abstract class Tier3 : RealClass {
-            public Tier3(IDs id, IDs prereq) : base(id) {
+            public Tier3(IDs id, IDs prereq) : base(id, LOOKUP[(byte)prereq].Category.ID) {
                 Tier = 3;
                 Max_Level = MAX_TIER_LEVEL[Tier];
                 Prereq = LOOKUP[(byte)prereq];
-                recommended_weapon = Prereq.recommended_weapon;
             }
 
             protected override Items.Unlock GetUnlockItem() {
@@ -573,11 +535,9 @@ namespace ExperienceAndClasses.Systems {
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Tier 1 Classes ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
         public class Novice : Tier1 {
-            public Novice() : base(IDs.Novice) {
+            public Novice() : base(IDs.Novice, PlayerClassCategory.TYPES.Novice) {
                 Class_Locations[0, 4] = ID_num;
-                Colour = COLOUR_NOVICE;
                 implementation_status = IMPLEMENTATION_STATUS.COMPLETE;
-                recommended_weapon = RECOMMENDED_WEAPON.ANY;
 
                 Attribute_Growth[(byte)Attribute.IDs.Power] = 1;
                 Attribute_Growth[(byte)Attribute.IDs.Vitality] = 1;
@@ -591,11 +551,9 @@ namespace ExperienceAndClasses.Systems {
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Tier 2 Classes ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
         public class Vanguard : Tier2 {
-            public Vanguard() : base(IDs.Vanguard) {
+            public Vanguard() : base(IDs.Vanguard, PlayerClassCategory.TYPES.CloseCombat) {
                 Class_Locations[1, 0] = ID_num;
-                Colour = COLOUR_CLOSE_RANGE_2;
                 implementation_status = IMPLEMENTATION_STATUS.ATTRIBUTE_ONLY;
-                recommended_weapon = RECOMMENDED_WEAPON.ANY;
 
                 Attribute_Growth[(byte)Attribute.IDs.Power] = 4;
                 Attribute_Growth[(byte)Attribute.IDs.Vitality] = 4;
@@ -607,11 +565,9 @@ namespace ExperienceAndClasses.Systems {
         }
 
         public class EagleEye : Tier2 {
-            public EagleEye() : base(IDs.EagleEye) {
+            public EagleEye() : base(IDs.EagleEye, PlayerClassCategory.TYPES.Projectile) {
                 Class_Locations[1, 1] = ID_num;
-                Colour = COLOUR_PROJECTILE_2;
                 implementation_status = IMPLEMENTATION_STATUS.ATTRIBUTE_ONLY;
-                recommended_weapon = RECOMMENDED_WEAPON.PROJECTILE;
 
                 Attribute_Growth[(byte)Attribute.IDs.Power] = 4;
                 Attribute_Growth[(byte)Attribute.IDs.Vitality] = 0;
@@ -623,27 +579,23 @@ namespace ExperienceAndClasses.Systems {
         }
 
         public class Traveler : Tier2 {
-            public Traveler() : base(IDs.Traveler) {
+            public Traveler() : base(IDs.Traveler, PlayerClassCategory.TYPES.Control) {
                 Class_Locations[1, 2] = ID_num;
-                Colour = COLOUR_UTILITY_2;
                 implementation_status = IMPLEMENTATION_STATUS.ATTRIBUTE_ONLY;
-                recommended_weapon = RECOMMENDED_WEAPON.ANY;
 
-                Attribute_Growth[(byte)Attribute.IDs.Power] = 0;
+                Attribute_Growth[(byte)Attribute.IDs.Power] = 1;
                 Attribute_Growth[(byte)Attribute.IDs.Vitality] = 1;
                 Attribute_Growth[(byte)Attribute.IDs.Mind] = 4;
                 Attribute_Growth[(byte)Attribute.IDs.Spirit] = 0;
                 Attribute_Growth[(byte)Attribute.IDs.Agility] = 1;
-                Attribute_Growth[(byte)Attribute.IDs.Dexterity] = 4;
+                Attribute_Growth[(byte)Attribute.IDs.Dexterity] = 3;
             }
         }
 
         public class Rogue : Tier2 {
-            public Rogue() : base(IDs.Rogue) {
+            public Rogue() : base(IDs.Rogue, PlayerClassCategory.TYPES.Stealth) {
                 Class_Locations[1, 3] = ID_num;
-                Colour = COLOUR_TRICKERY_2;
                 implementation_status = IMPLEMENTATION_STATUS.ATTRIBUTE_ONLY;
-                recommended_weapon = RECOMMENDED_WEAPON.NON_MINION;
 
                 Attribute_Growth[(byte)Attribute.IDs.Power] = 1;
                 Attribute_Growth[(byte)Attribute.IDs.Vitality] = 0;
@@ -655,11 +607,9 @@ namespace ExperienceAndClasses.Systems {
         }
 
         public class Summoner : Tier2 {
-            public Summoner() : base(IDs.Summoner) {
+            public Summoner() : base(IDs.Summoner, PlayerClassCategory.TYPES.Minion) {
                 Class_Locations[1, 4] = ID_num;
-                Colour = COLOUR_MINION_2;
                 implementation_status = IMPLEMENTATION_STATUS.ATTRIBUTE_ONLY;
-                recommended_weapon = RECOMMENDED_WEAPON.MINION;
 
                 Attribute_Growth[(byte)Attribute.IDs.Power] = 4;
                 Attribute_Growth[(byte)Attribute.IDs.Vitality] = 0;
@@ -671,11 +621,9 @@ namespace ExperienceAndClasses.Systems {
         }
 
         public class Cleric : Tier2 {
-            public Cleric() : base(IDs.Cleric) {
+            public Cleric() : base(IDs.Cleric, PlayerClassCategory.TYPES.Light) {
                 Class_Locations[1, 5] = ID_num;
-                Colour = COLOUR_SUPPORT_2;
                 implementation_status = IMPLEMENTATION_STATUS.ATTRIBUTE_ONLY;
-                recommended_weapon = RECOMMENDED_WEAPON.ANY;
 
                 Attribute_Growth[(byte)Attribute.IDs.Power] = 0;
                 Attribute_Growth[(byte)Attribute.IDs.Vitality] = 2;
@@ -687,11 +635,9 @@ namespace ExperienceAndClasses.Systems {
         }
 
         public class Bard : Tier2 {
-            public Bard() : base(IDs.Bard) {
+            public Bard() : base(IDs.Bard, PlayerClassCategory.TYPES.Musical) {
                 Class_Locations[1, 6] = ID_num;
-                Colour = COLOUR_MUSIC_2;
                 implementation_status = IMPLEMENTATION_STATUS.ATTRIBUTE_ONLY;
-                recommended_weapon = RECOMMENDED_WEAPON.ANY;
 
                 Attribute_Growth[(byte)Attribute.IDs.Power] = 2;
                 Attribute_Growth[(byte)Attribute.IDs.Vitality] = 1;
@@ -703,11 +649,9 @@ namespace ExperienceAndClasses.Systems {
         }
 
         public class Tinkerer : Tier2 {
-            public Tinkerer() : base(IDs.Tinkerer) {
+            public Tinkerer() : base(IDs.Tinkerer, PlayerClassCategory.TYPES.Mechanical) {
                 Class_Locations[1, 7] = ID_num;
-                Colour = COLOUR_NONCOMBAT_2;
                 implementation_status = IMPLEMENTATION_STATUS.ATTRIBUTE_ONLY;
-                recommended_weapon = RECOMMENDED_WEAPON.ANY;
 
                 Attribute_Growth[(byte)Attribute.IDs.Power] = 2;
                 Attribute_Growth[(byte)Attribute.IDs.Vitality] = 2;
@@ -719,11 +663,9 @@ namespace ExperienceAndClasses.Systems {
         }
 
         public class Hybrid : Tier2 {
-            public Hybrid() : base(IDs.Hybrid) {
+            public Hybrid() : base(IDs.Hybrid, PlayerClassCategory.TYPES.Hybrid) {
                 Class_Locations[1, 8] = ID_num;
-                Colour = COLOUR_HYBRID_2;
                 implementation_status = IMPLEMENTATION_STATUS.ATTRIBUTE_ONLY;
-                recommended_weapon = RECOMMENDED_WEAPON.ANY;
 
                 Attribute_Growth[(byte)Attribute.IDs.Power] = 2;
                 Attribute_Growth[(byte)Attribute.IDs.Vitality] = 2;
@@ -743,7 +685,6 @@ namespace ExperienceAndClasses.Systems {
                 //Class_Locations[3, 0] = ID_num;
                 Enabled = false;
 
-                Colour = COLOUR_CLOSE_RANGE_3;
                 implementation_status = IMPLEMENTATION_STATUS.ATTRIBUTE_ONLY;
             }
         }
@@ -751,7 +692,6 @@ namespace ExperienceAndClasses.Systems {
         public class Berserker : Tier3 {
             public Berserker() : base(IDs.Berserker, IDs.Vanguard) {
                 Class_Locations[3, 0] = ID_num;
-                Colour = COLOUR_CLOSE_RANGE_3;
                 implementation_status = IMPLEMENTATION_STATUS.ATTRIBUTE_ONLY;
 
                 Attribute_Growth[(byte)Attribute.IDs.Power] = 4;
@@ -766,7 +706,6 @@ namespace ExperienceAndClasses.Systems {
         public class Guardian : Tier3 {
             public Guardian() : base(IDs.Guardian, IDs.Vanguard) {
                 Class_Locations[2, 0] = ID_num;
-                Colour = COLOUR_CLOSE_RANGE_3;
                 implementation_status = IMPLEMENTATION_STATUS.ATTRIBUTE_ONLY;
 
                 Attribute_Growth[(byte)Attribute.IDs.Power] = 3;
@@ -781,7 +720,6 @@ namespace ExperienceAndClasses.Systems {
         public class Sharpshooter : Tier3 {
             public Sharpshooter() : base(IDs.Sharpshooter, IDs.EagleEye) {
                 Class_Locations[2, 1] = ID_num;
-                Colour = COLOUR_PROJECTILE_3;
                 implementation_status = IMPLEMENTATION_STATUS.ATTRIBUTE_ONLY;
 
                 Attribute_Growth[(byte)Attribute.IDs.Power] = 5;
@@ -796,7 +734,6 @@ namespace ExperienceAndClasses.Systems {
         public class Chrono : Tier3 {
             public Chrono() : base(IDs.Chrono, IDs.EagleEye) {
                 Class_Locations[3, 1] = ID_num;
-                Colour = COLOUR_PROJECTILE_3;
                 implementation_status = IMPLEMENTATION_STATUS.ATTRIBUTE_ONLY;
 
                 Attribute_Growth[(byte)Attribute.IDs.Power] = 3;
@@ -815,7 +752,6 @@ namespace ExperienceAndClasses.Systems {
                 //Class_Locations[3, 1] = ID_num;
                 Enabled = false;
 
-                Colour = COLOUR_PROJECTILE_3;
                 implementation_status = IMPLEMENTATION_STATUS.ATTRIBUTE_ONLY;
             }
         }
@@ -823,7 +759,6 @@ namespace ExperienceAndClasses.Systems {
         public class Controller : Tier3 {
             public Controller() : base(IDs.Controller, IDs.Traveler) {
                 Class_Locations[2, 2] = ID_num;
-                Colour = COLOUR_UTILITY_3;
                 implementation_status = IMPLEMENTATION_STATUS.ATTRIBUTE_ONLY;
 
                 Attribute_Growth[(byte)Attribute.IDs.Power] = 2;
@@ -838,7 +773,6 @@ namespace ExperienceAndClasses.Systems {
         public class Shadow : Tier3 {
             public Shadow() : base(IDs.Shadow, IDs.Rogue) {
                 Class_Locations[3, 3] = ID_num;
-                Colour = COLOUR_TRICKERY_3;
                 implementation_status = IMPLEMENTATION_STATUS.ATTRIBUTE_ONLY;
 
                 Attribute_Growth[(byte)Attribute.IDs.Power] = 3;
@@ -853,7 +787,6 @@ namespace ExperienceAndClasses.Systems {
         public class Assassin : Tier3 {
             public Assassin() : base(IDs.Assassin, IDs.Rogue) {
                 Class_Locations[2, 3] = ID_num;
-                Colour = COLOUR_TRICKERY_3;
                 implementation_status = IMPLEMENTATION_STATUS.ATTRIBUTE_ONLY;
 
                 Attribute_Growth[(byte)Attribute.IDs.Power] = 5;
@@ -868,7 +801,6 @@ namespace ExperienceAndClasses.Systems {
         public class SoulBinder : Tier3 {
             public SoulBinder() : base(IDs.SoulBinder, IDs.Summoner) {
                 Class_Locations[2, 4] = ID_num;
-                Colour = COLOUR_MINION_3;
                 implementation_status = IMPLEMENTATION_STATUS.ATTRIBUTE_ONLY;
 
                 Attribute_Growth[(byte)Attribute.IDs.Power] = 5;
@@ -883,7 +815,6 @@ namespace ExperienceAndClasses.Systems {
         public class Tactician : Tier3 {
             public Tactician() : base(IDs.Tactician, IDs.Summoner) {
                 Class_Locations[3, 4] = ID_num;
-                Colour = COLOUR_MINION_3;
                 implementation_status = IMPLEMENTATION_STATUS.ATTRIBUTE_ONLY;
 
                 Attribute_Growth[(byte)Attribute.IDs.Power] = 3;
@@ -898,7 +829,6 @@ namespace ExperienceAndClasses.Systems {
         public class Saint : Tier3 {
             public Saint() : base(IDs.Saint, IDs.Cleric) {
                 Class_Locations[2, 5] = ID_num;
-                Colour = COLOUR_SUPPORT_3;
                 implementation_status = IMPLEMENTATION_STATUS.ATTRIBUTE_ONLY;
 
                 Attribute_Growth[(byte)Attribute.IDs.Power] = 3;
@@ -913,7 +843,6 @@ namespace ExperienceAndClasses.Systems {
         public class Oracle : Tier3 {
             public Oracle() : base(IDs.Oracle, IDs.Cleric) {
                 Class_Locations[3, 5] = ID_num;
-                Colour = COLOUR_SUPPORT_3;
                 implementation_status = IMPLEMENTATION_STATUS.ATTRIBUTE_ONLY;
 
                 Attribute_Growth[(byte)Attribute.IDs.Power] = 0;
@@ -928,7 +857,6 @@ namespace ExperienceAndClasses.Systems {
         public class Minstrel : Tier3 {
             public Minstrel() : base(IDs.Minstrel, IDs.Bard) {
                 Class_Locations[2, 6] = ID_num;
-                Colour = COLOUR_MUSIC_3;
                 implementation_status = IMPLEMENTATION_STATUS.ATTRIBUTE_ONLY;
 
                 Attribute_Growth[(byte)Attribute.IDs.Power] = 3;
@@ -944,9 +872,7 @@ namespace ExperienceAndClasses.Systems {
         public class Engineer : Tier3 {
             public Engineer() : base(IDs.Engineer, IDs.Tinkerer) {
                 Class_Locations[2, 7] = ID_num;
-                Colour = COLOUR_NONCOMBAT_3;
                 implementation_status = IMPLEMENTATION_STATUS.ATTRIBUTE_ONLY;
-                recommended_weapon = RECOMMENDED_WEAPON.ANY;
 
                 Attribute_Growth[(byte)Attribute.IDs.Power] = 3;
                 Attribute_Growth[(byte)Attribute.IDs.Vitality] = 4;
@@ -960,7 +886,6 @@ namespace ExperienceAndClasses.Systems {
         public class HybridPrime : Tier3 {
             public HybridPrime() : base(IDs.HybridPrime, IDs.Hybrid) {
                 Class_Locations[2, 8] = ID_num;
-                Colour = COLOUR_HYBRID_3;
                 implementation_status = IMPLEMENTATION_STATUS.ATTRIBUTE_ONLY;
 
                 Attribute_Growth[(byte)Attribute.IDs.Power] = 3;
