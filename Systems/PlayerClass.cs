@@ -20,7 +20,7 @@ namespace ExperienceAndClasses.Systems {
             Traveler,
             Rogue,
             Summoner,
-            Cleric,
+            Photomancer,
             Hybrid,
             BloodKnight,
             Berserker,
@@ -33,7 +33,7 @@ namespace ExperienceAndClasses.Systems {
             Assassin,
             SoulBinder,
             Tactician,
-            Saint,
+            Pulsar,
             HybridPrime,
             Tinkerer,
             Oracle,
@@ -127,7 +127,10 @@ namespace ExperienceAndClasses.Systems {
 
         public Color Colour { get
             {
-                return Category.Colours[Tier - 1];
+                if (Tier == 0)
+                    return PlayerClassCategory.COLOUR_DEFAULT;
+                else
+                    return Category.Colours[Tier - 1];
             }
         }
 
@@ -620,8 +623,8 @@ namespace ExperienceAndClasses.Systems {
             }
         }
 
-        public class Cleric : Tier2 {
-            public Cleric() : base(IDs.Cleric, PlayerClassCategory.TYPES.Light) {
+        public class Photomancer : Tier2 {
+            public Photomancer() : base(IDs.Photomancer, PlayerClassCategory.TYPES.Light) {
                 Class_Locations[1, 5] = ID_num;
                 implementation_status = IMPLEMENTATION_STATUS.ATTRIBUTE_ONLY;
 
@@ -826,8 +829,8 @@ namespace ExperienceAndClasses.Systems {
             }
         }
 
-        public class Saint : Tier3 {
-            public Saint() : base(IDs.Saint, IDs.Cleric) {
+        public class Pulsar : Tier3 {
+            public Pulsar() : base(IDs.Pulsar, IDs.Photomancer) {
                 Class_Locations[2, 5] = ID_num;
                 implementation_status = IMPLEMENTATION_STATUS.ATTRIBUTE_ONLY;
 
@@ -841,7 +844,7 @@ namespace ExperienceAndClasses.Systems {
         }
 
         public class Oracle : Tier3 {
-            public Oracle() : base(IDs.Oracle, IDs.Cleric) {
+            public Oracle() : base(IDs.Oracle, IDs.Photomancer) {
                 Class_Locations[3, 5] = ID_num;
                 implementation_status = IMPLEMENTATION_STATUS.ATTRIBUTE_ONLY;
 
