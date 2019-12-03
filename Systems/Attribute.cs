@@ -308,8 +308,8 @@ namespace ExperienceAndClasses.Systems {
 
         public class Vitality : Attribute {
             private static float PER_POINT_LIFE { get { return 2.5f * ATTRIBUTE_BONUS_MULTIPLIER; } }
-            private static float PER_POINT_LIFE_REGEN { get { return 0.1f * ATTRIBUTE_BONUS_MULTIPLIER; } }
-            private static float PER_POINT_DEFENSE { get { return 0.7f * ATTRIBUTE_BONUS_MULTIPLIER; } }
+            private static float PER_POINT_LIFE_REGEN { get { return 0.05f * ATTRIBUTE_BONUS_MULTIPLIER; } }
+            private static float PER_POINT_DEFENSE { get { return 0.35f * ATTRIBUTE_BONUS_MULTIPLIER; } }
 
             public Vitality() : base(IDs.Vitality) {}
             protected override void Effect(EACPlayer eacplayer, int points, bool do_effects = true) {
@@ -388,7 +388,7 @@ namespace ExperienceAndClasses.Systems {
         public class Agility : Attribute {
             private static float PER_POINT_MOVEMENT { get { return 0.005f * ATTRIBUTE_BONUS_MULTIPLIER; } }
             private static float PER_POINT_JUMP { get { return 0.01f * ATTRIBUTE_BONUS_MULTIPLIER; } }
-            private static float PER_POINT_DODGE { get { return 0.0025f * ATTRIBUTE_BONUS_MULTIPLIER; } }
+            private static float PER_POINT_DODGE { get { return 0.002f * ATTRIBUTE_BONUS_MULTIPLIER; } }
             private static float PER_POINT_FLY { get { return 0.5f * ATTRIBUTE_BONUS_MULTIPLIER; } }
 
             public Agility() : base(IDs.Agility) {}
