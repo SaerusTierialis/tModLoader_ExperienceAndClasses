@@ -146,6 +146,12 @@ namespace ExperienceAndClasses.UI {
             old_xp_button.visible = false;
             panel_class.Append(old_xp_button);
 
+            //class tier lines
+            DragableUIPanel panel_line = new DragableUIPanel(CLASS_WIDTH, panel_class.top_space + (CLASS_BUTTON_SIZE + CLASS_ROW_PADDING), Color.Transparent, this, false, false, false);
+            panel_class.Append(panel_line);
+            panel_line = new DragableUIPanel(CLASS_WIDTH, panel_class.top_space + (2 * (CLASS_BUTTON_SIZE + CLASS_ROW_PADDING)), Color.Transparent, this, false, false, false);
+            panel_class.Append(panel_line);
+
             //attribute panel
             DragableUIPanel panel_attribute = new DragableUIPanel(WIDTH_ATTRIBUTES, HEIGHT_ATTRIBUTES, Constants.COLOUR_SUBPANEL, this, false, false, false);
             panel_attribute.Left.Set(panel_class.Left.Pixels + panel_class.Width.Pixels - 2f, 0f);
