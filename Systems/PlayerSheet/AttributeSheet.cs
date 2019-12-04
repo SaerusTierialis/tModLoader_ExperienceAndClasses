@@ -235,7 +235,10 @@ namespace ExperienceAndClasses.Systems.PlayerSheet {
             return tag;
         }
         public void Load(TagCompound tag) {
-            Power_Scaling = PowerScaling.LOOKUP[Utilities.Commons.TagTryGet(tag, TAG_NAMES.Attributes_PowerScaling, PowerScaling.ID_NUM_DEFAULT)];
+            byte power_scaling_byte = Utilities.Commons.TagTryGet(tag, TAG_NAMES.Attributes_PowerScaling, PowerScaling.ID_NUM_DEFAULT);
+            if (power_scaling_byte >= (byte)PowerScaling.IDs.NUMBER_OF_IDs)
+                power_scaling_byte = PowerScaling.ID_NUM_DEFAULT;
+            Power_Scaling = PowerScaling.LOOKUP[power_scaling_byte];
 
             Allocated = Utilities.Commons.TagLoadListAsArray<int>(tag, TAG_NAMES.Attributes_Allocated, Attribute.Count);
 

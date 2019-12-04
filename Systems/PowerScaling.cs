@@ -13,9 +13,7 @@ namespace ExperienceAndClasses.Systems {
             RangedThrowing,
             Magic,
             Minion,
-            Light,
-            Harmonic,
-            Mechanical,
+            Ability,
             Other,
             All,
 
@@ -153,24 +151,12 @@ namespace ExperienceAndClasses.Systems {
             }
         }
 
-        public class Light : PowerScaling {
-            public Light() : base(IDs.Light, new string[] { "Light" }) { }
-            protected override void Apply(EACPlayer eacplayer, float damage_increase) {
-                eacplayer.PSheet.Stats.Damage_Light += damage_increase;
-            }
-        }
-
-        public class Harmonic : PowerScaling {
-            public Harmonic() : base(IDs.Harmonic, new string[] { "Harmonic" }) { }
-            protected override void Apply(EACPlayer eacplayer, float damage_increase) {
-                eacplayer.PSheet.Stats.Damage_Harmonic += damage_increase;
-            }
-        }
-
-        public class Mechanical : PowerScaling {
-            public Mechanical() : base(IDs.Mechanical, new string[] { "Mechanical" }) { }
-            protected override void Apply(EACPlayer eacplayer, float damage_increase) {
-                eacplayer.PSheet.Stats.Damage_Mechanical += damage_increase;
+        public class Ability : PowerScaling
+        {
+            public Ability() : base(IDs.Ability, new string[] { "Ability" }) { }
+            protected override void Apply(EACPlayer eacplayer, float damage_increase)
+            {
+                eacplayer.PSheet.Stats.Damage_Ability += damage_increase;
             }
         }
 

@@ -388,9 +388,7 @@ namespace ExperienceAndClasses.UI {
             str += Systems.Attribute.BonusValueString(eacplayer.player.thrownDamage + global_damage_add, "Stat_Damage_Throwing", true, default, default, false);
             str += Systems.Attribute.BonusValueString(eacplayer.player.magicDamage + global_damage_add, "Stat_Damage_Magic", true, default, default, false);
             str += Systems.Attribute.BonusValueString(eacplayer.player.minionDamage + global_damage_add, "Stat_Damage_Minion", true, default, default, false);
-            str += Systems.Attribute.BonusValueString(eacplayer.PSheet.Stats.Damage_Light + global_damage_add, "Stat_Damage_Light", true, default, default, false);
-            str += Systems.Attribute.BonusValueString(eacplayer.PSheet.Stats.Damage_Harmonic + global_damage_add, "Stat_Damage_Harmonic", true, default, default, false);
-            str += Systems.Attribute.BonusValueString(eacplayer.PSheet.Stats.Damage_Mechanical + global_damage_add, "Stat_Damage_Mechanical", true, default, default, false);
+            str += Systems.Attribute.BonusValueString(eacplayer.PSheet.Stats.Damage_Ability + global_damage_add, "Stat_Damage_Ability", true, default, default, false);
             str += Systems.Attribute.BonusValueString(eacplayer.PSheet.Stats.Damage_Other_Add + global_damage_add, "Stat_Damage_Other", true, default, default, true);
 
             if (str.Length > 0) str += "\n\n";
@@ -415,9 +413,7 @@ namespace ExperienceAndClasses.UI {
             str += Systems.Attribute.BonusValueString(eacplayer.player.thrownCrit / 100f + global_crit_chance, "Stat_Crit_Throwing", true, default, default, false);
             str += Systems.Attribute.BonusValueString(eacplayer.player.magicCrit / 100f + global_crit_chance, "Stat_Crit_Magic", true, default, default, false);
             str += Systems.Attribute.BonusValueString(global_crit_chance + Systems.Combat.BASE_CRIT_MINION, "Stat_Crit_Minion", true, default, default, false);
-            str += Systems.Attribute.BonusValueString(global_crit_chance + Systems.Combat.BASE_CRIT_LIGHT, "Stat_Crit_Light", true, default, default, false);
-            str += Systems.Attribute.BonusValueString(global_crit_chance + Systems.Combat.BASE_CRIT_HARMONIC, "Stat_Crit_Harmonic", true, default, default, false);
-            str += Systems.Attribute.BonusValueString(global_crit_chance + Systems.Combat.BASE_CRIT_MECHANICAL, "Stat_Crit_Mechanical", true, default, default, false);
+            str += Systems.Attribute.BonusValueString(global_crit_chance + Systems.Combat.BASE_CRIT_ABILITY, "Stat_Crit_Ability", true, default, default, false);
             str += Systems.Attribute.BonusValueString(global_crit_chance, "Stat_Crit_Other", true, default, default, true);
 
             if (str.Length > 0) str += "\n\n";

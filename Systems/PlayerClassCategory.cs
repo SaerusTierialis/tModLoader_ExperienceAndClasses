@@ -20,7 +20,7 @@ namespace ExperienceAndClasses.Systems
             Control,
             Stealth,
             Minion,
-            Light,
+            Eclipse,
             Musical,
             Mechanical,
             Hybrid,
@@ -138,12 +138,12 @@ namespace ExperienceAndClasses.Systems
             }
         }
 
-        public class Light : PlayerClassCategory
+        public class Eclipse : PlayerClassCategory
         {
-            public Light() : base(TYPES.Light, RECOMMENDED_WEAPON.Any)
+            public Eclipse() : base(TYPES.Eclipse, RECOMMENDED_WEAPON.Any)
             {
-                Colours[1] = new Color(255, 204, 153);
-                Colours[2] = new Color(255, 174, 94);
+                Colours[1] = new Color(185, 185, 185);
+                Colours[2] = new Color(225, 225, 225);
             }
         }
 

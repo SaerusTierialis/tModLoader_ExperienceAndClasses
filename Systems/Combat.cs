@@ -9,9 +9,7 @@ namespace ExperienceAndClasses.Systems {
     class Combat {
         public const double SECONDS_IN_COMBAT = 10;
         public const float BASE_CRIT_MINION = 0.04f;
-        public const float BASE_CRIT_LIGHT = 0.04f;
-        public const float BASE_CRIT_HARMONIC = 0.04f;
-        public const float BASE_CRIT_MECHANICAL = 0.04f;
+        public const float BASE_CRIT_ABILITY = 0.04f;
 
         public class DamageSource {
             public readonly bool Is_Item;
@@ -19,7 +17,7 @@ namespace ExperienceAndClasses.Systems {
             public readonly Item Item;
             public readonly Projectile Projectile;
 
-            public DamageSource(Item item, bool is_light = false, bool is_harmonic = false, bool is_mechanical = false) {
+            public DamageSource(Item item, bool is_ability = false) {
                 Is_Item = true;
                 Is_Projectile = false;
                 Item = item;
@@ -32,12 +30,10 @@ namespace ExperienceAndClasses.Systems {
                 Throwing = item.thrown;
                 Magic = item.magic;
                 Minion = ItemIsMinionWeapon(item);
-                Light = is_light;
-                Harmonic = is_harmonic;
-                Mechanical = is_mechanical;
-                Other = Weapon && !(Melee || Ranged || Throwing || Magic || Minion || Light || Harmonic || Mechanical);
+                Ability = is_ability;
+                Other = Weapon && !(Melee || Ranged || Throwing || Magic || Minion || Ability);
             }
-            public DamageSource(Projectile proj, bool is_light = false, bool is_harmonic = false, bool is_mechanical = false) {
+            public DamageSource(Projectile proj, bool is_ability = false) {
                 Is_Item = false;
                 Is_Projectile = true;
                 Projectile = proj;
@@ -50,10 +46,8 @@ namespace ExperienceAndClasses.Systems {
                 Throwing = proj.thrown;
                 Magic = proj.magic;
                 Minion = proj.minion || proj.sentry;
-                Light = is_light;
-                Harmonic = is_harmonic;
-                Mechanical = is_mechanical;
-                Other = Weapon && !(Melee || Ranged || Throwing || Magic || Minion || Light || Harmonic || Mechanical);
+                Ability = is_ability;
+                Other = Weapon && !(Melee || Ranged || Throwing || Magic || Minion || Ability);
             }
 
             public readonly bool Tool;
@@ -63,9 +57,7 @@ namespace ExperienceAndClasses.Systems {
             public readonly bool Throwing;
             public readonly bool Magic;
             public readonly bool Minion;
-            public readonly bool Light;
-            public readonly bool Harmonic;
-            public readonly bool Mechanical;
+            public readonly bool Ability;
             public readonly bool Other;
 
         }
@@ -90,8 +82,7 @@ namespace ExperienceAndClasses.Systems {
                 add += eacplayer.PSheet.Stats.Damage_Other_Add;
             }
 
-            if (dsource.Light) add += (eacplayer.PSheet.Stats.Damage_Light - 1f);
-            if (dsource.Harmonic) add += (eacplayer.PSheet.Stats.Damage_Harmonic - 1f);
+            if (dsource.Ability) add += (eacplayer.PSheet.Stats.Damage_Ability - 1f);
         }
 
         public static float ModifyItemUseTime(EACPlayer eacplayer, Item item, float use_time) {
@@ -151,9 +142,7 @@ namespace ExperienceAndClasses.Systems {
             float crit_chance = eacplayer.PSheet.Stats.Crit_All;
 
             if (dsource.Minion) crit_chance += BASE_CRIT_MINION;
-            if (dsource.Light) crit_chance += BASE_CRIT_LIGHT;
-            if (dsource.Harmonic) crit_chance += BASE_CRIT_HARMONIC;
-            if (dsource.Mechanical) crit_chance += BASE_CRIT_MECHANICAL;
+            if (dsource.Ability) crit_chance += BASE_CRIT_ABILITY;
 
             return Main.rand.NextFloat(0f, 1f - adjust) < crit_chance;
         }

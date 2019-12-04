@@ -17,10 +17,10 @@ namespace ExperienceAndClasses.Systems {
             Novice,
             Vanguard,
             EagleEye,
-            Traveler,
+            Windwalker,
             Rogue,
             Summoner,
-            Photomancer,
+            Eclipse,
             Hybrid,
             BloodKnight,
             Berserker,
@@ -28,12 +28,12 @@ namespace ExperienceAndClasses.Systems {
             ProjTurretClass,
             Sharpshooter,
             Chrono,
-            Controller,
+            ForceSeer,
             Shadow,
             Assassin,
             SoulBinder,
             Tactician,
-            Pulsar,
+            Penumbra,
             HybridPrime,
             Tinkerer,
             Oracle,
@@ -581,8 +581,8 @@ namespace ExperienceAndClasses.Systems {
             }
         }
 
-        public class Traveler : Tier2 {
-            public Traveler() : base(IDs.Traveler, PlayerClassCategory.TYPES.Control) {
+        public class Windwalker : Tier2 {
+            public Windwalker() : base(IDs.Windwalker, PlayerClassCategory.TYPES.Control) {
                 Class_Locations[1, 2] = ID_num;
                 implementation_status = IMPLEMENTATION_STATUS.ATTRIBUTE_ONLY;
 
@@ -623,8 +623,8 @@ namespace ExperienceAndClasses.Systems {
             }
         }
 
-        public class Photomancer : Tier2 {
-            public Photomancer() : base(IDs.Photomancer, PlayerClassCategory.TYPES.Light) {
+        public class Eclipse : Tier2 {
+            public Eclipse() : base(IDs.Eclipse, PlayerClassCategory.TYPES.Eclipse) {
                 Class_Locations[1, 5] = ID_num;
                 implementation_status = IMPLEMENTATION_STATUS.ATTRIBUTE_ONLY;
 
@@ -759,8 +759,8 @@ namespace ExperienceAndClasses.Systems {
             }
         }
 
-        public class Controller : Tier3 {
-            public Controller() : base(IDs.Controller, IDs.Traveler) {
+        public class ForceSeer : Tier3 {
+            public ForceSeer() : base(IDs.ForceSeer, IDs.Windwalker) {
                 Class_Locations[2, 2] = ID_num;
                 implementation_status = IMPLEMENTATION_STATUS.ATTRIBUTE_ONLY;
 
@@ -829,8 +829,8 @@ namespace ExperienceAndClasses.Systems {
             }
         }
 
-        public class Pulsar : Tier3 {
-            public Pulsar() : base(IDs.Pulsar, IDs.Photomancer) {
+        public class Penumbra : Tier3 {
+            public Penumbra() : base(IDs.Penumbra, IDs.Eclipse) {
                 Class_Locations[2, 5] = ID_num;
                 implementation_status = IMPLEMENTATION_STATUS.ATTRIBUTE_ONLY;
 
@@ -844,7 +844,7 @@ namespace ExperienceAndClasses.Systems {
         }
 
         public class Oracle : Tier3 {
-            public Oracle() : base(IDs.Oracle, IDs.Photomancer) {
+            public Oracle() : base(IDs.Oracle, IDs.Eclipse) {
                 Class_Locations[3, 5] = ID_num;
                 implementation_status = IMPLEMENTATION_STATUS.ATTRIBUTE_ONLY;
 
