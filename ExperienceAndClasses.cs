@@ -50,21 +50,5 @@ namespace ExperienceAndClasses
             }
         }
 
-        /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ RecipeGroup ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
-
-        public override void AddRecipeGroups() {
-            base.AddRecipeGroups();
-
-            // Creates a new recipe group
-            RecipeGroup mechanical_soul = new RecipeGroup(() => Language.GetTextValue("LegacyMisc.37") + " Mechanical Boss Soul", new int[]
-            {
-                ItemID.SoulofFright,
-                ItemID.SoulofMight,
-                ItemID.SoulofSight
-            });
-            // Registers the new recipe group with the specified name
-            RecipeGroup.RegisterGroup(Shortcuts.RECIPE_GROUP_MECHANICAL_SOUL, mechanical_soul);
-        }
-
     }
 }
