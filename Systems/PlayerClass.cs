@@ -298,8 +298,17 @@ namespace ExperienceAndClasses.Systems {
             //take item
             Shortcuts.LOCAL_PLAYER.player.ConsumeItem(Unlock_Item.item.type);
 
+            //is subclass available?
+            bool could_unlock_subclass_before = CanUnlockSubclass(psheet);
+
             //unlock class
             info.Unlock(true);
+
+            //t3 unlock for subclass
+            if (!could_unlock_subclass_before && CanUnlockSubclass(psheet))
+            {
+                Main.NewText(Language.GetTextValue("Mods.ExperienceAndClasses.Common.Unlock_Multiclass_CanUnlock"), UI.Constants.COLOUR_MESSAGE_SUCCESS);
+            }
 
             return true;
         }
@@ -452,6 +461,11 @@ namespace ExperienceAndClasses.Systems {
             return psheet.Character.Defeated_WOF;
         }
 
+        public static bool CanUnlockSubclass(PSheet psheet)
+        {
+            return psheet.Classes.Has_Any_T3();
+        }
+
         /// <summary>
         /// Try to unlock subclassing (called from UI)
         /// </summary>
@@ -466,6 +480,10 @@ namespace ExperienceAndClasses.Systems {
                 if (!Shortcuts.LOCAL_PLAYER.player.HasItem(item.type)) {
                     //item requirement not met
                     Main.NewText(Language.GetTextValue("Mods.ExperienceAndClasses.Common.Unlock_Multiclass_NoItem", item.Name), UI.Constants.COLOUR_MESSAGE_ERROR);
+                }
+                else if (!CanUnlockSubclass(Shortcuts.LOCAL_PLAYER.PSheet))
+                {
+                    Main.NewText(Language.GetTextValue("Mods.ExperienceAndClasses.Common.Unlock_Multiclass_NoT3", item.Name), UI.Constants.COLOUR_MESSAGE_ERROR);
                 }
                 else {
                     //requirements met..

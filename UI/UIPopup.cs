@@ -328,7 +328,7 @@ namespace ExperienceAndClasses.UI {
                 str += "Defeat the Wall of Flesh\n";
             }
 
-            str += c.Prereq.Name + " Level " + c.Prereq.Max_Level + "\n" + item.item.Name + "\n\nToken Recipe:\n" + item.GetRecipeString(true) + "\n(Work Bench)";
+            str += c.Prereq.Name + " Level " + c.Prereq.Max_Level + "\nx1 " + item.item.Name + "\n\nToken Recipe:\n" + item.GetRecipeString(true) + "\n(Work Bench)";
 
             mode = MODE.INPUT;
             unlock_mode = INPUT_MODE.CLASS;
@@ -340,7 +340,7 @@ namespace ExperienceAndClasses.UI {
         public void ShowUnlockSubclass(UIElement source) {
             Items.MItem item = ModContent.GetInstance<Items.Unlock_Subclass>();
 
-            string str = "Unlocking multiclassing will allow you to freely set any class as your subclass.\n\nRequirements:\nx1 " + item.item.Name + "\n\nToken Recipe:\n" + item.GetRecipeString(true) + "\n(Work Bench)";
+            string str = "Unlocking multiclassing will allow you to freely set any class as your subclass.\n\nRequirements:\nUnlock Any Tier III Class\nx1 " + item.item.Name + "\n\nToken Recipe:\n" + item.GetRecipeString(true) + "\n(Work Bench)";
 
             mode = MODE.INPUT;
             unlock_mode = INPUT_MODE.SUBCLASS;

@@ -175,6 +175,16 @@ namespace ExperienceAndClasses.Systems.PlayerSheet {
             }
         }
 
+        public bool Has_Any_T3()
+        {
+            foreach (ClassInfo cinfo in Data_Class)
+            {
+                if (cinfo.Unlocked && cinfo.Class.Enabled && cinfo.Class.Tier == 3)
+                    return true;
+            }
+            return false;
+        }
+
         public void SetDefaultClass() {
             //default class selection
             SetPrimary((byte)PlayerClass.IDs.Novice, false);
