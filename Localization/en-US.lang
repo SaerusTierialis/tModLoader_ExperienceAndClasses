@@ -139,7 +139,7 @@ Common.Class_Penumbra_Name=Penumbra
 Common.Class_Oracle_Name=Oracle
 Common.Class_Minstrel_Name=Minstrel
 Common.Class_HybridPrime_Name=Hybrid Prime
-Common.Class_Engineer_Name=Engineer
+Common.Class_Pilot_Name=Pilot
 
 //Class - Descriptions
 Common.Class_None_Description=
@@ -168,7 +168,7 @@ Common.Class_Penumbra_Description=Specializes in direct damage and healing. Deta
 Common.Class_Oracle_Description=Specializes in buffing, debuffing, and healing-over-time. Details TBD.
 Common.Class_Minstrel_Description=Further specializes in ongoing musical effects.
 Common.Class_HybridPrime_Description=Further specializes in cycling between multiple types of weapons.
-Common.Class_Engineer_Description=Further specializes in the Mech mount.
+Common.Class_Pilot_Description=Further specializes in the Mech mount.
 
 //Attributes
 Common.Attribute_Reset_Success=Attributes have been reset!

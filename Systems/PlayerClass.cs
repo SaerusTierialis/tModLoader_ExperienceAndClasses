@@ -39,7 +39,7 @@ namespace ExperienceAndClasses.Systems {
             Oracle,
             Bard,
             Minstrel,
-            Engineer,
+            Pilot,
 
             //insert here
 
@@ -890,8 +890,8 @@ namespace ExperienceAndClasses.Systems {
             }
         }
 
-        public class Engineer : Tier3 {
-            public Engineer() : base(IDs.Engineer, IDs.Tinkerer) {
+        public class Pilot : Tier3 {
+            public Pilot() : base(IDs.Pilot, IDs.Tinkerer) {
                 Class_Locations[2, 7] = ID_num;
                 implementation_status = IMPLEMENTATION_STATUS.ATTRIBUTE_ONLY;
 

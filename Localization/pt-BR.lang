@@ -135,6 +135,7 @@ Common.Class_Penumbra_Name=???
 Common.Class_Oracle_Name=Oráculo
 Common.Class_Minstrel_Name=Menestrel
 Common.Class_HybridPrime_Name=Híbrido Prime
+Common.Class_Pilot_Description=???
 
 //Class - Descriptions
 Common.Class_None_Description=
@@ -164,7 +165,7 @@ Common.Class_Penumbra_Description=TODO
 Common.Class_Oracle_Description=TODO
 Common.Class_Minstrel_Description=TODO
 Common.Class_HybridPrime_Description=TODO
-Common.Class_Engineer_Description=TODO
+Common.Class_Pilot_Description=TODO
 
 //Attributes
 Common.Attribute_Reset_Success=Os atributos foram redefinidos!
