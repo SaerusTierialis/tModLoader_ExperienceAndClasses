@@ -92,7 +92,7 @@ namespace ExperienceAndClasses.UI {
             panel.Append(panel_class);
 
             //class title
-            panel_class.SetTitle("Classes", FONT_SCALE_TITLE, true, "Left click to select primary class\nRight click to select secondary class", "Classes");
+            panel_class.SetTitle(Shortcuts.GetCommonText("UI_UIMain_Classes"), FONT_SCALE_TITLE, true, Shortcuts.GetCommonText("UI_UIMain_Classes_Help"), Shortcuts.GetCommonText("UI_UIMain_Classes"));
 
             //indicator for primary class
             Color color = Constants.COLOUR_CLASS_PRIMARY;
@@ -135,7 +135,7 @@ namespace ExperienceAndClasses.UI {
             }
 
             //old xp button
-            old_xp_button = new TextButton("Apply Legacy XP", FONT_SCALE_ATTRIBUTE, FONT_SCALE_ATTRIBUTE + 0.1f);
+            old_xp_button = new TextButton(Shortcuts.GetCommonText("UI_UIMain_AllocateLegacy"), FONT_SCALE_ATTRIBUTE, FONT_SCALE_ATTRIBUTE + 0.1f);
             old_xp_button.OnClick += new UIElement.MouseEvent(ClickPreRevampXP);
             old_xp_button.OnMouseOver += new UIElement.MouseEvent(MouseOverPreRevampXP);
             old_xp_button.OnMouseOut += new UIElement.MouseEvent(MouseOutPreRevampXP);
@@ -159,7 +159,7 @@ namespace ExperienceAndClasses.UI {
             panel.Append(panel_attribute);
 
             //attribute title
-            panel_attribute.SetTitle("Attributes", FONT_SCALE_TITLE, true, "Allocated + Class + Bonus = Final\n\nCost to increase is displayed on the right\n\nHold the Ability Alternate Effect key when clicking the add button to invest up to 10 points instead of 1", "Attribute Points");
+            panel_attribute.SetTitle(Shortcuts.GetCommonText("UI_UIMain_Attributes"), FONT_SCALE_TITLE, true, Shortcuts.GetCommonText("UI_UIMain_Attributes_Help"), Shortcuts.GetCommonText("UI_UIMain_Attributes"));
 
             //attributes
             float top = panel_attribute.top_space + Constants.UI_PADDING;
@@ -176,15 +176,15 @@ namespace ExperienceAndClasses.UI {
             }
 
             //attribute reset
-            TextButton attribute_point_reset = new TextButton("   Reset", FONT_SCALE_ATTRIBUTE, FONT_SCALE_ATTRIBUTE + 0.1f);
-            attribute_point_reset.Left.Set(Constants.UI_PADDING, 0f);
+            TextButton attribute_point_reset = new TextButton(Shortcuts.GetCommonText("UI_UIMain_Attributes_Reset"), FONT_SCALE_ATTRIBUTE, FONT_SCALE_ATTRIBUTE + 0.1f);
+            attribute_point_reset.Left.Set(Constants.UI_PADDING * 3, 0f);
             attribute_point_reset.Top.Set(top + Constants.UI_PADDING, 0f);
             attribute_point_reset.Width.Set(WIDTH_ATTRIBUTES_RESET, 0f);
             attribute_point_reset.OnClick += new UIElement.MouseEvent(ClickReset);
             panel_attribute.Append(attribute_point_reset);
 
             //attribute points
-            attribute_point_text = new HelpTextPanel("Points: 0", FONT_SCALE_ATTRIBUTE, false, "Allocation points are earned with every level and higher tier classes award more points. These are character-wide rather than tied to a specific class.", "Attribute Allocation");
+            attribute_point_text = new HelpTextPanel(Shortcuts.GetCommonText("UI_UIMain_Attributes_Points_Amount", 0), FONT_SCALE_ATTRIBUTE, false, Shortcuts.GetCommonText("UI_UIMain_Attributes_Points_Help"), Shortcuts.GetCommonText("UI_UIMain_Attributes_Points"));
             attribute_point_text.Left.Set(WIDTH_ATTRIBUTES_RESET + (Constants.UI_PADDING * 2f), 0f);
             attribute_point_text.Top.Set(top, 0f);
             attribute_point_text.Width.Set(panel_attribute.Width.Pixels - WIDTH_ATTRIBUTES_RESET - (Constants.UI_PADDING * 3f), 0f);
@@ -199,11 +199,11 @@ namespace ExperienceAndClasses.UI {
             panel.Append(panel_character);
 
             //character title
-            panel_character.SetTitle("Level", FONT_SCALE_TITLE, true, "TODO", "Level");
+            panel_character.SetTitle(Shortcuts.GetCommonText("UI_UIMain_Level"), FONT_SCALE_TITLE, true, Shortcuts.GetCommonText("UI_UIMain_Level_Help"), Shortcuts.GetCommonText("UI_UIMain_Level"));
             top = panel_character.top_space;
 
             //character level
-            label_character = new HelpTextPanel("Character", FONT_SCALE_LEVEL, false, "TODO", "Character Level", false, true);
+            label_character = new HelpTextPanel(Shortcuts.GetCommonText("UI_UIMain_Character"), FONT_SCALE_LEVEL, false, Shortcuts.GetCommonText("UI_UIMain_Character_Help"), Shortcuts.GetCommonText("UI_UIMain_Character"), false, true);
             label_character.Left.Set(Constants.UI_PADDING, 0f);
             label_character.Top.Set(top, 0f);
             top += label_character.Height.Pixels - 2 * Constants.UI_PADDING;
@@ -228,7 +228,7 @@ namespace ExperienceAndClasses.UI {
             top = label_character.Top.Pixels + label_character.Height.Pixels;
 
             //character primary level
-            label_primary = new HelpTextPanel("DEFAULT", FONT_SCALE_LEVEL, false, "TODO", "Primary Class Level", false, true);
+            label_primary = new HelpTextPanel("DEFAULT", FONT_SCALE_LEVEL, false, Shortcuts.GetCommonText("UI_UIMain_Level_Primary_Help"), Shortcuts.GetCommonText("UI_UIMain_Level_Primary"), false, true);
             label_primary.Left.Set(Constants.UI_PADDING, 0f);
             label_primary.Top.Set(top, 0f);
             top += label_primary.Height.Pixels - 2 * Constants.UI_PADDING;
@@ -253,7 +253,7 @@ namespace ExperienceAndClasses.UI {
             top = label_primary.Top.Pixels + label_primary.Height.Pixels;
 
             //character secondary level
-            label_secondary = new HelpTextPanel("DEFAULT", FONT_SCALE_LEVEL, false, "TODO", "Secondary Class Level (Effective)", false, true);
+            label_secondary = new HelpTextPanel("DEFAULT", FONT_SCALE_LEVEL, false, Shortcuts.GetCommonText("UI_UIMain_Level_Secondary_Help"), Shortcuts.GetCommonText("UI_UIMain_Level_Secondary"), false, true);
             label_secondary.Left.Set(Constants.UI_PADDING, 0f);
             label_secondary.Top.Set(top, 0f);
             top += label_secondary.Height.Pixels - 2 * Constants.UI_PADDING;
@@ -525,7 +525,7 @@ namespace ExperienceAndClasses.UI {
         }
 
         private void UpdateAttributePoints() {
-            attribute_point_text.SetText("Points: " + String.Format("{0,5}", Shortcuts.LOCAL_PLAYER.PSheet.Attributes.Points_Available));
+            attribute_point_text.SetText(Shortcuts.GetCommonText("UI_UIMain_Attributes_Points_Amount", String.Format("{0,5}", Shortcuts.LOCAL_PLAYER.PSheet.Attributes.Points_Available)));
         }
 
         //the panel behind the selected buttons prevents their use without this workaround
@@ -620,14 +620,14 @@ namespace ExperienceAndClasses.UI {
                     old_modplayer.SpendXP(xp_to_apply);
                     Systems.XP.Adjustments.LocalAddXP(xp_to_apply, false);
 
-                    Main.NewText(xp_to_apply + " legacy experience has been allocated! " + old_modplayer.GetXPAvailable() + " remains.");
+                    Main.NewText(Shortcuts.GetCommonText("UI_UIMain_AllocateLegacy_Do", xp_to_apply, old_modplayer.GetXPAvailable()));
                     MouseOverPreRevampXP(evt, listeningElement);
 
                     UpdatePreRevampXPButtonVisible();
 
                 }
                 else {
-                    Main.NewText("Cannot currently gain XP!");
+                    Main.NewText(Shortcuts.GetCommonText("UI_UIMain_AllocateLegacy_Fail"));
                 }
             }
         }
@@ -637,7 +637,7 @@ namespace ExperienceAndClasses.UI {
                 Systems.Legacy.MyPlayer old_modplayer = Main.LocalPlayer.GetModPlayer<Systems.Legacy.MyPlayer>();
                 double xp_available = old_modplayer.GetXPAvailable();
                 if (xp_available > 0) {
-                    UIPopup.Instance.ShowHelpText(old_xp_button, xp_available + " XP is available", "Legacy Redistribution");
+                    UIPopup.Instance.ShowHelpText(old_xp_button, Shortcuts.GetCommonText("UI_UIMain_AllocateLegacy_Amount", xp_available), Shortcuts.GetCommonText("UI_UIMain_AllocateLegacy"));
                 }
                 else {
                     UIPopup.Instance.EndText(old_xp_button);

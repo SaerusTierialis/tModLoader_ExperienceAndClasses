@@ -287,3 +287,40 @@ Common.ClassCategory_Eclipse_Name=Light & Dark
 Common.ClassCategory_Musical_Name=Ongoing Effects
 Common.ClassCategory_Mechanical_Name=Mechanical
 Common.ClassCategory_Hybrid_Name=Multiple Weapon Types
+
+//UI: UIMain
+Common.UI_UIMain_Classes=Classes
+Common.UI_UIMain_Classes_Help=Classes are designations that determine a player's abilities and playstyle. Each class also gains bonus attributes following a pattern of growth. Move the cursor over each class to learn more.\n\nYou may freely change your current primary class by left clicking on a class icon. Right clicking will set the current secondary class instead. If you have not unlocked the subclass system then right clicking will open the unlock dialogue.
+
+Common.UI_UIMain_AllocateLegacy=Reallocate Legacy XP
+Common.UI_UIMain_AllocateLegacy_Amount={0} XP is available for redistribution.
+Common.UI_UIMain_AllocateLegacy_Do={0} legacy XP has been allocated! {1} legacy XP remains. 
+Common.UI_UIMain_AllocateLegacy_Fail=Failed to allocated legacy XP.
+
+Common.UI_UIMain_Attributes=Attributes
+Common.UI_UIMain_Attributes_Help=TODO (describute what each number is and mention how reset works)
+Common.UI_UIMain_Attributes_Points=Attribute Allocation Points
+Common.UI_UIMain_Attributes_Points_Amount=Points: {0}
+Common.UI_UIMain_Attributes_Points_Help=Allocation points are primarily earned by raising the character level. Leveling any class also earns allocation points based on the class tier. You can level several classes to maximize these points.
+Common.UI_UIMain_Attributes_Reset=Reset
+
+Common.UI_UIMain_Abilities=Abilities
+Common.UI_UIMain_Abilities_Help=TODO
+
+Common.UI_UIMain_Level=Level
+Common.UI_UIMain_Level_Help=When a secondary class is active, you will have access to the abilities of both classes as well as a portion of their bonus attributes. The effective level of the secondary class cannot exceed half the primary class level. XP is divided between active classes.
+
+Common.UI_UIMain_Level_Primary=Primary Class Level
+Common.UI_UIMain_Level_Primary_Help=The level and tier of the primary class determines the limit on the secondary class.
+Common.UI_UIMain_Level_Secondary=Effective Secondary Class Level
+Common.UI_UIMain_Level_Secondary_Help=The secondary class level is limited based on the level and tier of the primary class.
+
+Common.UI_UIMain_Character=Character
+Common.UI_UIMain_Character_Help=Character level represents overall progression and is the main source of attribute allocation points.
+
+//UI: Attributes
+
+
+//UI: Classes
+
+
