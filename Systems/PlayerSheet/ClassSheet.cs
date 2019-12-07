@@ -316,8 +316,8 @@ namespace ExperienceAndClasses.Systems.PlayerSheet {
             }
         }
 
-        public int[] GetTierTotalLevels(bool require_gives_allocation = false) {
-            int[] totals = new int[PlayerClass.MAX_TIER + 1];
+        public float[] GetTierTotalLevels(bool require_gives_allocation = false) {
+            float[] totals = new float[PlayerClass.MAX_TIER + 1];
 
             for (byte i=0; i< PlayerClass.Count; i++) {
                 if (Data_Class[i].Valid_Class && (!require_gives_allocation || Data_Class[i].Class.Gives_Allocation_Attributes)) {

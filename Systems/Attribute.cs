@@ -170,7 +170,7 @@ namespace ExperienceAndClasses.Systems {
             sum += psheet.Character.Level * ALLOCATION_POINTS_PER_CHARACTER_LEVEL;
 
             //get class levels
-            int[] class_level_per_tier = psheet.Classes.GetTierTotalLevels(true);
+            float[] class_level_per_tier = psheet.Classes.GetTierTotalLevels(true);
 
             //points from classes
             for (byte i = 0; i < PlayerClass.MAX_TIER; i++) {
