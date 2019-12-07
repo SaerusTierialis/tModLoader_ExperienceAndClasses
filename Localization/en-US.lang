@@ -41,6 +41,7 @@ ItemTooltip.Unlock_Tier2=A token that is used to unlock any standard Tier II cla
 ItemName.Unlock_Tier3=Tier III Class Token
 ItemTooltip.Unlock_Tier3=A token that is used to unlock any Tier III class.\nClick on a class icon to open the unlock dialogue.
 ItemName.Unlock_Subclass=Subclass Token
+ItemTooltip.Unlock_Subclass=A token that is used to unlock the Subclass system.\nRight click on any class icon to open the unlock dialogue.\nThis unlock is performed just once rather than per class.\nOnce unlocked, right click a class to set it as the current subclass.
 ItemName.Potion_XP_Instant=Instant Experience Potion
 ItemTooltip.Potion_XP_Instant=Instantly gain 100 XP per character level
 ItemName.Potion_XP_Buff=Experience Rate Potion
