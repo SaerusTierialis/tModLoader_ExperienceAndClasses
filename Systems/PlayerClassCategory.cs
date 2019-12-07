@@ -79,8 +79,8 @@ namespace ExperienceAndClasses.Systems
 
         public void LoadLocalizedText()
         {
-            Name = Language.GetTextValue("Mods.ExperienceAndClasses.Common.ClassCategory_" + INTERNAL_NAME + "_Name");
-            Recommended_Weapon = Language.GetTextValue("Mods.ExperienceAndClasses.Common.RecommendedWeapon_" + recommended_weapon + "_Name");
+            Name = Shortcuts.GetCommonText("ClassCategory_" + INTERNAL_NAME + "_Name");
+            Recommended_Weapon = Shortcuts.GetCommonText("RecommendedWeapon_" + recommended_weapon + "_Name");
         }
 
         /*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ Types ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/

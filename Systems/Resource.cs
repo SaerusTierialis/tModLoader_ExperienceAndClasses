@@ -55,7 +55,7 @@ namespace ExperienceAndClasses.Systems {
 
         public void LoadLocalizedText()
         {
-            Name = Language.GetTextValue("Mods.ExperienceAndClasses.Common.Resource_" + INTERNAL_NAME + "_Name");
+            Name = Shortcuts.GetCommonText("Resource_" + INTERNAL_NAME + "_Name");
         }
 
     }

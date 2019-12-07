@@ -32,7 +32,7 @@ namespace ExperienceAndClasses.Systems {
                 if (Shortcuts.IS_SINGLEPLAYER) {
                     if (password_new != world_password) {
                         world_password = password_new;
-                        Main.NewText(Language.GetTextValue("Mods.ExperienceAndClasses.Common.Password_Display") + ":" + world_password);
+                        Main.NewText(Shortcuts.GetCommonText("Password_Display") + ":" + world_password);
                     }
                 }
                 else if (Shortcuts.IS_CLIENT && Shortcuts.LOCAL_PLAYER_VALID) {
@@ -49,13 +49,13 @@ namespace ExperienceAndClasses.Systems {
 
             public override string Command => "eac_password";
 
-            public override string Description => Language.GetTextValue("Mods.ExperienceAndClasses.Common.Password_CommandShow_Description");
+            public override string Description => Shortcuts.GetCommonText("Password_CommandShow_Description");
 
             public override void Action(CommandCaller caller, string input, string[] args) {
                 if (args.Length > 0) {
                     world_password = args[0];
                 }
-                System.Console.WriteLine(Language.GetTextValue("Mods.ExperienceAndClasses.Common.Password_Display", world_password));
+                System.Console.WriteLine(Shortcuts.GetCommonText("Password_Display", world_password));
             }
         }
 
@@ -64,7 +64,7 @@ namespace ExperienceAndClasses.Systems {
 
             public override string Command => "eac_password <pass>";
 
-            public override string Description => Language.GetTextValue("Mods.ExperienceAndClasses.Common.Password_CommandSet_Description");
+            public override string Description => Shortcuts.GetCommonText("Password_CommandSet_Description");
 
             public override void Action(CommandCaller caller, string input, string[] args) {}
         }

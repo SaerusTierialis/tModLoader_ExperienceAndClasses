@@ -101,7 +101,7 @@ namespace ExperienceAndClasses.Systems {
 
         public void LoadLocalizedText()
         {
-            Name = Language.GetTextValue("Mods.ExperienceAndClasses.Common.Attribute_" + INTERNAL_NAME + "_Name");
+            Name = Shortcuts.GetCommonText("Attribute_" + INTERNAL_NAME + "_Name");
         }
 
         public void ApplyEffect(EACPlayer eacplayer, int points, bool do_effects = true) {
@@ -190,9 +190,9 @@ namespace ExperienceAndClasses.Systems {
 
             //do reset
             if (eacplayer.PSheet.Attributes.Points_Spent <= 0)
-                Main.NewText(Language.GetTextValue("Mods.ExperienceAndClasses.Common.Attribute_Reset_NoPoints"), UI.Constants.COLOUR_MESSAGE_ERROR);
+                Main.NewText(Shortcuts.GetCommonText("Attribute_Reset_NoPoints"), UI.Constants.COLOUR_MESSAGE_ERROR);
             if (eacplayer.PSheet.Character.In_Combat)
-                Main.NewText(Language.GetTextValue("Mods.ExperienceAndClasses.Common.Attribute_Reset_InCombat"), UI.Constants.COLOUR_MESSAGE_ERROR);
+                Main.NewText(Shortcuts.GetCommonText("Attribute_Reset_InCombat"), UI.Constants.COLOUR_MESSAGE_ERROR);
             else if (held >= cost) {
                 //consume
                 for (int i = 0; i < cost; i++)
@@ -202,10 +202,10 @@ namespace ExperienceAndClasses.Systems {
                 eacplayer.PSheet.Attributes.Reset();
 
                 //message
-                Main.NewText(Language.GetTextValue("Mods.ExperienceAndClasses.Common.Attribute_Reset_Success"), UI.Constants.COLOUR_MESSAGE_SUCCESS);
+                Main.NewText(Shortcuts.GetCommonText("Attribute_Reset_Success"), UI.Constants.COLOUR_MESSAGE_SUCCESS);
             }
             else
-                Main.NewText(Language.GetTextValue("Mods.ExperienceAndClasses.Common.Attribute_Reset_Fail"), UI.Constants.COLOUR_MESSAGE_ERROR);
+                Main.NewText(Shortcuts.GetCommonText("Attribute_Reset_Fail"), UI.Constants.COLOUR_MESSAGE_ERROR);
         }
 
         /// <summary>
@@ -266,7 +266,7 @@ namespace ExperienceAndClasses.Systems {
                 str += Math.Round(value, 3);
             }
 
-            str += " " + Language.GetTextValue("Mods.ExperienceAndClasses.Common." + type) + type_suffix;
+            str += " " + Shortcuts.GetCommonText("" + type) + type_suffix;
 
             if (per_point > 0) {
                 str += " (";

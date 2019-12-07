@@ -281,19 +281,19 @@ namespace ExperienceAndClasses.UI {
             string points = "";
             string points_values = "";
 
-            points += Language.GetTextValue("Mods.ExperienceAndClasses.Common.UI_Attribute_Calc_ZeroPoint") + ":\n";
-            points_values += "-" + sheet.Zero_Point + " (" + Language.GetTextValue("Mods.ExperienceAndClasses.Common.UI_Attribute_Calc_ZeroPoint_Desciption") + ")\n";
+            points += Shortcuts.GetCommonText("UI_Attribute_Calc_ZeroPoint") + ":\n";
+            points_values += "-" + sheet.Zero_Point + " (" + Shortcuts.GetCommonText("UI_Attribute_Calc_ZeroPoint_Desciption") + ")\n";
 
-            points += Language.GetTextValue("Mods.ExperienceAndClasses.Common.UI_Attribute_Calc_FromAllocate") + ":\n";
+            points += Shortcuts.GetCommonText("UI_Attribute_Calc_FromAllocate") + ":\n";
             points_values += "  " + sheet.Allocated[attribute.ID_num] + "\n";
 
-            points += Language.GetTextValue("Mods.ExperienceAndClasses.Common.UI_Attribute_Calc_FromClass") + ":\n";
+            points += Shortcuts.GetCommonText("UI_Attribute_Calc_FromClass") + ":\n";
             points_values += "  " + sheet.From_Class[attribute.ID_num] + "\n";
 
-            points += Language.GetTextValue("Mods.ExperienceAndClasses.Common.UI_Attribute_Calc_FromOther") + ":\n";
+            points += Shortcuts.GetCommonText("UI_Attribute_Calc_FromOther") + ":\n";
             points_values += "  " + sheet.Bonuses[attribute.ID_num] + "\n";
 
-            points += Language.GetTextValue("Mods.ExperienceAndClasses.Common.UI_Attribute_Calc_Total") + ":\n";
+            points += Shortcuts.GetCommonText("UI_Attribute_Calc_Total") + ":\n";
             if (sheet.Final[attribute.ID_num] >= 0)
                 points_values += "  " + sheet.Final[attribute.ID_num] + "\n";
             else
@@ -381,7 +381,7 @@ namespace ExperienceAndClasses.UI {
 
             //damage
             float global_damage_add = eacplayer.player.allDamage - 1f;
-            str += Language.GetTextValue("Mods.ExperienceAndClasses.Common.Stat_Damage_Header");
+            str += Shortcuts.GetCommonText("Stat_Damage_Header");
             str += Systems.Attribute.BonusValueString(eacplayer.player.allDamageMult, "Stat_Damage_Dealt_Multiplier", true, default, default, false);
             str += Systems.Attribute.BonusValueString(eacplayer.player.meleeDamage + global_damage_add, "Stat_Damage_Melee", true, default, default, false);
             str += Systems.Attribute.BonusValueString(eacplayer.player.rangedDamage + global_damage_add, "Stat_Damage_Ranged", true, default, default, false);
@@ -392,21 +392,21 @@ namespace ExperienceAndClasses.UI {
             str += Systems.Attribute.BonusValueString(eacplayer.PSheet.Stats.Damage_Other_Add + global_damage_add, "Stat_Damage_Other", true, default, default, true);
 
             if (str.Length > 0) str += "\n\n";
-            str += Language.GetTextValue("Mods.ExperienceAndClasses.Common.Stat_Defensive_Header");
+            str += Shortcuts.GetCommonText("Stat_Defensive_Header");
             str += Systems.Attribute.BonusValueString(eacplayer.PSheet.Stats.Damage_Taken_Multiplier, "Stat_Damage_Taken_Multiplier", true, default, default, false);
             str += Systems.Attribute.BonusValueString(eacplayer.player.lifeRegen, "Stat_Defensive_LifeRegen", false, default, default, false);
             str += Systems.Attribute.BonusValueString(eacplayer.player.statDefense, "Stat_Defensive_Defense", false, default, default, false);
             str += Systems.Attribute.BonusValueString(eacplayer.PSheet.Stats.Dodge, "Stat_Defensive_Dodge", true, default, default, false);
 
             if (str.Length > 0) str += "\n\n";
-            str += Language.GetTextValue("Mods.ExperienceAndClasses.Common.Stat_Sheet_Disclaimer");
+            str += Shortcuts.GetCommonText("Stat_Sheet_Disclaimer");
 
             str1 = str;
             str = "";
 
             float global_crit_chance = eacplayer.PSheet.Stats.Crit_All;
             if (str.Length > 0) str += "\n\n";
-            str += Language.GetTextValue("Mods.ExperienceAndClasses.Common.Stat_Crit_Header");
+            str += Shortcuts.GetCommonText("Stat_Crit_Header");
             str += Systems.Attribute.BonusValueString(eacplayer.PSheet.Stats.Crit_Damage_Mult, "Stat_Crit_Mult", true, default, default, false);
             str += Systems.Attribute.BonusValueString(eacplayer.player.meleeCrit / 100f + global_crit_chance, "Stat_Crit_Melee", true, default, default, false);
             str += Systems.Attribute.BonusValueString(eacplayer.player.rangedCrit / 100f + global_crit_chance, "Stat_Crit_Ranged", true, default, default, false);
@@ -417,7 +417,7 @@ namespace ExperienceAndClasses.UI {
             str += Systems.Attribute.BonusValueString(global_crit_chance, "Stat_Crit_Other", true, default, default, true);
 
             if (str.Length > 0) str += "\n\n";
-            str += Language.GetTextValue("Mods.ExperienceAndClasses.Common.Stat_Mobility_Header");
+            str += Shortcuts.GetCommonText("Stat_Mobility_Header");
             str += Systems.Attribute.BonusValueString(eacplayer.player.maxRunSpeed, "Stat_Mobility_MaxRun", false, default, default, false);
             str += Systems.Attribute.BonusValueString(eacplayer.player.runAcceleration, "Stat_Mobility_RunAccel", false, default, default, false);
             str += Systems.Attribute.BonusValueString(eacplayer.player.jumpSpeedBoost, "Stat_Mobility_Jump", false, default, default, false);
@@ -427,22 +427,22 @@ namespace ExperienceAndClasses.UI {
             str = "";
 
             if (str.Length > 0) str += "\n\n";
-            str += Language.GetTextValue("Mods.ExperienceAndClasses.Common.Stat_Mana_Header");
+            str += Shortcuts.GetCommonText("Stat_Mana_Header");
             str += Systems.Attribute.BonusValueString(eacplayer.player.manaRegenBonus, "Stat_Mana_ManaRegen", false, default, default, false);
             str += Systems.Attribute.BonusValueString(eacplayer.PSheet.Stats.Mana_Regen_Delay_Reduction, "Stat_Mana_ManaRegenDelay", true, default, default, false);
 
             if (str.Length > 0) str += "\n\n";
-            str += Language.GetTextValue("Mods.ExperienceAndClasses.Common.Stat_ItemSpeed_Header");
+            str += Shortcuts.GetCommonText("Stat_ItemSpeed_Header");
             str += Systems.Attribute.BonusValueString(eacplayer.PSheet.Stats.Item_Speed_Weapon, "Stat_ItemSpeed_Weapon", true, default, default, false);
             str += Systems.Attribute.BonusValueString(1f + (1f - eacplayer.player.meleeSpeed), "Stat_ItemSpeed_Melee", true, default, default, false);
 
             if (str.Length > 0) str += "\n\n";
-            str += Language.GetTextValue("Mods.ExperienceAndClasses.Common.Stat_Abilities_Header");
+            str += Shortcuts.GetCommonText("Stat_Abilities_Header");
             str += Systems.Attribute.BonusValueString(eacplayer.PSheet.Stats.Ability_Delay_Reduction, "Stat_Abilities_Cooldown", true, default, default, false);
             str += Systems.Attribute.BonusValueString(eacplayer.PSheet.Stats.Healing_Mult, "Stat_Abilities_Healing", true, default, default, false);
 
             if (str.Length > 0) str += "\n\n";
-            str += Language.GetTextValue("Mods.ExperienceAndClasses.Common.Stat_Misc_Header");
+            str += Shortcuts.GetCommonText("Stat_Misc_Header");
             str += Systems.Attribute.BonusValueString(eacplayer.player.maxMinions, "Stat_Misc_MinionCap", false, default, default, false);
             str += Systems.Attribute.BonusValueString(2f - eacplayer.player.pickSpeed, "Stat_Misc_MiningSpeed", true, default, default, false);
             str += Systems.Attribute.BonusValueString(eacplayer.player.FishingLevel(), "Stat_Misc_FishingPower", false, default, default, false);

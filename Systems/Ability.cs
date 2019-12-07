@@ -63,8 +63,8 @@ namespace ExperienceAndClasses.Systems {
 
         public void LoadLocalizedText()
         {
-            Name = Language.GetTextValue("Mods.ExperienceAndClasses.Common.Ability_" + INTERNAL_NAME + "_Name");
-            Description = Language.GetTextValue("Mods.ExperienceAndClasses.Common.Ability_" + INTERNAL_NAME + "_Description");
+            Name = Shortcuts.GetCommonText("Ability_" + INTERNAL_NAME + "_Name");
+            Description = Shortcuts.GetCommonText("Ability_" + INTERNAL_NAME + "_Description");
         }
 
         public float CooldownPercent() {

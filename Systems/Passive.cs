@@ -74,8 +74,8 @@ namespace ExperienceAndClasses.Systems {
 
         public void LoadLocalizedText()
         {
-            Name = Language.GetTextValue("Mods.ExperienceAndClasses.Common.Passive_" + INTERNAL_NAME + "_Name");
-            Description = Language.GetTextValue("Mods.ExperienceAndClasses.Common.Passive_" + INTERNAL_NAME + "_Description");
+            Name = Shortcuts.GetCommonText("Passive_" + INTERNAL_NAME + "_Name");
+            Description = Shortcuts.GetCommonText("Passive_" + INTERNAL_NAME + "_Description");
         }
 
     }

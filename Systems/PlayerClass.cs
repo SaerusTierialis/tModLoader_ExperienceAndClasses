@@ -142,8 +142,8 @@ namespace ExperienceAndClasses.Systems {
 
         public void LoadLocalizedText()
         {
-            Name = Language.GetTextValue("Mods.ExperienceAndClasses.Common.Class_" + INTERNAL_NAME + "_Name");
-            Description = Language.GetTextValue("Mods.ExperienceAndClasses.Common.Class_" + INTERNAL_NAME + "_Description");
+            Name = Shortcuts.GetCommonText("Class_" + INTERNAL_NAME + "_Name");
+            Description = Shortcuts.GetCommonText("Class_" + INTERNAL_NAME + "_Description");
         }
 
         public void LoadTextureAndItem() {
@@ -270,7 +270,7 @@ namespace ExperienceAndClasses.Systems {
             //tier 3 requirement
             if (Tier == 3 && !CanUnlockTier3(psheet)) {
                 if (!psheet.Character.Defeated_WOF) {
-                    Main.NewText(Language.GetTextValue("Mods.ExperienceAndClasses.Common.Unlock_Class_Fail_WOF"), UI.Constants.COLOUR_MESSAGE_ERROR);
+                    Main.NewText(Shortcuts.GetCommonText("Unlock_Class_Fail_WOF"), UI.Constants.COLOUR_MESSAGE_ERROR);
                 }
                 else {
                     Utilities.Logger.Error("LocalCanUnlockTier3 returned false for unknown reasons! Please Report!");
@@ -280,7 +280,7 @@ namespace ExperienceAndClasses.Systems {
 
             //level requirements
             if (!MeetsClassPrereq(psheet)) {
-                Main.NewText(Language.GetTextValue("Mods.ExperienceAndClasses.Common.Unlock_Class_Fail_Prereq", Prereq.Max_Level, Prereq.Name, Name), UI.Constants.COLOUR_MESSAGE_ERROR);
+                Main.NewText(Shortcuts.GetCommonText("Unlock_Class_Fail_Prereq", Prereq.Max_Level, Prereq.Name, Name), UI.Constants.COLOUR_MESSAGE_ERROR);
                 return false;
             }
 
@@ -288,7 +288,7 @@ namespace ExperienceAndClasses.Systems {
             if (Unlock_Item != null) {
                 if (!Shortcuts.LOCAL_PLAYER.player.HasItem(Unlock_Item.item.type)) {
                     //item requirement not met
-                    Main.NewText(Language.GetTextValue("Mods.ExperienceAndClasses.Common.Unlock_Class_Fail_Item", Unlock_Item.item.Name, Name), UI.Constants.COLOUR_MESSAGE_ERROR);
+                    Main.NewText(Shortcuts.GetCommonText("Unlock_Class_Fail_Item", Unlock_Item.item.Name, Name), UI.Constants.COLOUR_MESSAGE_ERROR);
                     return false;
                 }
             }
@@ -307,7 +307,7 @@ namespace ExperienceAndClasses.Systems {
             //t3 unlock for subclass
             if (!could_unlock_subclass_before && CanUnlockSubclass(psheet))
             {
-                Main.NewText(Language.GetTextValue("Mods.ExperienceAndClasses.Common.Unlock_Multiclass_CanUnlock"), UI.Constants.COLOUR_MESSAGE_SUCCESS);
+                Main.NewText(Shortcuts.GetCommonText("Unlock_Multiclass_CanUnlock"), UI.Constants.COLOUR_MESSAGE_SUCCESS);
             }
 
             return true;
@@ -430,15 +430,15 @@ namespace ExperienceAndClasses.Systems {
 
                     case CLASS_VALIDITY.INVALID_COMBINATION:
                         //SetClass_Fail_Combination
-                        Main.NewText(Language.GetTextValue("Mods.ExperienceAndClasses.Common.SetClass_Fail_Combination"), UI.Constants.COLOUR_MESSAGE_ERROR);
+                        Main.NewText(Shortcuts.GetCommonText("SetClass_Fail_Combination"), UI.Constants.COLOUR_MESSAGE_ERROR);
                         break;
 
                     case CLASS_VALIDITY.INVALID_LOCKED:
-                        Main.NewText(Language.GetTextValue("Mods.ExperienceAndClasses.Common.SetClass_Fail_Locked"), UI.Constants.COLOUR_MESSAGE_ERROR);
+                        Main.NewText(Shortcuts.GetCommonText("SetClass_Fail_Locked"), UI.Constants.COLOUR_MESSAGE_ERROR);
                         break;
 
                     case CLASS_VALIDITY.INVALID_COMBAT:
-                        Main.NewText(Language.GetTextValue("Mods.ExperienceAndClasses.Common.SetClass_Fail_Combat"), UI.Constants.COLOUR_MESSAGE_ERROR);
+                        Main.NewText(Shortcuts.GetCommonText("SetClass_Fail_Combat"), UI.Constants.COLOUR_MESSAGE_ERROR);
                         break;
 
                     default:
@@ -479,11 +479,11 @@ namespace ExperienceAndClasses.Systems {
                 Item item = ModContent.GetInstance<Items.Unlock_Subclass>().item;
                 if (!Shortcuts.LOCAL_PLAYER.player.HasItem(item.type)) {
                     //item requirement not met
-                    Main.NewText(Language.GetTextValue("Mods.ExperienceAndClasses.Common.Unlock_Multiclass_NoItem", item.Name), UI.Constants.COLOUR_MESSAGE_ERROR);
+                    Main.NewText(Shortcuts.GetCommonText("Unlock_Multiclass_NoItem", item.Name), UI.Constants.COLOUR_MESSAGE_ERROR);
                 }
                 else if (!CanUnlockSubclass(Shortcuts.LOCAL_PLAYER.PSheet))
                 {
-                    Main.NewText(Language.GetTextValue("Mods.ExperienceAndClasses.Common.Unlock_Multiclass_NoT3", item.Name), UI.Constants.COLOUR_MESSAGE_ERROR);
+                    Main.NewText(Shortcuts.GetCommonText("Unlock_Multiclass_NoT3", item.Name), UI.Constants.COLOUR_MESSAGE_ERROR);
                 }
                 else {
                     //requirements met..

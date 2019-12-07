@@ -182,7 +182,7 @@ namespace ExperienceAndClasses.Systems {
                     }
 
                     //message
-                    Main.NewText(Language.GetTextValue("Mods.ExperienceAndClasses.Common.Death_Penalty_XP"), UI.Constants.COLOUR_MESSAGE_ERROR);
+                    Main.NewText(Shortcuts.GetCommonText("Death_Penalty_XP"), UI.Constants.COLOUR_MESSAGE_ERROR);
                 }
             }
 

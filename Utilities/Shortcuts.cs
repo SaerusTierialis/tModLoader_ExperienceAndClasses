@@ -241,5 +241,14 @@ namespace ExperienceAndClasses {
             }
         }
 
+        public static string GetCommonText(string key) { return GetCommonText(key, new object[0]); }
+        public static string GetCommonText(string key, object arg1) { return GetCommonText(key, new object[] { arg1 }); }
+        public static string GetCommonText(string key, object arg1, object arg2) { return GetCommonText(key, new object[] { arg1, arg2 }); }
+        public static string GetCommonText(string key, object arg1, object arg2, object arg3) { return GetCommonText(key, new object[] { arg1, arg2, arg3 }); }
+        public static string GetCommonText(string key, object[] args)
+        {
+            return Language.GetTextValue("Mods.ExperienceAndClasses.Common." + key, args);
+        }
+
     }
 }

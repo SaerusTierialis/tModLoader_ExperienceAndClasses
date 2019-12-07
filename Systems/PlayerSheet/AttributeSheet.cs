@@ -90,7 +90,7 @@ namespace ExperienceAndClasses.Systems.PlayerSheet {
 
             //allow allocate
             if (PSHEET.Character.In_Combat) {
-                Main.NewText(Language.GetTextValue("Mods.ExperienceAndClasses.Common.Attribute_Allocate_InCombat"), UI.Constants.COLOUR_MESSAGE_ERROR);
+                Main.NewText(Shortcuts.GetCommonText("Attribute_Allocate_InCombat"), UI.Constants.COLOUR_MESSAGE_ERROR);
                 return false;
             }
 
@@ -155,7 +155,7 @@ namespace ExperienceAndClasses.Systems.PlayerSheet {
         public void LocalPowerScalingNext() {
             if (PSHEET.eacplayer.Fields.Is_Local) {
                 if (PSHEET.Character.In_Combat) {
-                    Main.NewText(Language.GetTextValue("Mods.ExperienceAndClasses.Common.PowerScaling_SetFail_InCombat"), UI.Constants.COLOUR_MESSAGE_ERROR);
+                    Main.NewText(Shortcuts.GetCommonText("PowerScaling_SetFail_InCombat"), UI.Constants.COLOUR_MESSAGE_ERROR);
                 }
                 else {
                     Power_Scaling = Power_Scaling.GetNext();
@@ -170,7 +170,7 @@ namespace ExperienceAndClasses.Systems.PlayerSheet {
         public void LocalPowerScalingPrior() {
             if (PSHEET.eacplayer.Fields.Is_Local) {
                 if (PSHEET.Character.In_Combat) {
-                    Main.NewText(Language.GetTextValue("Mods.ExperienceAndClasses.Common.PowerScaling_SetFail_InCombat"), UI.Constants.COLOUR_MESSAGE_ERROR);
+                    Main.NewText(Shortcuts.GetCommonText("PowerScaling_SetFail_InCombat"), UI.Constants.COLOUR_MESSAGE_ERROR);
                 }
                 else {
                     Power_Scaling = Power_Scaling.GetPrior();

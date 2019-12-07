@@ -54,10 +54,10 @@ namespace ExperienceAndClasses.Systems.PlayerSheet {
             if (PSHEET.eacplayer.Fields.Is_Local) {
                 //show local message
                 if (afk) {
-                    Main.NewText(Language.GetTextValue("Mods.ExperienceAndClasses.Common.AFK_Start"), UI.Constants.COLOUR_MESSAGE_ERROR);
+                    Main.NewText(Shortcuts.GetCommonText("AFK_Start"), UI.Constants.COLOUR_MESSAGE_ERROR);
                 }
                 else {
-                    Main.NewText(Language.GetTextValue("Mods.ExperienceAndClasses.Common.AFK_End"), UI.Constants.COLOUR_MESSAGE_SUCCESS);
+                    Main.NewText(Shortcuts.GetCommonText("AFK_End"), UI.Constants.COLOUR_MESSAGE_SUCCESS);
                 }
 
                 //sync change
@@ -85,9 +85,9 @@ namespace ExperienceAndClasses.Systems.PlayerSheet {
         public void DefeatWOF() {
             if (PSHEET.eacplayer.Fields.Is_Local && !Defeated_WOF) {
                 Defeated_WOF = true;
-                Main.NewText(Language.GetTextValue("Mods.ExperienceAndClasses.Common.Unlock_WOF"), UI.Constants.COLOUR_MESSAGE_SUCCESS);
+                Main.NewText(Shortcuts.GetCommonText("Unlock_WOF"), UI.Constants.COLOUR_MESSAGE_SUCCESS);
                 if (PlayerClass.CanUnlockTier3(PSHEET)) {
-                    Main.NewText(Language.GetTextValue("Mods.ExperienceAndClasses.Common.Unlock_T3"), UI.Constants.COLOUR_MESSAGE_SUCCESS);
+                    Main.NewText(Shortcuts.GetCommonText("Unlock_T3"), UI.Constants.COLOUR_MESSAGE_SUCCESS);
                 }
             }
         }
@@ -95,7 +95,7 @@ namespace ExperienceAndClasses.Systems.PlayerSheet {
         public void UnlockSecondary() {
             if (!Secondary_Unlocked) {
                 Secondary_Unlocked = true;
-                Main.NewText(Language.GetTextValue("Mods.ExperienceAndClasses.Common.Unlock_Multiclass"), UI.Constants.COLOUR_MESSAGE_SUCCESS);
+                Main.NewText(Shortcuts.GetCommonText("Unlock_Multiclass"), UI.Constants.COLOUR_MESSAGE_SUCCESS);
             }
         }
 
@@ -150,7 +150,7 @@ namespace ExperienceAndClasses.Systems.PlayerSheet {
         }
 
         public string GetLevelupMessage() {
-            return Language.GetTextValue("Mods.ExperienceAndClasses.Common.Levelup_Character", PSHEET.eacplayer.player.name, Level);
+            return Shortcuts.GetCommonText("Levelup_Character", PSHEET.eacplayer.player.name, Level);
         }
 
         public void LocalResetLevel() {

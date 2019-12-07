@@ -105,7 +105,7 @@ namespace ExperienceAndClasses.Systems.PlayerSheet {
 
             public void Unlock(bool announce = true) {
                 if (!Unlocked && announce) {
-                    Main.NewText(Language.GetTextValue("Mods.ExperienceAndClasses.Common.Unlock", Class.Name), UI.Constants.COLOUR_MESSAGE_SUCCESS);
+                    Main.NewText(Shortcuts.GetCommonText("Unlock", Class.Name), UI.Constants.COLOUR_MESSAGE_SUCCESS);
                 }
 
                 //set
@@ -158,7 +158,7 @@ namespace ExperienceAndClasses.Systems.PlayerSheet {
                         Main.NewText(CONTAINER.GetLevelupMessage(ID), UI.Constants.COLOUR_MESSAGE_SUCCESS);
 
                     if ((Class.Tier < PlayerClass.MAX_TIER) && (Level == Class.Max_Level)) {
-                        Main.NewText(Language.GetTextValue("Mods.ExperienceAndClasses.Common.Unlock_Class_Prereq_Met", new string('I', Class.Tier + 1), Class.Name, Level), UI.Constants.COLOUR_MESSAGE_SUCCESS);
+                        Main.NewText(Shortcuts.GetCommonText("Unlock_Class_Prereq_Met", new string('I', Class.Tier + 1), Class.Name, Level), UI.Constants.COLOUR_MESSAGE_SUCCESS);
                     }
 
                     CONTAINER.PSHEET.Attributes.LocalUpdateAttributePoints();
@@ -194,7 +194,7 @@ namespace ExperienceAndClasses.Systems.PlayerSheet {
         }
 
         public string GetLevelupMessage(byte id) {
-            return Language.GetTextValue("Mods.ExperienceAndClasses.Common.Levelup_Class", PSHEET.eacplayer.player.name, Data_Class[id].Level, Data_Class[id].Class.Name);
+            return Shortcuts.GetCommonText("Levelup_Class", PSHEET.eacplayer.player.name, Data_Class[id].Level, Data_Class[id].Class.Name);
         }
 
         public ClassInfo GetClassInfo(byte id) {

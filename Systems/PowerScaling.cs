@@ -47,7 +47,7 @@ namespace ExperienceAndClasses.Systems {
                     if (name.Length > 0)
                         name += "/";
 
-                    name += Language.GetTextValue("Mods.ExperienceAndClasses.Common.Damage_Type_" + type);
+                    name += Shortcuts.GetCommonText("Damage_Type_" + type);
                 }
 
                 return name;
@@ -119,7 +119,7 @@ namespace ExperienceAndClasses.Systems {
             protected override void Apply(EACPlayer eacplayer, float damage_increase) {
                 eacplayer.player.allDamage += damage_increase;
             }
-            public override string Name => Language.GetTextValue("Mods.ExperienceAndClasses.Common.Damage_Type_Balanced");
+            public override string Name => Shortcuts.GetCommonText("Damage_Type_Balanced");
         }
 
         public class Melee : PowerScaling {
