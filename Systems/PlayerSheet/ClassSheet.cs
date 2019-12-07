@@ -161,6 +161,8 @@ namespace ExperienceAndClasses.Systems.PlayerSheet {
                         Main.NewText(Language.GetTextValue("Mods.ExperienceAndClasses.Common.Unlock_Class_Prereq_Met", new string('I', Class.Tier + 1), Class.Name, Level), UI.Constants.COLOUR_MESSAGE_SUCCESS);
                     }
 
+                    CONTAINER.PSHEET.Attributes.LocalUpdateAttributePoints();
+
                     CONTAINER.OnClassOrLevelChange();
                 }
                 else {
