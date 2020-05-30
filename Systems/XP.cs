@@ -226,7 +226,10 @@ namespace ExperienceAndClasses.Systems {
             }
 
             public static void AddOreXP(int x, int y, int type) {
-                Do_AddXP_TreeOre(x, y, Main.tileValue[type] / 100.0);
+                if (Shortcuts.GetConfigServer.EnableMiningXP)
+                {
+                    Do_AddXP_TreeOre(x, y, Main.tileValue[type] / 100.0);
+                }
             }
 
             private static void Do_AddXP_TreeOre(int x, int y, double xp_base) {

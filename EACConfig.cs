@@ -50,6 +50,11 @@ namespace ExperienceAndClasses {
         [DefaultValue(1000f)]
         public float RewardDistance { get; set; }
 
+        [Label("$Mods.ExperienceAndClasses.Common.Config_Reward_Enable_Mining_XP_Label")]
+        [Tooltip("$Mods.ExperienceAndClasses.Common.Config_Reward_Enable_Mining_XP_Tooltip")]
+        [DefaultValue(true)]
+        public bool EnableMiningXP { get; set; }
+
 
 
         //Attributes

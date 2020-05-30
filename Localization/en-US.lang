@@ -77,6 +77,9 @@ Common.Config_Reward_ModPerPlayer_Tooltip=Bonus to apply before splitting reward
 Common.Config_Reward_Distance_Label=Multiplayer Reward Distance
 Common.Config_Reward_Distance_Tooltip=Distance to recieve rewards in multiplayer\nPlayers who damaged the target are eligible regardless of distance\nPlayers are always eligible for boss rewards 
 
+Common.Config_Reward_Enable_Mining_XP_Label=Enable Mining XP
+Common.Config_Reward_Enable_Mining_XP_Tooltip=Disabling this is a workaround to the related XP bug
+
 Common.Config_Rebalance_Mode_Label=Rebalance Mode
 Common.Config_Rebalance_Mode_Tooltip=Attributes provide stats that are roughly equal to equipment.\nTo balance this, enemies gain up to 50% more life and damage.\nEnemy adjustments are gradually introduced based on their xp value.\n\nDisabling this mode will restore enemy defaults,\nbut decreases attribute bonuses by 90%.
 
